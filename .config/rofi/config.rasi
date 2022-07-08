@@ -1,0 +1,11 @@
+configuration {
+  display-run: " ";
+  display-drun: "  ";
+  display-window: "  ";
+  drun-display-format: "{icon} {name}";
+  font: "Bistream Vera Sans 10";
+  modi: "window,run,drun";
+  show-icons: true;
+}
+
+@theme "/home/karyana/.config/rofi/themes/minimal.rasi"
