@@ -18,59 +18,51 @@ items:
         family: Fira Code
         style: Bold Italic
       size: 11
-  - colors:
-      name: onespace (dark)
-      author: Karyana Yandi
-      primary:
-        background: '#282a36'
-        foreground: '#abb2bf'
-      cursor:
-        text: '#2c323c'
-        cursor: '#5c6370'
-      normal:
-        black: '#282c34'
-        red: '#e06c75'
-        green: '#98C379'
-        yellow: '#e5c07b'
-        blue: '#61afef'
-        magenta: '#c678dd'
-        cyan: '#56b6c2'
-        white: '#abb2bf'
-      bright:
-        black: '#282c34'
-        red: '#e06c75'
-        green: '#98C379'
-        yellow: '#e5c07b'
-        blue: '#61afef'
-        magenta: '#c678dd'
-        cyan: '#56b6c2'
-        white: '#abb2bf'
-  - theme: 3024.dark
 colors:
-  # Default colors
   primary:
-    background: '#282a36'
-    foreground: '#abb2bf'
-
-  # Normal colors
+    background: '#2e3440'
+    foreground: '#d8dee9'
+    dim_foreground: '#a5abb6'
+  cursor:
+    text: '#2e3440'
+    cursor: '#d8dee9'
+  vi_mode_cursor:
+    text: '#2e3440'
+    cursor: '#d8dee9'
+  selection:
+    text: CellForeground
+    background: '#4c566a'
+  search:
+    matches:
+      foreground: CellBackground
+      background: '#88c0d0'
+    bar:
+      background: '#434c5e'
+      foreground: '#d8dee9'
   normal:
-    black: '#575b70'
-    red: '#e06c75'
-    green: '#98C379'
-    yellow: '#e5c07b'
-    blue: '#c678dd'
-    magenta: '#ff92d0'
-    cyan: '#56B6C2'
-    white: '#e2e8f0'
-
-  # Bright colors
+    black: '#3b4252'
+    red: '#bf616a'
+    green: '#a3be8c'
+    yellow: '#ebcb8b'
+    blue: '#81a1c1'
+    magenta: '#b48ead'
+    cyan: '#88c0d0'
+    white: '#e5e9f0'
   bright:
-    black: '#575b70'
-    red: '#E06C75'
-    green: '#98C379'
-    yellow: '#E5C07B'
-    blue: '#C678DD'
-    magenta: '#ff92d0'
-    cyan: '#56B6C2'
-    white: '#e2e8f0'
-theme: OneSpace
+    black: '#4c566a'
+    red: '#bf616a'
+    green: '#a3be8c'
+    yellow: '#ebcb8b'
+    blue: '#81a1c1'
+    magenta: '#b48ead'
+    cyan: '#8fbcbb'
+    white: '#eceff4'
+  dim:
+    black: '#373e4d'
+    red: '#94545d'
+    green: '#809575'
+    yellow: '#b29e75'
+    blue: '#68809a'
+    magenta: '#8c738c'
+    cyan: '#6d96a5'
+    white: '#aeb3bb'
