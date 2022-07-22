@@ -1,6 +1,6 @@
 include "/home/karyana/.gtkrc-2.0.mine"
-gtk-theme-name="Materia"
-gtk-icon-theme-name="Tela"
+gtk-theme-name="Nordic"
+gtk-icon-theme-name="Tela Nord"
 gtk-font-name="Inter 11"
 gtk-cursor-theme-name="Adwaita"
 gtk-cursor-theme-size=0

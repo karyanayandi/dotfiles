@@ -7,6 +7,7 @@ export STARSHIP_CONFIG=~/.starship/config.toml
 alias ls "exa --group-directories-first --icons"
 alias lsl "exa --group-directories-first -lh --icons"
 alias ll "exa -al -g --icons"
+alias tree "exa --tree --level=2 --group-directories-first --icons --ignore-glob='*node_modules*'"
 alias vis "sudo nvim"
 alias font-refresh "fc-cache -fv"
 alias clone "git clone --depth 1"
@@ -19,7 +20,7 @@ alias remove "yay -Rns"
 alias clean "yay -Yc"
 alias autoclean "sudo pacman -R $(pacman -Qdtq)"
 alias pkglist "yay -Qe"
-alias update-lock "betterlockscreen -u ~/Pictures --fx dim,pixel,blur"
+alias update-lock "betterlockscreen -u ~/.wallpaper.png --fx dim,pixel,blur"
 alias update-time "sudo ntpd -qg"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
 
@@ -67,7 +68,6 @@ alias pnd "pnpm dev"
 alias pna "pnpm add"
 alias pnad "pnpm add -D"
 
-
 alias ni "npm install"
 alias nrs "npm run start"
 alias nrd "npm run dev"
@@ -80,7 +80,3 @@ set fish_key_bindings fish_default_key_bindings
 #pnpm
 set -gx PNPM_HOME "/home/karyana/.local/share/pnpm"
 set -gx PATH "$PNPM_HOME" $PATH
-
-#dvm
-# set -gx DVM_HOM  "/home/karyana/.dvm"
-# set -gx PATH "$DVM_HOME" $PATH

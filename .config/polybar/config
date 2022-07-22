@@ -8,9 +8,9 @@ margin-top = 5
 margin-bottom = 5
 
 [colors]
-background = #282c34
-foreground = #abb2bf
-foreground-alt = #e2e8f0
+background = #2e3440
+foreground = #d8dee9
+foreground-alt = #eceff4
 
 [bar/mainbar]
 enable-ipc=true
@@ -32,7 +32,7 @@ module-margin-right = 3
 dpi-x = 96
 dpi-y = 96
 font-0 = Inter:pixelsize=9;2
-font-1 = SF Mono:style=Regular:size=12;3
+font-1 = Inter Mono:style=Regular:size=12;3
 font-2 = siji:pixelsize=13;2
 font-3 = Fira Code Nerd Font:style=Extra Bold,Regular:size=13;2
 bottom = false

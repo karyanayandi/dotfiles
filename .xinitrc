@@ -56,7 +56,6 @@ eval $(/usr/bin/gnome-keyring-daemon --start)
 export SSH_AUTH_SOCK
 mkdir -p "$HOME"/.local/share/keyrings
 
-#hsetroot -full ~/Pictures/wallpaper.jpg
 xsetroot -cursor_name left_ptr
 xset b off
 xset r rate 250 25
@@ -68,7 +67,7 @@ setxkbmap -option caps:swapescape
 devmon &
 xsettingsd &
 dunst &
-betterlockscreen -u ~/Pictures
+betterlockscreen -u ~/.wallpaper.png
 betterlockscreen -w dim
 
 # start i3 and keep it running

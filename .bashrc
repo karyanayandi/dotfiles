@@ -1,15 +1,11 @@
 eval "$(starship init bash)"
 eval "$(fnm env --use-on-cd)"
 
-#dvm
-export DVM_DIR="$HOME/.dvm"
-export PATH="$PATH:$DVM_BIN"
-[ -f "$DVM_DIR/dvm.sh" ] && . "$DVM_DIR/dvm.sh"
-
 #Aliases
 alias ls="exa --group-directories-first --icons"
 alias lsl="exa --group-directories-first -lh --icons"
 alias ll="exa -al -g --icons"
+alias tree="exa --tree --level=2 --group-directories-first --icons --ignore-glob='*node_modules*'"
 alias vis="sudo nvim"
 alias font-refresh="fc-cache -fv"
 alias clone="git clone --depth 1"
@@ -23,7 +19,7 @@ alias clean="yay -Yc"
 alias autoclean="sudo pacman -R $(pacman -Qdtq)"
 alias autoremove="sudo apt-get autoremove"
 alias pkglist="yay -Qe"
-alias update-lock="betterlockscreen -u ~/Pictures/Wallpapers/ --fx dim,pixel,blur"
+alias update-lock="betterlockscreen -u ~/.wallpaper.png --fx dim,pixel,blur"
 alias update-time="sudo ntpd -qg"
 alias refresh-mirror="sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
 
@@ -76,6 +72,3 @@ alias nrs="npm run start"
 alias nrd="npm run dev"
 alias nid="npm install --save-dev"
 alias nig="npm install --location=global"
-
-
-

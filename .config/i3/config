@@ -80,7 +80,7 @@ exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart
 exec --no-startup-id picom --experimental-backends -b 
 
 #set wallpaper:
-exec --no-startup-id feh --bg-scale ~/.wallpaper.jpg
+exec --no-startup-id feh --bg-center ~/.wallpaper.png
 
 #set powersavings for display:
 exec --no-startup-id xset s 480 dpms 600 600 600
@@ -92,6 +92,7 @@ for_window [class="Screeny" instance="screeny"] floating enable
 for_window [class="Feh" instance="feh"] floating enable
 for_window [class="Viewnior" instance="viewnior"] floating enable
 for_window [class="mpv"] floating enable
+for_window [class="Archive Manager"] floating enable
 
 
 # resize floating windows with mouse scroll:
