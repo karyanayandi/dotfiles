@@ -77,10 +77,10 @@ bindsym $mod+a focus parent
 exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart
 
 #set compositor
-exec --no-startup-id picom --experimental-backends -b 
+exec --no-startup-id picom -b 
 
 #set wallpaper:
-exec --no-startup-id feh --bg-center ~/.wallpaper.png
+exec --no-startup-id feh --bg-center ~/.wallpaper-nijika.png
 
 #set powersavings for display:
 exec --no-startup-id xset s 480 dpms 600 600 600
@@ -196,7 +196,7 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 # App shortcuts
-bindsym $mod+b exec "/usr/bin/google-chrome-stable"
+bindsym $mod+b exec "/usr/bin/google-chrome-unstable"
 bindsym $mod+g exec "record"
 bindsym $mod+Shift+g exec "stoprec"
 #bindsym $mod+w exec "x-www-browser"

@@ -61,7 +61,7 @@ xset b off
 xset r rate 250 25
 xrdb -merge ~/.Xresources
 xrandr --output HDMI-0 --primary --mode 1920x1080 --rate 74.97 --rotate normal
-setxkbmap -option caps:swapescape
+# setxkbmap -option caps:swapescape
 
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 devmon &
@@ -69,6 +69,7 @@ xsettingsd &
 dunst &
 betterlockscreen -u ~/.wallpaper.png
 betterlockscreen -w dim
+# setxkbmap -option caps:escape
 
 # start i3 and keep it running
 if [ -f /usr/bin/i3 ]; then
