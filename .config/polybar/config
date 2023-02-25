@@ -31,8 +31,8 @@ module-margin-left = 3
 module-margin-right = 3
 dpi-x = 96
 dpi-y = 96
-font-0 = Inter:pixelsize=9;2
-font-1 = Inter Mono:style=Regular:size=12;3
+font-0 = Bitstream Vera Sans:pixelsize=9;2
+font-1 = Fira Code:pixelsize=13;2
 font-2 = siji:pixelsize=13;2
 font-3 = Fira Code Nerd Font:style=Extra Bold,Regular:size=13;2
 bottom = false

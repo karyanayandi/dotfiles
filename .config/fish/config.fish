@@ -67,6 +67,8 @@ alias pns "pnpm start"
 alias pnd "pnpm dev"
 alias pna "pnpm add"
 alias pnad "pnpm add -D"
+alias pnr "pnpm remove"
+alias pnu "pnpm up --latest"
 
 alias ni "npm install"
 alias nrs "npm run start"

@@ -8,7 +8,7 @@ smart_borders on
 
 new_window 1pixel
 
-font pango: Inter 11
+font pango: Bitstream Vera Sans 11
 
 # thin borders:
 hide_edge_borders both
@@ -80,7 +80,7 @@ exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart
 exec --no-startup-id picom -b 
 
 #set wallpaper:
-exec --no-startup-id feh --bg-center ~/.wallpaper-nijika.png
+exec --no-startup-id feh --bg-center ~/.wallpaper.png
 
 #set powersavings for display:
 exec --no-startup-id xset s 480 dpms 600 600 600
@@ -247,15 +247,15 @@ bindsym $mod+shift+space exec rofi -show run -config "~/.config/rofi/config.rasi
                 
 bindsym F9 exec rofi -modi drun -show drun -line-padding 4 \
                 -columns 2 -padding 50 -hide-scrollbar \
-                -font "Inter 10"
+                -font "Bitstream Vera Sans 10"
 
 bindsym $mod+o exec rofi -show window -line-padding 4 \
                 -lines 6 -padding 50 -hide-scrollbar \
-                -font "Inter 10"
+                -font "Bitstream Vera Sans 10"
 
 bindsym F10 exec rofi -show window -line-padding 4 \
                 -lines 6 -padding 50 -hide-scrollbar \
-                -font "Inter 10"                
+                -font "Bitstream Vera Sans 10"                
 
 #bindsym F3 exec nmtui                
 
