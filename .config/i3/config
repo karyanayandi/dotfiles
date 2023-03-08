@@ -1,4 +1,4 @@
-set $mod Mod4
+set $mod Mod1
 
 for_window [class="^.*"] border pixel 0
 gaps inner 16

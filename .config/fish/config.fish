@@ -24,7 +24,9 @@ alias update-lock "betterlockscreen -u ~/.wallpaper.png --fx dim,pixel,blur"
 alias update-time "sudo ntpd -qg"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
 
-alias v "nvim"
+alias sshk "kitty +kitten ssh"
+
+alias e "nvim"
 alias nv "nvim"
 alias vim "nvim"
 
@@ -35,6 +37,8 @@ alias cdp "cd ~/Projects"
 alias cdd "cd ~/Database"
 alias cdo "cd ~/Downloads"
 alias cddo "cd ~/DevOps" 
+alias rm "trash-put"
+alias rmr "rm"
 
 alias vf "nvim ~/.config/fish/config.fish"
 alias sf "source ~/.config/fish/config.fish"
@@ -55,6 +59,7 @@ alias gpso "git push origin main"
 alias gplo "git pull origin main"
 alias gst "git status"
 alias glg "git log"
+alias gpr "gh pr create"
 
 alias yi "yarn install"
 alias ys "yarn start"
