@@ -3,8 +3,8 @@
 	editor = nvim
 	ignorecase = false
 [user]
-	name = Karyana Yandi
-	email = karyana@yopun.com
+	name = karyanayandi
+	email = halo@yandi.me
 [credential]
 	helper = cache --timeout=18000
 [push]

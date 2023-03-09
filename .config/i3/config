@@ -88,7 +88,8 @@ exec --no-startup-id xset s 480 dpms 600 600 600
 # set floating (nontiling)for apps needing it:
 for_window [class="Yad" instance="yad"] floating enable
 for_window [class="Pavucontrol" instance="pavucontrol"] floating enable
-for_window [class="Screeny" instance="screeny"] floating enable
+for_window [class="screenshot" instance="screenshot"] floating enable
+for_window [class="xdg-open" instance="xdg-open"] floating enable
 for_window [class="Feh" instance="feh"] floating enable
 for_window [class="Viewnior" instance="viewnior"] floating enable
 for_window [class="mpv"] floating enable
@@ -207,9 +208,9 @@ bindsym $mod+s exec "spotify"
 
 # screenshot
 #bindsym $mod+p exec --no-startup-id maim "/home/$USER/dir/data/Pictures/screenshot/$(date +%s).png"
-bindsym Print exec screeny
-bindsym $mod+p exec screeny -s
-bindsym $mod+Shift+p exec screeny -f
+bindsym Print exec screenshot
+bindsym $mod+p exec screenshot -s
+bindsym $mod+Shift+p exec screenshot -f
 #bindsym $mod+p exec --no-startup-id maim | xclip -selection Sclipboard -t image/png
 #bindsym $mod+shift+p exec --no-startup-id maim --window $(xdotool getactivewindow) | xclip -selection clipboard -t image/png
 # bindsym $mod+Shift+p exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
