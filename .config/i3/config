@@ -1,4 +1,4 @@
-set $mod Mod1
+set $mod Mod4
 
 for_window [class="^.*"] border pixel 0
 gaps inner 16
@@ -197,7 +197,7 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 # App shortcuts
-bindsym $mod+b exec "/usr/bin/google-chrome-unstable"
+bindsym $mod+b exec "/usr/bin/google-chrome-stable"
 bindsym $mod+g exec "record"
 bindsym $mod+Shift+g exec "stoprec"
 #bindsym $mod+w exec "x-www-browser"
@@ -208,7 +208,7 @@ bindsym $mod+s exec "spotify"
 
 # screenshot
 #bindsym $mod+p exec --no-startup-id maim "/home/$USER/dir/data/Pictures/screenshot/$(date +%s).png"
-bindsym Print exec screenshot
+bindsym Print exec flameshot gui
 bindsym $mod+p exec screenshot -s
 bindsym $mod+Shift+p exec screenshot -f
 #bindsym $mod+p exec --no-startup-id maim | xclip -selection Sclipboard -t image/png

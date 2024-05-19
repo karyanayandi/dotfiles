@@ -43,10 +43,10 @@ cursor-scroll = ns-resize
 
 [bar/desktop]
 inherit = bar/mainbar
-monitor = HDMI-0
+monitor = HDMI-2
 modules-left = i3 xwindow
 modules-center = 
-modules-right = pulseaudio date polypomo
+modules-right = pulseaudio eth memory date polypomo
 
 [module/i3]
 type = internal/i3
@@ -97,7 +97,7 @@ ramp-signal-foreground = ${colors.foreground-alt}
 
 [module/eth]
 type = internal/network
-interface = enp0s20f0u3 
+interface = enp2s0 
 interval = 3.0
 format-connected-prefix = "龍  "
 format-connected-prefix-foreground = ${colors.foreground-alt}
