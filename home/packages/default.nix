@@ -10,6 +10,7 @@
     firefox-devedition-bin-unwrapped
     fzf
     gcc
+    gimp
     google-chrome
     htop
     inxi
