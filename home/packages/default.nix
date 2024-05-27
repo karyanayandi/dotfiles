@@ -12,6 +12,7 @@
     gcc
     google-chrome
     htop
+    inxi
     luajitPackages.lua-lsp
     mpv
     pfetch
