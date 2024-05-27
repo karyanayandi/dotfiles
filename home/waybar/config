@@ -1,0 +1,23 @@
+{
+  "layer": "top",
+    "margin": "12 12 0 12",
+    "modules-left": ["hyprland/workspaces"],
+    "modules-right": ["clock", "pulseaudio"],
+    "hyprland/workspaces": {
+      "format": "{name}",
+      "disable-scroll": true,
+    },
+    "clock": {
+      "format": "<span color='#1d2021'> </span> {:%H:%M}"
+    },
+    "pulseaudio": {
+      "format": "<span color='#dedede'>{icon}</span> {volume}%",
+      "format-muted": "",
+      "tooltip": false,
+      "format-icons": {
+        "headphone": "",
+        "default": ["", "", "󰕾", "󰕾", "󰕾", "", "", ""]
+      },
+      "scroll-step": 1
+    },
+}
