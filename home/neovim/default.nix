@@ -66,8 +66,10 @@ in {
 
   home.file."./.config/nvim/lua/config/init.lua".text = ''
     require "config.autocommands"
-    require "config.options"
+    require "config.functions"
+    require "config.icons"
     require "config.keymaps"
+    require "config.options"
     vim.opt.runtimepath:append("${treesitter-parsers}")
   '';
 

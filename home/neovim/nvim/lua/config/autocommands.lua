@@ -119,7 +119,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 vim.api.nvim_create_user_command("AutoFormatDisable", function(args)
   if args.bang then
-    -- FormatDisable! will disable formatting just for this buffer
     vim.b.disable_autoformat = true
   else
     vim.g.disable_autoformat = true
@@ -137,12 +136,3 @@ vim.api.nvim_create_user_command("AutoFormatEnable", function()
 end, {
   desc = "Re-enable autoformat-on-save",
 })
-
--- vim.cmd [[
--- augroup import_cost_auto_run
---   autocmd!
---   autocmd InsertLeave *.js,*.jsx,*.ts,*.tsx ImportCost
---   autocmd BufEnter *.js,*.jsx,*.ts,*.tsx ImportCost
---   autocmd CursorHold *.js,*.jsx,*.ts,*.tsx ImportCost
--- augroup END
--- ]]
