@@ -1,10 +1,55 @@
 local M = {}
 
+vim.cmd [[
+  function Test()
+    %SnipRun
+    call feedkeys("\<esc>`.")
+  endfunction
+
+  function TestI()
+    let b:caret = winsaveview()
+    %SnipRun
+    call winrestview(b:caret)
+  endfunction
+]]
+
+function M.sniprun_enable()
+  vim.cmd [[
+    %SnipRun
+
+    augroup _sniprun
+     autocmd!
+     autocmd TextChanged * call Test()
+     autocmd TextChangedI * call TestI()
+    augroup end
+  ]]
+  vim.notify "Enabled SnipRun"
+end
+
+function M.disable_sniprun()
+  M.remove_augroup "_sniprun"
+  vim.cmd [[
+    SnipClose
+    SnipTerminate
+    ]]
+  vim.notify "Disabled SnipRun"
+end
+
+function M.toggle_sniprun()
+  if vim.fn.exists "#_sniprun#TextChanged" == 0 then
+    M.sniprun_enable()
+  else
+    M.disable_sniprun()
+  end
+end
+
 function M.remove_augroup(name)
   if vim.fn.exists("#" .. name) == 1 then
     vim.cmd("au! " .. name)
   end
 end
+
+vim.cmd [[ command! SnipRunToggle execute 'lua require("config.functions").toggle_sniprun()' ]]
 
 function M.get_word_length()
   local word = vim.fn.expand "<cword>"
@@ -68,19 +113,6 @@ function M.smart_quit()
   else
     vim.cmd "q!"
   end
-end
-
-function M.system_open(path)
-  local cmd
-  if vim.fn.has "win32" == 1 and vim.fn.executable "explorer" == 1 then
-    cmd = { "cmd.exe", "/K", "explorer" }
-  elseif vim.fn.has "unix" == 1 and vim.fn.executable "xdg-open" == 1 then
-    cmd = { "xdg-open" }
-  elseif (vim.fn.has "mac" == 1 or vim.fn.has "unix" == 1) and vim.fn.executable "open" == 1 then
-    cmd = { "open" }
-  end
-  if not cmd then M.notify("Available system opening tool not found!", vim.log.levels.ERROR) end
-  vim.fn.jobstart(vim.fn.extend(cmd, { path or vim.fn.expand "<cfile>" }), { detach = true })
 end
 
 return M

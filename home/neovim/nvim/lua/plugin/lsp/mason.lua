@@ -10,8 +10,8 @@ local servers = {
   "yamlls",
   "bashls",
   "clangd",
-  "rust_analyzer",
   "tailwindcss",
+  -- "rust_analyzer",
   -- "deno",
   -- "stylua",
   -- "shellcheck",
@@ -19,13 +19,16 @@ local servers = {
   -- "flake8",
 }
 
+
+local icons = require "config.icons"
+
 local settings = {
   ui = {
     border = "none",
     icons = {
-      package_installed = "✓",
-      package_pending = "➜",
-      package_uninstalled = "✗",
+      package_installed = icons.ui.Installed,
+      package_pending = icons.ui.Pending,
+      package_uninstalled = icons.ui.Uninstalled,
     },
   },
   log_level = vim.log.levels.INFO,

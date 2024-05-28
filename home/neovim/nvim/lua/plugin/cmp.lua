@@ -52,9 +52,9 @@ return {
       color_square_width = 2,
     }
 
-    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#A3BE8C" })
-    vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#F64D00" })
-    vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#EBCB8B" })
+    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#8ec07c" })
+    vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#eebd35" })
+    -- vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d65d0e" })
 
     local cmp = require "cmp"
     local luasnip = require "luasnip"
@@ -157,12 +157,12 @@ return {
 
             local color_name, color_number
             if
-              words[2] == "x"
-              or words[2] == "y"
-              or words[2] == "t"
-              or words[2] == "b"
-              or words[2] == "l"
-              or words[2] == "r"
+                words[2] == "x"
+                or words[2] == "y"
+                or words[2] == "t"
+                or words[2] == "b"
+                or words[2] == "l"
+                or words[2] == "r"
             then
               color_name = words[3]
               color_number = words[4]
@@ -227,10 +227,10 @@ return {
             vim_item.kind_hl_group = "CmpItemKindCopilot"
           end
 
-          if entry.source.name == "crates" then
-            vim_item.kind = icons.misc.Package
-            vim_item.kind_hl_group = "CmpItemKindCrate"
-          end
+          -- if entry.source.name == "crates" then
+          --   vim_item.kind = icons.misc.Package
+          --   vim_item.kind_hl_group = "CmpItemKindCrate"
+          -- end
 
           if entry.source.name == "lab.quick_data" then
             vim_item.kind = icons.misc.CircuitBoard
@@ -273,8 +273,7 @@ return {
         { name = "calc" },
         { name = "emoji" },
         { name = "treesitter" },
-        { name = "crates" },
-        { name = "tmux" },
+        -- { name = "crates" },
       },
       confirm_opts = {
         behavior = cmp.ConfirmBehavior.Replace,

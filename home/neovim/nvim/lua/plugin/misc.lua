@@ -23,8 +23,8 @@ return {
     "lambdalisue/suda.vim",
     event = "BufReadPre",
   },
-	{
-		"romainl/vim-cool",
-		event = "BufReadPre",
-	},
+  {
+    "romainl/vim-cool",
+    event = "BufReadPre",
+  },
 }

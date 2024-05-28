@@ -3,9 +3,10 @@ return {
   event = "VeryLazy",
   dependencies = { "nvim-neotest/nvim-nio", "mfussenegger/nvim-dap" },
   config = function()
+    local icons = require "config.icons"
     require("dapui").setup {
       expand_lines = true,
-      icons = { expanded = "", collapsed = "", circular = "" },
+      icons = { expanded = icons.ui.Expanded, collapsed = icons.ui.Collapsed, circular = icons.ui.Circular },
       mappings = {
         expand = { "<CR>", "<2-LeftMouse>" },
         open = "o",
@@ -17,17 +18,17 @@ return {
       layouts = {
         {
           elements = {
-            { id = "scopes", size = 0.33 },
+            { id = "scopes",      size = 0.33 },
             { id = "breakpoints", size = 0.17 },
-            { id = "stacks", size = 0.25 },
-            { id = "watches", size = 0.25 },
+            { id = "stacks",      size = 0.25 },
+            { id = "watches",     size = 0.25 },
           },
           size = 0.33,
           position = "right",
         },
         {
           elements = {
-            { id = "repl", size = 0.45 },
+            { id = "repl",    size = 0.45 },
             { id = "console", size = 0.55 },
           },
           size = 0.27,
@@ -44,6 +45,6 @@ return {
       },
     }
 
-    vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
+    vim.fn.sign_define("DapBreakpoint", { text = icons.ui.Bug, texthl = "DiagnosticSignError", linehl = "", numhl = "" })
   end,
 }
