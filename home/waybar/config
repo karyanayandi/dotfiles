@@ -8,15 +8,15 @@
       "disable-scroll": true,
     },
     "clock": {
-      "format": "<span color='#1d2021'> </span> {:%H:%M}"
+      "format": "<span color='#1d2021'> </span>  {:%H:%M}"
     },
     "pulseaudio": {
-      "format": "<span color='#dedede'>{icon}</span> {volume}%",
+      "format": "<span color='#dedede'>{icon}</span>  {volume}%",
       "format-muted": "",
       "tooltip": false,
       "format-icons": {
         "headphone": "",
-        "default": ["", "", "󰕾", "󰕾", "󰕾", "", "", ""]
+        "default": ["󰕾"]
       },
       "scroll-step": 1
     },
