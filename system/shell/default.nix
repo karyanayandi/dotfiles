@@ -1,4 +1,5 @@
 {pkgs, ...}: let
+  commandFoldl' = builtins.foldl' (a: b: a + b + ''&&'') '''';
   aliases = {
     autoclean = "nix store gc";
     c = "clear";
