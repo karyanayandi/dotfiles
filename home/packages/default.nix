@@ -2,9 +2,7 @@
   home.packages = with pkgs; [
     alejandra
     android-tools
-    bun
     cinnamon.nemo
-    eslint_d
     eza
     fd
     firefox-devedition-bin-unwrapped
@@ -17,15 +15,11 @@
     luajitPackages.lua-lsp
     mpv
     pfetch
-    nodejs
-    corepack
     openssl
     pavucontrol
     postman
-    prettierd
     ripgrep
     stdenv.cc.cc.lib
-    stylelint
     termius
     trash-cli
     unzip

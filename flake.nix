@@ -21,6 +21,7 @@
   };
 
   outputs = {
+    self,
     nixpkgs,
     home-manager,
     ...
@@ -39,6 +40,10 @@
           }
         ];
       };
+    };
+
+    devShells = import ./devShell.nix {
+      pkgs = self.legacyPackages.${inputs.nixpkgs.system};
     };
   };
 }
