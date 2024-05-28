@@ -1,20 +1,11 @@
 {pkgs, ...}: let
-  commandFoldl' = builtins.foldl' (a: b: a + b + ''&&'') '''';
   aliases = {
     autoclean = "nix store gc";
     c = "clear";
-    cat = "${bat}/bin/bat";
+    cat = "bat";
     cdc = "cd ~/.config/dotfiles";
     cdp = "cd ~/Projects";
-    clean = commandFoldl' [
-      "nix profile wipe-history"
-      "nix-collect-garbage"
-      "nix-collect-garbage -d"
-      "nix-collect-garbage --delete-old"
-      "nix store gc"
-      "nix store optimise"
-      "nix-store --verify --repair --check-contents"
-    ];
+    clean = "nix profile wipe-history && sudo nix-collect-garbage -d && sudo nix-collect-garbage --delete-old && sudo nix store gc && sudo nix-store --verify --repair --check-contents";
     delete-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations";
     dev = "nix develop";
     e = "nvim";
@@ -36,7 +27,6 @@
     sshk = "kitty +kitten ssh";
     tree = "eza --tree --level=2 --group-directories-first --icons --ignore-glob='*node_modules*'";
     update = "nix-update";
-    update-time = "sudo ntpd -qg";
     x = "exit";
     z = "zoxide";
   };
