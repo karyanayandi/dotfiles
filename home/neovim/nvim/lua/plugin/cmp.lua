@@ -68,6 +68,19 @@ return {
 
     local icons = require "config.icons"
 
+    local function border(hl_name)
+      return {
+        { "╭", hl_name },
+        { "─", hl_name },
+        { "╮", hl_name },
+        { "│", hl_name },
+        { "╯", hl_name },
+        { "─", hl_name },
+        { "╰", hl_name },
+        { "│", hl_name },
+      }
+    end
+
     cmp.setup {
       snippet = {
         expand = function(args)
@@ -285,22 +298,21 @@ return {
           selection_order = "top_down",
         },
         docs = {
-          auto_open = false,
+          auto_open = true,
         },
       },
       window = {
         completion = {
-          border = "rounded",
-          winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,FloatBorder:FloatBorder,Search:None",
+          winhighlight = "Normal:CmpPmenu,CursorLine:CmpSel,Search:None",
+          border = border "CmpBorder",
           col_offset = -3,
           side_padding = 1,
           scrollbar = false,
           scrolloff = 8,
         },
         documentation = {
-          border = "rounded",
-          winhighlight = "Normal:Pmenu,FloatBorder:FloatBorder,Search:None",
-        },
+          border = border "CmpDocBorder",
+          winhighlight = "Normal:CmpDoc", },
       },
       experimental = {
         ghost_text = false,
