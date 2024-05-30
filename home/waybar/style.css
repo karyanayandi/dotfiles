@@ -32,18 +32,18 @@ window#waybar {
   border-radius: 0px;
 }
 
-#pulseaudio {
+#disk,
+#network,
+#clock,
+#cpu,
+#pulseaudio,
+#memory {
   background: #1d2021;
   color: #dedede;
   padding-left: 10px;
   padding-right: 10px;
-  margin-right: 15px;
 }
 
 #clock {
-  color: #1d2021;
-  background: #dedede;
-  padding-left: 15px;
-  padding-right: 15px;
-  margin-right: 15px;
+  margin-right: 20px;
 }
