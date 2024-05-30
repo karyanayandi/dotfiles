@@ -23,7 +23,6 @@
     inxi
     luajitPackages.lua-lsp
     mpv
-    nodejs
     pfetch
     openssl
     pavucontrol
