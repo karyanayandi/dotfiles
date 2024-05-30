@@ -1,14 +1,31 @@
 {pkgs, ...}: let
-  tmux-gruvbox = pkgs.fetchFromGitHub {
-    owner = "z3z1ma";
-    repo = "tmux-gruvbox";
-    rev = "main";
-    sha256 = "sha256-0kaspb4zk79bsrj4w32fv06wldgzh7fc3yrhw8ayfs1rrwl4w660";
+  customOverlay = final: prev: {
+    tmuxPlugins =
+      prev.tmuxPlugins
+      {
+        tmux-gruvbox = pkgs.stdenv.mkDerivation {
+          pname = "tmux-gruvbox";
+          version = "main";
+          src = pkgs.fetchFromGitHub {
+            owner = "z3z1ma";
+            repo = "tmux-gruvbox";
+            rev = "main";
+            sha256 = "0kaspb4zk79bsrj4w32fv06wldgzh7fc3yrhw8ayfs1rrwl4w660";
+          };
+
+          installPhase = ''
+            mkdir -p $out
+            cp -r * $out
+          '';
+        };
+      };
   };
+
+  customPkgs = pkgs.extend customOverlay;
 in {
   programs.tmux = {
     enable = true;
-    plugin = tmux-gruvbox;
+    clock24 = true;
     extraConfig = ''
       unbind-key C-b
 
@@ -58,14 +75,14 @@ in {
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
-
     '';
-    plugins = with pkgs.tmuxPlugins; [
+    plugins = with customPkgs.tmuxPlugins; [
       better-mouse-mode
       resurrect
       sensible
       vim-tmux-navigator
       yank
+      tmux-gruvbox
     ];
   };
 }
