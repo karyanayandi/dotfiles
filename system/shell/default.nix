@@ -28,6 +28,7 @@
     shell = "nix-shell";
     sshk = "kitty +kitten ssh";
     t = "tmux";
+    tx = "tmuxifier";
     tree = "eza --tree --level=2 --group-directories-first --icons --ignore-glob='*node_modules*'";
     update = "nix-update";
     x = "exit";

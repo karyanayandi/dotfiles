@@ -11,8 +11,6 @@
     {
       plugin = rose-pine;
       extraConfig = ''
-        unbind C-b
-
         set -g prefix C-Space
         set -g mouse on
 

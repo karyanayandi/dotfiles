@@ -32,6 +32,7 @@
     stdenv.cc.cc.lib
     stylelint
     termius
+    tmuxifier
     trash-cli
     unzip
     unrar
