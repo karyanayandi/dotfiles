@@ -111,18 +111,6 @@ return {
         F = { "<cmd>lua require('refactoring').refactor('Extract Function To File')<cr>", "Extact Function To File" },
         i = { "<cmd>lua require('refactoring').refactor('Inline Variable')<cr>", "Inline Variable" },
       },
-      d = {
-        name = "Debug",
-        b = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", "Breakpoint" },
-        c = { "<cmd>lua require'dap'.continue()<cr>", "Continue" },
-        i = { "<cmd>lua require'dap'.step_into()<cr>", "Into" },
-        o = { "<cmd>lua require'dap'.step_over()<cr>", "Over" },
-        O = { "<cmd>lua require'dap'.step_out()<cr>", "Out" },
-        r = { "<cmd>lua require'dap'.repl.toggle()<cr>", "Repl" },
-        l = { "<cmd>lua require'dap'.run_last()<cr>", "Last" },
-        u = { "<cmd>lua require'dapui'.toggle()<cr>", "UI" },
-        x = { "<cmd>lua require'dap'.terminate()<cr>", "Exit" },
-      },
       f = {
         name = "Find",
         b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
@@ -195,6 +183,14 @@ return {
         u = { "<cmd>LuaSnipUnlinkCurrent<cr>", "Unlink Snippet" },
       },
       t = {
+        name = "Test",
+        t = { "<cmd>TestNearest<cr>", "Nearest" },
+        f = { "<cmd>TestFile<cr>", "File" },
+        a = { "<cmd>TestSuite<cr>", "All" },
+        l = { "<cmd>TestLast<cr>", "Last" },
+        v = { "<cmd>TestVisit<cr>", "Visit" },
+      },
+      T = {
         name = "Terminal",
         ["1"] = { ":1ToggleTerm<cr>", "1" },
         ["2"] = { ":2ToggleTerm<cr>", "2" },
@@ -211,12 +207,6 @@ return {
         L = { "<cmd>lua require('persistence').load()<cr>", "Load Session" },
         l = { "<cmd>lua require('persistence').load({ last = true })<cr>", "Load Last Session" },
         s = { "<cmd>lua require('persistence').stop()<cr>", "Stop Session" },
-      },
-      T = {
-        name = "Treesitter",
-        h = { "<cmd>TSHighlightCapturesUnderCursor<cr>", "Highlight" },
-        r = { "<cmd>TSToggle rainbow<cr>", "Rainbow" },
-        s = { "<cmd>lua require('treesj').toggle({split = {recursive = true}})<CR>", "Split" },
       },
       p = {
         name = "Package Info",
