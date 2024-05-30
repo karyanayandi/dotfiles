@@ -2,6 +2,7 @@ return {
   { "moll/vim-bbye" },
   { "wakatime/vim-wakatime" },
   { "folke/trouble.nvim" },
+  { "preservim/vimux" },
   {
     "nvim-lua/plenary.nvim",
     lazy = true,
