@@ -3,6 +3,7 @@
     alejandra
     android-tools
     bat
+    bottom
     bun
     cinnamon.nemo
     corepack
@@ -19,7 +20,6 @@
     gh-copilot
     gimp
     google-chrome
-    htop
     inxi
     luajitPackages.lua-lsp
     mpv

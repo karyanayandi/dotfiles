@@ -42,12 +42,12 @@
   },
   "cpu": {
     "format": "󰻠 {load}",
-    "on-click": "kitty -e htop",
+    "on-click": "kitty -e btm",
     "interval": 5
   },
   "memory": {
     "format": "󰍛 {used}",
-    "on-click": "kitty -e htop",
+    "on-click": "kitty -e btm",
     "interval": 5
   }
 }
