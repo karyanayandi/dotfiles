@@ -18,13 +18,11 @@
   environment = {
     variables = {EDITOR = "vim";};
     systemPackages = with pkgs; [
-      vim
       curl
       git
+      lsof
+      vim
       wget
-      fzf
-      fishPlugins.fzf-fish
-      zoxide
       inputs.alejandra.defaultPackage.${pkgs.system}
       inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
     ];

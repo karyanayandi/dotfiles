@@ -10,8 +10,13 @@
     eza
     fd
     firefox-devedition-bin-unwrapped
+    fishPlugins.autopair
+    fishPlugins.forgit
+    fishPlugins.fzf-fish
+    fishPlugins.z
     fzf
     gcc
+    gh-copilot
     gimp
     google-chrome
     htop

@@ -1,5 +1,7 @@
 {pkgs, ...}: let
   aliases = {
+    sug = "gh copilot suggest";
+    exp = "gh copilot explain";
     autoclean = "nix store gc";
     c = "clear";
     cat = "bat";
@@ -28,7 +30,6 @@
     tree = "eza --tree --level=2 --group-directories-first --icons --ignore-glob='*node_modules*'";
     update = "nix-update";
     x = "exit";
-    z = "zoxide";
   };
 in {
   programs = {
