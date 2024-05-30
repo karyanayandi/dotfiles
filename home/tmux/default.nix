@@ -1,27 +1,10 @@
 {pkgs, ...}: let
-  customOverlay = final: prev: {
-    tmuxPlugins =
-      prev.tmuxPlugins
-      {
-        tmux-gruvbox = pkgs.stdenv.mkDerivation {
-          pname = "tmux-gruvbox";
-          version = "main";
-          src = pkgs.fetchFromGitHub {
-            owner = "z3z1ma";
-            repo = "tmux-gruvbox";
-            rev = "main";
-            sha256 = "0kaspb4zk79bsrj4w32fv06wldgzh7fc3yrhw8ayfs1rrwl4w660";
-          };
-
-          installPhase = ''
-            mkdir -p $out
-            cp -r * $out
-          '';
-        };
-      };
+  gruvbox = pkgs.fetchFromGitHub {
+    owner = "z3z1ma";
+    repo = "tmux-gruvbox";
+    rev = "main";
+    sha256 = "0kaspb4zk79bsrj4w32fv06wldgzh7fc3yrhw8ayfs1rrwl4w660";
   };
-
-  customPkgs = pkgs.extend customOverlay;
 in {
   programs.tmux = {
     enable = true;
@@ -75,14 +58,16 @@ in {
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
+
     '';
-    plugins = with customPkgs.tmuxPlugins; [
+    plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
       resurrect
       sensible
       vim-tmux-navigator
       yank
-      tmux-gruvbox
     ];
   };
+
+  home.file.".tmux/tmux-gruvbox".source = "${gruvbox}";
 }
