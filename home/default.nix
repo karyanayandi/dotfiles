@@ -17,6 +17,7 @@
     ./node
     ./qt
     ./foot
+    ./tmux
     ./wofi
   ];
 }
