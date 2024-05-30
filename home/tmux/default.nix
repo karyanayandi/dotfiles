@@ -1,12 +1,14 @@
 {pkgs, ...}: let
-  gruvbox = builtins.fetchTarball {
-    url = "https://github.com/z3z1ma/tmux-gruvbox/archive/refs/heads/main.tar.gz";
-    sha256 = "1wlkyzgg56vval97mr1gvg22wf48yvsaahsapg3rrn7r35b93fka";
+  tmux-gruvbox = pkgs.fetchFromGitHub {
+    owner = "z3z1ma";
+    repo = "tmux-gruvbox";
+    rev = "main";
+    sha256 = "sha256-0kaspb4zk79bsrj4w32fv06wldgzh7fc3yrhw8ayfs1rrwl4w660";
   };
 in {
   programs.tmux = {
     enable = true;
-    clock24 = true;
+    plugin = tmux-gruvbox;
     extraConfig = ''
       unbind-key C-b
 
@@ -22,6 +24,7 @@ in {
       set-option -g status-right ""
       set-option -g allow-rename off
       set-option -g status-position top
+      set -g @gruvbox_flavour 'dark'
       set-window-option -g window-status-separator ""
 
       bind r source-file ~/.tmux.conf
@@ -56,7 +59,6 @@ in {
       bind-key k select-pane -U
       bind-key l select-pane -R
 
-      run-shell ~/.tmux/plugins/tmux-gruvbox/gruvbox.tmux
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
@@ -66,6 +68,4 @@ in {
       yank
     ];
   };
-
-  home.file."tmux/plugins/tmux-gruvbox".source = "${gruvbox}";
 }
