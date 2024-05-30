@@ -14,6 +14,7 @@
     ./hyprland
     ./dunst
     ./waybar
+    ./node
     ./qt
     ./foot
     ./wofi

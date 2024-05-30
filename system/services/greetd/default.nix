@@ -5,9 +5,9 @@
       initial_session = {
         # command = "Hyprland";
         command = "$SHELL -l";
-        user = "karyana";
+        # user = "karyana";
       };
-      # default_session = initial_session;
+      default_session = initial_session;
     };
   };
 }
