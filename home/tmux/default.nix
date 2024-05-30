@@ -13,6 +13,8 @@
         unbind C-b
         set -g prefix C-Space
         bind C-Space send-prefix
+        bind - split-window -h
+        bind '=' split-window -v
         set -g mouse on
       '';
     }
