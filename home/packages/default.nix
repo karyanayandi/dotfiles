@@ -35,7 +35,6 @@
     termius
     tlrc
     tmuxifier
-    trash-cli
     unzip
     unrar
     viewnior

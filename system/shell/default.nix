@@ -21,8 +21,6 @@
     lzg = "lazygit";
     pn = "corepack pnpm";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
-    rm = "trash-put";
-    rmr = "rm";
     rollback = "nix-env --rollback";
     search = "nix search nixpkgs";
     shell = "nix-shell";
