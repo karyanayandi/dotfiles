@@ -4,6 +4,7 @@
     exp = "gh copilot explain";
     autoclean = "nix store gc";
     c = "clear";
+    cd = "z";
     cat = "bat";
     cdc = "cd ~/.config/dotfiles";
     cdp = "cd ~/Projects";
@@ -12,6 +13,7 @@
     dev = "nix develop";
     e = "nvim";
     font-refresh = "fc-cache -fv";
+    fuck = "thefuck";
     g = "git";
     list-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --list-generations --profile /nix/var/nix/profiles/system";
     install = "nix-env -iA";

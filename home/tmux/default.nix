@@ -13,7 +13,6 @@ in {
     extraConfig = ''
       run-shell '~/.tmux/tmux-gruvbox/gruvbox.tmux'
 
-      unbind -a
       unbind-key C-b
 
       set -g prefix C-Space
@@ -21,13 +20,14 @@ in {
       set -g history-limit 5000
       set -g @continuum-restore 'on'
       set -g @continuum-save-interval '60'
+      set -g @resurrect-save 's'
+      set -g @resurrect-restore 'r'
 
       set-option -g allow-rename off
       set-option -g status-position top
       set -g status-bg '#282828'
       set-option -g status-right ""
 
-      bind , command-prompt "rename-window %%"
       bind d detach
       bind '\' list-session
       bind c new-window
@@ -35,9 +35,10 @@ in {
       bind v split-window -v
       bind x kill-pane
       bind ? list-keys
+      bind , command-prompt "rename-session %%"
 
       bind -n M-':' command-prompt
-      bind -n M-',' command-prompt "rename-window %%"
+      bind -n M-',' command-prompt "rename-session %%"
       bind -n M-'=' choose-tree
       bind -n M-d detach
       bind -n M-'\' list-session
@@ -60,7 +61,6 @@ in {
       bind -n M-x kill-pane
       bind -n M-'?' list-keys
 
-      bind-key C-Space send-prefix
       bind-key '=' choose-tree
       bind-key w new-window
       bind-key h previous-window

@@ -33,6 +33,8 @@
     stdenv.cc.cc.lib
     stylelint
     termius
+    thefuck
+    tlrc
     tmuxifier
     trash-cli
     unzip
