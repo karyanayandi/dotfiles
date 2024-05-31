@@ -153,7 +153,7 @@ return {
         name = "LSP",
         a = { "<cmd>lua require('actions-preview').code_actions()<cr>", "Code Action" },
         c = { "<cmd>lua require('lsp').server_capabilities()<cr>", "Get Capabilities" },
-        d = { "<cmd>TroubleToggle<cr>", "Diagnostics" },
+        d = { "<cmd>Trouble diagnostics toggle win.position=right<cr>", "Diagnostics" },
         f = { "<cmd>AutoFormatDisable<cr>", "Disable autoformat-on-save" },
         F = { "<cmd>AutoFormatEnable<cr>", "Re-enable autoformat-on-save" },
         i = { "<cmd>LspInfo<cr>", "Info" },
@@ -172,7 +172,7 @@ return {
         o = { "<cmd>SymbolsOutline<cr>", "Outline" },
         q = { "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>", "Quickfix" },
         r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-        R = { "<cmd>TroubleToggle lsp_references<cr>", "References" },
+        R = { "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", "References" },
         s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
         S = {
           "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
