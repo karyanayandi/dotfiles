@@ -16,7 +16,7 @@
   },
   "clock": {
     "format": "󱑎  {:%H:%M}",
-    "on-click": "kitty -e date"
+    "on-click": "foot -e date"
   },
   "disk": {
     "interval": 30,
@@ -26,7 +26,7 @@
   "network": {
     "interface": "enp1s0",
     "format": "󰓅  {bandwidthUpBits}",
-    "on-click": "kitty -e ping 8.8.8.8",
+    "on-click": "foot -e ping 8.8.8.8",
     "interval": 5
  },
   "pulseaudio": {
@@ -42,12 +42,12 @@
   },
   "cpu": {
     "format": "󰻠 {load}",
-    "on-click": "kitty -e btm",
+    "on-click": "foot -e btm",
     "interval": 5
   },
   "memory": {
     "format": "󰍛 {used}",
-    "on-click": "kitty -e btm",
+    "on-click": "foot -e btm",
     "interval": 5
   }
 }
