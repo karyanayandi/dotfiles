@@ -128,7 +128,7 @@ return {
         R = { "<cmd>Telescope registers<cr>", "Registers" },
         k = { "<cmd>Telescope keymaps<cr>", "Keymaps" },
         C = { "<cmd>Telescope commands<cr>", "Commands" },
-        u = { "<cmd>lua require('undotree').toggle()<cr>", "Undo Tree" },
+        u = { "<cmd>lua require('undotree').toggle()<cr>", "Undotree" },
       },
       g = {
         name = "Git",

@@ -103,7 +103,7 @@ keymap("n", ";w", "<cmd>WorkspacesOpen<cr>", opts)
 keymap("n", ";r", "<cmd>lua require('spectre').open_file_search()<cr>", opts)
 
 -- Undotree
-keymap("n", ";u", "<cmd>vim.cmd.UndotreeToggle<cr>", opts)
+keymap("n", ";u", "<cmd>lua require('undotree').toggle()<cr>", opts)
 
 -- Show document symbol
 keymap("n", "<C-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
