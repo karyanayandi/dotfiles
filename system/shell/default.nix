@@ -13,7 +13,6 @@
     dev = "nix develop";
     e = "nvim";
     font-refresh = "fc-cache -fv";
-    fuck = "thefuck";
     g = "git";
     list-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --list-generations --profile /nix/var/nix/profiles/system";
     install = "nix-env -iA";

@@ -87,6 +87,7 @@
     ./security
     ./shell
     ./init
+    ./thefuck
     ./services
     ./ld
     ./hyprland
