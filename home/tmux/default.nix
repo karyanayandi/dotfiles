@@ -8,21 +8,30 @@
 in {
   programs.tmux = {
     enable = true;
-    clock24 = true;
+    terminal = "screen-256color";
+    baseIndex = 1;
     extraConfig = ''
+      run-shell '~/.tmux/tmux-gruvbox/gruvbox.tmux'
+
       unbind-key C-b
 
       set -g prefix C-Space
       set -g mouse on
+      set -g @continuum-restore 'on'
+      set -g @continuum-save-interval '60'
 
       set-option -g allow-rename off
       set-option -g status-position top
+      set -g status-bg '#282828'
+      set-option -g status-right ""
 
-      bind r source-file ~/.tmux.conf
+      bind , command-prompt "rename-window %%"
       bind c new-window
       bind s split-window -h
       bind v split-window -v
 
+      bind -n M-':' command-prompt
+      bind -n M-',' command-prompt "rename-window %%"
       bind -n M-'=' choose-tree
       bind -n M-w new-window -c '#{pane_current_path}'
       bind -n M-h previous-window
@@ -49,15 +58,10 @@ in {
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
-
-      run-shell '~/.tmux/tmux-gruvbox/gruvbox.tmux'
-
-      set -g @gruvbox_flavour 'dark'
-      set -g @gruvbox_status_left_separator "█"
-      set -g @gruvbox_status_right_separator "█"
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
+      continuum
       resurrect
       sensible
       vim-tmux-navigator
