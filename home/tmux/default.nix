@@ -14,18 +14,9 @@ in {
 
       set -g prefix C-Space
       set -g mouse on
-      set -g visual-activity off
-      set -g visual-bell off
-      set -g visual-silence off
-      set -g bell-action none
-      set -g status-justify left
-      setw -g monitor-activity off
 
-      set-option -g status-right ""
       set-option -g allow-rename off
       set-option -g status-position top
-      set -g @gruvbox_flavour 'dark'
-      set-window-option -g window-status-separator ""
 
       bind r source-file ~/.tmux.conf
       bind c new-window
@@ -59,6 +50,11 @@ in {
       bind-key k select-pane -U
       bind-key l select-pane -R
 
+      run-shell '~/.tmux/tmux-gruvbox/gruvbox.tmux'
+
+      set -g @gruvbox_flavour 'dark'
+      set -g @gruvbox_status_left_separator "█"
+      set -g @gruvbox_status_right_separator "█"
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
@@ -69,5 +65,5 @@ in {
     ];
   };
 
-  home.file.".tmux/tmux-gruvbox".source = "${gruvbox}";
+  home.file.".tmux/tmux-gruvbox".source = "${gruvbox}/";
 }
