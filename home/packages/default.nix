@@ -5,6 +5,7 @@
     bat
     bottom
     bun
+    chafa
     cinnamon.nemo
     corepack
     eslint_d
