@@ -17,6 +17,7 @@ in {
 
       set -g prefix C-Space
       set -g mouse on
+      set -g history-limit 5000
       set -g @continuum-restore 'on'
       set -g @continuum-save-interval '60'
 
@@ -26,13 +27,20 @@ in {
       set-option -g status-right ""
 
       bind , command-prompt "rename-window %%"
+      bind d detach
+      bind '\' list-session
       bind c new-window
       bind s split-window -h
       bind v split-window -v
+      bind x kill-pane
+      bind ? list-keys
 
       bind -n M-':' command-prompt
       bind -n M-',' command-prompt "rename-window %%"
       bind -n M-'=' choose-tree
+      bind -n M-d detach
+      bind -n M-'\' list-session
+      bind -n M-x kill-pane
       bind -n M-w new-window -c '#{pane_current_path}'
       bind -n M-h previous-window
       bind -n M-l next-window
@@ -48,6 +56,8 @@ in {
       bind -n M-7 select-window -t:=7
       bind -n M-8 select-window -t:=8
       bind -n M-9 select-window -t:=9
+      bind -n M-x kill-pane
+      bind -n M-'?' list-keys
 
       bind-key C-Space send-prefix
       bind-key '=' choose-tree
