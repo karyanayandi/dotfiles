@@ -39,23 +39,18 @@
     enableSSHSupport = true;
   };
 
-  # fileSystems = {
-  #   "/home/karyana/HDD" = {
-  #     device = "/dev/sda1";
-  #     fsType = "ntfs-3g";
-  #     options = ["rw" "uid=1000"];
-  #   };
-  #   "/home/karyana/HDD2" = {
-  #     device = "/dev/sdb1";
-  #     fsType = "ntfs-3g";
-  #     options = ["rw" "uid=1000"];
-  #   };
-  #   "/home/karyana/NVME" = {
-  #     device = "/dev/nvme0n1p3";
-  #     fsType = "ntfs-3g";
-  #     options = ["rw" "uid=1000"];
-  #   };
-  # };
+  fileSystems = {
+    "/home/karyana/HDD" = {
+      device = "/dev/sda1";
+      fsType = "ntfs-3g";
+      options = ["rw" "uid=1000"];
+    };
+    "/home/karyana/arch" = {
+      device = "/dev/sdb2";
+      fsType = "btfs";
+      options = ["rw" "uid=1000"];
+    };
+  };
 
   nix.settings = {
     experimental-features = ["nix-command" "flakes"];
