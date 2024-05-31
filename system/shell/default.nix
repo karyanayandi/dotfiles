@@ -4,7 +4,6 @@
     exp = "gh copilot explain";
     autoclean = "nix store gc";
     c = "clear";
-    cd = "z";
     cat = "bat";
     cdc = "cd ~/.config/dotfiles";
     cdp = "cd ~/Projects";
