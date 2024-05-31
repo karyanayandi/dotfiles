@@ -13,6 +13,7 @@ in {
     extraConfig = ''
       run-shell '~/.tmux/tmux-gruvbox/gruvbox.tmux'
 
+      unbind -a
       unbind-key C-b
 
       set -g prefix C-Space
