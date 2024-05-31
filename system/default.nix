@@ -45,11 +45,6 @@
       fsType = "ntfs-3g";
       options = ["rw" "uid=1000"];
     };
-    "/home/karyana/arch" = {
-      device = "/dev/sdb2";
-      fsType = "btfs";
-      options = ["rw" "uid=1000"];
-    };
   };
 
   nix.settings = {
