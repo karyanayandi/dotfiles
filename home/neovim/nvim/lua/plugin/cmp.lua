@@ -52,6 +52,7 @@ return {
       color_square_width = 2,
     }
 
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#8ec07c" })
     vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#eebd35" })
     -- vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d65d0e" })
@@ -303,7 +304,7 @@ return {
       },
       window = {
         completion = {
-          winhighlight = "Normal:CmpPmenu,CursorLine:CmpSel,Search:None",
+          winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:None",
           border = border "CmpBorder",
           col_offset = -3,
           side_padding = 1,
