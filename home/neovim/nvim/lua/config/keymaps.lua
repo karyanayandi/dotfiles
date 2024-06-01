@@ -18,11 +18,6 @@ vim.g.maplocalleader = " "
 -- keymap("n", "<C-k>", "<C-w>k", opts)
 -- keymap("n", "<C-l>", "<C-w>l", opts)
 
--- Tabs --
-keymap("n", "<m-t>", ":tabnew %<cr>", opts)
-keymap("n", "<m-c>", ":tabclose<cr>", opts)
-keymap("n", [[c-\]], ":tabonly<cr>", opts)
-
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
@@ -106,7 +101,7 @@ keymap("n", ";r", "<cmd>lua require('spectre').open_file_search()<cr>", opts)
 keymap("n", ";u", "<cmd>lua require('undotree').toggle()<cr>", opts)
 
 -- Show document symbol
-keymap("n", "<C-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
+keymap("n", "<m-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
 
 -- No HL
 keymap("n", ";z", "<cmd>nohlsearch<cr>", opts)

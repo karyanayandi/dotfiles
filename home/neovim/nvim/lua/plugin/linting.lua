@@ -15,17 +15,13 @@ return {
       astro = { "eslint_d" },
       css = { "stylelint" },
       svelte = { "eslint_d" },
-      -- python = { "pylint" },
       -- prisma = { "prisma-lint" },
-      -- markdown = { "markdownlint" },
       fish = { "fish" },
-      -- go = { "golangcilint" },
-      -- php = { "php", "phpcs" },
-      -- sh = { "shellcheck" },
+      go = { "golangcilint" },
+      sh = { "shellcheck" },
       nix = { "nix" },
-      -- json = { "jsonlint" },
+      json = { "jsonlint" },
       vue = { "eslint_d" },
-      -- yaml = { "yamllint" },
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })

@@ -1,7 +1,6 @@
 return {
   { "moll/vim-bbye" },
   { "wakatime/vim-wakatime" },
-  { "folke/trouble.nvim" },
   { "preservim/vimux" },
   {
     "nvim-lua/plenary.nvim",
@@ -12,17 +11,13 @@ return {
     lazy = true,
   },
   {
-    "simrat39/symbols-outline.nvim",
-    lazy = true,
-  },
-  {
-    "jamessan/vim-gnupg",
-    lazy = false,
-    ft = "markdown",
-  },
-  {
-    "lambdalisue/suda.vim",
+    "kevinhwang91/nvim-fundo",
+    dependencies = "kevinhwang91/promise-async",
+    build = function()
+      require("fundo").install()
+    end,
     event = "BufReadPre",
+    config = true,
   },
   {
     "romainl/vim-cool",

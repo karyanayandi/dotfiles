@@ -1,4 +1,7 @@
 return {
   "sQVe/sort.nvim",
-  cmd = "Sort"
+  cmd = "Sort",
+  config = function()
+    require("sort").setup({})
+  end
 }
