@@ -1,7 +1,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   config = function()
-    local theme = require "lualine.themes.gruvbox-baby"
+    local theme = require "lualine.themes.gruvbox-material"
 
     local mode_color = {
       n = "#7fa2ac",
