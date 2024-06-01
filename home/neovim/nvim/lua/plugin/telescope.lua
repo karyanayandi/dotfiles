@@ -23,12 +23,6 @@ return {
       end,
     },
     {
-      "nvim-telescope/telescope-fzf-native.nvim",
-      config = function()
-        require("telescope").load_extension "fzf"
-      end,
-    },
-    {
       "nvim-telescope/telescope-file-browser.nvim",
       config = function()
         require("telescope").load_extension "file_browser"
