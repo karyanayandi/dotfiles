@@ -3,9 +3,8 @@
   "margin": "12 12 0 12",
   "modules-left": ["hyprland/workspaces"],
   "modules-right": [
-    "disk",
     "network",
-    "cpu",
+    "disk",
     "memory",
     "pulseaudio",
     "clock"
@@ -39,11 +38,6 @@
     },
     "scroll-step": 1,
     "on-click": "amixer set Master toggle"
-  },
-  "cpu": {
-    "format": "󰻠 {load}",
-    "on-click": "foot -e btm",
-    "interval": 5
   },
   "memory": {
     "format": "󰍛 {used}",

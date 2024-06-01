@@ -35,7 +35,6 @@ window#waybar {
 #disk,
 #network,
 #clock,
-#cpu,
 #pulseaudio,
 #memory {
   background: #1d2021;
