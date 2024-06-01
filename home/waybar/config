@@ -40,7 +40,7 @@
     "on-click": "amixer set Master toggle"
   },
   "memory": {
-    "format": "󰍛 {used}",
+    "format": "󰍛 {used}GB",
     "on-click": "foot -e btm",
     "interval": 5
   }
