@@ -8,7 +8,7 @@
     cdc = "cd ~/.config/dotfiles";
     cdp = "cd ~/Projects";
     clean = "nix profile wipe-history && sudo nix-collect-garbage -d && sudo nix-collect-garbage --delete-old && sudo nix store gc && sudo nix-store --verify --repair --check-contents";
-    clean-node = "find . -type d -name " node_modules " -exec rm -rf {} +;";
+    clean-node = "find . -type d -name 'node_modules' -exec rm -rf {} +;";
     delete-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations";
     dev = "nix develop";
     e = "nvim";
