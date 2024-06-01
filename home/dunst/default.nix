@@ -14,7 +14,7 @@
         separator_color = "frame";
         idle_threshold = 120;
         show_age-threshole = 60;
-        font = "Fira Code Nerd Font 12";
+        font = "Fira Code Nerd Font 10";
         line_height = 0;
         format = ''
           <b>%s</b>
@@ -22,10 +22,10 @@
         alignment = "left";
         icon_position = "off";
         startup_notification = "false";
-        corner_radius = 12;
-        frame_color = "#83a598";
+        corner_radius = 10;
+        frame_color = "#a9b665";
         background = "#1d2021";
-        foreground = "#ebdbb2";
+        foreground = "#d4be98";
         timeout = 2;
       };
     };
