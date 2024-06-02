@@ -62,7 +62,6 @@ keymap("x", "J", ":move '>+1<CR>gv-gv", opts)
 keymap("x", "K", ":move '<-2<CR>gv-gv", opts)
 keymap("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
 keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
-
 -- Split Windows
 keymap("n", ";v", "<cmd>vsplit<cr>", opts)
 keymap("n", ";s", "<cmd>split<cr>", opts)
@@ -87,9 +86,6 @@ keymap("n", ";g", "<cmd>Telescope git_branches theme=ivy<cr>", opts)
 
 -- Find help tags
 keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", opts)
-
--- Markdown Preview
-keymap("n", ";m", "<cmd>Glow<cr>", opts)
 
 -- Find workspaces
 keymap("n", ";w", "<cmd>WorkspacesOpen<cr>", opts)

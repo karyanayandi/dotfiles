@@ -97,15 +97,6 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-  pattern = { "term://*" },
-  callback = function()
-    vim.cmd [[
-    set cmdheight=1
-  ]]
-  end,
-})
-
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup "last_loc",
   callback = function()

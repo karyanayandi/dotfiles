@@ -190,17 +190,6 @@ return {
         l = { "<cmd>TestLast<cr>", "Last" },
         v = { "<cmd>TestVisit<cr>", "Visit" },
       },
-      T = {
-        name = "Terminal",
-        t    = { ":1ToggleTerm<cr>", "Terminal" },
-        n    = { "<cmd>lua _NODE_TOGGLE()<cr>", "Node" },
-        l    = { "<cmd>lua _LF_TOGGLE()<cr>", "lf" },
-        b    = { "<cmd>lua _BOTTOM_TOGGLE()<cr>", "btm" },
-        p    = { "<cmd>lua _PYTHON_TOGGLE()<cr>", "Python" },
-        f    = { "<cmd>ToggleTerm direction=float<cr>", "Float" },
-        h    = { "<cmd>ToggleTerm size=10 direction=horizontal<cr>", "Horizontal" },
-        v    = { "<cmd>ToggleTerm size=80 direction=vertical<cr>", "Vertical" },
-      },
       p = {
         name = "Package Info",
         c = { "<cmd>lua require('package-info').change_version()<cr>", "Change Version" },
