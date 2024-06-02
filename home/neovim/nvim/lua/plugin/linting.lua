@@ -8,20 +8,20 @@ return {
     local lint = require "lint"
 
     lint.linters_by_ft = {
-      javascript = { "eslint_d" },
-      typescript = { "eslint_d" },
-      javascriptreact = { "eslint_d" },
-      typescriptreact = { "eslint_d" },
-      astro = { "eslint_d" },
+      -- javascript = { "eslint_d" },
+      -- typescript = { "eslint_d" },
+      -- javascriptreact = { "eslint_d" },
+      -- typescriptreact = { "eslint_d" },
+      -- astro = { "eslint_d" },
       css = { "stylelint" },
-      svelte = { "eslint_d" },
+      -- svelte = { "eslint_d" },
       -- prisma = { "prisma-lint" },
       fish = { "fish" },
       go = { "golangcilint" },
       sh = { "shellcheck" },
       nix = { "nix" },
       json = { "jsonlint" },
-      vue = { "eslint_d" },
+      -- vue = { "eslint_d" },
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
