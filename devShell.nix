@@ -5,7 +5,6 @@
       bun
       eslint_d
       prettierd
-      stylelint
     ];
   };
 
@@ -13,7 +12,6 @@
     description = "Deno";
     buildInputs = with pkgs; [
       deno
-      stylelint
     ];
   };
 
@@ -24,7 +22,6 @@
       corepack
       eslint_d
       prettierd
-      stylelint
     ];
   };
 
@@ -35,7 +32,6 @@
       corepack
       eslint_d
       prettierd
-      stylelint
     ];
   };
 }

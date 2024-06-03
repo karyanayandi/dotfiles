@@ -14,7 +14,7 @@
     ./dunst
     ./waybar
     ./node
-    ./qt
+    ./starship
     ./foot
     ./tmux
     ./wofi
