@@ -38,7 +38,6 @@
     unzip
     unrar
     viewnior
-    vscode
     xclip
     yazi
   ];

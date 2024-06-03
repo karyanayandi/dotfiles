@@ -1,4 +1,4 @@
-{pkgs, ...}: 
+{pkgs, ...}: {
   programs.tmux = {
     enable = true;
     terminal = "screen-256color";
@@ -62,6 +62,7 @@
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
       continuum
+      nord
       resurrect
       sensible
       vim-tmux-navigator

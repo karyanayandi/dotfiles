@@ -4,26 +4,26 @@ return {
     local theme = require "lualine.themes.onenord"
 
     local mode_color = {
-      n = "#7fa2ac",
-      i = "#6a9955",
-      v = "#b16286",
-      [""] = "#b16286",
-      V = "#b16286",
+      n = "#88C0D0",
+      i = "#A3BE8C",
+      v = "#BF616A",
+      [""] = "#BF616A",
+      V = "#BF616A",
       c = "#458588",
-      no = "#7fa2ac",
-      s = "#fb4934",
-      S = "#fb4934",
-      [""] = "#fb4934",
+      no = "#88C0D0",
+      s = "#D08770",
+      S = "#D08770",
+      [""] = "#D08770",
       ic = "#EBCB8B",
-      R = "#fb4934",
-      Rv = "#fb4934",
-      cv = "#7fa2ac",
-      ce = "#7fa2ac",
-      r = "#fb4934",
-      rm = "#458588",
-      ["r?"] = "#458588",
-      ["!"] = "#458588",
-      t = "#ebdbb2",
+      R = "#D08770",
+      Rv = "#D08770",
+      cv = "#88C0D0",
+      ce = "#88C0D0",
+      r = "#D08770",
+      rm = "#8FBCBB",
+      ["r?"] = "#8FBCBB",
+      ["!"] = "#8FBCBB",
+      t = "#EBCB8B",
     }
 
     local hide_in_width = function()
@@ -32,10 +32,10 @@ return {
 
     local icons = require "config.icons"
 
-    vim.api.nvim_set_hl(0, "SLGitIcon", { fg = "#504945", bg = "#dedede" })
-    vim.api.nvim_set_hl(0, "SLBranchName", { fg = "#504945", bg = "#dedede", bold = false })
-    vim.api.nvim_set_hl(0, "SLProgress", { fg = "#dedede", bg = "#2E3440" })
-    vim.api.nvim_set_hl(0, "SLSeparator", { fg = "#808080", bg = "#252525" })
+    vim.api.nvim_set_hl(0, "SLGitIcon", { fg = "#4C566A", bg = "#ECEFF4" })
+    vim.api.nvim_set_hl(0, "SLBranchName", { fg = "#4C566A", bg = "#ECEFF4", bold = false })
+    vim.api.nvim_set_hl(0, "SLProgress", { fg = "#ECEFF4", bg = "#2E3440" })
+    vim.api.nvim_set_hl(0, "SLSeparator", { fg = "#3B4252", bg = "#2E3440" })
 
     local diagnostics = {
       "diagnostics",
@@ -59,7 +59,7 @@ return {
       "filetype",
       icons_enabled = true,
       color = function()
-        return { fg = "#e5e9f0" }
+        return { fg = "#E5E9F0" }
       end,
     }
 
@@ -75,14 +75,14 @@ return {
       path = 1,
       shorting_target = 20,
       color = function()
-        return { fg = "#e5e9f0" }
+        return { fg = "#E5E9F0" }
       end,
     }
 
     local location = {
       "location",
       color = function()
-        return { fg = "#2e3440", bg = mode_color[vim.fn.mode()] }
+        return { fg = "#2E3440", bg = mode_color[vim.fn.mode()] }
       end,
     }
 

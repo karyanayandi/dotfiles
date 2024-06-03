@@ -15,7 +15,7 @@
   },
   "clock": {
     "format": "󱑎  {:%H:%M}",
-    "on-click": "alacritty -e date"
+    "on-click": "foot -e date"
   },
   "disk": {
     "interval": 30,
@@ -25,7 +25,7 @@
   "network": {
     "interface": "enp1s0",
     "format": "󰓅  {bandwidthUpBits}",
-    "on-click": "alacritty -e ping 8.8.8.8",
+    "on-click": "foot -e ping 8.8.8.8",
     "interval": 5
  },
   "pulseaudio": {
@@ -41,7 +41,7 @@
   },
   "memory": {
     "format": "󰍛 {used}GB",
-    "on-click": "alacritty -e btm",
+    "on-click": "foot -e btm",
     "interval": 5
   }
 }

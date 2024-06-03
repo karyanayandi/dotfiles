@@ -6,7 +6,7 @@ return {
   priority = 1000,
   config = function()
     require("onenord").setup {
-      theme = "dark",
+      theme = nil,
       borders = true,
       fade_nc = false,
       styles = {

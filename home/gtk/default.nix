@@ -23,14 +23,14 @@
     };
 
     theme = {
-      name = "gruvbox-dark";
-      package = pkgs.gruvbox-dark-gtk;
+      name = "Nordic";
+      package = pkgs.nordic;
     };
 
     gtk2 = {
       configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
       extraConfig = ''
-        gtk-theme-name="gruvbox-dark-gtk"
+        gtk-theme-name="Nordic"
         gtk-xft-antialias=1
         gtk-xft-hinting=1
         gtk-xft-hintstyle="hintfull"
@@ -49,7 +49,7 @@
       ];
 
       extraConfig = {
-        gtk-theme-name = "gruvbox-dark-gtk";
+        gtk-theme-name = "Nordic";
         gtk-application-prefer-dark-theme = 1;
         gtk-xft-antialias = 1;
         gtk-xft-hinting = 1;

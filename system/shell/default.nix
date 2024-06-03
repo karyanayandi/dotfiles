@@ -19,7 +19,7 @@
     ls = "eza --group-directories-first --icons";
     lsl = "eza --group-directories-first -lh --icons";
     ll = "eza -al -g --icons";
-    lzg = "lazygit";
+    gt = "gitui";
     pn = "corepack pnpm";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
     rollback = "nix-env --rollback";
