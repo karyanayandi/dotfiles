@@ -224,7 +224,8 @@ return {
 
     local vmappings = {
       ["/"] = { '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', "Comment" },
-      s = { "<cmd>sort<cr>", "Sort" },
+      s = { "<cmd>:sort<cr>", "Sort" },
+      c = { "<cmd>:CarbonNow<cr>", "Capture Image" },
     }
 
     require("which-key").setup(setup)
