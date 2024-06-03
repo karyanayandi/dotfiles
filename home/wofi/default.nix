@@ -4,44 +4,51 @@
     package = pkgs.wofi;
     settings = {location = "center";};
     style = ''
+      * {
+      	font-family: "Inter", monospace;
+      }
+
       window {
-      margin: 0px;
-      border: 1px solid #928374;
-      background-color: #282828;
+      	background-color: #3B4252;
       }
 
       #input {
-      margin: 5px;
-      border: none;
-      color: #ebdbb2;
-      background-color: #1d2021;
+      	margin: 5px;
+      	border-radius: 0px;
+      	border: none;
+      	background-color: #3B4252;
+      	color: white;
       }
 
       #inner-box {
-      margin: 5px;
-      border: none;
-      background-color: #282828;
+      	background-color: #383C4A;
       }
 
       #outer-box {
-      margin: 5px;
-      border: none;
-      background-color: #282828;
+      	margin: 2px;
+      	padding: 10px;
+      	background-color: #383C4A;
       }
 
       #scroll {
-      margin: 0px;
-      border: none;
+      	margin: 5px;
       }
 
       #text {
-      margin: 5px;
-      border: none;
-      color: #ebdbb2;
+      	padding: 4px;
+      	color: white;
+      }
+
+      #entry:nth-child(even){
+      	background-color: #404552;
       }
 
       #entry:selected {
-      background-color: #1d2021;
+      	background-color: #4C566A;
+      }
+
+      #text:selected {
+      	background: transparent;
       }
     '';
   };

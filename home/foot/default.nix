@@ -10,7 +10,7 @@
         hide-when-typing = "yes";
       };
       cursor = {
-        color = "2e3440";
+        color = "2e3440 d8dee9";
       };
       colors = {
         foreground = "d8dee9";
@@ -24,7 +24,6 @@
         regular5 = "81a1c1";
         regular6 = "b48ead";
         regular7 = "88c0d0";
-        regular8 = "e5e9f0";
         bright1 = "4c566a";
         bright2 = "bf616a";
         bright3 = "a3be8c";
@@ -32,7 +31,6 @@
         bright5 = "81a1c1";
         bright6 = "b48ead";
         bright7 = "8fbcbb";
-        bright8 = "eceff4";
         dim1 = "373e4d";
         dim2 = "94545d";
         dim3 = "809575";
@@ -40,7 +38,6 @@
         dim5 = "68809a";
         dim6 = "8c738c";
         dim7 = "6d96a5";
-        dim8 = "aeb3bb";
       };
     };
   };
