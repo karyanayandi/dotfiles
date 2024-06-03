@@ -13,11 +13,5 @@
   };
 
   programs.gh.enable = true;
-  programs.lazygit = {
-    enable = true;
-    settings = {
-      mouseEvents = true;
-      nerdFontsVersion = "";
-    };
-  };
+  programs.lazygit.enable = true;
 }
