@@ -87,7 +87,6 @@ keymap("n", ";g", "<cmd>Telescope git_branches theme=ivy<cr>", opts)
 -- Find help tags
 keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", opts)
 
-
 -- Find Projects
 keymap("n", ";p", "<cmd>lua require('telescope').extensions.projects.projects()<cr>", opts)
 

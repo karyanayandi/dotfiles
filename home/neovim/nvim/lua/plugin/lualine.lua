@@ -1,7 +1,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   config = function()
-    local theme = require "lualine.themes.gruvbox-material"
+    local theme = require "lualine.themes.onenord"
 
     local mode_color = {
       n = "#7fa2ac",
