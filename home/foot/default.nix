@@ -4,8 +4,8 @@
     settings = {
       main = {
         font = "Fira Code Nerd Font:size=11:line-height=16px";
+        dpi-aware = "yes";
       };
-      dpi-aware = "yes";
       mouse = {
         hide-when-typing = "yes";
       };
