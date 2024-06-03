@@ -10,10 +10,10 @@ return {
       borders = true,
       fade_nc = false,
       styles = {
-        comments = "NONE",
+        comments = "italic",
         strings = "NONE",
         keywords = "NONE",
-        functions = "italic",
+        functions = "NONE",
         variables = "NONE",
         diagnostics = "underline",
       },
