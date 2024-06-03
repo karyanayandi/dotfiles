@@ -37,6 +37,7 @@
       stashing_save: Some(( code: Char('w'), modifiers: "")),
       stashing_toggle_index: Some(( code: Char('m'), modifiers: "")),
       stash_open: Some(( code: Char('l'), modifiers: "")),
-      abort_merge: Some(( code: Char('M'), modifiers: "SHIFT")),    '';
+      abort_merge: Some(( code: Char('M'), modifiers: "SHIFT")),
+    '';
   };
 }

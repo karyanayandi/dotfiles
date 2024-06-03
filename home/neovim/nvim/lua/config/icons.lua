@@ -68,8 +68,8 @@ return {
     Untracked = "★",
   },
   ui = {
-    ArrowClosed = "",
-    ArrowOpen = "",
+    ArrowClosed = " ",
+    ArrowOpen = " ",
     Lock = " ",
     Circle = " ",
     BigCircle = " ",
