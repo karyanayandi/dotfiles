@@ -10,7 +10,7 @@
         hide-when-typing = "yes";
       };
       cursor = {
-        color = ["2e3440" "d8dee9"];
+        color = "2e3440";
       };
       colors = {
         foreground = "d8dee9";
