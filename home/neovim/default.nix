@@ -70,6 +70,7 @@ in {
     require "config.icons"
     require "config.keymaps"
     require "config.options"
+    vim.cmd.colorscheme('onenord')
     vim.opt.runtimepath:append("${treesitter-parsers}")
   '';
 

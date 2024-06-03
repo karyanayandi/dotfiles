@@ -3,7 +3,7 @@ return {
   -- branch = "custom",
   "rmehri01/onenord.nvim",
   lazy = false,
-  priority = 1001,
+  priority = 1000,
   config = function()
     require("onenord").setup {
       theme = "dark",
@@ -29,5 +29,4 @@ return {
       custom_colors = {},
     }
   end,
-  vim.cmd.colorscheme('onenord')
 }

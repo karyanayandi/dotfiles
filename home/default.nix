@@ -4,13 +4,13 @@
   home.stateVersion = "24.05";
   programs.home-manager.enable = true;
   imports = [
+    ./alacritty
     ./fonts
     ./git
     ./gtk
     ./direnv
     ./neovim
     ./packages
-    ./kitty
     ./hyprland
     ./dunst
     ./waybar
