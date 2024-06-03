@@ -6,8 +6,8 @@
         font = "Fira Code Nerd Font:size=11:line-height=16px";
       };
       colors = {
-        background = "282828";
-        foreground = "d4be98";
+        background = "2E3440";
+        foreground = "C8D0E0";
         regular0 = "3c3836";
         regular1 = "ea6962";
         regular2 = "a9b665";

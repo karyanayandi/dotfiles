@@ -1,18 +1,9 @@
-{pkgs, ...}: let
-  gruvbox = pkgs.fetchFromGitHub {
-    owner = "z3z1ma";
-    repo = "tmux-gruvbox";
-    rev = "main";
-    sha256 = "0kaspb4zk79bsrj4w32fv06wldgzh7fc3yrhw8ayfs1rrwl4w660";
-  };
-in {
+{pkgs, ...}: 
   programs.tmux = {
     enable = true;
     terminal = "screen-256color";
     baseIndex = 1;
     extraConfig = ''
-      run-shell '~/.tmux/tmux-gruvbox/gruvbox.tmux'
-
       unbind-key C-b
 
       set -g prefix C-Space
@@ -24,9 +15,7 @@ in {
       set -g @resurrect-restore 'r'
 
       set-option -g allow-rename off
-      set-option -g status-position top
-      set -g status-bg '#282828'
-      set-option -g status-right ""
+      set -g status off
 
       bind d detach
       bind '\' list-session
@@ -79,6 +68,4 @@ in {
       yank
     ];
   };
-
-  home.file.".tmux/tmux-gruvbox".source = "${gruvbox}/";
 }

@@ -2,7 +2,6 @@
   programs.alacritty = {
     enable = true;
     settings = {
-      shell.program = "/usr/local/bin/fish";
       font = {
         normal = {
           family = "FiraCode Nerd Font";
@@ -16,7 +15,7 @@
           family = "FiraCode Nerd Font";
           style = "Italic";
         };
-        size = "12.0";
+        size = 12.0;
       };
       colors = {
         # Default colors
@@ -58,10 +57,10 @@
             foreground = "#EBCB8B";
             background = "#4C566A";
           };
-          footer_bar = {
-            background = "#434C5E";
-            foreground = "#88C0D0";
-          };
+          # footer_bar = {
+          #   background = "#434C5E";
+          #   foreground = "#88C0D0";
+          # };
         };
 
         hints = {
