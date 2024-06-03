@@ -316,7 +316,7 @@ return {
           winhighlight = "Normal:CmpDoc", },
       },
       experimental = {
-        ghost_text = false,
+        ghost_text = true,
       },
     }
   end,
