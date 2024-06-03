@@ -37,8 +37,8 @@ return {
     vim.cmd "autocmd! TermOpen term://* lua set_terminal_keymaps()"
 
     local Terminal = require("toggleterm.terminal").Terminal
-    local gitui = Terminal:new {
-      cmd = "gitui",
+    local lazygit = Terminal:new {
+      cmd = "lazygit",
       hidden = true,
       direction = "tab",
       on_open = function(_)
@@ -51,8 +51,8 @@ return {
       count = 100,
     }
 
-    function _GITUI_TOGGLE()
-      gitui:toggle()
+    function _LAZYGIT_TOGGLE()
+      lazygit:toggle()
     end
   end
 }

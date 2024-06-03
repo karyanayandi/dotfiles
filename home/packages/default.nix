@@ -40,5 +40,6 @@
     viewnior
     xclip
     yazi
+    zed-editor
   ];
 }
