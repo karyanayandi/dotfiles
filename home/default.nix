@@ -8,6 +8,7 @@
     ./git
     ./gtk
     ./direnv
+    ./lock
     ./neovim
     ./packages
     ./hyprland
