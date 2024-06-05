@@ -12,8 +12,6 @@
     idle = lib.concatStringsSep " " [
       "swayidle -w"
       "timeout 450 'swaylock -f'"
-      "timeout 10 'if pgrep swaylock; then hyprctl dispatch dpms off; fi'"
-      "resume 'hyprctl dispatch dpms on'"
       "before-sleep 'swaylock -f'"
     ];
   };
