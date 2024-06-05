@@ -23,8 +23,6 @@
     lzg = "lazygit";
     pn = "corepack pnpm";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
-    record-video = "wf-recorder --file ~/Videos/Records/Action_$(date +%Y%m%d_%H%M%S).mp4 --codec libx264";
-    stop-record-video = "pkill -f wf-recorder";
     rollback = "nix-env --rollback";
     search = "nix search nixpkgs";
     shell = "nix-shell";

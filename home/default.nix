@@ -14,6 +14,7 @@
     ./dunst
     ./waybar
     ./node
+    ./scripts
     ./starship
     ./foot
     ./tmux
