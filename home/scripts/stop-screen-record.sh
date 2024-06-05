@@ -1,4 +1,5 @@
 #!/bin/bash
 
-killall -9 wf-recorder
-pkill wf-recorder
+pkill -f wf-recorder
+
+dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Stopped'
