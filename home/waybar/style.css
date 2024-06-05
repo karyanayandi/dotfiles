@@ -36,7 +36,8 @@ window#waybar {
 #network,
 #clock,
 #pulseaudio,
-#memory {
+#memory,
+#window {
   background: #2e3440;
   color: #eceff4;
   padding-left: 10px;
