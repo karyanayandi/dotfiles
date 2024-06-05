@@ -6,34 +6,47 @@
 }: {
   home.packages = with pkgs; [swayidle];
 
-  settings.lock = {
-    enable = true;
-    bin = "swaylock";
-    idle = lib.concatStringsSep " " [
-      "swayidle -w"
-      "timeout 450 'swaylock -f'"
-      "before-sleep 'swaylock -f'"
-    ];
-  };
-
   programs.swaylock = {
     enable = true;
     package = pkgs.swaylock-effects;
-    settings =
-      {
-        ignore-empty-password = true;
-        indicator = true;
-        indicator-idle-visible = true;
-        indicator-caps-lock = true;
-        indicator-radius = 100;
-        indicator-thickness = 16;
-        line-uses-inside = true;
-        effect-blur = "9x7";
-        effect-vignette = "0.85:0.85";
-        fade-in = 0.1;
-      }
-      // lib.optionalAttrs (config.settings.wallpaper.${config.settings.scheme} != null) {
-        image = config.settings.wallpaper.${config.settings.scheme};
-      };
+    settings = {
+      daemonize = true;
+      show-failed-attempts = true;
+      clock = true;
+      screenshot = true;
+      effect-blur = "15x15";
+      effect-vignette = "1:1";
+      color = "2e3440cc";
+      font = "Inter";
+      indicator = true;
+      indicator-radius = 200;
+      indicator-thickness = 20;
+      line-color = "2e3440";
+      ring-color = "81a1c1";
+      inside-color = "3b4252";
+      key-hl-color = "b48ead";
+      separator-color = "4c566a";
+      text-color = "d8dee9";
+      text-caps-lock-color = "";
+      line-ver-color = "2e3440";
+      ring-ver-color = "81a1c1";
+      inside-ver-color = "3b4252";
+      text-ver-color = "d8dee9";
+      ring-wrong-color = "bf616a";
+      text-wrong-color = "bf616a";
+      inside-wrong-color = "3b4252";
+      inside-clear-color = "3b4252";
+      text-clear-color = "d8dee9";
+      ring-clear-color = "81a1c1";
+      line-clear-color = "2e3440";
+      line-wrong-color = "2e3440";
+      bs-hl-color = "bf616a";
+      grace = 0;
+      grace-no-touch = true;
+      datestr = "%a, %B %e";
+      timestr = "%I:%M %p";
+      fade-in = 0.3;
+      ignore-empty-password = true;
+    };
   };
 }
