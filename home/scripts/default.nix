@@ -10,10 +10,15 @@
   stopScreenRecordScript = pkgs.writeShellScriptBin "stop-screen-record" ''
     ${builtins.readFile ./stop-screen-record.sh}
   '';
+
+  powerMenuScript = pkgs.writeShellScriptBin "power-menu" ''
+    ${builtins.readFile ./power-menu.sh}
+  '';
 in {
   home.packages = [
     screenRecordScript
     stopScreenRecordScript
+    powerMenuScript
   ];
 
   home.sessionVariables = {
