@@ -4,5 +4,5 @@ mkdir -p ~/Videos/Records/
 time=$(date +"%y.%m.%d_%H:%M:%S")
 
 wf-recorder \
---file ~/Videos/Action_"$time".mp4 \
+--file ~/Videos/Records/Action_"$time".mp4 \
 --codec libx264

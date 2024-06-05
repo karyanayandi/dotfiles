@@ -3,36 +3,20 @@
   pkgs,
   ...
 }: let
-  createExecutableScript = {
-    name,
-    content,
-  }:
-    pkgs.runCommand name {} ''
-      mkdir -p $out/bin
-      scriptPath=$out/bin/${name}
-      echo "${content}" > ${scriptPath}
-      chmod +x ${scriptPath}
-    '';
+  screenRecordScript = pkgs.writeShellScriptBin "screen-record" ''
+    ${builtins.readFile ./screen-record.sh}
+  '';
 
-  screenRecordScriptContent = builtins.readFile ./screen-record.sh;
-  stopScreenRecordScriptContent = builtins.readFile ./stop-screen-record.sh;
-
-  screenRecordScript = createExecutableScript {
-    name = "screen-record";
-    content = screenRecordScriptContent;
-  };
-
-  stopScreenRecordScript = createExecutableScript {
-    name = "stop-screen-record";
-    content = stopScreenRecordScriptContent;
-  };
+  stopScreenRecordScript = pkgs.writeShellScriptBin "stop-screen-record" ''
+    ${builtins.readFile ./stop-screen-record.sh}
+  '';
 in {
-  home.packages = with pkgs; [
+  home.packages = [
     screenRecordScript
     stopScreenRecordScript
   ];
 
   home.sessionVariables = {
-    PATH = "${config.home.homeDirectory}/.local/share/bin:$PATH";
+    PATH = "${config.home.homeDirectory}/.local/share/bin:${pkgs.coreutils}/bin";
   };
 }
