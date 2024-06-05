@@ -3,15 +3,19 @@
 entries="Logout\nSuspend\nReboot\nShutdown"
 placeholder="Select an action"
 
-selected=$(echo -e $entries | wofi --dmenu --cache-file /dev/null --prompt "$placeholder" | awk -F '\t' '{print tolower($2)}')
+selected=$(echo -e "$entries" | wofi --dmenu --cache-file /dev/null --prompt "$placeholder" | tr '[:upper:]' '[:lower:]')
 
 case $selected in
   logout)
-    hyprctl dispatch exit;;
+    hyprctl dispatch exit
+    ;;
   suspend)
-    exec systemctl suspend;;
+    systemctl suspend
+    ;;
   reboot)
-    exec systemctl reboot;;
+    systemctl reboot
+    ;;
   shutdown)
-    exec systemctl poweroff -i;;
+    systemctl poweroff -i
+    ;;
 esac
