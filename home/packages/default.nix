@@ -7,6 +7,7 @@
     bun
     chafa
     cinnamon.nemo
+    cinnamon.nemo-fileroller
     corepack
     eslint_d
     eza
@@ -38,6 +39,7 @@
     unzip
     unrar
     viewnior
+    wf-recorder
     xclip
     yazi
     zed-editor

@@ -9,6 +9,7 @@
     cdp = "cd ~/Projects";
     clean = "nix profile wipe-history && sudo nix-collect-garbage -d && sudo nix-collect-garbage --delete-old && sudo nix store gc && sudo nix-store --verify --repair --check-contents";
     clean-node = "find . -type d -name 'node_modules' -exec rm -rf {} +;";
+    clean-trash = "rm -rf ~/.local/share/Trash/*";
     delete-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations";
     dev = "nix develop";
     e = "nvim";
@@ -22,6 +23,8 @@
     lzg = "lazygit";
     pn = "corepack pnpm";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
+    record-video = "wf-recorder --file ~/Videos/Records/Action_$(date +%Y%m%d_%H%M%S).mp4 --codec libx264";
+    stop-record-video = "pkill -f wf-recorder";
     rollback = "nix-env --rollback";
     search = "nix search nixpkgs";
     shell = "nix-shell";
