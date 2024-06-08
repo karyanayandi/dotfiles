@@ -15,8 +15,9 @@ return {
     }
 
     vim.g.indentLine_enabled = 1
-    vim.g.indent_blankline_char = "▏"
-    vim.g.indent_blankline_show_trailing_blankline_indent = false
+    vim.g.indent_blankline_char = "│"
+    vim.g.indent_blankline_scope_char = "│"
+    vim.g.indent_blankline_show_trailing_blankline_indent = true
     vim.g.indent_blankline_show_first_indent_level = true
     vim.g.indent_blankline_use_treesitter = true
     vim.g.indent_blankline_show_current_context = true
@@ -42,8 +43,6 @@ return {
       "import_statement",
       "operation_type",
     }
-    require("ibl").setup {
-      -- show_current_context = true,
-    }
+    require("ibl").setup {}
   end,
 }
