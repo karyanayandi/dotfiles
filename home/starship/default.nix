@@ -7,7 +7,7 @@
       # right_format = "$all";
       command_timeout = 1000;
       git_branch = {
-        symbol = "";
+        symbol = " ";
         format = "[$symbol$branch]($style)";
       };
       aws = {
