@@ -25,9 +25,11 @@ in {
     eslint_d
     gcc
     go
+    luajitPackages.lua-lsp
     nil
     nodejs
     prettierd
+    rust-analyzer
     rustup
   ];
 }

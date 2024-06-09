@@ -18,7 +18,6 @@
     google-chrome
     insomnia
     inxi
-    luajitPackages.lua-lsp
     mpv
     pfetch
     openssl
