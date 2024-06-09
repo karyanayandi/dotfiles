@@ -1,5 +1,6 @@
 {
   imports = [
+    ./disk
     ./dbus
     ./xserver
     ./greetd
