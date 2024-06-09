@@ -25,6 +25,7 @@ in {
     eslint_d
     gcc
     go
+    nil
     nodejs
     prettierd
   ];
