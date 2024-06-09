@@ -1,8 +1,5 @@
 return {
   "nvim-lualine/lualine.nvim",
-  dependencies = {
-    "AndreM222/copilot-lualine",
-  },
   config = function()
     local hide_in_width = function()
       return vim.fn.winwidth(0) > 80
@@ -41,25 +38,6 @@ return {
       icon = { "", align = "left" }
     }
 
-    local copilot = {
-      "copilot",
-      show_colors = true,
-      show_loading = true
-    }
-
-    -- local lsp_client = function()
-    --   local clients = vim.lsp.get_clients()
-    --   if next(clients) == nil then
-    --     return ""
-    --   end
-    --
-    --   local c = {}
-    --   for _, client in pairs(clients) do
-    --     table.insert(c, client.name)
-    --   end
-    --   return "\u{f085}  " .. table.concat(c, ", ")
-    -- end
-
     require("lualine").setup {
       options = {
         globalstatus = true,
@@ -74,7 +52,7 @@ return {
         lualine_a = { branch },
         lualine_b = {},
         lualine_c = { diff },
-        lualine_x = { copilot, diagnostics },
+        lualine_x = { diagnostics },
         lualine_y = { filetype },
         lualine_z = { "location" },
       },
