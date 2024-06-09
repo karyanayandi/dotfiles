@@ -20,6 +20,7 @@
     gh-copilot
     gimp
     gnome.nautilus
+    go
     google-chrome
     inxi
     luajitPackages.lua-lsp
