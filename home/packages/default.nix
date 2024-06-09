@@ -6,7 +6,6 @@
     bottom
     bun
     chafa
-    cinnamon.nemo-with-extensions
     corepack
     eslint_d
     eza
@@ -20,6 +19,7 @@
     gcc
     gh-copilot
     gimp
+    gnome.nautilus
     google-chrome
     inxi
     luajitPackages.lua-lsp
