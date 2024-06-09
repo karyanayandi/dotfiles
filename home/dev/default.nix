@@ -29,7 +29,6 @@ in {
     nodejs
     prettierd
     rust-analyzer
-    rustfmt
     rustup
   ];
 }
