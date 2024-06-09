@@ -21,6 +21,8 @@ in {
   home.packages = with pkgs; [
     alejandra
     bun
+    cargo
+    clippy
     corepack
     eslint_d
     gcc
@@ -29,6 +31,7 @@ in {
     nil
     nodejs
     prettierd
-    rustup
+    rust-analyzer
+    rustc
   ];
 }
