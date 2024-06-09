@@ -3,6 +3,7 @@
     android-tools
     bat
     bottom
+    cinnamon.nemo-with-extensions
     chafa
     eza
     fd
@@ -20,7 +21,6 @@
     mpv
     pfetch
     openssl
-    pantheon.elementary-files
     pavucontrol
     ripgrep
     stdenv.cc.cc.lib
