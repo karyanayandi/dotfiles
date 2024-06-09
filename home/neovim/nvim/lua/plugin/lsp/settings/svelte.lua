@@ -1,7 +1,4 @@
 return {
-  init_options = {
-    typescript = {},
-  },
   settings = {
     typescript = {
       inlayHints = {
@@ -13,5 +10,5 @@ return {
         enumMemberValues = { enabled = true },
       },
     },
-  }
+  },
 }
