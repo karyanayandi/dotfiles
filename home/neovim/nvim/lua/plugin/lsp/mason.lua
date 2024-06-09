@@ -7,6 +7,7 @@ local servers = {
   "html",
   "jsonls",
   "lua_ls",
+  "nil",
   "pyright",
   "svelte",
   "tailwindcss",
