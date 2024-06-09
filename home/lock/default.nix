@@ -17,7 +17,7 @@
       effect-blur = "15x15";
       effect-vignette = "1:1";
       color = "2e3440cc";
-      font = "Jetbrains Mono";
+      font = "JetBrains Mono";
       indicator = true;
       indicator-radius = 200;
       indicator-thickness = 20;

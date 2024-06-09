@@ -14,7 +14,7 @@
         separator_color = "frame";
         idle_threshold = 120;
         show_age-threshole = 60;
-        font = "Jetbrains Mono Nerd Font 10";
+        font = "JetBrains Mono Nerd Font 10";
         line_height = 0;
         format = ''
           <b>%s</b>
