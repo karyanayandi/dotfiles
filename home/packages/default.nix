@@ -16,6 +16,7 @@
     gh-copilot
     gimp
     google-chrome
+    gnome.file-roller
     insomnia
     inxi
     mpv
