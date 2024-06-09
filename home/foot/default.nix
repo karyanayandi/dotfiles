@@ -3,7 +3,7 @@
     enable = true;
     settings = {
       main = {
-        font = "Fira Code Nerd Font:size=11:line-height=16px";
+        font = "Jetbrains Mono Nerd Font:size=11:line-height=16px";
         dpi-aware = "yes";
       };
       mouse = {

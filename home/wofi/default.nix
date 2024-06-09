@@ -5,7 +5,7 @@
     settings = {location = "center";};
     style = ''
       * {
-      	font-family: "Inter", monospace;
+      	font-family: "Jetbrains Mono", monospace;
       }
 
       window {
