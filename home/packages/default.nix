@@ -12,9 +12,11 @@
     fishPlugins.fzf-fish
     fishPlugins.z
     fzf
+    gh-copilot
     gimp
     gnome.nautilus
     google-chrome
+    insomnia
     inxi
     luajitPackages.lua-lsp
     mpv
@@ -23,6 +25,7 @@
     pavucontrol
     ripgrep
     stdenv.cc.cc.lib
+    termius
     tlrc
     tmuxifier
     unzip

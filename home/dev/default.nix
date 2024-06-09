@@ -24,11 +24,8 @@ in {
     corepack
     eslint_d
     gcc
-    gh-copilot
     go
-    insomnia
     nodejs
     prettierd
-    termius
   ];
 }
