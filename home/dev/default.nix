@@ -18,7 +18,17 @@ in {
     NPM_CONFIG_PREFIX = "${config.home.homeDirectory}/.cache/npm/global";
   };
 
-  home.packages = [
-    pkgs.nodejs
+  home.packages = with pkgs; [
+    alejandra
+    bun
+    corepack
+    eslint_d
+    gcc
+    gh-copilot
+    go
+    insomnia
+    nodejs
+    prettierd
+    termius
   ];
 }

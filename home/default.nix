@@ -14,7 +14,7 @@
     ./hyprland
     ./dunst
     ./waybar
-    ./node
+    ./dev
     ./scripts
     ./starship
     ./foot
