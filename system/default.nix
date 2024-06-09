@@ -18,7 +18,9 @@
   environment = {
     variables = {EDITOR = "vim";};
     systemPackages = with pkgs; [
+      bat
       curl
+      eza
       git
       lsof
       vim
@@ -75,7 +77,7 @@
     ./sound
     ./users
     ./security
-    # ./shell
+    ./shell
     ./init
     ./thefuck
     ./services
