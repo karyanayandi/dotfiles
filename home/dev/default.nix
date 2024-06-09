@@ -9,13 +9,9 @@
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
     npm install -g ls_emmet
   '';
-  rustConfig = ''
-    rustup default stable
-  '';
 in {
   home.activation.configureNode = ''
     ${nodeJsConfig}
-    ${rustConfig}
   '';
 
   home.sessionVariables = {
