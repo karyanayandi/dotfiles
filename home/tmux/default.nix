@@ -6,16 +6,17 @@
     extraConfig = ''
       unbind-key C-b
 
+      set -g status off
       set -g prefix C-Space
       set -g mouse on
       set -g history-limit 5000
+
       set -g @continuum-restore 'on'
       set -g @continuum-save-interval '60'
       set -g @resurrect-save 's'
       set -g @resurrect-restore 'r'
 
       set-option -g allow-rename off
-      set -g status off
 
       bind d detach
       bind '\' list-session
@@ -58,11 +59,11 @@
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
+
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
       continuum
-      nord
       resurrect
       sensible
       vim-tmux-navigator
