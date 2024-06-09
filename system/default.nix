@@ -41,7 +41,7 @@
 
   fileSystems = {
     "/home/karyana/HDD" = {
-      device = "/dev/sda1";
+      device = "/dev/sdb1";
       fsType = "ntfs-3g";
       options = ["rw" "uid=1000"];
     };
