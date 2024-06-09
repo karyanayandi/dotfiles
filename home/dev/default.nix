@@ -28,5 +28,8 @@ in {
     nil
     nodejs
     prettierd
+    rust-analyzer
+    rustfmt
+    rustup
   ];
 }
