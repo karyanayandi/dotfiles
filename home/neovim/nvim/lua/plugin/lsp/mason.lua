@@ -5,7 +5,7 @@ local servers = {
   "html",
   "jsonls",
   "lua_ls",
-  "vtsls",
+  "tsserver",
   "pyright",
   "yamlls",
   "bashls",
