@@ -6,8 +6,7 @@
     bottom
     bun
     chafa
-    cinnamon.nemo
-    cinnamon.nemo-fileroller
+    cinnamon.nemo-with-extensions
     corepack
     eslint_d
     eza
@@ -32,7 +31,6 @@
     prettierd
     ripgrep
     stdenv.cc.cc.lib
-    stylelint
     termius
     tlrc
     tmuxifier

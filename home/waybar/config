@@ -30,7 +30,7 @@
     "interval": 5
  },
   "pulseaudio": {
-    "format": "{icon} {volume}%",
+    "format": "{icon}{volume}%",
     "format-muted": "󰸈 ",
     "tooltip": false,
     "format-icons": {
@@ -41,7 +41,7 @@
     "on-click": "amixer set Master toggle"
   },
   "memory": {
-    "format": "󰍛 {used}GB",
+    "format": "󰍛{used}GB",
     "on-click": "foot -e btm",
     "interval": 5
   }

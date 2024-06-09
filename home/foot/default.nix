@@ -3,7 +3,7 @@
     enable = true;
     settings = {
       main = {
-        font = "JetBrains Mono Nerd Font:size=11:line-height=16px";
+        font = "JetBrains Mono Nerd Font:size=12:line-height=16px";
         dpi-aware = "yes";
       };
       mouse = {
@@ -25,7 +25,6 @@
         regular5 = "b48ead";
         regular6 = "88c0d0";
         regular7 = "e5e9f0";
-
         bright0 = "4c566a";
         bright1 = "bf616a";
         bright2 = "a3be8c";

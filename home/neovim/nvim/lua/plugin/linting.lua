@@ -13,7 +13,6 @@ return {
       javascriptreact = { "eslint_d" },
       typescriptreact = { "eslint_d" },
       astro = { "eslint_d" },
-      css = { "stylelint" },
       svelte = { "eslint_d" },
       prisma = { "prisma-lint" },
       fish = { "fish" },
