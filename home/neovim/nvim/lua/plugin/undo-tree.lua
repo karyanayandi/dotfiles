@@ -3,7 +3,7 @@ return {
   opts = {
 
     float_diff = false,
-    layout = "left_bottom", -- "left_bottom", "left_left_bottom"
+    layout = "left_bottom",
     ignore_filetype = { "Undotree", "UndotreeDiff", "qf", "TelescopePrompt", "spectre_panel" },
     window = {
       winblend = 4,
