@@ -16,7 +16,7 @@
     ./waybar
     ./dev
     ./scripts
-    ./starship
+    ./shell
     ./foot
     ./tmux
     ./wofi
