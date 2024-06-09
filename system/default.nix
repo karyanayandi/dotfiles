@@ -75,7 +75,7 @@
     ./sound
     ./users
     ./security
-    ./shell
+    # ./shell
     ./init
     ./thefuck
     ./services

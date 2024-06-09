@@ -14,13 +14,13 @@
     fzf
     gh-copilot
     gimp
-    gnome.nautilus
     google-chrome
     insomnia
     inxi
     mpv
     pfetch
     openssl
+    pantheon.elementary-files
     pavucontrol
     ripgrep
     stdenv.cc.cc.lib
