@@ -29,7 +29,6 @@ in {
     nil
     nodejs
     prettierd
-    rust-analyzer
     rustup
   ];
 }
