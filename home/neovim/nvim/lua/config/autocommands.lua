@@ -108,22 +108,31 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-vim.api.nvim_create_user_command("AutoFormatDisable", function(args)
-  if args.bang then
-    vim.b.disable_autoformat = true
-  else
-    vim.g.disable_autoformat = true
+vim.api.nvim_create_autocmd("InsertEnter", {
+  pattern = "*",
+  callback = function()
+    vim.lsp.inlay_hint.enable(false)
   end
-  vim.notify("autoformat-on-save disabled", "info")
-end, {
-  desc = "Disable autoformat-on-save",
-  bang = true,
 })
 
-vim.api.nvim_create_user_command("AutoFormatEnable", function()
-  vim.b.disable_autoformat = false
-  vim.g.disable_autoformat = false
-  vim.notify("autoformat-on-save re-enabled", "info")
+vim.api.nvim_create_autocmd("InsertLeave", {
+  pattern = "*",
+  callback = function()
+    vim.lsp.inlay_hint.enable(true)
+  end
+})
+
+vim.api.nvim_create_user_command("AutoFormatOnSaveToggle", function(args)
+  local autoformat_var = args.bang and vim.b or vim.g
+
+  if autoformat_var.disable_autoformat then
+    autoformat_var.disable_autoformat = false
+    vim.notify("autoformat-on-save re-enabled", "info")
+  else
+    autoformat_var.disable_autoformat = true
+    vim.notify("autoformat-on-save disabled", "info")
+  end
 end, {
-  desc = "Re-enable autoformat-on-save",
+  desc = "Toggle autoformat-on-save",
+  bang = true,
 })
