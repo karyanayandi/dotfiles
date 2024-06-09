@@ -45,7 +45,7 @@ return {
         theme = "auto",
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
-        disabled_filetypes = { "alpha", "dashboard", "TelescopePrompt", "qf", "undotree", "spectre_panel" },
+        disabled_filetypes = { "alpha", "dashboard", "TelescopePrompt", "qf", "undotree", "spectre_panel", "NvimTree" },
         always_divide_middle = true,
       },
       sections = {

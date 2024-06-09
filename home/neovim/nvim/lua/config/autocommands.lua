@@ -108,19 +108,19 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-vim.api.nvim_create_autocmd("InsertEnter", {
-  pattern = "*",
-  callback = function()
-    vim.lsp.inlay_hint.enable(false)
-  end
-})
-
-vim.api.nvim_create_autocmd("InsertLeave", {
-  pattern = "*",
-  callback = function()
-    vim.lsp.inlay_hint.enable(true)
-  end
-})
+-- vim.api.nvim_create_autocmd("InsertEnter", {
+--   pattern = "*",
+--   callback = function()
+--     vim.lsp.inlay_hint.enable(false)
+--   end
+-- })
+--
+-- vim.api.nvim_create_autocmd("InsertLeave", {
+--   pattern = "*",
+--   callback = function()
+--     vim.lsp.inlay_hint.enable(true)
+--   end
+-- })
 
 vim.api.nvim_create_user_command("AutoFormatOnSaveToggle", function(args)
   local autoformat_var = args.bang and vim.b or vim.g
