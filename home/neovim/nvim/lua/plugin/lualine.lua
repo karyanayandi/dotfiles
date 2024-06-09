@@ -3,29 +3,6 @@ return {
   config = function()
     local theme = require "lualine.themes.onenord"
 
-    local mode_color = {
-      n = "#88C0D0",
-      i = "#A3BE8C",
-      v = "#BF616A",
-      [""] = "#BF616A",
-      V = "#BF616A",
-      c = "#458588",
-      no = "#88C0D0",
-      s = "#D08770",
-      S = "#D08770",
-      [""] = "#D08770",
-      ic = "#EBCB8B",
-      R = "#D08770",
-      Rv = "#D08770",
-      cv = "#88C0D0",
-      ce = "#88C0D0",
-      r = "#D08770",
-      rm = "#8FBCBB",
-      ["r?"] = "#8FBCBB",
-      ["!"] = "#8FBCBB",
-      t = "#EBCB8B",
-    }
-
     local hide_in_width = function()
       return vim.fn.winwidth(0) > 80
     end
@@ -33,7 +10,7 @@ return {
     local icons = require "config.icons"
 
     vim.api.nvim_set_hl(0, "SLGitIcon", { fg = "#4C566A", bg = "#ECEFF4" })
-    vim.api.nvim_set_hl(0, "SLBranchName", { fg = "#4C566A", bg = "#ECEFF4", bold = false })
+    vim.api.nvim_set_hl(0, "SLBranchName", { fg = "#4C566A", bold = true })
     vim.api.nvim_set_hl(0, "SLProgress", { fg = "#ECEFF4", bg = "#2E3440" })
     vim.api.nvim_set_hl(0, "SLSeparator", { fg = "#3B4252", bg = "#2E3440" })
 
@@ -69,23 +46,6 @@ return {
       icon = "%#SLGitIcon#" .. "" .. "%*" .. "%#SLBranchName#",
     }
 
-    local filename = {
-      "filename",
-      file_status = false,
-      path = 1,
-      shorting_target = 20,
-      color = function()
-        return { fg = "#E5E9F0" }
-      end,
-    }
-
-    local location = {
-      "location",
-      color = function()
-        return { fg = "#2E3440", bg = mode_color[vim.fn.mode()] }
-      end,
-    }
-
     require("lualine").setup {
       options = {
         globalstatus = true,
@@ -98,11 +58,11 @@ return {
       },
       sections = {
         lualine_a = { branch },
-        lualine_b = { filename },
-        lualine_c = { diagnostics },
-        lualine_x = { diff },
+        lualine_b = { diff },
+        lualine_c = { "" },
+        lualine_x = { diagnostics },
         lualine_y = { filetype },
-        lualine_z = { location },
+        lualine_z = { "location" },
       },
       tabline = {},
       extensions = {},
