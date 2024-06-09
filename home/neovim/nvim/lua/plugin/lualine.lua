@@ -72,10 +72,10 @@ return {
       },
       sections = {
         lualine_a = { branch },
-        lualine_b = { filetype },
+        lualine_b = {},
         lualine_c = { diff },
         lualine_x = { copilot, diagnostics },
-        lualine_y = {},
+        lualine_y = { filetype },
         lualine_z = { "location" },
       },
       tabline = {},
