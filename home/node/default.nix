@@ -7,7 +7,7 @@
     export PATH=${pkgs.nodejs}/bin:$PATH
     npm config set prefix "${config.home.homeDirectory}/.cache/npm/global"
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
-    npm install -g ls_emmet @vtsls/language-server
+    npm install -g ls_emmet
   '';
 in {
   home.activation.configureNode = ''

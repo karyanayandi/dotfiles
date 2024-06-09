@@ -3,8 +3,6 @@
     enable = true;
     settings = {
       add_newline = false;
-      # format = "$directory$character";
-      # right_format = "$all";
       command_timeout = 1000;
       git_branch = {
         symbol = " ";
