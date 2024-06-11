@@ -27,7 +27,6 @@
     stdenv.cc.cc.lib
     termius
     tlrc
-    tmuxifier
     unzip
     unrar
     viewnior

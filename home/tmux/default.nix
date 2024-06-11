@@ -11,13 +11,6 @@
       set -g mouse on
       set -g history-limit 5000
 
-      set -g @continuum-restore 'on'
-      set -g @continuum-save-interval '60'
-      set -g @resurrect-save 's'
-      set -g @resurrect-restore 'r'
-
-      set-option -g allow-rename off
-
       bind d detach
       bind '\' list-session
       bind c new-window
@@ -59,15 +52,28 @@
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
-
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
-      continuum
-      resurrect
       sensible
       vim-tmux-navigator
       yank
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '60'
+        '';
+      }
+      {
+        plugin = resurrect;
+        extraConfig = ''
+          set -g @resurrect-save 's'
+          set -g @resurrect-restore 'r'
+          set -g @resurrect-capture-pane-contents 'on'
+          set -g @resurrect-processes '"~nvim"'
+        '';
+      }
     ];
   };
 }
