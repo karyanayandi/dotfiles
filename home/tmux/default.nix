@@ -55,7 +55,6 @@
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
-      sensible
       vim-tmux-navigator
       yank
       {
