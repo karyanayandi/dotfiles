@@ -32,7 +32,6 @@ in {
     nodejs
     nodePackages.prisma
     prettierd
-    prisma-engines
     rust-analyzer
     rustc
   ];
