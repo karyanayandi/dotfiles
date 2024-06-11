@@ -33,5 +33,11 @@ in {
     prettierd
     rust-analyzer
     rustc
+    # JetBrains IDEs, install just for trying only
+    jetbrains.datagrip
+    jetbrains.goland
+    jetbrains.phpstrom
+    jetbrains.rust-rover
+    jetbrains.webstorm
   ];
 }
