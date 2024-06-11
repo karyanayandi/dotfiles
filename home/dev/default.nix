@@ -7,7 +7,7 @@
     export PATH=${pkgs.nodejs}/bin:$PATH
     npm config set prefix "${config.home.homeDirectory}/.cache/npm/global"
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
-    npm install -g ls_emmet
+    npm install -g ls_emmet prisma-lint
   '';
 in {
   home.activation.configureNode = ''
@@ -32,6 +32,7 @@ in {
     nodejs
     nodePackages.prisma
     prettierd
+    prisma-engines
     rust-analyzer
     rustc
   ];

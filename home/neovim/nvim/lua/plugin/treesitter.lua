@@ -52,13 +52,13 @@ return {
         enable = true,
       },
       indent = { enable = true, disable = { "python" } },
-      -- context_commentstring = {
-      --   enable = true,
-      --   enable_autocmd = false,
-      --   throttle = true,
-      --   max_lines = 0,
-      --   patterns = {},
-      -- },
+      context_commentstring = {
+        enable = true,
+        enable_autocmd = false,
+        throttle = true,
+        max_lines = 0,
+        patterns = {},
+      },
       autotag = {
         enable = true,
         filetypes = {
