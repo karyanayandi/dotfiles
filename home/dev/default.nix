@@ -36,7 +36,7 @@ in {
     # JetBrains IDEs, install just for trying only
     jetbrains.datagrip
     jetbrains.goland
-    jetbrains.phpstrom
+    jetbrains.phpstorm
     jetbrains.rust-rover
     jetbrains.webstorm
   ];
