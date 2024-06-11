@@ -30,6 +30,7 @@ in {
     luajitPackages.lua-lsp
     nil
     nodejs
+    nodePackages.prisma
     prettierd
     rust-analyzer
     rustc

@@ -20,6 +20,7 @@
     p.make
     p.markdown
     p.nix
+    p.prisma
     p.python
     p.rust
     p.toml
