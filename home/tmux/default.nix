@@ -56,6 +56,7 @@
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
       vim-tmux-navigator
+      sensible
       yank
       {
         plugin = continuum;
