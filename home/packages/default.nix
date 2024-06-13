@@ -21,6 +21,7 @@
     inxi
     mpv
     pfetch
+    obsidian
     openssl
     pavucontrol
     ripgrep
