@@ -29,10 +29,6 @@ keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 keymap("n", "<S-l>", ":bnext<CR>", opts)
 keymap("n", "<S-h>", ":bprevious<CR>", opts)
 
--- Move text up and down
-keymap("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
-keymap("n", "<A-k>", "<Esc>:m .-2<CR>==gi", opts)
-
 --  Select All
 keymap("n", "<C-a>", "gg<S-v>G", opts)
 
@@ -53,15 +49,16 @@ keymap("v", "<", "<gv", opts)
 keymap("v", ">", ">gv", opts)
 
 -- Move text up and down
-keymap("v", "<A-j>", ":m .+1<CR>==", opts)
+keymap("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
+keymap("n", "<A-k>", "<Esc>:m .-2<CR>==gi", opts)
 keymap("v", "<A-k>", ":m .-2<CR>==", opts)
+keymap("v", "<A-j>", ":m .+1<CR>==", opts)
 keymap("v", "p", '"_dP', opts)
-
--- Move text up and down
 keymap("x", "J", ":move '>+1<CR>gv-gv", opts)
 keymap("x", "K", ":move '<-2<CR>gv-gv", opts)
 keymap("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
 keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
+
 -- Split Windows
 keymap("n", ";v", "<cmd>vsplit<cr>", opts)
 keymap("n", ";s", "<cmd>split<cr>", opts)
@@ -105,17 +102,11 @@ keymap("n", "<m-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
 -- No HL
 keymap("n", ";z", "<cmd>nohlsearch<cr>", opts)
 
--- Open File lists
-keymap("n", "<F1>", ":e .<cr>", opts)
-
 -- Resume Telescope
 keymap("n", "<F3>", "<cmd>Telescope resume<cr>", opts)
 
 -- Find Telescope commands
 keymap("n", "<F4>", "<cmd>Telescope commands<CR>", opts)
-
--- Treesitter highlight
-keymap("n", "<F5>", "<cmd>TSHighlightCapturesUnderCursor<cr>", opts)
 
 -- Show references
 keymap("n", "<F7>", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
