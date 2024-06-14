@@ -1,3 +1,30 @@
+local icons = require "config.icons"
+
+local diagnostic_signs = {
+  { name = "DiagnosticSignError", text = icons.diagnostics.Error },
+  { name = "DiagnosticSignWarn",  text = icons.diagnostics.Warning },
+  { name = "DiagnosticSignHint",  text = icons.diagnostics.Hint },
+  { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
+}
+
+local diagnostic_config = {
+  virtual_text = false,
+  signs = {
+    active = diagnostic_signs,
+  },
+  update_in_insert = true,
+  underline = true,
+  severity_sort = true,
+  float = {
+    focusable = true,
+    style = "minimal",
+    border = "rounded",
+    source = "always",
+    header = "",
+    prefix = "",
+  },
+}
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -19,28 +46,63 @@ return {
     config = function()
       local M = {}
 
-      M.server_capabilities = function()
-        local active_clients = vim.lsp.get_clients()
-        local active_client_map = {}
+      M.capabilities = vim.lsp.protocol.make_client_capabilities()
 
-        for index, value in ipairs(active_clients) do
-          active_client_map[value.name] = index
-        end
+      local cmp_nvim_lsp = require "cmp_nvim_lsp"
 
-        vim.ui.select(vim.tbl_keys(active_client_map), {
-          prompt = "Select client:",
-          format_item = function(item)
-            return "capabilites for: " .. item
-          end,
-        }, function(choice)
-          print(vim.inspect(vim.lsp.get_clients()[active_client_map[choice]].server_capabilities))
-        end)
+      M.capabilities.textDocument.completion.completionItem.snippetSupport = true
+      M.capabilities.textDocument.completion.completionItem.resolveSupport = {
+        properties = {
+          "documentation",
+          "detail",
+          "additionalTextEdits",
+        },
+      }
+      M.capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
+
+      M.capabilities = cmp_nvim_lsp.default_capabilities(M.capabilities)
+
+      for _, sign in ipairs(diagnostic_signs) do
+        vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
       end
 
-      require("plugin.lsp.handlers").setup()
+      vim.diagnostic.config(diagnostic_config)
+
+      local function lsp_highlight_document(client)
+        local illuminate = require "illuminate"
+        illuminate.on_attach(client)
+      end
+
+      local function lsp_keymaps(bufnr)
+        local opts = { noremap = true, silent = true }
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+        vim.cmd [[ command! Format execute 'lua vim.lsp.buf.format({ async = true })' ]]
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-f>", "<cmd>Format<cr>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-a>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+      end
+
+      M.on_attach = function(client, bufnr)
+        lsp_keymaps(bufnr)
+        lsp_highlight_document(client)
+      end
+
+      function M.remove_augroup(name)
+        if vim.fn.exists("#" .. name) == 1 then
+          vim.cmd("au! " .. name)
+        end
+      end
 
       return M
     end,
   },
 }
-
