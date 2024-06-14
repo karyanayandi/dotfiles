@@ -30,6 +30,7 @@ in {
     golangci-lint
     golangci-lint-langserver
     luajitPackages.lua-lsp
+    luajitPackages.luacheck
     nil
     nodejs
     prettierd
