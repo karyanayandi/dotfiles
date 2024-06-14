@@ -19,23 +19,29 @@ in {
   };
 
   home.packages = with pkgs; [
-    alejandra
     bun
     cargo
     clippy
     corepack
-    eslint_d
     gcc
     go
+    nodejs
+    rustc
+    # Language Servers & Linters
+    alejandra
+    eslint_d
+    goimports-reviser
     golangci-lint
     golangci-lint-langserver
+    gopls
+    jq
     luajitPackages.lua-lsp
     luajitPackages.luacheck
     nil
-    nodejs
     prettierd
+    pyright
+    shellcheck
     rust-analyzer
-    rustc
     # JetBrains IDEs, install just for trying only
     jetbrains.datagrip
     jetbrains.goland
