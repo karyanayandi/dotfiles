@@ -162,7 +162,7 @@ return {
       l = {
         name = "LSP",
         a = { "<cmd>lua require('actions-preview').code_actions()<cr>", "Code Action" },
-        d = { "<cmd>Trouble diagnostics toggle win.position=right<cr>", "Diagnostics" },
+        d = { "<cmd>Trouble diagnostics toggle win.position=bottom<cr>", "Diagnostics" },
         f = { "<cmd>AutoFormatOnSaveToggle<cr>", "Toggle autoformat-on-save" },
         i = { "<cmd>LspInfo<cr>", "Info" },
         h = { "<cmd>ToggleInlayHint<cr>", "Toggle Inlay Hint" },
