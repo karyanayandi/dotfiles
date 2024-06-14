@@ -72,9 +72,9 @@ return {
       ["W"] = { "<cmd>w<CR>", "Write" },
       ["h"] = { "<cmd>nohlsearch<CR>", "No HL" },
       ["q"] = { "<cmd>lua require('config.functions').smart_quit()<CR>", "Quit" },
-      ["T"] = { "<cmd>lua _FLOAT_TERM()<cr>", "Terminal"},
+      ["T"] = { "<cmd>lua _FLOAT_TERM()<cr>", "Terminal" },
       ["/"] = { '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>', "Comment" },
-      ["P"] = { "<cmd>lua require('telescope').extensions.projects.projects()<cr>", "Projects" },
+      ["p"] = { "<cmd>lua require('telescope').extensions.projects.projects()<cr>", "Projects" },
       ["gy"] = "Link",
       z = {
         name = "Lazy",
@@ -197,16 +197,6 @@ return {
         a = { "<cmd>TestSuite<cr>", "All" },
         l = { "<cmd>TestLast<cr>", "Last" },
         v = { "<cmd>TestVisit<cr>", "Visit" },
-      },
-      p = {
-        name = "Package Info",
-        c = { "<cmd>lua require('package-info').change_version()<cr>", "Change Version" },
-        d = { "<cmd>lua require('package-info').delete()<cr>", "Delete" },
-        h = { "<cmd>lua require('package-info').hide()<cr>", "Hide" },
-        i = { "<cmd>lua require('package-info').install()<cr>", "Install" },
-        s = { "<cmd>lua require('package-info').show()<cr>", "Show" },
-        t = { "<cmd>lua require('package-info').toggle()<cr>", "Toggle" },
-        u = { "<cmd>lua require('package-info').update()<cr>", "Update" },
       },
       w = {
         name = "Workspaces",
