@@ -1,30 +1,3 @@
-local icons = require "config.icons"
-
-local diagnostic_signs = {
-  { name = "DiagnosticSignError", text = icons.diagnostics.Error },
-  { name = "DiagnosticSignWarn",  text = icons.diagnostics.Warning },
-  { name = "DiagnosticSignHint",  text = icons.diagnostics.Hint },
-  { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
-}
-
-local diagnostic_config = {
-  virtual_text = false,
-  signs = {
-    active = diagnostic_signs,
-  },
-  update_in_insert = true,
-  underline = true,
-  severity_sort = true,
-  float = {
-    focusable = true,
-    style = "minimal",
-    border = "rounded",
-    source = "always",
-    header = "",
-    prefix = "",
-  },
-}
-
 return {
   {
     "neovim/nvim-lspconfig",
@@ -64,6 +37,35 @@ return {
       }
 
       M.capabilities = cmp_nvim_lsp.default_capabilities(M.capabilities)
+
+
+      local icons = require "config.icons"
+
+      local diagnostic_signs = {
+        { name = "DiagnosticSignError", text = icons.diagnostics.Error },
+        { name = "DiagnosticSignWarn",  text = icons.diagnostics.Warning },
+        { name = "DiagnosticSignHint",  text = icons.diagnostics.Hint },
+        { name = "DiagnosticSignInfo",  text = icons.diagnostics.Information },
+      }
+
+      local diagnostic_config = {
+        virtual_text = false,
+        signs = {
+          active = diagnostic_signs,
+        },
+        update_in_insert = true,
+        underline = true,
+        severity_sort = true,
+        float = {
+          focusable = true,
+          style = "minimal",
+          border = "rounded",
+          source = "always",
+          header = "",
+          prefix = "",
+        },
+      }
+
 
       for _, sign in ipairs(diagnostic_signs) do
         vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
