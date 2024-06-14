@@ -27,6 +27,8 @@ in {
     eslint_d
     gcc
     go
+    golangci-lint
+    golangci-lint-langserver
     luajitPackages.lua-lsp
     nil
     nodejs
