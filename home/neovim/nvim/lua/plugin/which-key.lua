@@ -153,7 +153,6 @@ return {
       l = {
         name = "LSP",
         a = { "<cmd>lua require('actions-preview').code_actions()<cr>", "Code Action" },
-        c = { "<cmd>lua require('lsp').server_capabilities()<cr>", "Get Capabilities" },
         d = { "<cmd>Trouble diagnostics toggle win.position=right<cr>", "Diagnostics" },
         f = { "<cmd>AutoFormatOnSaveToggle<cr>", "Toggle autoformat-on-save" },
         i = { "<cmd>LspInfo<cr>", "Info" },
