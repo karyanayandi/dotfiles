@@ -16,7 +16,7 @@ return {
       svelte = { "eslint_d" },
       prisma = { "prisma-lint" },
       fish = { "fish" },
-      go = { "golangcilint" },
+      go = { "golangci_lint_ls" },
       sh = { "shellcheck" },
       nix = { "nix" },
       json = { "jsonlint" },
