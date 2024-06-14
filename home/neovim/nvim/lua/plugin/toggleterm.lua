@@ -37,6 +37,7 @@ return {
     vim.cmd "autocmd! TermOpen term://* lua set_terminal_keymaps()"
 
     local Terminal = require("toggleterm.terminal").Terminal
+
     local lazygit = Terminal:new {
       cmd = "lazygit",
       hidden = true,
@@ -54,5 +55,42 @@ return {
     function _LAZYGIT_TOGGLE()
       lazygit:toggle()
     end
-  end
+
+    local float_term = Terminal:new {
+      direction = "float",
+      on_open = function(term)
+        vim.cmd "startinsert!"
+        vim.api.nvim_buf_set_keymap(
+          term.bufnr,
+          "n",
+          "<C-t>",
+          "<cmd>1ToggleTerm direction=float<cr>",
+          { noremap = true, silent = true }
+        )
+        vim.api.nvim_buf_set_keymap(
+          term.bufnr,
+          "t",
+          "<C-t>",
+          "<cmd>1ToggleTerm direction=float<cr>",
+          { noremap = true, silent = true }
+        )
+        vim.api.nvim_buf_set_keymap(
+          term.bufnr,
+          "i",
+          "<C-t>",
+          "<cmd>1ToggleTerm direction=float<cr>",
+          { noremap = true, silent = true }
+        )
+      end,
+      count = 1,
+    }
+
+    function _FLOAT_TERM()
+      float_term:toggle()
+    end
+
+    vim.api.nvim_set_keymap("n", "<C-t>", "<cmd>lua _FLOAT_TERM()<CR>", { noremap = true, silent = true })
+    vim.api.nvim_set_keymap("i", "<C-t>", "<cmd>lua _FLOAT_TERM()<CR>", { noremap = true, silent = true })
+
+  end,
 }

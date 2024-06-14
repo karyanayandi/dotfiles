@@ -76,10 +76,20 @@ keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", opts)
 keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", opts)
 
 -- Find buffers
-keymap("n", ";b", "<cmd>Telescope buffers theme=ivy<cr>", opts)
+keymap(
+  "n",
+  ";b",
+  "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+  opts
+)
 
 -- Find git branches
-keymap("n", ";g", "<cmd>Telescope git_branches theme=ivy<cr>", opts)
+keymap(
+  "n",
+  ";g",
+  "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+  opts
+)
 
 -- Find help tags
 keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", opts)

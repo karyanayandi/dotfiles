@@ -71,7 +71,8 @@ return {
       ["e"] = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
       ["W"] = { "<cmd>w<CR>", "Write" },
       ["h"] = { "<cmd>nohlsearch<CR>", "No HL" },
-      ["q"] = { '<cmd>lua require("config.functions").smart_quit()<CR>', "Quit" },
+      ["q"] = { "<cmd>lua require('config.functions').smart_quit()<CR>", "Quit" },
+      ["T"] = { "<cmd>lua _FLOAT_TERM()<cr>", "Terminal"},
       ["/"] = { '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>', "Comment" },
       ["P"] = { "<cmd>lua require('telescope').extensions.projects.projects()<cr>", "Projects" },
       ["gy"] = "Link",
@@ -93,7 +94,7 @@ return {
         r = { '<cmd>lua require("config.functions").toggle_option("relativenumber")<cr>', "Relative" },
         l = { '<cmd>lua require("config.functions").toggle_option("cursorline")<cr>', "Cursorline" },
         S = { '<cmd>lua require("config.functions").toggle_option("spell")<cr>', "Spell" },
-        s = { '<cmd>sort<cr>', "Short" },
+        s = { "<cmd>sort<cr>", "Short" },
         t = { '<cmd>lua require("config.functions").toggle_tabline()<cr>', "Tabline" },
         c = { "<cmd>Telescope colorscheme<cr>", "Colorscheme" },
       },
@@ -114,13 +115,21 @@ return {
       },
       f = {
         name = "Find",
-        b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
+        b = {
+          "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+          "Buffer",
+        },
+        B = {
+          "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+          "Checkout branch",
+        },
         f = {
           "<cmd>lua require('telescope.builtin').find_files(require('telescope.themes').get_ivy{previewer = false})<cr>",
           "Find files",
         },
         t = { "<cmd>Telescope live_grep theme=ivy<cr>", "Find Text" },
         T = { "<cmd>TodoTelescope theme=ivy<cr>", "Find Todo" },
+        -- TODO: Fix treesitter error when access telecope help_tags
         h = { "<cmd>Telescope help_tags<cr>", "Help" },
         i = { "<cmd>lua require('telescope').extensions.media_files.media_files()<cr>", "Media" },
         l = { "<cmd>Telescope resume<cr>", "Last Search" },
