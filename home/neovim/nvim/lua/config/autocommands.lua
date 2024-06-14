@@ -108,20 +108,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
--- vim.api.nvim_create_autocmd("InsertEnter", {
---   pattern = "*",
---   callback = function()
---     vim.lsp.inlay_hint.enable(false)
---   end
--- })
---
--- vim.api.nvim_create_autocmd("InsertLeave", {
---   pattern = "*",
---   callback = function()
---     vim.lsp.inlay_hint.enable(true)
---   end
--- })
-
 vim.api.nvim_create_user_command("AutoFormatOnSaveToggle", function(args)
   local autoformat_var = args.bang and vim.b or vim.g
 
@@ -136,3 +122,32 @@ end, {
   desc = "Toggle autoformat-on-save",
   bang = true,
 })
+
+vim.api.nvim_create_user_command("ToggleInlayHint", function()
+  ---@diagnostic disable-next-line: missing-parameter
+  local is_enabled = vim.lsp.inlay_hint.is_enabled()
+  vim.lsp.inlay_hint.enable(not is_enabled)
+
+  if not is_enabled then
+    vim.notify("Inlay hint enabled", vim.log.levels.INFO)
+  else
+    vim.notify("Inlay hint disabled", vim.log.levels.INFO)
+  end
+end, {
+  desc = "Toggle inlay hint",
+  bang = true,
+})
+
+-- vim.api.nvim_create_autocmd("InsertEnter", {
+--   pattern = "*",
+--   callback = function()
+--     vim.lsp.inlay_hint.enable(false)
+--   end
+-- })
+--
+-- vim.api.nvim_create_autocmd("InsertLeave", {
+--   pattern = "*",
+--   callback = function()
+--     vim.lsp.inlay_hint.enable(true)
+--   end
+-- })

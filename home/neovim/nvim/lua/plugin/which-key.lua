@@ -157,6 +157,7 @@ return {
         d = { "<cmd>Trouble diagnostics toggle win.position=right<cr>", "Diagnostics" },
         f = { "<cmd>AutoFormatOnSaveToggle<cr>", "Toggle autoformat-on-save" },
         i = { "<cmd>LspInfo<cr>", "Info" },
+        h = { "<cmd>ToggleInlayHint<cr>", "Toggle Inlay Hint" },
         H = { "<cmd>lua require('illuminate').toggle()<cr>", "Toggle Doc HL" },
         I = { "<cmd>LspInstall<cr>", "Installer Info" },
         j = {

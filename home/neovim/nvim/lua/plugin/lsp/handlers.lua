@@ -70,18 +70,6 @@ local function lsp_keymaps(bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-f>", "<cmd>Format<cr>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-a>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-
-  if vim.lsp.inlay_hint then
-    vim.keymap.set(
-      "n",
-      "<leader>lh",
-      function()
-        ---@diagnostic disable-next-line: missing-parameter
-        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-      end,
-      { desc = "Toggle Inlay Hints" }
-    )
-  end
 end
 
 M.on_attach = function(client, bufnr)
