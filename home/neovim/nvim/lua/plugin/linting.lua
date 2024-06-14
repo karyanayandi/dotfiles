@@ -17,6 +17,7 @@ return {
       prisma = { "prisma-lint" },
       fish = { "fish" },
       go = { "golangcilint" },
+      lua = {"luacheck" },
       sh = { "shellcheck" },
       nix = { "nix" },
       json = { "jsonlint" },

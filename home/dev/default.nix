@@ -30,9 +30,11 @@ in {
     # Language Servers & Linters
     alejandra
     eslint_d
+    gofumpt
     goimports-reviser
     golangci-lint
     golangci-lint-langserver
+    golines
     gopls
     jq
     luajitPackages.lua-lsp
@@ -41,6 +43,7 @@ in {
     prettierd
     pyright
     shellcheck
+    stylua
     rust-analyzer
     # JetBrains IDEs, install just for trying only
     jetbrains.datagrip
