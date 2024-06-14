@@ -19,6 +19,7 @@
     gnome.file-roller
     insomnia
     inxi
+    macchina
     mpv
     pfetch
     obsidian
