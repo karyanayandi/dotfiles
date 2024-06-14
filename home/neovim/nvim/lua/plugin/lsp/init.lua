@@ -14,14 +14,6 @@ return {
         cmd = "Neoconf",
         config = true,
       },
-      {
-        "folke/neodev.nvim",
-        opts = {
-          experimental = {
-            pathStrict = true,
-          },
-        },
-      },
     },
     lazy = true,
     config = function()
