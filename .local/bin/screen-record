@@ -1,17 +1,21 @@
 #!/bin/bash
 
-mkdir -p ~/Videos/Records
+dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Started'
+
+mkdir -p ~/Videos
 time=$(date +"%y.%m.%d_%H:%M:%S")
 
 ffmpeg \
 -f x11grab \
 -framerate 25 \
 -s 1920x1080 \
--an -i :0.0 \
+-i :0.0 \
+-f pulse -ac 2 -i default \
 -c:v libx264 \
 -b:v 5M \
 -crf 23 \
--preset fast \
--y ~/Videos/Records/Action_$time.mp4
+-preset ultrafast \
+-c:a aac \
+-b:a 192k \
+-y ~/Videos/Action_$time.mp4
 
-dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Started'
