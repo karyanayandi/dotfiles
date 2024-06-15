@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p ~/Videos
+mkdir -p ~/Videos/Records
 time=$(date +"%y.%m.%d_%H:%M:%S")
 
 ffmpeg \
@@ -8,8 +8,8 @@ ffmpeg \
 -framerate 25 \
 -s 1920x1080 \
 -an -i :0.0 \
--c:v libvpx \
+-c:v libx264 \
 -b:v 5M \
--crf 10 \
--quality realtime \
--y ~/Videos/Action_$time.mkv
+-crf 23 \
+-preset fast \
+-y ~/Videos/Records/Action_$time.mp4

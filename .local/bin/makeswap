@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo btrfs filesystem mkswapfile --size 16g --uuid clear /swapfile && sudo swapon /swapfile

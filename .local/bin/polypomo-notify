@@ -1,5 +1,0 @@
-#!/bin/bash
-notify-send -t 0 -u critical Pomodoro "time reached zero" && paplay /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga
-
-
-
