@@ -2,7 +2,7 @@
 
 dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Started'
 
-mkdir -p ~/Videos
+mkdir -p ~/Videos/Records
 time=$(date +"%y.%m.%d_%H:%M:%S")
 
 ffmpeg \
@@ -17,5 +17,4 @@ ffmpeg \
 -preset ultrafast \
 -c:a aac \
 -b:a 192k \
--y ~/Videos/Action_$time.mp4
-
+-y ~/Videos/Records/Action_$time.mp4
