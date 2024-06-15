@@ -1,0 +1,6 @@
+#!/bin/bash
+
+killall -9 ffmpeg
+pkill ffmpeg
+
+dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Stopped'

@@ -13,3 +13,5 @@ ffmpeg \
 -crf 23 \
 -preset fast \
 -y ~/Videos/Records/Action_$time.mp4
+
+dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Started'
