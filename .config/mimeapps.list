@@ -1,10 +1,8 @@
-
 [Default Applications]
-text/html=google-chrome-unstable.desktop
-x-scheme-handler/http=google-chrome-unstable.desktop
-x-scheme-handler/https=google-chrome-unstable.desktop
-x-scheme-handler/about=google-chrome-unstable.desktop
-x-scheme-handler/unknown=google-chrome-unstable.desktop
-x-scheme-handler/mailto=google-chrome-unstable.desktop
-x-scheme-handler/postman=Postman.desktop
-x-scheme-handler/webcal=google-chrome-unstable.desktop
+text/html=google-chrome-stable.desktop
+x-scheme-handler/http=google-chrome-stable.desktop
+x-scheme-handler/https=google-chrome-stable.desktop
+x-scheme-handler/about=google-chrome-stable.desktop
+x-scheme-handler/unknown=google-chrome-stable.desktop
+x-scheme-handler/mailto=google-chrome-stable.desktop
+x-scheme-handler/webcal=google-chrome-stable.desktop

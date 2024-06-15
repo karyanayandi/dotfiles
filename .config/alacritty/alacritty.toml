@@ -1,0 +1,72 @@
+[font]
+size = 12
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.glyph_offset]
+x = 0
+y = 0
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[font.offset]
+x = 0
+y = 0
+
+[colors.bright]
+black = "0x4C566A"
+blue = "0x81A1C1"
+cyan = "0x8FBCBB"
+green = "0xA3BE8C"
+magenta = "0xB988B0"
+red = "0xBF616A"
+white = "0xECEFF4"
+yellow = "0xEBCB8B"
+
+[colors.hints.end]
+background = "#4C566A"
+foreground = "#81A1C1"
+
+[colors.hints.start]
+background = "#4C566A"
+foreground = "#B988B0"
+
+[colors.normal]
+black = "0x3B4252"
+blue = "0x81A1C1"
+cyan = "0x88C0D0"
+green = "0xA3BE8C"
+magenta = "0xB988B0"
+red = "0xBF616A"
+white = "0xE5E9F0"
+yellow = "0xEBCB8B"
+
+[colors.primary]
+background = "0x2E3440"
+foreground = "0xC8D0E0"
+
+[colors.search.focused_match]
+background = "#4C566A"
+foreground = "#EBCB8B"
+
+[colors.search.matches]
+background = "#4C566A"
+foreground = "#81A1C1"
+
+[colors.selection]
+background = "#3F4758"
+text = "CellForeground"
+
+[window]
+dynamic_padding = true
+
+[window.padding]
+x = 16
+y = 16

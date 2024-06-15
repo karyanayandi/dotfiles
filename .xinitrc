@@ -8,27 +8,27 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 # merge in defaults and keymaps
 
 if [ -f $sysresources ]; then
-    xrdb -merge $sysresources
+	xrdb -merge $sysresources
 fi
 
 if [ -f $sysmodmap ]; then
-    xmodmap $sysmodmap
+	xmodmap $sysmodmap
 fi
 
 if [ -f "$userresources" ]; then
-    xrdb -merge "$userresources"
+	xrdb -merge "$userresources"
 fi
 
 if [ -f "$usermodmap" ]; then
-    xmodmap "$usermodmap"
+	xmodmap "$usermodmap"
 fi
 
 # start some nice programs
-if [ -d /etc/X11/xinit/xinitrc.d ] ; then
- for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
-  [ -x "$f" ] && . "$f"
- done
- unset f
+if [ -d /etc/X11/xinit/xinitrc.d ]; then
+	for f in /etc/X11/xinit/xinitrc.d/?*.sh; do
+		[ -x "$f" ] && . "$f"
+	done
+	unset f
 fi
 
 export PATH="${PATH}:/sbin"
@@ -56,15 +56,20 @@ eval $(/usr/bin/gnome-keyring-daemon --start)
 export SSH_AUTH_SOCK
 mkdir -p "$HOME"/.local/share/keyrings
 
+# Disable laptop keyboard
+device=$(xinput list --id-only 'AT Translated Set 2 keyboard')
+xinput --set-prop "$device" 'Device Enabled' 0
+
 xsetroot -cursor_name left_ptr
 xset b off
 xset r rate 250 25
+xset s off
 xrdb -merge ~/.Xresources
-xrandr --output HDMI-0 --primary --mode 1920x1080 --rate 74.97 --rotate normal
-# setxkbmap -option caps:swapescape
+xrandr --output HDMI-2 --primary --mode 1920x1080 --rate 75 --rotate normal
 
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 devmon &
+# xbindkeys &
 xsettingsd &
 dunst &
 betterlockscreen -u ~/.wallpaper.png
@@ -73,5 +78,6 @@ betterlockscreen -w dim
 
 # start i3 and keep it running
 if [ -f /usr/bin/i3 ]; then
-    exec i3
+	exec i3
 fi
+
