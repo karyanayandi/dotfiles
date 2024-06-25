@@ -2,7 +2,7 @@
   programs.git = {
     enable = true;
     userName = "karyanaayandi";
-    userEmail = "xkaryanayandi@gmail.com";
+    userEmail = "karyana@yandi.me";
     extraConfig = {
       credential.helper = "cache --timeout=18000";
       core.editor = "nvim";
