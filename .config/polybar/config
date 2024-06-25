@@ -43,7 +43,7 @@ cursor-scroll = ns-resize
 
 [bar/desktop]
 inherit = bar/mainbar
-monitor = HDMI-1
+monitor = HDMI-A-0
 modules-left = i3 xwindow
 modules-center = 
 modules-right = pulseaudio date
@@ -174,3 +174,22 @@ animation-charging-foreground = ${colors.foreground-alt}
 animation-charging-framerate = 750
 animation-discharging-foreground = ${colors.foreground-alt}
 animation-discharging-framerate = 750
+
+[module/filesystem]
+type = internal/fs
+interval = 25
+mount-0 = /
+label-mounted =   %percentage_used%%
+label-unmounted = %mountpoint% not mounted
+label-unmounted-foreground = ${colors.foreground-alt}
+
+[module/polypomo]
+type = custom/script
+exec = polypomo
+tail = true
+label = %output%
+click-left = polypomo toggle
+click-right = polypomo end
+click-middle = polypomo lock
+scroll-up = polypomo time +60
+scroll-down = polypomo time -60

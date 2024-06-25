@@ -58,14 +58,15 @@ mkdir -p "$HOME"/.local/share/keyrings
 
 # Disable laptop keyboard
 device=$(xinput list --id-only 'AT Translated Set 2 keyboard')
-xinput --set-prop "$device" 'Device Enabled' 0
+xinput --set-prop $device 'Device Enabled' 0
 
 xsetroot -cursor_name left_ptr
 xset b off
 xset r rate 250 25
 xset s off
 xrdb -merge ~/.Xresources
-xrandr --output HDMI-2 --primary --mode 1920x1080 --rate 75 --rotate normal
+xrandr --output HDMI-A-0 --primary --mode 1920x1080 --rate 74.97 --rotate normal
+# setxkbmap -option caps:swapescape
 
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 devmon &
@@ -80,4 +81,3 @@ betterlockscreen -w dim
 if [ -f /usr/bin/i3 ]; then
 	exec i3
 fi
-
