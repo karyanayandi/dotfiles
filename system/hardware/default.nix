@@ -32,10 +32,9 @@
 
   networking.useDHCP = lib.mkDefault true;
 
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+    enable32bit = true;
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
