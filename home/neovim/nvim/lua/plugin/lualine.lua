@@ -27,6 +27,7 @@ return {
 
     local filename = {
       "filename",
+      icons_enabled = true,
       file_status = false,
       path = 1,
       shorting_target = 20,
@@ -60,8 +61,8 @@ return {
       },
       sections = {
         lualine_a = { branch },
-        lualine_b = {},
-        lualine_c = { diff, filename },
+        lualine_b = { filename },
+        lualine_c = { diff },
         lualine_x = { diagnostics },
         lualine_y = { filetype },
         lualine_z = { "location" },
