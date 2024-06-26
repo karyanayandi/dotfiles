@@ -67,7 +67,6 @@ return {
         lualine_y = { filetype },
         lualine_z = { "location" },
       },
-      tabline = {},
       extensions = {},
     }
   end,
