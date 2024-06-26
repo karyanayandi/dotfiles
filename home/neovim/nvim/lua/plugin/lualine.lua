@@ -25,6 +25,16 @@ return {
       separator = "%#SLSeparator#" .. " " .. "%*",
     }
 
+    local filename = {
+      "filename",
+      file_status = false,
+      path = 1,
+      shorting_target = 20,
+      color = function()
+        return { fg = "#E5E9F0" }
+      end,
+    }
+
     local filetype = {
       "filetype",
       icons_enabled = true,
@@ -35,7 +45,7 @@ return {
 
     local branch = {
       "branch",
-      icon = { "", align = "left" }
+      icon = { "", align = "left" },
     }
 
     require("lualine").setup {
@@ -51,7 +61,7 @@ return {
       sections = {
         lualine_a = { branch },
         lualine_b = {},
-        lualine_c = { diff },
+        lualine_c = { diff, filename },
         lualine_x = { diagnostics },
         lualine_y = { filetype },
         lualine_z = { "location" },
