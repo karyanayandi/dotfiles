@@ -6,6 +6,7 @@ return {
   root_dir = util.root_pattern("go.work", "go.mod", ".git"),
   settings = {
     completeUnimported = true,
+    usePlaceholders = true,
     hints = {
       rangeVariableTypes = true,
       parameterNames = true,
