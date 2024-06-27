@@ -25,17 +25,6 @@ return {
       separator = "%#SLSeparator#" .. " " .. "%*",
     }
 
-    local filename = {
-      "filename",
-      icons_enabled = true,
-      file_status = false,
-      path = 1,
-      shorting_target = 20,
-      color = function()
-        return { fg = "#E5E9F0" }
-      end,
-    }
-
     local filetype = {
       "filetype",
       icons_enabled = true,
@@ -61,7 +50,7 @@ return {
       },
       sections = {
         lualine_a = { branch },
-        lualine_b = { filename },
+        lualine_b = {},
         lualine_c = { diff },
         lualine_x = { diagnostics },
         lualine_y = { filetype },

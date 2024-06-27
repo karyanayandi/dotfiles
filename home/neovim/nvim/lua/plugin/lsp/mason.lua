@@ -5,6 +5,7 @@ local servers = {
   "clangd",
   "bashls",
   "cssls",
+  "emmet_ls",
   "html",
   "jsonls",
   "svelte",

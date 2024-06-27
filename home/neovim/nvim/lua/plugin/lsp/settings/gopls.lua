@@ -9,5 +9,5 @@ return {
       compositeLiteralTypes = true,
       functionTypeParameters = true,
     },
-  }
+  },
 }
