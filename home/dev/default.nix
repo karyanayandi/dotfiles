@@ -27,24 +27,18 @@ in {
     go
     nodejs
     rustc
-    # Language Servers & Linters
+    # Formatters and Linters
     alejandra
     eslint_d
     gofumpt
     goimports-reviser
     golangci-lint
-    golangci-lint-langserver
     golines
-    # gopls
     jq
-    luajitPackages.lua-lsp
     luajitPackages.luacheck
-    nil
     prettierd
-    pyright
     shellcheck
     stylua
-    rust-analyzer
     # JetBrains IDEs, install just for trying only
     jetbrains.datagrip
     jetbrains.goland
