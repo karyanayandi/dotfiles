@@ -13,7 +13,6 @@ in {
     extraConfig = ''
       unbind-key C-b
 
-      # set -g status off
       set -g prefix C-Space
       set -g mouse on
       set -g history-limit 5000
@@ -60,13 +59,14 @@ in {
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
+
+      run-shell '~/.tmux/onenord-tmux/onenord.tmux'
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
       vim-tmux-navigator
       sensible
       yank
-      onenord
       {
         plugin = continuum;
         extraConfig = ''
@@ -83,4 +83,5 @@ in {
       }
     ];
   };
+  home.file.".tmux/onenord-tmux".source = "${onenord}/";
 }
