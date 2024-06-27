@@ -32,6 +32,7 @@ in {
       bind -n M-'=' choose-tree
       bind -n M-d detach
       bind -n M-'\' list-session
+      bind -n M-r source-file ~/.tmux.conf
       bind -n M-x kill-pane
       bind -n M-w new-window -c '#{pane_current_path}'
       bind -n M-h previous-window
