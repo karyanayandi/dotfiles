@@ -13,6 +13,8 @@ in {
     extraConfig = ''
       unbind-key C-b
 
+      # set -g status off
+      set -g status-position top
       set -g prefix C-Space
       set -g mouse on
       set -g history-limit 5000
