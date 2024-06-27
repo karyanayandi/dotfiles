@@ -1,4 +1,11 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  onenord = pkgs.fetchFromGitHub {
+    owner = "karyanayandi";
+    repo = "onenord-tmux";
+    rev = "main";
+    sha256 = "04c1w6k4w85m0h62ad2wk485pzxwgnxgn0r0am79cw3gkqgaymg5";
+  };
+in {
   programs.tmux = {
     enable = true;
     terminal = "screen-256color";
@@ -6,14 +13,15 @@
     extraConfig = ''
       unbind-key C-b
 
-      set -g status off
+      # set -g status off
       set -g prefix C-Space
       set -g mouse on
       set -g history-limit 5000
 
+      bind C-Space send-prefix
       bind d detach
       bind '\' list-session
-      bind c new-window
+      bind w new-window
       bind s split-window -h
       bind v split-window -v
       bind x kill-pane
@@ -58,6 +66,7 @@
       vim-tmux-navigator
       sensible
       yank
+      onenord
       {
         plugin = continuum;
         extraConfig = ''
@@ -70,8 +79,6 @@
         extraConfig = ''
           set -g @resurrect-save 's'
           set -g @resurrect-restore 'r'
-          set -g @resurrect-capture-pane-contents 'on'
-          set -g @resurrect-processes '"~nvim"'
         '';
       }
     ];
