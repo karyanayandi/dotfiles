@@ -35,7 +35,7 @@ in {
     golangci-lint
     golangci-lint-langserver
     golines
-    gopls
+    # gopls
     jq
     luajitPackages.lua-lsp
     luajitPackages.luacheck

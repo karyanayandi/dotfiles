@@ -6,6 +6,7 @@ local servers = {
   "bashls",
   "cssls",
   "emmet_ls",
+  "gopls",
   "html",
   "jsonls",
   "svelte",
