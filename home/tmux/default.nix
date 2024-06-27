@@ -80,8 +80,8 @@ in {
       {
         plugin = resurrect;
         extraConfig = ''
-          set -g @resurrect-save 's'
-          set -g @resurrect-restore 'r'
+          set -g @resurrect-save 'S'
+          set -g @resurrect-restore 'R'
         '';
       }
     ];
