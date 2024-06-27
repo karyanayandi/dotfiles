@@ -171,12 +171,12 @@ return {
 
             local color_name, color_number
             if
-                words[2] == "x"
-                or words[2] == "y"
-                or words[2] == "t"
-                or words[2] == "b"
-                or words[2] == "l"
-                or words[2] == "r"
+              words[2] == "x"
+              or words[2] == "y"
+              or words[2] == "t"
+              or words[2] == "b"
+              or words[2] == "l"
+              or words[2] == "r"
             then
               color_name = words[3]
               color_number = words[4]
@@ -313,7 +313,8 @@ return {
         },
         documentation = {
           border = border "CmpDocBorder",
-          winhighlight = "Normal:CmpDoc", },
+          winhighlight = "Normal:CmpDoc",
+        },
       },
       experimental = {
         ghost_text = true,
