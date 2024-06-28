@@ -7,7 +7,7 @@
     chafa
     eza
     fd
-    firefox-devedition-bin-unwrapped
+    firefox
     fishPlugins.autopair
     fishPlugins.forgit
     fishPlugins.fzf-fish
