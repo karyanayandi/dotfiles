@@ -30,6 +30,9 @@ gimp \
 github-cli \
 gnome-keyring \
 go \
+gofumpt \
+goimports-reviser \
+golines \
 google-chrome \
 gzip \
 gparted \
@@ -42,6 +45,7 @@ libxcrypt-compat \
 lf \
 local-by-flywheel-bin \
 lshw \
+luacheck \
 microsoft-edge-dev-bin \
 mpv \
 nemo  \
@@ -72,7 +76,9 @@ rustup \
 scrot \
 sed \
 sof-firmware \
+shellcheck \
 starship \
+stylua \
 tmux \
 trash-cli \
 ttf-bitstream-vera \

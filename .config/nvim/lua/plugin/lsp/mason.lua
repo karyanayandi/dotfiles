@@ -1,7 +1,6 @@
 local icons = require "config.icons"
 
 local servers = {
-  -- LSP
   "astro",
   "clangd",
   "bashls",
@@ -24,16 +23,6 @@ local servers = {
   "taplo",
   "tsserver",
   "yamlls",
-  -- Formatters and Linters
-  "alejandra",
-  "eslint_d",
-  "gofumpt",
-  "goimports-reviser",
-  "golines",
-  "luacheck",
-  "prettierd",
-  "shellcheck",
-  "stylua",
 }
 
 local settings = {
