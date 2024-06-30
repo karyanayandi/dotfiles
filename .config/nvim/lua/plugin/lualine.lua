@@ -35,7 +35,7 @@ return {
 
     local branch = {
       "branch",
-      icon = { "", align = "left" }
+      icon = { "", align = "left" },
     }
 
     require("lualine").setup {
@@ -56,7 +56,6 @@ return {
         lualine_y = { filetype },
         lualine_z = { "location" },
       },
-      tabline = {},
       extensions = {},
     }
   end,

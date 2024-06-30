@@ -1,7 +1,7 @@
 return {
-  "karyanayandi/onenord.nvim",
-  branch = "custom",
-  -- "rmehri01/onenord.nvim",
+  -- "karyanayandi/onenord.nvim",
+  -- branch = "custom",
+  "rmehri01/onenord.nvim",
   lazy = false,
   priority = 1000,
   config = function()

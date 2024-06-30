@@ -2,6 +2,8 @@ return {
   { "moll/vim-bbye" },
   { "wakatime/vim-wakatime" },
   { "preservim/vimux" },
+  { "tpope/vim-sleuth" },
+  { "MaxMEllon/vim-jsx-pretty" },
   {
     "nvim-lua/plenary.nvim",
     lazy = true,

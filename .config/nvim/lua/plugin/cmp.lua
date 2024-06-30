@@ -68,6 +68,7 @@ return {
     end
 
     local icons = require "config.icons"
+    local types = require "cmp.types"
 
     local function border(hl_name)
       return {
@@ -89,8 +90,22 @@ return {
         end,
       },
       mapping = cmp.mapping.preset.insert {
-        ["<C-k>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
-        ["<C-j>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
+        ["<C-k>"] = cmp.mapping(
+          cmp.mapping.select_prev_item { behavior = types.cmp.SelectBehavior.Select },
+          { "i", "c" }
+        ),
+        ["<C-j>"] = cmp.mapping(
+          cmp.mapping.select_next_item { behavior = types.cmp.SelectBehavior.Select },
+          { "i", "c" }
+        ),
+        ["<C-p>"] = cmp.mapping(
+          cmp.mapping.select_prev_item { behavior = types.cmp.SelectBehavior.Select },
+          { "i", "c" }
+        ),
+        ["<C-n>"] = cmp.mapping(
+          cmp.mapping.select_next_item { behavior = types.cmp.SelectBehavior.Select },
+          { "i", "c" }
+        ),
         ["<Down>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
         ["<Up>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
         ["<C-h>"] = function()
@@ -108,7 +123,7 @@ return {
           c = cmp.mapping.close(),
         },
         ["<CR>"] = cmp.mapping.confirm { select = true },
-        ["<Tab>"] = cmp.mapping(function(fallback)
+        ["<Tab>"] = cmp.mapping(function(_fallback)
           if cmp.visible() then
             cmp.select_next_item()
           elseif luasnip.expandable() then
@@ -116,9 +131,11 @@ return {
           elseif luasnip.expand_or_jumpable() then
             luasnip.expand_or_jump()
           elseif check_backspace() then
-            fallback()
+            -- fallback()
+            require("neotab").tabout()
           else
-            fallback()
+            -- fallback()
+            require("neotab").tabout()
           end
         end, {
           "i",
@@ -139,6 +156,7 @@ return {
       },
       formatting = {
         fields = { "kind", "abbr", "menu" },
+        expandable_indicator = true,
         format = function(entry, vim_item)
           vim_item.kind = icons.kind[vim_item.kind]
           vim_item.menu = ({
@@ -171,12 +189,12 @@ return {
 
             local color_name, color_number
             if
-                words[2] == "x"
-                or words[2] == "y"
-                or words[2] == "t"
-                or words[2] == "b"
-                or words[2] == "l"
-                or words[2] == "r"
+              words[2] == "x"
+              or words[2] == "y"
+              or words[2] == "t"
+              or words[2] == "b"
+              or words[2] == "l"
+              or words[2] == "r"
             then
               color_name = words[3]
               color_number = words[4]
@@ -194,16 +212,13 @@ return {
               end
 
               local hl_group = "lsp_documentColor_mf_" .. color
-              -- vim.api.nvim_set_hl(0, hl_group, { fg = "#" .. color, bg = "#" .. color })
               vim.api.nvim_set_hl(0, hl_group, { fg = "#" .. color, bg = "NONE" })
               vim_item.kind_hl_group = hl_group
 
-              -- make the color square 2 chars wide
               vim_item.kind = string.rep("▣", 1)
 
               return vim_item
             elseif #words < 3 or #words > 4 then
-              -- doesn't look like this is a tailwind css color
               return vim_item
             end
 
@@ -225,15 +240,11 @@ return {
             local color = tailwindcss_colors[color_name][color_index]
 
             local hl_group = "lsp_documentColor_mf_" .. color
-            -- vim.api.nvim_set_hl(0, hl_group, { fg = "#" .. color, bg = "#" .. color })
             vim.api.nvim_set_hl(0, hl_group, { fg = "#" .. color, bg = "NONE" })
 
             vim_item.kind_hl_group = hl_group
 
-            -- make the color square 2 chars wide
             vim_item.kind = string.rep("▣", 1)
-
-            -- return vim_item
           end
 
           if entry.source.name == "copilot" then
@@ -241,10 +252,10 @@ return {
             vim_item.kind_hl_group = "CmpItemKindCopilot"
           end
 
-          -- if entry.source.name == "crates" then
-          --   vim_item.kind = icons.misc.Package
-          --   vim_item.kind_hl_group = "CmpItemKindCrate"
-          -- end
+          if entry.source.name == "crates" then
+            vim_item.kind = icons.misc.Package
+            vim_item.kind_hl_group = "CmpItemKindCrate"
+          end
 
           if entry.source.name == "lab.quick_data" then
             vim_item.kind = icons.misc.CircuitBoard
@@ -265,9 +276,6 @@ return {
           name = "nvim_lsp",
           entry_filter = function(entry, ctx)
             local kind = require("cmp.types.lsp").CompletionItemKind[entry:get_kind()]
-            if kind == "Snippet" and ctx.prev_context.filetype == "java" then
-              return false
-            end
 
             if ctx.prev_context.filetype == "markdown" then
               return true
@@ -287,7 +295,7 @@ return {
         { name = "calc" },
         { name = "emoji" },
         { name = "treesitter" },
-        -- { name = "crates" },
+        { name = "crates" },
       },
       confirm_opts = {
         behavior = cmp.ConfirmBehavior.Replace,
@@ -313,7 +321,8 @@ return {
         },
         documentation = {
           border = border "CmpDocBorder",
-          winhighlight = "Normal:CmpDoc", },
+          winhighlight = "Normal:CmpDoc",
+        },
       },
       experimental = {
         ghost_text = true,

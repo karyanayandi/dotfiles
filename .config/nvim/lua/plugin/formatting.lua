@@ -30,7 +30,7 @@ return {
         go = { "gofumpt", "goimports-reviser", "golines" },
         sh = { "shfmt" },
         fish = { "fish_indent" },
-        -- rust = { "rushfmt" },
+        rust = { "rushfmt" },
       },
       format_on_save = function(bufnr)
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then

@@ -1,25 +1,39 @@
 local icons = require "config.icons"
 
 local servers = {
+  -- LSP
   "astro",
+  "clangd",
   "bashls",
   "cssls",
+  "dockerls",
+  "docker_compose_language_service",
   "emmet_ls",
+  "golangci_lint_ls",
   "gopls",
+  "intelephense",
   "html",
   "jsonls",
   "lua_ls",
-  "sqlls",
+  "nil_ls",
+  "pyright",
   "rust_analyzer",
+  "sqls",
   "svelte",
   "tailwindcss",
+  "taplo",
   "tsserver",
   "yamlls",
-  -- "deno",
-  -- "stylua",
-  -- "shellcheck",
-  -- "shfmt",
-  -- "flake8",
+  -- Formatters and Linters
+  "alejandra",
+  "eslint_d",
+  "gofumpt",
+  "goimports-reviser",
+  "golines",
+  "luacheck",
+  "prettierd",
+  "shellcheck",
+  "stylua",
 }
 
 local settings = {
