@@ -25,6 +25,7 @@ in {
     corepack
     gcc
     go
+    nixpacks
     nodejs
     rustc
     # Formatters and Linters
