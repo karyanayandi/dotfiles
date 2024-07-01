@@ -1,7 +1,5 @@
 {pkgs, ...}: let
   aliases = {
-    sug = "gh copilot suggest";
-    exp = "gh copilot explain";
     autoclean = "nix store gc";
     c = "clear";
     cat = "bat";
@@ -13,6 +11,7 @@
     delete-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations";
     dev = "nix develop";
     e = "nvim";
+    exp = "gh copilot explain";
     font-refresh = "fc-cache -fv";
     g = "git";
     list-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --list-generations --profile /nix/var/nix/profiles/system";
@@ -21,16 +20,23 @@
     lsl = "eza --group-directories-first -lh --icons";
     ll = "eza -al -g --icons";
     lzg = "lazygit";
+    npm = "corepack npm";
+    npx = "corepack npx";
     pn = "corepack pnpm";
+    pnpm = "corepack pnpm";
+    pnpx = "corepack pnpx";
     px = "corepack pnx";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
     rollback = "nix-env --rollback";
     search = "nix search nixpkgs";
     shell = "nix-shell";
+    sug = "gh copilot suggest";
     t = "tmux";
-    tree = "eza --tree --level=4 --group-directories-first --icons --ignore-glob='*node_modules*'";
+    tree = "eza --tree --group-directories-first --icons --ignore-glob='*node_modules*'";
     update = "nix-update";
     x = "exit";
+    yarn = "corepack yarn";
+    yarnpkg = "corepack yarnpkg";
   };
 in {
   programs = {
