@@ -27,7 +27,7 @@
     search = "nix search nixpkgs";
     shell = "nix-shell";
     t = "tmux";
-    tree = "eza --tree --level=2 --group-directories-first --icons --ignore-glob='*node_modules*'";
+    tree = "eza --tree --level=4 --group-directories-first --icons --ignore-glob='*node_modules*'";
     update = "nix-update";
     x = "exit";
   };
