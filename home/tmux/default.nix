@@ -1,9 +1,9 @@
 {pkgs, ...}: let
-  onenord = pkgs.fetchFromGitHub {
+  nord = pkgs.fetchFromGitHub {
     owner = "karyanayandi";
-    repo = "onenord-tmux";
+    repo = "nord-tmux";
     rev = "main";
-    sha256 = "04c1w6k4w85m0h62ad2wk485pzxwgnxgn0r0am79cw3gkqgaymg5";
+    sha256 = "1bni7rds05s715k8pwy1sqciqk0skaqh01f1ac5b1gq3kf40x550";
   };
 in {
   programs.tmux = {
@@ -63,7 +63,7 @@ in {
       bind-key k select-pane -U
       bind-key l select-pane -R
 
-      run-shell '~/.tmux/onenord-tmux/onenord.tmux'
+      run-shell '~/.tmux/nord-tmux/nord.tmux'
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
@@ -86,5 +86,5 @@ in {
       }
     ];
   };
-  home.file.".tmux/onenord-tmux".source = "${onenord}/";
+  home.file.".tmux/nord-tmux".source = "${nord}/";
 }
