@@ -82,6 +82,7 @@ in {
         extraConfig = ''
           set -g @resurrect-save 'S'
           set -g @resurrect-restore 'R'
+          set -g @resurrect-strategy-nvim 'session'
         '';
       }
     ];
