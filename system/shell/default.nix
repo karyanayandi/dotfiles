@@ -22,6 +22,7 @@
     ll = "eza -al -g --icons";
     lzg = "lazygit";
     pn = "corepack pnpm";
+    px = "corepack pnx";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
     rollback = "nix-env --rollback";
     search = "nix search nixpkgs";
