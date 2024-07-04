@@ -105,7 +105,8 @@ return {
     Uninstalled = "✗",
     Expanded = "",
     Collapsed = "",
-    Circular = ""
+    Pipe = "│",
+    Circular = "",
   },
   diagnostics = {
     Error = " ",

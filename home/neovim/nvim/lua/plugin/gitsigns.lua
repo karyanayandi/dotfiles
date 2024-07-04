@@ -5,10 +5,30 @@ return {
     require("gitsigns").setup {
       signs = {
         add = { hl = "GitSignsAdd", text = icons.git.Sign, numhl = "GitSignsAddNr", linehl = "GitSignsAddLn" },
-        change = { hl = "GitSignsChange", text = icons.git.Sign, numhl = "GitSignsChangeNr", linehl = "GitSignsChangeLn" },
-        delete = { hl = "GitSignsDelete", text = icons.git.SignDelete, numhl = "GitSignsDeleteNr", linehl = "GitSignsDeleteLn" },
-        topdelete = { hl = "GitSignsDelete", text = icons.git.SignDelete, numhl = "GitSignsDeleteNr", linehl = "GitSignsDeleteLn" },
-        changedelete = { hl = "GitSignsChange", text = "│", numhl = "GitSignsChangeNr", linehl = "GitSignsChangeLn" },
+        change = {
+          hl = "GitSignsChange",
+          text = icons.git.Sign,
+          numhl = "GitSignsChangeNr",
+          linehl = "GitSignsChangeLn",
+        },
+        delete = {
+          hl = "GitSignsDelete",
+          text = icons.git.SignDelete,
+          numhl = "GitSignsDeleteNr",
+          linehl = "GitSignsDeleteLn",
+        },
+        topdelete = {
+          hl = "GitSignsDelete",
+          text = icons.git.SignDelete,
+          numhl = "GitSignsDeleteNr",
+          linehl = "GitSignsDeleteLn",
+        },
+        changedelete = {
+          hl = "GitSignsChange",
+          text = icons.git.Sign,
+          numhl = "GitSignsChangeNr",
+          linehl = "GitSignsChangeLn",
+        },
         untracked = {
           hl = "GitSignsUntracked",
           text = icons.git.Sign,
