@@ -7,6 +7,7 @@
     chafa
     eza
     fd
+    file-roller
     firefox
     fishPlugins.autopair
     fishPlugins.forgit
@@ -16,7 +17,6 @@
     gh-copilot
     gimp
     google-chrome
-    gnome.file-roller
     insomnia
     inxi
     macchina
