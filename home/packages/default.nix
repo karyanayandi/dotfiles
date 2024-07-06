@@ -5,6 +5,7 @@
     bottom
     cinnamon.nemo-with-extensions
     chafa
+    distrobox
     eza
     fd
     file-roller
