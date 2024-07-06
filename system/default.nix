@@ -3,14 +3,6 @@
   inputs,
   ...
 }: {
-  virtualisation = {
-    libvirtd.enable = true;
-    podman = {
-      enable = true;
-      dockerCompat = true;
-    };
-  };
-
   nixpkgs = {
     config = {
       allowUnfree = true;
@@ -82,9 +74,9 @@
     ./security
     ./shell
     ./init
-    ./thefuck
     ./services
     ./ld
     ./hyprland
+    ./virtualization
   ];
 }

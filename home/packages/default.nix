@@ -11,7 +11,6 @@
     file-roller
     firefox
     fishPlugins.autopair
-    fishPlugins.forgit
     fishPlugins.fzf-fish
     fishPlugins.z
     fzf
