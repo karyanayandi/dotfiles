@@ -162,6 +162,7 @@ return {
       l = {
         name = "LSP",
         a = { "<cmd>lua require('actions-preview').code_actions()<cr>", "Code Action" },
+        A = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
         d = { "<cmd>Trouble diagnostics toggle win.position=bottom<cr>", "Diagnostics" },
         f = { "<cmd>AutoFormatOnSaveToggle<cr>", "Toggle autoformat-on-save" },
         i = { "<cmd>LspInfo<cr>", "Info" },
@@ -176,7 +177,6 @@ return {
           "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>",
           "Prev Diagnostic",
         },
-        L = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
         m = { "<cmd>Mason<cr>", "Mason Info" },
         q = { "<cmd>Trouble qflist toggle<cr>", "Quickfix" },
         r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
