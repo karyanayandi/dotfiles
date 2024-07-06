@@ -37,6 +37,8 @@
     x = "exit";
     yarn = "corepack yarn";
     yarnpkg = "corepack yarnpkg";
+    yr = "corepack yarn";
+    yrpkg = "corepack yarnpkg";
   };
 in {
   programs.zsh = {
