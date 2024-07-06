@@ -15,6 +15,7 @@
     ./dunst
     ./waybar
     ./dev
+    ./shell
     ./scripts
     ./starship
     ./foot
