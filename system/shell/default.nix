@@ -15,7 +15,7 @@
     e = "nvim";
     exp = "gh copilot explain";
     font-refresh = "fc-cache -fv";
-    ft = "nvim $(fzf --preview 'bat --color=always --style=header,grid --line-range :500 {}')";
+    ft = "nvim $(fzf -m --preview 'bat --color=always --style=header,grid --line-range :500 {}')";
     g = "git";
     list-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --list-generations --profile /nix/var/nix/profiles/system";
     install = "nix-env -iA";
