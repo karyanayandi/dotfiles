@@ -1,6 +1,8 @@
 {pkgs, ...}: let
   aliases = {
     autoclean = "nix store gc";
+    bn = "bun";
+    bx = "bunx";
     c = "clear";
     cat = "bat";
     cdc = "cd ~/.config/dotfiles";
