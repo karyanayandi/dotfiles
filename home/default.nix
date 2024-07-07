@@ -7,7 +7,6 @@
     ./fonts
     ./git
     ./gtk
-    ./index
     ./direnv
     ./lock
     ./neovim
