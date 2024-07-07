@@ -15,6 +15,7 @@
     e = "nvim";
     exp = "gh copilot explain";
     font-refresh = "fc-cache -fv";
+    ft = "fzf --preview 'bat --color=always --style=header,grid --line-range :500 {}'";
     g = "git";
     list-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --list-generations --profile /nix/var/nix/profiles/system";
     install = "nix-env -iA";
@@ -58,5 +59,14 @@ in {
       enable = true;
       plugins = ["z"];
     };
+    initExtra = ''
+      export PATH="$HOME/.local/bin:$PATH"
+      export NIX_REMOTE=daemon
+      export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+      export PATH="$HOME/.nix-profile/sbin:/nix/var/nix/profiles/default/sbin:$PATH"
+      export PATH="$HOME/.nix-profile/libexec:$PATH"
+      export NIX_PATH=$HOME/.nix-defexpr/channels:$NIX_PATH
+      export DIRENV_LOG_FORMAT=
+    '';
   };
 }
