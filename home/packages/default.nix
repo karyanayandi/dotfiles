@@ -5,7 +5,6 @@
     bottom
     cinnamon.nemo-with-extensions
     chafa
-    comma
     distrobox
     eza
     fd

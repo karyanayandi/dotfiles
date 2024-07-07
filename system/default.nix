@@ -14,6 +14,7 @@
     variables = {EDITOR = "vim";};
     systemPackages = with pkgs; [
       bat
+      comma
       curl
       eza
       git
