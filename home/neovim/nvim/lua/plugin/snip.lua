@@ -1,7 +1,0 @@
-return {
-  "L3MON4D3/LuaSnip",
-  event = "InsertEnter",
-  dependencies = {
-    "karyanayandi/friendly-snippets",
-  },
-}
