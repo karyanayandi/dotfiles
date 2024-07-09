@@ -123,24 +123,6 @@ end, {
   bang = true,
 })
 
-vim.api.nvim_create_user_command("LintingToggle", function(args)
-  local linting_var = args.bang and vim.b or vim.g
-
-  if linting_var.disable_linting then
-    linting_var.disable_linting = false
-    vim.notify("Linting re-enabled", "info")
-    require("lint").try_lint()
-  else
-    linting_var.disable_linting = true
-    vim.notify("Linting disabled", "info")
-    require("lint").linters_by_ft = {}
-    vim.diagnostic.hide()
-  end
-end, {
-  desc = "Toggle linting",
-  bang = true,
-})
-
 vim.api.nvim_create_user_command("ToggleInlayHint", function()
   ---@diagnostic disable-next-line: missing-parameter
   local is_enabled = vim.lsp.inlay_hint.is_enabled()
