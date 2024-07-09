@@ -38,16 +38,6 @@ return {
       lint.try_lint()
     end, { desc = "Trigger linting for current file" })
 
-    local toggle_lint = function()
-      if lint == true then
-        lint = false
-        vim.diagnostic.reset(nil, 0)
-      else
-        lint = true
-        require("lint").try_lint()
-      end
-    end
-
     vim.keymap.set({ "n" }, "<leader>lL", toggle_lint, { noremap = true, desc = "Toggle linting for current file" })
   end,
 }

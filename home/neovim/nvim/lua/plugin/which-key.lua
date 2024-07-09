@@ -177,6 +177,7 @@ return {
           "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>",
           "Prev Diagnostic",
         },
+        L = { "<cmd>LintingToggle<cr>", "Toggle linting" },
         m = { "<cmd>Mason<cr>", "Mason Info" },
         q = { "<cmd>Trouble qflist toggle<cr>", "Quickfix" },
         r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
