@@ -133,7 +133,8 @@ vim.api.nvim_create_user_command("LintingToggle", function(args)
   else
     linting_var.disable_linting = true
     vim.notify("Linting disabled", "info")
-    vim.diagnostic.reset(nil, 0)
+    require("lint").linters_by_ft = {}
+    vim.diagnostic.hide()
   end
 end, {
   desc = "Toggle linting",
