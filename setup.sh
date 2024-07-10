@@ -10,3 +10,5 @@ apt install \
 curl -sS https://starship.rs/install.sh | sh \
 
 cp -r . ~/
+
+chsh -s /usr/bin/fish
