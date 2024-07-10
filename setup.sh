@@ -3,6 +3,7 @@
 apt install \
   exa \
   fish \
+  git \
   neofetch \
   vim \
 
