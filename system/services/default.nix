@@ -5,6 +5,7 @@
     ./xserver
     ./greetd
     ./pipewire
+    ./postgresql
     ./openssh
     ./printing
   ];
