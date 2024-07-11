@@ -14,6 +14,7 @@ local servers = {
   "html",
   "jsonls",
   "lua_ls",
+  "marksman",
   "nil_ls",
   "pyright",
   "rust_analyzer",
@@ -21,6 +22,7 @@ local servers = {
   "svelte",
   "tailwindcss",
   "taplo",
+  "templ",
   "tsserver",
   "yamlls",
 }
