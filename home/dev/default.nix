@@ -8,7 +8,7 @@
     export NODE_OPTIONS=--max_old_space_size=4096
     npm config set prefix "${config.home.homeDirectory}/.cache/npm/global"
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
-    npm install -g ls_emmet
+    npm install -g node-gyp ls_emmet
   '';
 in {
   home.activation.configureNode = ''
