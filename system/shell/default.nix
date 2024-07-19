@@ -28,7 +28,7 @@
     pn = "corepack pnpm";
     pnpm = "corepack pnpm";
     pnpx = "corepack pnpx";
-    px = "corepack pnx";
+    px = "corepack pnpx";
     rebuild = "sudo nixos-rebuild switch --flake .#computer";
     rollback = "nix-env --rollback";
     search = "nix search nixpkgs";
