@@ -1,5 +1,6 @@
 {
   imports = [
+    ./bluetooth
     ./disk
     ./dbus
     ./xserver
