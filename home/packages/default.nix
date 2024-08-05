@@ -3,7 +3,6 @@
     android-tools
     bat
     bottom
-    cinnamon.nemo-with-extensions
     chafa
     distrobox
     eza
@@ -21,6 +20,7 @@
     inxi
     mpv
     pfetch
+    nemo-with-extensions
     obsidian
     openssl
     pavucontrol
