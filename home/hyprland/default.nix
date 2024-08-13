@@ -11,8 +11,6 @@
       };
 
       env = [
-        "XCURSOR_THEME,Bibata-Modern-Ice"
-        "XCURSOR_SIZE,20"
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
@@ -29,7 +27,6 @@
         "dunst"
         "swaybg -i $HOME/.config/dotfiles/wallpaper.jpg"
         "waybar"
-        "hyprctl setcursor Bibata-Modern-Ice 20"
       ];
 
       input = {
