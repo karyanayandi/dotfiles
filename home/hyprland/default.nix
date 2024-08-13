@@ -46,7 +46,7 @@
 
       gestures = {
         workspace_swipe = true;
-        worspace_swipe_fingers = 3;
+        workspace_swipe_fingers = 3;
       };
 
       general = {
@@ -144,7 +144,6 @@
         "float,class:^(nm-connection-editor)$"
         "float,class:^(org.kde.polkit-kde-authentication-agent-1)$"
         "float,class:^(com.obsproject.Studio)$,title:^(Controls)$"
-        "blur,logout"
       ];
 
       bind = [
