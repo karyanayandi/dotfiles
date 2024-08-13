@@ -1,4 +1,5 @@
-{
+{pkgs, ...}: {
+  home.packages = with pkgs; [swaybg wlsunset wl-clipboard sway slurp grim];
   wayland.windowManager.hyprland = {
     enable = true;
 
