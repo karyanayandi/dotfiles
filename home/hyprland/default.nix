@@ -3,7 +3,7 @@
     enable = true;
 
     settings = {
-      source = "${pkgs.writeText "rose-pine.conf" (builtins.readFile "/home/ms/.config/nixos/home/hyprland/rose-pine.conf")}";
+      source = "${pkgs.writeText "rose-pine.conf" (builtins.readFile "/home/karyana/.config/nixos/home/hyprland/rose-pine.conf")}";
 
       monitor = ",highres,auto,1";
       "exec" = "gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'";
