@@ -16,6 +16,7 @@
     gh-copilot
     gimp
     google-chrome
+    grim
     insomnia
     inxi
     mpv
@@ -25,13 +26,18 @@
     openssl
     pavucontrol
     ripgrep
+    slurp
     stdenv.cc.cc.lib
+    sway
+    swaybg
     termius
     tlrc
     unzip
     unrar
     viewnior
     wf-recorder
+    wlsunset
+    wl-clipboard
     xclip
     yazi
     zed-editor
