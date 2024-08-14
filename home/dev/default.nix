@@ -37,6 +37,7 @@ in {
     golangci-lint
     golines
     jq
+    luajitPackages.luacheck
     prettierd
     shellcheck
     stylua
