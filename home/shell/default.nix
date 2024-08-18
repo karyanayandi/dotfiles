@@ -12,6 +12,7 @@
     clean-trash = "rm -rf ~/.local/share/Trash/*";
     delete-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations";
     dev = "nix develop";
+    dbox = "distrobox";
     e = "nvim";
     exp = "gh copilot explain";
     font-refresh = "fc-cache -fv";
