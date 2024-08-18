@@ -26,6 +26,7 @@ in {
     corepack
     gcc
     go
+    jetbrains.datagrip
     nixpacks
     nodejs
     rustc
@@ -41,11 +42,5 @@ in {
     prettierd
     shellcheck
     stylua
-    # JetBrains IDEs, install just for trying only
-    jetbrains.datagrip
-    jetbrains.goland
-    jetbrains.phpstorm
-    jetbrains.rust-rover
-    jetbrains.webstorm
   ];
 }
