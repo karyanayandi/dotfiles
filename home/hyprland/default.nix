@@ -122,6 +122,7 @@
         "float,title:^(Media viewer)$"
         "float,title:^(Volume Control)$"
         "float,title:^(Picture-in-Picture)$"
+        "float,title:^(Extract)$"
         "size 800 600,title:^(Volume Control)$"
         "move 75 44%,title:^(Volume Control)$"
       ];
