@@ -1,7 +1,7 @@
 {
   programs.git = {
     enable = true;
-    userName = "karyanaayandi";
+    userName = "karyanayandi";
     userEmail = "karyana@yandi.me";
     extraConfig = {
       credential.helper = "cache --timeout=18000";
