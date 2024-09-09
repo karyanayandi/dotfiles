@@ -1,8 +1,4 @@
-{pkgs, ...}: {
-  # home.packages = with pkgs; [
-  #   wayland-scanner
-  # ];
-  #
+{}: {
   wayland.windowManager.hyprland = {
     enable = true;
 
@@ -14,18 +10,19 @@
         force_zero_scaling = true;
       };
 
-      env = [
-        "XDG_CURRENT_DESKTOP,Hyprland"
-        "XDG_SESSION_TYPE,wayland"
-        "XDG_SESSION_DESKTOP,Hyprland"
-        "QT_QPA_PLATFORM,wayland"
-        "QT_QPA_PLATFORMTHEME,qt5ct"
-        "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
-        "QT_AUTO_SCREEN_SCALE_FACTOR,1"
-        "MOZ_ENABLE_WAYLAND,1"
-        "WLR_NO_HARDWARE_CURSORS,1"
-        "HYPRLAND_NO_SD_NOTIFY=0"
-      ];
+      environment.variables = {
+        NIXOS_OZONE_WL = "1";
+        XDG_CURRENT_DESKTOP = "Hyprland";
+        XDG_SESSION_TYPE = "wayland";
+        XDG_SESSION_DESKTOP = "Hyprland";
+        QT_QPA_PLATFORM = "wayland";
+        QT_QPA_PLATFORMTHEME = "qt5ct";
+        QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+        QT_AUTO_SCREEN_SCALE_FACTOR = "1";
+        MOZ_ENABLE_WAYLAND = "1";
+        WLR_NO_HARDWARE_CURSORS = "1";
+        HYPRLAND_NO_SD_NOTIFY = "0";
+      };
 
       "exec-once" = [
         "dunst"
