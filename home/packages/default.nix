@@ -35,7 +35,6 @@
     unzip
     unrar
     viewnior
-    wayland-scanner
     wf-recorder
     wlsunset
     wl-clipboard
