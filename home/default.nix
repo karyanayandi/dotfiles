@@ -8,7 +8,7 @@
     ./git
     ./gtk
     ./direnv
-    ./lock
+    # ./lock
     ./neovim
     ./packages
     ./hyprland

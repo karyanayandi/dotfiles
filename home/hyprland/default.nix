@@ -1,8 +1,8 @@
 {pkgs, ...}: {
-  home.packages = with pkgs; [
-    wayland-scanner
-  ];
-
+  # home.packages = with pkgs; [
+  #   wayland-scanner
+  # ];
+  #
   wayland.windowManager.hyprland = {
     enable = true;
 

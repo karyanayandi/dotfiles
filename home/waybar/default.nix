@@ -7,7 +7,7 @@
         layer = "top";
         margin = "12 12 0 12";
         "modules-left" = ["hyprland/workspaces" "hyprland/window"];
-        "modules-right" = ["network" "disk" "memory" "pulseaudio" "clock"];
+        "modules-right" = ["network" "disk" "memory" "pulseaudio" "clock" "tray"];
 
         "hyprland/workspaces" = {
           format = "{name}";
@@ -31,6 +31,11 @@
           format = "󰓅 {bandwidthUpBits}";
           on-click = "foot -e ping 8.8.8.8";
           interval = 5;
+        };
+
+        tray = {
+          "icon-size" = 20;
+          spacing = 5;
         };
 
         pulseaudio = {
