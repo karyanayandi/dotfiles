@@ -24,10 +24,6 @@
       inputs.alejandra.defaultPackage.${pkgs.system}
       inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
     ];
-    sessionVariables = {
-      LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
-      LD_PRELOAD = "${pkgs.stdenv.cc.cc.lib}/lib";
-    };
   };
 
   services.gnome.gnome-keyring.enable = true;
