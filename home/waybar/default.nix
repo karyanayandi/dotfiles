@@ -6,8 +6,9 @@
       mainBar = {
         layer = "top";
         margin = "12 12 0 12";
-        "modules-left" = ["hyprland/workspaces" "hyprland/window"];
-        "modules-right" = ["network" "disk" "memory" "pulseaudio" "clock" "tray"];
+        "modules-left" = ["hyprland/workspaces"];
+        # "modules-left" = ["hyprland/workspaces" "hyprland/window"];
+        "modules-right" = ["network" "disk" "memory" "pulseaudio" "clock"];
 
         "hyprland/workspaces" = {
           format = "{name}";
