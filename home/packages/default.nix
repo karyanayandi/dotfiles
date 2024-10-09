@@ -25,6 +25,7 @@
     obsidian
     openssl
     pavucontrol
+    realvnc-vnc-viewer
     ripgrep
     slurp
     stdenv.cc.cc.lib
