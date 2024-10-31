@@ -92,7 +92,7 @@ return {
       {
         "<leader>t",
         "<cmd>lua _FLOAT_TERM()<cr>",
-        "Terminal",
+        desc = "Terminal",
       },
       {
         "<leader>/",
@@ -382,26 +382,106 @@ return {
         "<cmd>AutoFormatOnSaveToggle<cr>",
         desc = "Toggle autoformat-on-save",
       },
-      { "<leader>i", "<cmd>LspInfo<cr>", desc = "Info" },
-      { "<leader>h", "<cmd>ToggleInlayHint<cr>", desc = "Toggle Inlay Hint" },
-      { "<leader>H", "<cmd>lua require('illuminate').toggle()<cr>", desc = "Toggle Doc HL" },
-      { "<leader>I", "<cmd>LspInstall<cr>", desc = "Installer Info" },
-      { "<leader>j", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", desc = "Next Diagnostic" },
-      { "<leader>k", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", desc = "Prev Diagnostic" },
-      { "<leader>m", "<cmd>Mason<cr>", desc = "Mason Info" },
-      { "<leader>q", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix" },
-      { "<leader>r", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" },
-      { "<leader>R", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", desc = "References" },
-      { "<leader>s", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
-      { "<leader>S", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace Symbols" },
-      { "<leader>t", '<cmd>lua require("config.functions").toggle_diagnostics()<cr>', desc = "Toggle Diagnostics" },
-      { "<leader>T", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>", desc = "Todo Diagnostics" },
-      { "<leader>u", "<cmd>LuaSnipUnlinkCurrent<cr>", desc = "Unlink Snippet" },
-      { "<leader>tt", "<cmd>TestNearest<cr>", desc = "Nearest" },
-      { "<leader>tf", "<cmd>TestFile<cr>", desc = "File" },
-      { "<leader>ta", "<cmd>TestSuite<cr>", desc = "All" },
-      { "<leader>tl", "<cmd>TestLast<cr>", desc = "Last" },
-      { "<leader>tv", "<cmd>TestVisit<cr>", desc = "Visit" },
+      {
+        "<leader>li",
+        "<cmd>LspInfo<cr>",
+        desc = "Info",
+      },
+      {
+        "<leader>lh",
+        "<cmd>ToggleInlayHint<cr>",
+        desc = "Toggle Inlay Hint",
+      },
+      {
+        "<leader>lH",
+        "<cmd>lua require('illuminate').toggle()<cr>",
+        desc = "Toggle Doc HL",
+      },
+      {
+        "<leader>lI",
+        "<cmd>LspInstall<cr>",
+        desc = "Installer Info",
+      },
+      {
+        "<leader>lj",
+        "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>",
+        desc = "Next Diagnostic",
+      },
+      {
+        "<leader>lk",
+        "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>",
+        desc = "Prev Diagnostic",
+      },
+      {
+        "<leader>lm",
+        "<cmd>Mason<cr>",
+        desc = "Mason Info",
+      },
+      {
+        "<leader>lq",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix",
+      },
+      {
+        "<leader>lr",
+        "<cmd>lua vim.lsp.buf.rename()<cr>",
+        desc = "Rename",
+      },
+      {
+        "<leader>lR",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "References",
+      },
+      {
+        "<leader>ls",
+        "<cmd>Telescope lsp_document_symbols<cr>",
+        desc = "Document Symbols",
+      },
+      {
+        "<leader>lS",
+        "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
+        desc = "Workspace Symbols",
+      },
+      {
+        "<leader>lt",
+        '<cmd>lua require("config.functions").toggle_diagnostics()<cr>',
+        desc = "Toggle Diagnostics",
+      },
+      {
+        "<leader>lT",
+        "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
+        desc = "Todo Diagnostics",
+      },
+      {
+        "<leader>lu",
+        "<cmd>LuaSnipUnlinkCurrent<cr>",
+        desc = "Unlink Snippet",
+      },
+      {
+        "<leader>tt",
+        "<cmd>TestNearest<cr>",
+        desc = "Nearest",
+      },
+      {
+        "<leader>tf",
+        "<cmd>TestFile<cr>",
+        desc = "File",
+      },
+      {
+        "<leader>ta",
+        "<cmd>TestSuite<cr>",
+        desc = "All",
+      },
+      {
+        "<leader>tl",
+        "<cmd>TestLast<cr>",
+        desc = "Last",
+      },
+      {
+        "<leader>tv",
+        "<cmd>TestVisit<cr>",
+        desc = "Visit",
+      },
     }
 
     local vopts = {
@@ -414,9 +494,21 @@ return {
     }
 
     local vmappings = {
-      ["/"] = { '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', "Comment" },
-      s = { ":'<,'>sort<CR>", "Sort selected lines" },
-      c = { "<ESC>:'<,'>CarbonNow<CR>", "Capture Image" },
+      {
+        "<leader>/",
+        '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>',
+        desc = "Comment",
+      },
+      {
+        "<leader>s",
+        ":'<,'>sort<CR>",
+        desc = "Sort selected lines",
+      },
+      {
+        "<leader>c",
+        "<ESC>:'<,'>CarbonNow<CR>",
+        desc = "Capture Image",
+      },
     }
 
     require("which-key").setup(setup)
