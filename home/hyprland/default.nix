@@ -154,7 +154,7 @@
         "SUPER, U, exec, swaylock"
         "SUPER, Return, exec, foot"
         "SUPER, B, exec, google-chrome-stable"
-        "SUPER, W, exec, vivaldi"
+        "SUPER, W, exec, firefox-devedition"
         "SUPER, N, exec, nemo"
         "SUPER, V, exec, code"
         "SUPER, SPACE, exec, wofi -S run --prompt=Run"
