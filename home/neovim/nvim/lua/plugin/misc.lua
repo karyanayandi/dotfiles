@@ -4,6 +4,7 @@ return {
   { "preservim/vimux" },
   { "tpope/vim-sleuth" },
   { "MaxMEllon/vim-jsx-pretty" },
+  { "echasnovski/mini.icons", version = false },
   {
     "nvim-lua/plenary.nvim",
     lazy = true,

@@ -20,17 +20,12 @@ return {
           g = true,
         },
       },
-      key_labels = {},
       icons = {
         breadcrumb = "»",
         separator = "➜",
         group = "+",
       },
-      popup_mappings = {
-        scroll_down = "<c-d>",
-        scroll_up = "<c-u>",
-      },
-      window = {
+      win = {
         border = "rounded",
         position = "bottom",
         margin = { 1, 0, 1, 0 },
@@ -43,13 +38,8 @@ return {
         spacing = 3,
         align = "center",
       },
-      ignore_missing = true,
       hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "call", "lua", "^:", "^ " },
       show_help = false,
-      triggers_blacklist = {
-        i = { "j", "k" },
-        v = { "j", "k" },
-      },
     }
 
     local opts = {
@@ -227,7 +217,7 @@ return {
     }
 
     require("which-key").setup(setup)
-    require("which-key").register(mappings, opts)
-    require("which-key").register(vmappings, vopts)
+    require("which-key").add(mappings, opts)
+    require("which-key").add(vmappings, vopts)
   end,
 }
