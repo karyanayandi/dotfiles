@@ -3,6 +3,7 @@ return {
   event = "VeryLazy",
   config = function()
     local setup = {
+      preset = "helix",
       plugins = {
         marks = true,
         registers = true,
@@ -28,9 +29,12 @@ return {
       win = {
         border = "rounded",
         position = "bottom",
+        no_overlap = false,
         margin = { 1, 0, 1, 0 },
         padding = { 2, 2, 2, 2 },
-        winblend = 0,
+        title = false,
+        title_pos = "center",
+        zindex = 1000,
       },
       layout = {
         height = { min = 4, max = 25 },
@@ -52,20 +56,56 @@ return {
     }
 
     local mappings = {
-      ["a"] = { "<cmd>Alpha<cr>", "Alpha" },
-      ["b"] = {
-        "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
-        "Buffer",
+      {
+        "<leader>a",
+        "<cmd>Alpha</cmd>",
+        desc = "Alpha",
       },
-      ["c"] = { "<cmd>:Bdelete<cr>", "Close" },
-      ["e"] = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
-      ["W"] = { "<cmd>w<CR>", "Write" },
-      ["h"] = { "<cmd>nohlsearch<CR>", "No HL" },
-      ["q"] = { "<cmd>lua require('config.functions').smart_quit()<CR>", "Quit" },
-      ["T"] = { "<cmd>lua _FLOAT_TERM()<cr>", "Terminal" },
-      ["/"] = { '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>', "Comment" },
-      ["p"] = { "<cmd>lua require('telescope').extensions.projects.projects()<cr>", "Projects" },
-      ["gy"] = "Link",
+      {
+        "<leader>b",
+        "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+        desc = "Buffer",
+      },
+      {
+        "<leader>c",
+        "<cmd>:Bdelete<cr>",
+        desc = "Close",
+      },
+      {
+        "<leader>e",
+        "<cmd>NvimTreeToggle<cr>",
+        desc = "Explorer",
+      },
+      {
+        "<leader>w",
+        "<cmd>w<CR>",
+        desc = "Write",
+      },
+      {
+        "<leader>h",
+        "<cmd>nohlsearch<CR>",
+        desc = "No HL",
+      },
+      {
+        "<leader>q",
+        "<cmd>lua require('config.functions').smart_quit()<CR>",
+        desc = "Quit",
+      },
+      {
+        "<leader>t",
+        "<cmd>lua _FLOAT_TERM()<cr>",
+        "Terminal",
+      },
+      {
+        "<leader>/",
+        '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>',
+        desc = "Comment",
+      },
+      {
+        "<leader>p",
+        "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
+        desc = "Projects",
+      },
       z = {
         name = "Lazy",
         i = { "<cmd>Lazy<cr>", "Install" },
