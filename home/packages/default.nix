@@ -8,7 +8,7 @@
     eza
     fd
     file-roller
-    firefox
+    vivaldi
     fishPlugins.autopair
     fishPlugins.fzf-fish
     fishPlugins.z
