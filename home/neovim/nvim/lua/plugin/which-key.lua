@@ -30,7 +30,6 @@ return {
         border = "rounded",
         position = "bottom",
         no_overlap = false,
-        margin = { 1, 0, 1, 0 },
         padding = { 2, 2, 2, 2 },
         title = false,
         title_pos = "center",
@@ -42,7 +41,6 @@ return {
         spacing = 3,
         align = "center",
       },
-      hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "call", "lua", "^:", "^ " },
       show_help = false,
     }
 
