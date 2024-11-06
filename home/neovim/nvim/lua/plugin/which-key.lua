@@ -28,7 +28,6 @@ return {
       },
       win = {
         border = "rounded",
-        position = "bottom",
         no_overlap = false,
         padding = { 2, 2, 2, 2 },
         title = false,
@@ -376,7 +375,7 @@ return {
       },
       { "<leader>a", "<cmd>lua require('actions-preview').code_actions()<cr>", desc = "Code Action" },
       { "<leader>A", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
-      { "<leader>d", "<cmd>Trouble diagnostics toggle win.position=bottom<cr>", desc = "Diagnostics" },
+      { "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
       {
         "<leader>f",
         "<cmd>AutoFormatOnSaveToggle<cr>",
@@ -429,7 +428,7 @@ return {
       },
       {
         "<leader>lR",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        "<cmd>Trouble lsp toggle focus=false<cr>",
         desc = "References",
       },
       {
