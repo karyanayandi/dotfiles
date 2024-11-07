@@ -7,8 +7,8 @@
     cat = "bat";
     cdc = "cd ~/.config/dotfiles";
     cdp = "cd ~/Codes";
-    clean = "nix profile wipe-history && sudo nix-collect-garbage -d && sudo nix-collect-garbage --delete-old && sudo nix store gc && sudo nix-store --verify --repair --check-contents";
-    clean-node = "find . -type d -name 'node_modules' -exec rm -rf {} +;";
+    clean-build = "nix profile wipe-history && sudo nix-collect-garbage -d && sudo nix-collect-garbage --delete-old && sudo nix store gc && sudo nix-store --verify --repair --check-contents";
+    clean-code = "find . -type d -name 'node_modules' -o -name '.next' -o -name '.turbo' -exec rm -rf {} + -o -type f -name '*.astro' -exec rm -f {} +;";
     clean-trash = "rm -rf ~/.local/share/Trash/*";
     delete-generations = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations";
     dev = "nix develop";
