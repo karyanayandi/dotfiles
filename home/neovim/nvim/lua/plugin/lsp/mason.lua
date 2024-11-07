@@ -23,7 +23,7 @@ local servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  "ts_ls",
+  "tsserver",
   "yamlls",
 }
 

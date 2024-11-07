@@ -3,8 +3,8 @@ return {
   event = "VeryLazy",
   config = function()
     local setup = {
-      preset = "helix",
-      plugins = {
+      preset = "classic",
+      Plugins = {
         marks = true,
         registers = true,
         spelling = {
@@ -22,12 +22,10 @@ return {
         },
       },
       icons = {
-        breadcrumb = "»",
-        separator = "➜",
-        group = "+",
+        mappings = false,
       },
       win = {
-        border = "rounded",
+        border = "none",
         no_overlap = false,
         padding = { 2, 2, 2, 2 },
         title = false,
@@ -55,9 +53,10 @@ return {
     local mappings = {
       {
         "<leader>a",
-        "<cmd>Alpha</cmd>",
+        "<cmd>Alpha<cr>",
         desc = "Alpha",
       },
+      { "<leader>A", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
       {
         "<leader>b",
         "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
@@ -68,15 +67,17 @@ return {
         "<cmd>:Bdelete<cr>",
         desc = "Close",
       },
+
+      { "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
       {
         "<leader>e",
         "<cmd>NvimTreeToggle<cr>",
         desc = "Explorer",
       },
       {
-        "<leader>w",
-        "<cmd>w<CR>",
-        desc = "Write",
+        "<leader>F",
+        "<cmd>AutoFormatOnSaveToggle<cr>",
+        desc = "Toggle autoformat-on-save",
       },
       {
         "<leader>h",
@@ -89,10 +90,11 @@ return {
         desc = "Quit",
       },
       {
-        "<leader>t",
-        "<cmd>lua _FLOAT_TERM()<cr>",
-        desc = "Terminal",
+        "<leader>w",
+        "<cmd>w<CR>",
+        desc = "Write",
       },
+
       {
         "<leader>/",
         '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>',
@@ -102,6 +104,10 @@ return {
         "<leader>p",
         "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
         desc = "Projects",
+      },
+      {
+        "<leader>z",
+        group = "Package",
       },
       {
         "<leader>zi",
@@ -153,7 +159,10 @@ return {
         "<cmd>Lazy restore<cr>",
         desc = "Restore",
       },
-
+      {
+        "<leader>o",
+        group = "Option",
+      },
       {
         "<leader>ow",
         '<cmd>lua require("config.functions").toggle_option("wrap")<cr>',
@@ -189,7 +198,10 @@ return {
         "<cmd>Telescope colorscheme<cr>",
         desc = "Colorscheme",
       },
-
+      {
+        "<leader>r",
+        group = "Replace",
+      },
       {
         "<leader>rr",
         "<cmd>lua require('spectre').open()<cr>",
@@ -205,38 +217,10 @@ return {
         "<cmd>lua require('spectre').open_visual({select_word=true})<cr>",
         desc = "Replace Selected Word",
       },
-
       {
-        "<leader>Rr",
-        "<cmd>lua require('refactoring').select_refactor()<cr>",
-        desc = "Refactor",
+        "<leader>f",
+        group = "Find",
       },
-      {
-        "<leader>Rb",
-        "<cmd>lua require('refactoring').refactor('Extract Block')<cr>",
-        desc = "Extract Block",
-      },
-      {
-        "<leader>RB",
-        "<cmd>lua require('refactoring').refactor('Extract Block To File')<cr>",
-        desc = "Extract Block To File",
-      },
-      {
-        "<leader>Rf",
-        "<cmd>lua require('refactoring').refactor('Extract Function')<cr>",
-        desc = "Extract Function",
-      },
-      {
-        "<leader>RF",
-        "<cmd>lua require('refactoring').refactor('Extract Function To File')<cr>",
-        desc = "Extract Function To File",
-      },
-      {
-        "<leader>Ri",
-        "<cmd>lua require('refactoring').refactor('Inline Variable')<cr>",
-        desc = "Inline Variable",
-      },
-
       {
         "<leader>fb",
         "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
@@ -307,7 +291,10 @@ return {
         "<cmd>lua require('undotree').toggle()<cr>",
         desc = "Undotree",
       },
-
+      {
+        "<leader>g",
+        group = "Git",
+      },
       {
         "<leader>gg",
         "<cmd>lua _LAZYGIT_TOGGLE()<CR>",
@@ -373,13 +360,9 @@ return {
         "<cmd>lua require 'gitsigns'.diffthis()<cr>",
         desc = "Diffview",
       },
-      { "<leader>a", "<cmd>lua require('actions-preview').code_actions()<cr>", desc = "Code Action" },
-      { "<leader>A", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
-      { "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
       {
-        "<leader>f",
-        "<cmd>AutoFormatOnSaveToggle<cr>",
-        desc = "Toggle autoformat-on-save",
+        "<leader>l",
+        group = "LSP",
       },
       {
         "<leader>li",
@@ -457,6 +440,10 @@ return {
         desc = "Unlink Snippet",
       },
       {
+        "<leader>t",
+        group = "Test",
+      },
+      {
         "<leader>tt",
         "<cmd>TestNearest<cr>",
         desc = "Nearest",
@@ -481,37 +468,27 @@ return {
         "<cmd>TestVisit<cr>",
         desc = "Visit",
       },
-    }
-
-    local vopts = {
-      mode = "v",
-      prefix = "<leader>",
-      buffer = nil,
-      silent = true,
-      noremap = true,
-      nowait = true,
-    }
-
-    local vmappings = {
       {
         "<leader>/",
         '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>',
         desc = "Comment",
+        mode = "v",
       },
       {
         "<leader>s",
         ":'<,'>sort<CR>",
         desc = "Sort selected lines",
+        mode = "v",
       },
       {
         "<leader>c",
         "<ESC>:'<,'>CarbonNow<CR>",
         desc = "Capture Image",
+        mode = "v",
       },
     }
 
     require("which-key").setup(setup)
     require("which-key").add(mappings, opts)
-    require("which-key").add(vmappings, vopts)
   end,
 }
