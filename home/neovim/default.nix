@@ -59,11 +59,10 @@ in {
 
   home.file."./.config/nvim/lua/config/init.lua".text = ''
     require "config.autocommands"
-    require "config.functions"
-    require "config.icons"
-    require "config.keymaps"
     require "config.options"
-    vim.cmd.colorscheme('onenord')
+    require "config.keymaps"
+    require "config.lazy"
+    vim.cmd "colorscheme onenord"
     vim.opt.runtimepath:append("${treesitter-parsers}")
   '';
 
