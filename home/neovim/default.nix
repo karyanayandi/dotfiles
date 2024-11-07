@@ -57,7 +57,7 @@ in {
     recursive = true;
   };
 
-  home.file."./.config/nvim/lua/config/init.lua".text = ''
+  home.file."./.config/nvim/init.lua".text = ''
     require "config.autocommands"
     require "config.options"
     require "config.keymaps"
