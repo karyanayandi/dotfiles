@@ -8,7 +8,7 @@ return {
           text = icons.ui.BoldLineMiddle,
         },
         change = {
-          text = icons.ui.BoldLineDashedMiddle,
+          text = icons.ui.BoldLineMiddle,
         },
         delete = {
           text = icons.ui.TriangleShortArrowRight,
