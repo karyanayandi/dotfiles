@@ -62,6 +62,7 @@ return {
     Repo = " ",
     Staged = "S",
     Sign = "│",
+    SignBold = "┃",
     SignDelete = "",
     Octoface = " ",
     Unstaged = "",

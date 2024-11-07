@@ -14,7 +14,6 @@ return {
       typescriptreact = { "eslint_d" },
       astro = { "eslint_d" },
       svelte = { "eslint_d" },
-      prisma = { "prisma-lint" },
       fish = { "fish" },
       go = { "golangcilint" },
       lua = { "luacheck" },

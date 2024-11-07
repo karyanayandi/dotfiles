@@ -5,19 +5,19 @@ return {
     require("gitsigns").setup {
       signs = {
         add = {
-          text = icons.ui.BoldLineMiddle,
+          text = icons.git.SignBold,
         },
         change = {
-          text = icons.ui.BoldLineMiddle,
+          text = icons.git.SignBold,
         },
         delete = {
-          text = icons.ui.TriangleShortArrowRight,
+          text = icons.git.SignDelete,
         },
         topdelete = {
-          text = icons.ui.TriangleShortArrowRight,
+          text = icons.git.SignDelete,
         },
         changedelete = {
-          text = icons.ui.BoldLineMiddle,
+          text = icons.git.SignBold,
         },
       },
       watch_gitdir = {
