@@ -9,6 +9,19 @@ return {
     local icons = require "config.icons"
 
     dashboard.section.header.val = {
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
+      [[                                                                                                                     ]],
       [[  ▄████████  ▄██████▄  ████████▄     ▄████████         ▄████████ ████████▄   ▄█      ███      ▄██████▄     ▄████████ ]],
       [[ ███    ███ ███    ███ ███   ▀███   ███    ███        ███    ███ ███   ▀███ ███  ▀█████████▄ ███    ███   ███    ███ ]],
       [[ ███    █▀  ███    ███ ███    ███   ███    █▀         ███    █▀  ███    ███ ███▌    ▀███▀▀██ ███    ███   ███    ███ ]],
@@ -30,7 +43,7 @@ return {
       ),
       dashboard.button("r", icons.ui.History .. " Recent files", ":Telescope oldfiles <CR>"),
       dashboard.button("t", icons.ui.List .. " Find text", ":Telescope live_grep <CR>"),
-      dashboard.button("c", icons.ui.Gear .. " Config", ":e ~/.config/nvim/init.lua <CR>"),
+      dashboard.button("c", icons.ui.GearOutline .. " Config", ":e ~/.config/nvim/init.lua <CR>"),
       dashboard.button("u", icons.ui.CloudDownload .. " Update", ":Lazy update<CR>"),
       dashboard.button("q", icons.ui.SignOut .. " Quit", ":qa<CR>"),
     }
