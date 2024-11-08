@@ -53,6 +53,7 @@ return {
   },
   git = {
     Add = " ",
+    Branch = "",
     Mod = " ",
     Remove = " ",
     Ignore = " ",

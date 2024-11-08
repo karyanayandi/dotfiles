@@ -11,7 +11,7 @@ return {
           on_config_done = nil,
           manual_mode = false,
           detection_methods = { "pattern" },
-          patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "Cargo.toml" },
+          patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "Cargo.toml", "deno.json" },
           show_hidden = false,
           silent_chdir = true,
           ignore_lsp = {},
@@ -32,12 +32,6 @@ return {
       "nvim-telescope/telescope-media-files.nvim",
       config = function()
         require("telescope").load_extension "media_files"
-      end,
-    },
-    {
-      "natecraddock/workspaces.nvim",
-      config = function()
-        require("telescope").load_extension "workspaces"
       end,
     },
   },

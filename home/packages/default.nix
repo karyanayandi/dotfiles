@@ -7,6 +7,8 @@
     distrobox
     eza
     fd
+    ffmpeg
+    ffmpegthumbnailer
     file-roller
     firefox-devedition
     fishPlugins.autopair
@@ -20,11 +22,12 @@
     insomnia
     inxi
     mpv
-    pfetch
     nemo-with-extensions
     obsidian
     openssl
     pavucontrol
+    pfetch
+    poppler_utils
     realvnc-vnc-viewer
     ripgrep
     slurp
@@ -32,13 +35,12 @@
     sway
     swaybg
     termius
-    tlrc
-    unzip
     unrar
+    unzip
     viewnior
     wf-recorder
-    wlsunset
     wl-clipboard
+    wlsunset
     xclip
     yazi
     zed-editor

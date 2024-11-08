@@ -20,7 +20,7 @@ return {
     local diff = {
       "diff",
       colored = true,
-      symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" }, -- changes diff symbols
+      symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" },
       cond = hide_in_width,
       separator = "%#SLSeparator#" .. " " .. "%*",
     }
@@ -35,7 +35,7 @@ return {
 
     local branch = {
       "branch",
-      icon = { "", align = "left" },
+      icon = { icons.git.Branch, align = "left" },
     }
 
     require("lualine").setup {
