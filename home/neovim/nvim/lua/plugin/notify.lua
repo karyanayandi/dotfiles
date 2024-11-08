@@ -26,14 +26,15 @@ return {
       },
     }
 
-    local notify_filter = vim.notify
+    local banned_messages = { "No information available" }
     ---@diagnostic disable-next-line: duplicate-set-field
     vim.notify = function(msg, ...)
-      if type(msg) == "string" and msg:match "character_offset must be called with valid offset encoding" then
-        return
+      for _, banned in ipairs(banned_messages) do
+        if msg == banned then
+          return
+        end
       end
-
-      notify_filter(msg, ...)
+      return require "notify"(msg, ...)
     end
   end,
 }
