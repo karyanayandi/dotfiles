@@ -55,7 +55,7 @@ return {
     vim.api.nvim_set_hl(0, "Pmenu", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#8ec07c" })
     vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#eebd35" })
-    -- vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d65d0e" })
+    vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d65d0e" })
 
     local cmp = require "cmp"
     local luasnip = require "luasnip"

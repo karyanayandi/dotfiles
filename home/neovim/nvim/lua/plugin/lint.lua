@@ -18,7 +18,7 @@ return {
       go = { "golangcilint" },
       lua = { "luacheck" },
       php = { "php", "phpcs" },
-      sh = { "shellcheck" },
+      -- sh = { "shellcheck" },
       nix = { "nix" },
       json = { "jsonlint" },
       vue = { "eslint_d" },
