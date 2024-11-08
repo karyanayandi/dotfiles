@@ -341,6 +341,16 @@ return {
         desc = "Undo Stage Hunk",
       },
       {
+        "<leader>gB",
+        "<cmd>lua require'gitlinker'.get_repo_url({action_callback = require'gitlinker.actions'.open_in_browser})<cr>",
+        desc = "Open in Browser",
+      },
+      {
+        "<leader>gY",
+        "<cmd>lua require'gitlinker'.get_repo_url()<cr>",
+        desc = "Get Repo URL",
+      },
+      {
         "<leader>go",
         "<cmd>Telescope git_status<cr>",
         desc = "Open Changed File",
