@@ -105,6 +105,9 @@ keymap("n", ";w", "<cmd>WorkspacesOpen<cr>", opts)
 -- Search and replace
 keymap("n", ";r", "<cmd>lua require('spectre').open_file_search()<cr>", opts)
 
+-- Tree
+keymap("n", ";e", "<cmd>NvimTreeToggle<cr>", opts)
+
 -- Undotree
 keymap("n", ";u", "<cmd>lua require('undotree').toggle()<cr>", opts)
 

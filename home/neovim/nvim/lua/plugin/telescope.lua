@@ -25,12 +25,6 @@ return {
       end,
     },
     {
-      "nvim-telescope/telescope-file-browser.nvim",
-      config = function()
-        require("telescope").load_extension "file_browser"
-      end,
-    },
-    {
       "nvim-telescope/telescope-media-files.nvim",
       config = function()
         require("telescope").load_extension "media_files"
@@ -39,12 +33,7 @@ return {
   },
   config = function()
     local actions = require "telescope.actions"
-    local file_browser_actions = require("telescope").extensions.file_browser.actions
     local icons = require "config.icons"
-
-    local function telescope_buffer_dir()
-      return vim.fn.expand "%:p:h"
-    end
 
     require("telescope").setup {
       defaults = {
@@ -158,47 +147,11 @@ return {
           keep_insert = true,
           open = { "NvimTreeOpen", "Telescope find_files" },
         },
-        file_browser = {
-          theme = "ivy",
-          hijack_netrw = true,
-          mappings = {
-            ["i"] = {
-              ["<C-w>"] = function()
-                vim.cmd "normal vbd"
-              end,
-            },
-            ["n"] = {
-              ["a"] = file_browser_actions.create,
-              ["c"] = file_browser_actions.copy,
-              ["x"] = file_browser_actions.move,
-              ["d"] = file_browser_actions.remove,
-              ["r"] = file_browser_actions.rename,
-              ["H"] = file_browser_actions.toggle_hidden,
-              ["h"] = file_browser_actions.goto_parent_dir,
-              ["w"] = file_browser_actions.goto_cwd,
-              ["/"] = function()
-                vim.cmd "startinsert"
-              end,
-            },
-          },
-        },
         media_files = {
           filetypes = { "png", "webp", "jpg", "jpeg" },
           find_cmd = "rg",
         },
       },
     }
-
-    vim.keymap.set("n", ";e", function()
-      require("telescope").extensions.file_browser.file_browser {
-        path = "%:p:h",
-        cwd = telescope_buffer_dir(),
-        respect_gitignore = false,
-        hidden = true,
-        grouped = true,
-        previewer = false,
-        initial_mode = "normal",
-      }
-    end)
   end,
 }
