@@ -28,7 +28,7 @@ require("lazy").setup {
     fallback = false,
   },
   spec = {
-    { import = "plugins" },
+    { import = "plugin" },
   },
   install = { colorscheme = { "onenord" } },
   checker = { enabled = true },
