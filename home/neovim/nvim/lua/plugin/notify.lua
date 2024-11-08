@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "rcarriga/nvim-notify",
   config = function()
@@ -24,9 +26,8 @@ return {
       },
     }
 
-    vim.notify = notify
-
     local notify_filter = vim.notify
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.notify = function(msg, ...)
       if type(msg) == "string" and msg:match "character_offset must be called with valid offset encoding" then
         return

@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "nvim-telescope/telescope.nvim",
   event = "Bufenter",
@@ -47,7 +49,7 @@ return {
     require("telescope").setup {
       defaults = {
         prompt_prefix = icons.ui.Telescope .. " ",
-        selection_caret = " ",
+        selection_caret = icons.ui.CaretRight,
         path_display = { "smart" },
         file_ignore_patterns = {
           ".git/",

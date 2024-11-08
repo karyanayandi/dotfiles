@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "hrsh7th/nvim-cmp",
   dependencies = {
@@ -123,6 +125,7 @@ return {
           c = cmp.mapping.close(),
         },
         ["<CR>"] = cmp.mapping.confirm { select = true },
+        ---@diagnostic disable-next-line: unused-local
         ["<Tab>"] = cmp.mapping(function(_fallback)
           if cmp.visible() then
             cmp.select_next_item()
@@ -244,7 +247,7 @@ return {
 
             vim_item.kind_hl_group = hl_group
 
-            vim_item.kind = string.rep("▣", 1)
+            vim_item.kind = string.rep(icons.documents.Code, 1)
           end
 
           if entry.source.name == "copilot" then

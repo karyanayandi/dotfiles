@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 local icons = require "config.icons"
 
 local servers = {
@@ -49,10 +51,8 @@ require("mason-lspconfig").setup {
 
 local lspconfig = require "lspconfig"
 
-local opts = {}
-
 for _, server in pairs(servers) do
-  opts = {
+  local opts = {
     on_attach = require("plugin.lsp.handlers").on_attach,
     capabilities = require("plugin.lsp.handlers").capabilities,
   }

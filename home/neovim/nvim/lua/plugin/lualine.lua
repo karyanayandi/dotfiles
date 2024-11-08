@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "nvim-lualine/lualine.nvim",
   config = function()

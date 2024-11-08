@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 local M = {}
 
 M.capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -59,18 +61,62 @@ local function lsp_highlight_document(client)
 end
 
 local function lsp_keymaps(bufnr)
-  local opts = { noremap = true, silent = true }
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", {
+    desc = "Go to Definition",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", {
+    desc = "Go to Declaration",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", {
+    desc = "Show Documentation",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", {
+    desc = "Go to Implementation",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", {
+    desc = "Show References",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", {
+    desc = "Show Diagnostics",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", {
+    desc = "Show Signature Help",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-f>", "<cmd>Format<cr>", {
+    desc = "Format",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-a>", "<cmd>lua vim.lsp.buf.code_action()<cr>", {
+    desc = "Code Action",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<F2>", "<cmd>lua vim.lsp.buf.rename()<CR>", {
+    desc = "Rename",
+    noremap = true,
+    silent = true,
+  })
+  vim.api.nvim_buf_set_keymap(bufnr, "i", "<F2>", "<cmd>lua vim.lsp.buf.rename()<CR>", {
+    desc = "Rename",
+    noremap = true,
+    silent = true,
+  })
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.format({ async = true })' ]]
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-f>", "<cmd>Format<cr>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-a>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 end
 
 M.on_attach = function(client, bufnr)

@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 local function augroup(name)
   return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
 end
@@ -147,17 +149,3 @@ vim.api.nvim_create_autocmd("FileType", {
     }
   end,
 })
-
--- vim.api.nvim_create_autocmd("InsertEnter", {
---   pattern = "*",
---   callback = function()
---     vim.lsp.inlay_hint.enable(false)
---   end
--- })
---
--- vim.api.nvim_create_autocmd("InsertLeave", {
---   pattern = "*",
---   callback = function()
---     vim.lsp.inlay_hint.enable(true)
---   end
--- })

@@ -1,3 +1,5 @@
+-- luacheck: globals vim _FLOAT_TERM _LAZYGIT_TOGGLE
+
 return {
   "akinsho/toggleterm.nvim",
   event = "VeryLazy",
@@ -91,6 +93,5 @@ return {
 
     vim.api.nvim_set_keymap("n", "<C-t>", "<cmd>lua _FLOAT_TERM()<CR>", { noremap = true, silent = true })
     vim.api.nvim_set_keymap("i", "<C-t>", "<cmd>lua _FLOAT_TERM()<CR>", { noremap = true, silent = true })
-
   end,
 }

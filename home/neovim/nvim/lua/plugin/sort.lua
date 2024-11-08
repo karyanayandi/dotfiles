@@ -3,6 +3,6 @@ return {
   lazy = true,
   cmd = "Sort",
   config = function()
-    require("sort").setup({})
-  end
+    require("sort").setup {}
+  end,
 }

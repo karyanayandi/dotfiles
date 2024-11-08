@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "ghillb/cybu.nvim",
   lazy = true,

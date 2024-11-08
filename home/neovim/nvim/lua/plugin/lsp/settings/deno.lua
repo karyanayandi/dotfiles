@@ -10,6 +10,6 @@ return {
       propertyDeclarationTypes = { enabled = true },
       functionLikeReturnTypes = { enable = true },
       enumMemberValues = { enabled = true },
-    }
-  }
+    },
+  },
 }

@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "RRethy/vim-illuminate",
   event = "VeryLazy",

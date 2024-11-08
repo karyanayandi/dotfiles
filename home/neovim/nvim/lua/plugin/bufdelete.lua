@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "famiu/bufdelete.nvim",
   event = "VeryLazy",

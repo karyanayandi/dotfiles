@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "kyazdani42/nvim-tree.lua",
   config = function()
@@ -38,8 +40,8 @@ return {
         indent_markers = {
           enable = false,
           icons = {
-            corner = "└ ",
-            edge = "│ ",
+            corner = icons.tree.IndentCorner,
+            edge = icons.tree.IndentEdge,
             none = "  ",
           },
         },
@@ -47,7 +49,7 @@ return {
           webdev_colors = true,
           git_placement = "before",
           padding = " ",
-          symlink_arrow = " ➛ ",
+          symlink_arrow = icons.tree.SymlinkArrow,
           show = {
             file = true,
             folder = true,

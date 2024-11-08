@@ -9,11 +9,6 @@ return {
           require "plugin.lsp.settings.jsonls"
         end,
       },
-      {
-        "folke/neoconf.nvim",
-        cmd = "Neoconf",
-        config = true,
-      },
     },
     lazy = true,
     config = function()

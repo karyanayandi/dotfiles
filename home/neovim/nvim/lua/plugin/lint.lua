@@ -1,3 +1,4 @@
+-- luacheck: globals vim
 -- TODO: add linting for github action, deno
 
 return {
@@ -7,21 +8,25 @@ return {
   config = function()
     local lint = require "lint"
 
+    local function has_deno_json()
+      return vim.fn.glob "deno.json" ~= ""
+    end
+
     lint.linters_by_ft = {
-      javascript = { "eslint_d" },
-      typescript = { "eslint_d" },
-      javascriptreact = { "eslint_d" },
-      typescriptreact = { "eslint_d" },
-      astro = { "eslint_d" },
-      svelte = { "eslint_d" },
+      astro = has_deno_json() and { "deno" } or { "eslint_d" },
       fish = { "fish" },
       go = { "golangcilint" },
+      javascript = has_deno_json() and { "deno" } or { "eslint_d" },
+      javascriptreact = has_deno_json() and { "deno" } or { "eslint_d" },
+      json = { "jsonlint" },
       lua = { "luacheck" },
+      nix = { "nix" },
       php = { "php", "phpcs" },
       -- sh = { "shellcheck" },
-      nix = { "nix" },
-      json = { "jsonlint" },
-      vue = { "eslint_d" },
+      svelte = has_deno_json() and { "deno" } or { "eslint_d" },
+      typescript = has_deno_json() and { "deno" } or { "eslint_d" },
+      typescriptreact = has_deno_json() and { "deno" } or { "eslint_d" },
+      vue = has_deno_json() and { "deno" } or { "eslint_d" },
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })

@@ -1,3 +1,6 @@
+-- luacheck: globals vim
+-- luacheck: ignore 631
+
 return {
   "smoka7/hop.nvim",
   config = function()

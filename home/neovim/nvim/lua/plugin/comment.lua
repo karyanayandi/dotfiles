@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "numToStr/Comment.nvim",
   event = "BufRead",
@@ -5,10 +7,10 @@ return {
     require("Comment").setup {
       pre_hook = function(ctx)
         if
-            vim.bo.filetype == "typescriptreact"
-            or vim.bo.filetype == "javascriptreact"
-            or vim.bo.filetype == "javascript"
-            or vim.bo.filetype == "typescript"
+          vim.bo.filetype == "typescriptreact"
+          or vim.bo.filetype == "javascriptreact"
+          or vim.bo.filetype == "javascript"
+          or vim.bo.filetype == "typescript"
         then
           local U = require "Comment.utils"
 

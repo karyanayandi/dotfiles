@@ -19,6 +19,9 @@ return {
         changedelete = {
           text = icons.git.SignBold,
         },
+        untracked = {
+          text = icons.git.SignUntracked,
+        },
       },
       watch_gitdir = {
         interval = 1000,

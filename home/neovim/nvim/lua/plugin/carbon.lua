@@ -3,7 +3,7 @@ return {
   lazy = true,
   cmd = "CarbonNow",
   config = function()
-    require("carbon-now").setup({
+    require("carbon-now").setup {
       options = {
         bg = "gray",
         drop_shadow_blur = "68px",
@@ -19,7 +19,7 @@ return {
         window_theme = "sharp",
         padding_horizontal = "0px",
         padding_vertical = "0px",
-      }
-    })
+      },
+    }
   end,
 }
