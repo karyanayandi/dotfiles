@@ -69,7 +69,6 @@ return {
         "<cmd>:Bdelete<cr>",
         desc = "Close",
       },
-
       { "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
       {
         "<leader>e",
