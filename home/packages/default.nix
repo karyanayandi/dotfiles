@@ -21,6 +21,7 @@
     grim
     insomnia
     inxi
+    logseq
     mpv
     nemo-with-extensions
     obsidian
