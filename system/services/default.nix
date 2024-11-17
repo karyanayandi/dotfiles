@@ -1,13 +1,14 @@
 {
   imports = [
     ./bluetooth
-    ./disk
     ./dbus
-    ./xserver
+    ./disk
+    ./flatpak
     ./greetd
+    ./openssh
     ./pipewire
     ./postgresql
-    ./openssh
     ./printing
+    ./xserver
   ];
 }
