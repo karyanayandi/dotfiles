@@ -10,7 +10,6 @@
     ffmpeg
     ffmpegthumbnailer
     file-roller
-    firefox-devedition
     fishPlugins.autopair
     fishPlugins.fzf-fish
     fishPlugins.z
