@@ -22,6 +22,7 @@
       vim
       wget
       inputs.alejandra.defaultPackage.${pkgs.system}
+      inputs.zen-browser.packages."${system}".default
       inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
     ];
   };

@@ -3,7 +3,6 @@
     ./bluetooth
     ./dbus
     ./disk
-    ./flatpak
     ./greetd
     ./openssh
     ./pipewire
