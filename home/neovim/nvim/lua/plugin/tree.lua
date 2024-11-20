@@ -30,7 +30,7 @@ return {
       --   custom = { ".git" },
       --   exclude = { ".gitignore", ".env", "~partytown", ".contentlayer", "dist", ".github", "neogit" },
       -- },
-      update_cwd = true,
+      update_cwd = false,
       renderer = {
         add_trailing = false,
         group_empty = false,

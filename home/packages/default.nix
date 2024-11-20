@@ -13,6 +13,7 @@
     fishPlugins.autopair
     fishPlugins.fzf-fish
     fishPlugins.z
+    flatpak
     fzf
     gh-copilot
     gimp
