@@ -92,7 +92,7 @@ return {
       },
       update_focused_file = {
         enable = true,
-        update_cwd = true,
+        update_cwd = false,
         ignore_list = {},
       },
       git = {
@@ -102,7 +102,7 @@ return {
       },
       view = {
         width = 30,
-        -- hide_root_folder = false,
+        hide_root_folder = false,
         side = "left",
         number = false,
         relativenumber = false,
