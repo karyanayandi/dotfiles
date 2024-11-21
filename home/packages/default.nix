@@ -4,6 +4,7 @@
     bat
     bottom
     chafa
+    davinci-resolve
     distrobox
     eza
     fd
