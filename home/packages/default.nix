@@ -20,6 +20,7 @@
     grim
     insomnia
     inxi
+    killport
     logseq
     mpv
     nemo-with-extensions
