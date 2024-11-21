@@ -23,6 +23,7 @@ in {
     cargo
     clippy
     corepack
+    firebase-tools
     gcc
     go
     jetbrains.datagrip
