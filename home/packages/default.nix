@@ -24,8 +24,6 @@
     killport
     mpv
     nemo-with-extensions
-    notesnook
-    notion
     obsidian
     openssl
     pavucontrol
