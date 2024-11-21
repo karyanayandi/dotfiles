@@ -22,9 +22,10 @@
     insomnia
     inxi
     killport
-    logseq
     mpv
     nemo-with-extensions
+    notesnook
+    notion
     obsidian
     openssl
     pavucontrol
