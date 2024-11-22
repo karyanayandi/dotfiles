@@ -441,6 +441,35 @@ return {
         desc = "Unlink Snippet",
       },
       {
+        "<leader>m",
+        group = "Monorepo",
+      },
+      {
+        "<leader>ma",
+        "<cmd>lua require('monorepo').add_project()<cr>",
+        desc = "Add Project",
+      },
+      {
+        "<leader>mm",
+        "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>",
+        desc = "Monorepo List",
+      },
+      {
+        "<leader>mr",
+        "<cmd>lua require('monorepo').remove_project()<cr>",
+        desc = "Remove Project",
+      },
+      {
+        "<leader>mt",
+        "<cmd>lua require('monorepo').toggle_project()<cr>",
+        desc = "Toggle Project",
+      },
+      {
+        "<leader>mp",
+        "<cmd>:lua require('monorepo').prompt_project('add')<cr>",
+        desc = "Prompt Add Project",
+      },
+      {
         "<leader>t",
         group = "Test",
       },

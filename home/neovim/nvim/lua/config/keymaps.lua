@@ -72,13 +72,12 @@ keymap("x", "<C-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.f
 keymap("x", "<A-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 
 -- Find files
--- keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", opts)
---
--- -- Find texts
--- keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", opts)
---
--- Find buffers
+keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", opts)
 
+-- Find texts
+keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", opts)
+
+-- Find buffers
 keymap(
   "n",
   ";b",
