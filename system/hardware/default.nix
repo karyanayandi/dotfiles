@@ -36,10 +36,6 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
-    extraPackages = with pkgs; [
-      intel-compute-runtime
-      rocmPackages.clr.icd
-    ];
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

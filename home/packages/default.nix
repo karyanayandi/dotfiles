@@ -4,7 +4,6 @@
     bat
     bottom
     chafa
-    davinci-resolve
     distrobox
     eza
     fd
@@ -21,6 +20,7 @@
     grim
     insomnia
     inxi
+    kdenlive
     killport
     mpv
     nemo-with-extensions
