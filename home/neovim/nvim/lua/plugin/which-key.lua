@@ -450,7 +450,7 @@ return {
         desc = "Add Project",
       },
       {
-        "<leader>mm",
+        "<leader>ml",
         "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>",
         desc = "Monorepo List",
       },
@@ -460,14 +460,9 @@ return {
         desc = "Remove Project",
       },
       {
-        "<leader>mt",
+        "<leader>mm",
         "<cmd>lua require('monorepo').toggle_project()<cr>",
         desc = "Toggle Project",
-      },
-      {
-        "<leader>mp",
-        "<cmd>:lua require('monorepo').prompt_project('add')<cr>",
-        desc = "Prompt Add Project",
       },
       {
         "<leader>t",
