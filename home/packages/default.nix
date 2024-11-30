@@ -33,7 +33,6 @@
     slurp
     stdenv.cc.cc.lib
     sway
-    swaybg
     termius
     unrar
     unzip

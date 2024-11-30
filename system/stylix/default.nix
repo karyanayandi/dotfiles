@@ -43,9 +43,5 @@
       name = "Bibata-Modern-Ice";
       size = 32;
     };
-    icon = {
-      name = "Tela-nord";
-      package = pkgs.tela-icon-theme;
-    };
   };
 }
