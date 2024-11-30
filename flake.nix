@@ -13,6 +13,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     zen-browser.url = "github:ch4og/zen-browser-flake";
+    stylix.url = "github:danth/stylix";
     alejandra = {
       url = "github:kamadorueda/alejandra/3.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -37,6 +38,7 @@
             home-manager.useUserPackages = true;
             home-manager.users.karyana = import ./home;
           }
+          inputs.stylix.nixosModules.stylix
         ];
       };
     };

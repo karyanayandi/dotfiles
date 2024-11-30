@@ -58,23 +58,24 @@
     ];
   };
 
-  system.stateVersion = "23.11";
+  system.stateVersion = "25.05";
 
   imports = [
+    ./boot
     ./fonts
     ./hardware
-    ./boot
-    ./network
-    ./locale
-    ./timezone
-    ./sound
-    ./users
-    ./security
-    ./shell
-    ./init
-    ./services
-    ./ld
     ./hyprland
+    ./init
+    ./ld
+    ./locale
+    ./network
+    ./security
+    ./services
+    ./shell
+    ./sound
+    ./stylix
+    ./timezone
+    ./users
     ./virtualization
   ];
 }
