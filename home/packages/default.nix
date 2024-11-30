@@ -20,7 +20,6 @@
     grim
     insomnia
     inxi
-    kdenlive
     killport
     mpv
     nemo-with-extensions
