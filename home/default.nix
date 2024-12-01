@@ -17,7 +17,6 @@
     ./scripts
     ./shell
     ./starship
-    ./stylix
     ./tmux
     ./waybar
     ./wofi
