@@ -4,9 +4,9 @@
     settings = {
       global = {
         origin = "bottom-right";
-        offset = "60x12";
+        geometry = "320x120-32-32";
         separator_height = 2;
-        padding = 12;
+        padding = 32;
         horizontal_padding = 12;
         text_icon_padding = 12;
         frame_width = 0;
