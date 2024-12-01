@@ -3,6 +3,12 @@ return {
   lazy = false,
   config = function()
     require("onenord").setup {
+      theme = nil,
+      disable = {
+        background = true,
+        float_background = true,
+        eob_lines = true,
+      },
       borders = true,
       styles = {
         comments = "NONE",
@@ -11,11 +17,6 @@ return {
         functions = "NONE",
         variables = "NONE",
         diagnostics = "underline",
-      },
-      disable = {
-        background = true,
-        float_background = true,
-        eob_lines = true,
       },
     }
   end,
