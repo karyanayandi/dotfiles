@@ -63,7 +63,7 @@ in {
       bind-key k select-pane -U
       bind-key l select-pane -R
 
-      run-shell '~/.tmux/custom-tmux-theme/custom-tmux-theme.tmux'
+      run-shell '~/.tmux/custom-tmux-theme/custom-theme.tmux'
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
