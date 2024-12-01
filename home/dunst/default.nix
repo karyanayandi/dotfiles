@@ -1,6 +1,10 @@
-{...}: {
+{pkgs, ...}: {
   services.dunst = {
     enable = true;
+    iconTheme = {
+      package = pkgs.tela-icon-theme;
+      name = "Tela-nord";
+    };
     settings = {
       global = {
         origin = "top-right";

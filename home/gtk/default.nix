@@ -6,7 +6,7 @@
   gtk = {
     enable = true;
     iconTheme = {
-      name = "Tela-black";
+      name = "Tela-nord";
       package = pkgs.tela-icon-theme;
     };
     gtk3 = {
