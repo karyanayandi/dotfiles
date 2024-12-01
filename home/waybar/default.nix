@@ -61,7 +61,7 @@
     style = ''
       * {
         border: none;
-        font-family: "VictorMono NF";
+        font-family: "Inter Variable";
         font-size: 15px;
         min-height: 30px;
       }

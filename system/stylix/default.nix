@@ -1,12 +1,8 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   stylix = {
     enable = true;
     image = ../../wallpapers/anime-skull.png;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
     fonts = {
       sizes = {
         applications = 10;
@@ -23,8 +19,8 @@
         name = "Inter Variable";
       };
       monospace = {
-        package = pkgs.nerd-fonts.victor-mono;
-        name = "VictorMono NF";
+        package = pkgs.nerd-fonts.zed-mono;
+        name = "ZedMono NF";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;
