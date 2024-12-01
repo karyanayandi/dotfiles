@@ -71,4 +71,10 @@ in {
       export DIRENV_LOG_FORMAT=
     '';
   };
+  home.packages = with pkgs; [
+    fish
+    fishPlugins.autopair
+    fishPlugins.fzf-fish
+    fishPlugins.z
+  ];
 }
