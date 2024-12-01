@@ -9,7 +9,6 @@ return {
       stages = "fade",
       render = "minimal",
       timeout = 3000,
-      background_colour = "Normal",
       minimum_width = 10,
       max_height = function()
         return math.floor(vim.o.lines * 0.75)
