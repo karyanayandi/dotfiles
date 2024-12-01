@@ -1,8 +1,11 @@
+-- luacheck: globals vim
+
 return {
-  "echasnovski/mini.base16",
+  "RRethy/base16-nvim",
   lazy = false,
   priority = 10000,
   config = function()
-    require("mini.base16").setup()
+    require("base16-colorscheme").setup()
+    vim.cmd "colorscheme base16-rose-pine-dawn"
   end,
 }

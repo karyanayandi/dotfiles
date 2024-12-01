@@ -2,7 +2,7 @@
   stylix = {
     enable = true;
     image = ../../wallpapers/gruvbox-anime-landscape.png;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/rose-pine.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/rose-pine-moon.yaml";
     fonts = {
       sizes = {
         applications = 10;
