@@ -30,6 +30,6 @@ require("lazy").setup {
   spec = {
     { import = "plugin" },
   },
-  install = { colorscheme = { "onenord" } },
+  install = { colorscheme = { "gruvbox-original" } },
   checker = { enabled = true },
 }
