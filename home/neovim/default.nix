@@ -62,7 +62,6 @@ in {
     require "config.options"
     require "config.keymaps"
     require "config.lazy"
-    vim.cmd "colorscheme gruvbox-material"
     vim.opt.runtimepath:append("${treesitter-parsers}")
   '';
 
