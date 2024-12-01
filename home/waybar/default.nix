@@ -5,7 +5,6 @@
     settings = {
       mainBar = {
         layer = "top";
-        margin = "12 12 0 12";
         "modules-left" = ["hyprland/workspaces"];
         "modules-right" = ["network" "disk" "memory" "pulseaudio" "clock"];
 
@@ -67,7 +66,7 @@
       }
 
       window#waybar {
-        border-radius: 6px;
+        border-radius: 0px;
       }
 
       #workspaces {
