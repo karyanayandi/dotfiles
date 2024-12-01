@@ -1,7 +1,7 @@
 {pkgs, ...}: let
-  nord = pkgs.fetchFromGitHub {
+  custom-tmux-theme = pkgs.fetchFromGitHub {
     owner = "karyanayandi";
-    repo = "nord-tmux";
+    repo = "custom-tmux-theme";
     rev = "main";
     sha256 = "1bni7rds05s715k8pwy1sqciqk0skaqh01f1ac5b1gq3kf40x550";
   };
@@ -63,7 +63,7 @@ in {
       bind-key k select-pane -U
       bind-key l select-pane -R
 
-      run-shell '~/.tmux/nord-tmux/nord.tmux'
+      run-shell '~/.tmux/custom-tmux-theme/custom-tmux-theme.tmux'
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
@@ -87,5 +87,5 @@ in {
       }
     ];
   };
-  home.file.".tmux/nord-tmux".source = "${nord}/";
+  home.file.".tmux/custom-tmux-theme".source = "${custom-tmux-theme}/";
 }
