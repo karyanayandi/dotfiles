@@ -2,7 +2,7 @@ return {
   "rmehri01/onenord.nvim",
   lazy = false,
   config = function()
-    require("lualine").setup {
+    require("onenord").setup {
       borders = true,
       styles = {
         comments = "NONE",
