@@ -32,8 +32,5 @@
       name = "Bibata-Modern-Ice";
       size = 24;
     };
-    targets = {
-      neovim.plugin = "mini.base16";
-    };
   };
 }

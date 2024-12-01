@@ -4,21 +4,22 @@
   home.stateVersion = "25.05";
   programs.home-manager.enable = true;
   imports = [
+    ./dev
+    ./direnv
+    ./dunst
+    ./foot
     ./git
     ./gtk
-    ./direnv
-    # ./lock
+    ./hyprland
+    ./lock
     ./neovim
     ./packages
-    ./hyprland
-    ./dunst
-    ./waybar
-    ./dev
-    ./shell
     ./scripts
+    ./shell
     ./starship
-    ./foot
+    ./stylix
     ./tmux
+    ./waybar
     ./wofi
   ];
 }
