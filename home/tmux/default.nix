@@ -3,7 +3,7 @@
     owner = "karyanayandi";
     repo = "custom-tmux-theme";
     rev = "main";
-    sha256 = "155w304qz09gqsfm8q1wjrw5yrdddqhmh7dqll9r0qlxvicmzj53";
+    sha256 = "111ny667iw57l53rd5n9ap8yahmzw18a049hfwf3akszsrlj02k9";
   };
 in {
   programs.tmux = {
