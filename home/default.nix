@@ -22,5 +22,6 @@
     ./tmux
     ./waybar
     ./wofi
+    ./yazi
   ];
 }
