@@ -18,7 +18,6 @@
     ./qt
     ./scripts
     ./shell
-    ./ssh
     ./starship
     ./tmux
     ./waybar
