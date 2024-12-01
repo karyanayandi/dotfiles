@@ -61,7 +61,7 @@
     style = ''
       * {
         border: none;
-        font-family: "Geist Mono NF";
+        font-family: "VictorMono NF";
         font-size: 15px;
         min-height: 30px;
       }

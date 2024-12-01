@@ -23,8 +23,8 @@
         name = "Inter Variable";
       };
       monospace = {
-        package = pkgs.nerd-fonts.geist-mono;
-        name = "GeistMono NF";
+        package = pkgs.nerd-fonts.victor-mono;
+        name = "VictorMono NF";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;
