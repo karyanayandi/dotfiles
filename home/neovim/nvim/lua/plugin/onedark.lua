@@ -1,7 +1,7 @@
 -- luacheck: globals vim
 
 return {
-  "ollimorris/onedarkpro.nvim",
+  "olimorris/onedarkpro.nvim",
   lazy = false,
   priority = 10000,
   config = function()
