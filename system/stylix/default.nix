@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   stylix = {
     enable = true;
-    image = ../../wallpapers/anime-skull.png;
+    image = ../../wallpapers/gruvbox-anime-lanscape.png;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
     fonts = {
       sizes = {
