@@ -40,7 +40,6 @@
     wl-clipboard
     wlsunset
     xclip
-    yazi
     zed-editor
   ];
 }
