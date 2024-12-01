@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   stylix = {
     enable = true;
-    image = ../../wallpapers/onedark/od_breadbrd.jpg;
+    image = ../../wallpapers/onedark/od_error.png;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark.yaml";
     fonts = {
       sizes = {
