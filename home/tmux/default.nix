@@ -1,9 +1,9 @@
 {pkgs, ...}: let
-  custom-tmux-theme = pkgs.fetchFromGitHub {
+  custom-theme = pkgs.fetchFromGitHub {
     owner = "karyanayandi";
     repo = "custom-tmux-theme";
     rev = "main";
-    sha256 = "1bni7rds05s715k8pwy1sqciqk0skaqh01f1ac5b1gq3kf40x550";
+    sha256 = "155w304qz09gqsfm8q1wjrw5yrdddqhmh7dqll9r0qlxvicmzj53";
   };
 in {
   programs.tmux = {
@@ -87,5 +87,5 @@ in {
       }
     ];
   };
-  home.file.".tmux/custom-tmux-theme".source = "${custom-tmux-theme}/";
+  home.file.".tmux/custom-tmux-theme".source = "${custom-theme}/";
 }
