@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   stylix = {
     enable = true;
-    image = ../../wallpapers/gruvbox-anime-landscape.png;
+    image = ../../wallpapers/od_error.png;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark.yaml";
     fonts = {
       sizes = {
