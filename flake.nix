@@ -37,14 +37,6 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.karyana = import ./home;
-            home-manager.sharedModules = [
-              {
-                stylix.targets.neovim = {
-                  enable = true;
-                  plugin = "mini.base16";
-                };
-              }
-            ];
           }
           inputs.stylix.nixosModules.stylix
         ];
