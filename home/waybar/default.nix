@@ -68,11 +68,11 @@
 
       window#waybar {
         border-radius: 6px;
-        background: #2e3440;
+        background: #181825;
       }
 
       #workspaces {
-        background-color: #2e3440;
+        background-color: #181825;
         color: #eceff4;
         margin-left: 15px;
         margin-right: 15px;
@@ -81,14 +81,14 @@
       }
 
       #workspaces button {
-        background: #2e3440;
+        background: #181825;
         color: #eceff4;
         padding-left: 10px;
         padding-right: 10px;
       }
 
       #workspaces button.active {
-        color: #2e3440;
+        color: #181825;
         background: #eceff4;
         border-radius: 0px;
       }
@@ -99,7 +99,7 @@
       #pulseaudio,
       #memory,
       #window {
-        background: #2e3440;
+        background: #181825;
         color: #eceff4;
         padding-left: 10px;
         padding-right: 10px;
