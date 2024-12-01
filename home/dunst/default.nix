@@ -1,27 +1,39 @@
 {pkgs, ...}: {
-  home.packages = with pkgs; [dunst];
   services.dunst = {
     enable = true;
+    iconTheme = {
+      package = pkgs.tela-icon-theme;
+      name = "Tela-black";
+    };
     settings = {
       global = {
-        origin = "top-right";
-        geometry = "320x120-28-28";
-        separator_height = 0;
-        padding = 32;
-        horizontal_padding = 12;
-        text_icon_padding = 12;
-        frame_width = 4;
-        idle_threshold = 120;
-        show_age-threshole = 60;
-        line_height = 0;
-        format = ''
-          <b>%s</b>
-          %b'';
+        corner_radius = 16;
+        follow = "mouse";
+        width = "(0, 600)";
+        height = 100;
+        origin = "bottom-right";
+        offset = "40x20";
+        progress_bar = true;
+        progress_bar_height = 10;
+        progress_bar_frame_width = 1;
+        progress_bar_min_width = 150;
+        progress_bar_max_width = 400;
+        progress_bar_corner_radius = 0;
+        separator_height = 2;
+        padding = 10;
+        horizontal_padding = 15;
+        text_icon_padding = 15;
+        frame_width = 2;
+        gap_size = 7;
+        sort = "yes";
         alignment = "left";
-        icon_position = "off";
-        startup_notification = "false";
-        corner_radius = 10;
-        timeout = 2;
+        vertical_alignment = "center";
+        show_age_threshold = 60;
+        ellipsize = "middle";
+        ignore_newline = "no";
+        stack_duplicates = true;
+        hide_duplicate_count = false;
+        show_indicators = "yes";
       };
     };
   };

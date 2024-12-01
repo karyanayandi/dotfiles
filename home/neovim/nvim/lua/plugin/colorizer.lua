@@ -4,14 +4,17 @@ return {
   config = function()
     require("colorizer").setup {
       filetypes = {
-        "typescript",
-        "typescriptreact",
-        "javascript",
-        "javascriptreact",
+        "astro",
         "css",
         "html",
-        "astro",
+        "javascript",
+        "javascriptreact",
         "lua",
+        "nix",
+        "sh",
+        "svelte",
+        "typescript",
+        "typescriptreact",
       },
       user_default_options = {
         rgb_fn = true,
