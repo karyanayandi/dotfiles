@@ -33,8 +33,7 @@
       size = 24;
     };
     targets = {
-      neovim.enable = true;
-      neovim.plugin = true;
+      neovim.plugin = "mini.base16";
     };
   };
 }
