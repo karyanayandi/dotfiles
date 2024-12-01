@@ -3,13 +3,13 @@
     enable = true;
     settings = {
       global = {
-        origin = "bottom-right";
+        origin = "top-right";
         geometry = "320x120-32-32";
         separator_height = 2;
         padding = 32;
         horizontal_padding = 12;
         text_icon_padding = 12;
-        frame_width = 0;
+        frame_width = 1;
         idle_threshold = 120;
         line_height = 12;
         format = ''
