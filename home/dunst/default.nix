@@ -4,12 +4,12 @@
     settings = {
       global = {
         origin = "top-right";
-        geometry = "320x120-32-32";
+        geometry = "320x120-28-28";
         separator_height = 2;
         padding = 32;
-        horizontal_padding = 12;
-        text_icon_padding = 12;
-        frame_width = 1;
+        horizontal_padding = 16;
+        text_icon_padding = 16;
+        frame_width = 0;
         idle_threshold = 120;
         line_height = 12;
         format = ''
