@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: let
   screenRecordScript = pkgs.writeShellScriptBin "screen-record" ''
@@ -23,5 +24,6 @@ in {
 
   home.sessionVariables = {
     PATH = "${config.home.homeDirectory}/.local/share/bin:${pkgs.coreutils}/bin";
+    QT_QPA_PLATFORMTHEME = lib.mkForce "gtk3";
   };
 }
