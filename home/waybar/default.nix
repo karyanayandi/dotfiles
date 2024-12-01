@@ -61,7 +61,7 @@
     style = ''
       * {
         border: none;
-        font-family: "ZedMono NF";
+        font-family: "JetbrainsMono NF";
         font-size: 15px;
         min-height: 30px;
       }

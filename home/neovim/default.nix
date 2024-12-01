@@ -62,7 +62,7 @@ in {
     require "config.options"
     require "config.keymaps"
     require "config.lazy"
-    vim.cmd "colorscheme base16-rose-pine-dawn"
+    vim.cmd "colorscheme base16-onedark"
     vim.opt.runtimepath:append("${treesitter-parsers}")
   '';
 

@@ -2,7 +2,7 @@
   stylix = {
     enable = true;
     image = ../../wallpapers/gruvbox-anime-landscape.png;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/rose-pine-moon.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark.yaml";
     fonts = {
       sizes = {
         applications = 10;
@@ -19,8 +19,8 @@
         name = "Inter Variable";
       };
       monospace = {
-        package = pkgs.nerd-fonts.zed-mono;
-        name = "ZedMono NF";
+        package = pkgs.nerd-fonts.jetbrains-mono;
+        name = "JetbrainsMono NF";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;

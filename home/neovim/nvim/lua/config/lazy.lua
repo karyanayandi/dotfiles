@@ -30,6 +30,6 @@ require("lazy").setup {
   spec = {
     { import = "plugin" },
   },
-  install = { colorscheme = { "base16-rose-pine-dawn" } },
+  install = { colorscheme = { "base16-onedark" } },
   checker = { enabled = true },
 }

@@ -6,6 +6,6 @@ return {
   priority = 10000,
   config = function()
     require("base16-colorscheme").setup()
-    vim.cmd "colorscheme base16-rose-pine-dawn"
+    vim.cmd "colorscheme base16-onedark"
   end,
 }
