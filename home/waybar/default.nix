@@ -61,7 +61,7 @@
     style = ''
       * {
         border: none;
-        font-family: "ZeddMono NF";
+        font-family: "ZedMono NF";
         font-size: 15px;
         min-height: 30px;
       }
