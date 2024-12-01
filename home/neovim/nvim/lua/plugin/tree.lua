@@ -52,8 +52,8 @@ return {
           symlink_arrow = icons.tree.SymlinkArrow,
           show = {
             file = true,
-            folder = true,
-            folder_arrow = true,
+            folder = false,
+            folder_arrow = false,
             git = true,
           },
           glyphs = {
