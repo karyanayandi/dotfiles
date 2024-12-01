@@ -9,10 +9,6 @@
     settings = {
       plugin.prepend_previewers = [
         {
-          mime = "application/*zip";
-          run = "ouch";
-        }
-        {
           mime = "application/x-tar*";
           run = "ouch";
         }
