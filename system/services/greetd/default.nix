@@ -10,8 +10,6 @@ in {
     enable = true;
     settings = {
       default_session = {
-        # command = "Hyprland";
-        # user = "karyana";
         command = "${tuigreet} --time --remember --remember-session --sessions ${hyprland-session}";
         user = "greeter";
       };

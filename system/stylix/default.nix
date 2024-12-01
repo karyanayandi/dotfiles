@@ -5,7 +5,7 @@
 }: {
   stylix = {
     enable = true;
-    image = ../../wallpaper.png;
+    image = ../../wallpapers/anime-skull.png;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
     fonts = {
       sizes = {
@@ -34,7 +34,7 @@
     cursor = {
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
-      size = 32;
+      size = 24;
     };
   };
 }

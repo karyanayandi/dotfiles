@@ -4,8 +4,6 @@
 
     settings = {
       monitor = ",highres,auto,1";
-      "exec" = "gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'";
-
       xwayland = {
         force_zero_scaling = true;
       };
