@@ -133,7 +133,7 @@
         "ALT, P, pin"
         "SUPER, F, fullscreen"
         "SUPER SHIFT, Q, exec, power-menu"
-        "SUPER, U, exec, swaylock"
+        "SUPER, U, exec, hyprlock"
         "SUPER, Return, exec, foot"
         "SUPER, B, exec, google-chrome-stable"
         "SUPER, W, exec, zen"
