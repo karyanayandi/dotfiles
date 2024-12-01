@@ -61,7 +61,7 @@
     style = ''
       * {
         border: none;
-        font-family: "JetBrains Mono Nerd Font";
+        font-family: "Geist Mono NF";
         font-size: 15px;
         min-height: 30px;
       }
