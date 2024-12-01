@@ -12,10 +12,13 @@
     ./gtk
     ./hyprland
     ./lock
+    ./mpv
     ./neovim
     ./packages
+    ./qt
     ./scripts
     ./shell
+    ./ssh
     ./starship
     ./tmux
     ./waybar

@@ -21,7 +21,6 @@
     insomnia
     inxi
     killport
-    mpv
     nemo-with-extensions
     obsidian
     openssl
