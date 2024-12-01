@@ -14,7 +14,6 @@
     fishPlugins.fzf-fish
     fishPlugins.z
     fzf
-    gh-copilot
     gimp
     google-chrome
     grim
@@ -38,7 +37,6 @@
     viewnior
     wf-recorder
     wl-clipboard
-    wlsunset
     xclip
     zed-editor
   ];
