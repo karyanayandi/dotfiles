@@ -29,7 +29,7 @@
         applications = 10;
         desktop = 10;
         popups = 10;
-        terminal = 13;
+        terminal = 10;
       };
       serif = {
         package = pkgs.noto-fonts;
