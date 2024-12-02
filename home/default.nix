@@ -11,7 +11,6 @@
     ./git
     ./gtk
     ./hyprland
-    ./lock
     ./mpv
     ./neovim
     ./packages
