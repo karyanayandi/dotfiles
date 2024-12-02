@@ -5,7 +5,7 @@
 }: {
   stylix = {
     enable = true;
-    image = ../../wallpapers/onedark/od_outrun_wave.png;
+    image = ../../wallpapers/gruvbox/gruvbox-anime-landscape.png;
     override = {
       base00 = "#282c34";
       base01 = "#353b45";

@@ -6,7 +6,7 @@ return {
       theme = nil,
       disable = {
         background = true,
-        float_background = false,
+        float_background = true,
         eob_lines = true,
       },
       borders = true,
