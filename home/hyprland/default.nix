@@ -211,7 +211,7 @@
   };
 
   programs = {
-    hyprpolkitpolkitagent.enable = true;
+    hyprpolkitagent.enable = true;
     hyprlock = {
       enable = true;
       settings = {
