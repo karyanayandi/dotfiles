@@ -17,12 +17,13 @@
       curl
       eza
       git
+      hyprpolkitagent
       lsof
       vim
       wget
       inputs.alejandra.defaultPackage.${pkgs.system}
-      inputs.zen-browser.packages."${system}".default
       inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
+      inputs.zen-browser.packages.${pkgs.system}.default
     ];
   };
 

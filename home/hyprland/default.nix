@@ -209,9 +209,7 @@
       ];
     };
   };
-
   programs = {
-    hyprpolkitagent.enable = true;
     hyprlock = {
       enable = true;
       settings = {
