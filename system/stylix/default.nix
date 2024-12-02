@@ -3,17 +3,12 @@
   pkgs,
   ...
 }: let
-  theme = "./aurora.yaml";
-  wallpaper-path = "../../wallpapers/gruvbox/gruvbox-anime-landscape.png";
-  wallpaper = pkgs.runCommand "${wallpaper-path}" {} ''
-    COLOR=$(${pkgs.yq}/bin/yq -r .base00 ${theme})
-    COLOR="#"$COLOR
-    ${pkgs.imagemagick}/bin/magick convert -size 1920x1080 xc:$COLOR $out
-  '';
+  theme = ./aurora.yaml;
+  wallpaper-path = "../../wallpapers/anime/ryomen-sukuna.jpg";
 in {
   stylix = {
     enable = true;
-    image = wallpaper;
+    image = wallpaper-path;
     base16Scheme = theme;
     fonts = {
       sizes = {
