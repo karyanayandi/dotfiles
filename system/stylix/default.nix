@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   stylix = {
     enable = true;
     image = ../../wallpapers/onedark/od_outrun_wave.png;
@@ -48,6 +52,9 @@
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
       size = 24;
+    };
+    targets = {
+      chromium.enable = lib.mkForce false;
     };
   };
 }
