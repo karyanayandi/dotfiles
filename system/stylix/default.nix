@@ -4,7 +4,7 @@
   ...
 }: let
   theme = ./aurora.yaml;
-  wallpaper-path = "../../wallpapers/anime/ryomen-sukuna.jpg";
+  wallpaper-path = ../../wallpapers/onedark/od_tux.png;
 in {
   stylix = {
     enable = true;
