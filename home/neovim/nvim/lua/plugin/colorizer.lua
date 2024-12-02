@@ -15,6 +15,7 @@ return {
         "svelte",
         "typescript",
         "typescriptreact",
+        "yaml",
       },
       user_default_options = {
         rgb_fn = true,
