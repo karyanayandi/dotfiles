@@ -6,12 +6,12 @@ return {
       theme = nil,
       disable = {
         background = true,
-        float_background = true,
+        float_background = false,
         eob_lines = true,
       },
       borders = true,
       styles = {
-        comments = "NONE",
+        comments = "italic",
         strings = "NONE",
         keywords = "NONE",
         functions = "NONE",
