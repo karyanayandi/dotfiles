@@ -1,6 +1,6 @@
 {
   security = {
     rtkit.enable = true;
-    sudo = { wheelNeedsPassword = false; };
+    sudo = {wheelNeedsPassword = false;};
   };
 }
