@@ -5,6 +5,8 @@ return {
     require("colorizer").setup {
       filetypes = {
         "*",
+      },
+      user_default_options = {
         names = false,
         rgb_fn = true,
         hsl_fn = true,
