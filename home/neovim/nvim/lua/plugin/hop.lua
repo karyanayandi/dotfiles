@@ -9,9 +9,6 @@ return {
     local opts = { noremap = true, silent = true }
     local keymap = vim.api.nvim_set_keymap
 
-    keymap("", "s", ":HopWordCurrentLine<cr>", { silent = true })
-    keymap("", "S", ":HopPattern<cr>", { silent = true })
-
     keymap(
       "o",
       "f",

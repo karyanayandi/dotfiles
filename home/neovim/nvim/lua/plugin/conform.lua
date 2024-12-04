@@ -14,7 +14,7 @@ return {
     local formatters_by_ft = {
       astro = has_deno_json() and { "deno_fmt", stop_after_first = true } or { "prettierd", stop_after_first = true },
       c = { "clang_format" },
-      css = { "prettierd" },
+      css = { "prettierd", stop_after_first = true },
       fish = { "fish_indent" },
       go = { "gofumpt", "goimports-reviser", "golines" },
       graphql = { "prettierd" },
@@ -23,12 +23,12 @@ return {
         or { "prettierd", stop_after_first = true },
       javascriptreact = has_deno_json() and { "deno_fmt", stop_after_first = true }
         or { "prettierd", stop_after_first = true },
-      json = { "prettierd" },
+      json = { "prettierd", stop_after_first = true },
       lua = { "stylua" },
       markdown = has_deno_json() and { "deno_fmt", stop_after_first = true }
         or { "prettierd", stop_after_first = true },
       nix = { "alejandra" },
-      php = { "phpcs_fixer", "prettierd" },
+      php = { "phpcs_fixer", "prettierd", stop_after_first = true },
       python = { "isort", "black" },
       rust = { "rushfmt" },
       sh = { "shfmt" },
