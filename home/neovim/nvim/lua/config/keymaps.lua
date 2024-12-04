@@ -71,7 +71,7 @@ keymap("n", "<A-/>", "<cmd>lua require('Comment.api').toggle.linewise.current()<
 keymap("x", "<C-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 keymap("x", "<A-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 
--- Find files
+-- Find
 keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", opts)
 
 -- Find texts
@@ -99,8 +99,8 @@ keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", opts)
 -- Find Projects
 keymap("n", ";p", "<cmd>lua require('telescope').extensions.projects.projects()<cr>", opts)
 
--- Find workspaces
-keymap("n", ";w", "<cmd>WorkspacesOpen<cr>", opts)
+-- Find monorepo
+keymap("n", ";m", "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>", opts)
 
 -- Search and replace
 keymap("n", ";r", "<cmd>lua require('spectre').open_file_search()<cr>", opts)
