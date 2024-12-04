@@ -5,11 +5,14 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons" },
   config = function()
     require("oil").setup {
-      float = {
-        max_height = 20,
-        max_width = 60,
+      columns = { "icon" },
+      view_options = { show_hidden = true },
+      keymaps = {
+        ["<C-h>"] = false,
+        ["<M-h>"] = "actions.select_split",
       },
+      vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" }),
+      vim.keymap.set("n", "<space>-", "<CMD>require('oil').toggle_float<CR>", { desc = "Open file Explorer" }),
     }
-    vim.keymap.set("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory" })
   end,
 }

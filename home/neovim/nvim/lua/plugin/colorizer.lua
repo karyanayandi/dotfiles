@@ -4,22 +4,14 @@ return {
   config = function()
     require("colorizer").setup {
       filetypes = {
-        "astro",
-        "css",
-        "html",
-        "javascript",
-        "javascriptreact",
-        "lua",
-        "nix",
-        "sh",
-        "svelte",
-        "typescript",
-        "typescriptreact",
-        "yaml",
-      },
-      user_default_options = {
+        "*",
+        names = false,
         rgb_fn = true,
+        hsl_fn = true,
         tailwind = "both",
+        RRGGBBAA = true,
+        AARRGGBB = true,
+        always_update = true,
       },
       buftypes = {},
     }
