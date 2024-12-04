@@ -12,28 +12,33 @@ return {
     end
 
     local formatters_by_ft = {
-      astro = has_deno_json() and { "deno_fmt" } or { "prettierd" },
+      astro = has_deno_json() and { "deno_fmt", stop_after_first = true } or { "prettierd", stop_after_first = true },
       c = { "clang_format" },
       css = { "prettierd" },
       fish = { "fish_indent" },
       go = { "gofumpt", "goimports-reviser", "golines" },
       graphql = { "prettierd" },
       html = { "prettierd" },
-      javascript = has_deno_json() and { "deno_fmt" } or { "prettierd" },
-      javascriptreact = has_deno_json() and { "deno_fmt" } or { "prettierd" },
+      javascript = has_deno_json() and { "deno_fmt", stop_after_first = true }
+        or { "prettierd", stop_after_first = true },
+      javascriptreact = has_deno_json() and { "deno_fmt", stop_after_first = true }
+        or { "prettierd", stop_after_first = true },
       json = { "prettierd" },
       lua = { "stylua" },
-      markdown = has_deno_json() and { "deno_fmt" } or { "prettierd" },
+      markdown = has_deno_json() and { "deno_fmt", stop_after_first = true }
+        or { "prettierd", stop_after_first = true },
       nix = { "alejandra" },
       php = { "phpcs_fixer", "prettierd" },
       python = { "isort", "black" },
       rust = { "rushfmt" },
       sh = { "shfmt" },
-      svelte = has_deno_json() and { "deno_fmt" } or { "prettierd" },
-      typescript = has_deno_json() and { "deno_fmt" } or { "prettierd" },
-      typescriptreact = has_deno_json() and { "deno_fmt" } or { "prettierd" },
-      vue = has_deno_json() and { "deno_fmt" } or { "prettierd" },
-      yaml = { "prettierd" },
+      svelte = has_deno_json() and { "deno_fmt", stop_after_first = true } or { "prettierd", stop_after_first = true },
+      typescript = has_deno_json() and { "deno_fmt", stop_after_first = true }
+        or { "prettierd", stop_after_first = true },
+      typescriptreact = has_deno_json() and { "deno_fmt", stop_after_first = true }
+        or { "prettierd", stop_after_first = true },
+      vue = has_deno_json() and { "deno_fmt", stop_after_first = true } or { "prettierd", stop_after_first = true },
+      yaml = { "prettierd", stop_after_first = true },
     }
 
     conform.setup {
