@@ -5,8 +5,8 @@
     xkb = {
       layout = "us";
       variant = "";
+      options = "altwin:swap_alt_win";
     };
-    xkbOptions = ["altwin:swap_alt_win"];
     excludePackages = [pkgs.xterm];
   };
 }
