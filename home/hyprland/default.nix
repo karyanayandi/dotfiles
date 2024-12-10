@@ -1,4 +1,8 @@
-{lib, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   wayland.windowManager.hyprland = {
     enable = true;
 
@@ -11,6 +15,7 @@
       "exec-once" = [
         "dunst"
         "waybar"
+        "systemctl --user start hyprpolkitagent"
       ];
 
       input = {
@@ -299,4 +304,7 @@
       ];
     };
   };
+  home.packages = with pkgs; [
+    hyprpolkitagent
+  ];
 }

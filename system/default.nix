@@ -17,7 +17,6 @@
       curl
       eza
       git
-      hyprpolkitagent
       lsof
       vim
       wget
