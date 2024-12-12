@@ -4,7 +4,7 @@ return {
   lazy = true,
   ft = { "typescript", "typescriptreact", "vue", "html", "svelte", "astro" },
   keys = {
-    { "<leader>ov", "<cmd>TWValues<cr>", desc = "Show tailwind CSS values" },
+    { "<leader>lv", "<cmd>TWValues<cr>", desc = "Show tailwind CSS values" },
   },
   opts = {
     show_unknown_classes = true,

@@ -2,14 +2,12 @@ return {
   "vuki656/package-info.nvim",
   dependencies = "MunifTanjim/nui.nvim",
   config = function()
-    local icons = require "config.icons"
-
     require("package-info").setup {
       icons = {
         enable = true,
         style = {
-          up_to_date = "| " + icons.ui.CheckBox,
-          outdated = "| " + icons.ui.MinusBox,
+          up_to_date = "|  ",
+          outdated = "|  ",
         },
       },
       autostart = true,

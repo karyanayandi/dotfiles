@@ -102,13 +102,42 @@ return {
         desc = "Comment",
       },
       {
-        "<leader>p",
+        "<leader>P",
         "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
         desc = "Projects",
       },
       {
-        "<leader>z",
+        "<leader>p",
         group = "Package",
+      },
+      {
+        "<leader>pp",
+        "<cmd>lua require('package-info').toggle()<cr>",
+        desc = "Toggle",
+      },
+      {
+        "<leader>pu",
+        "<cmd>lua require('package-info').update()<cr>",
+        desc = "Update",
+      },
+      {
+        "<leader>pd",
+        "<cmd>lua require('package-info').delete()<cr>",
+        desc = "Update",
+      },
+      {
+        "<leader>pi",
+        "<cmd>lua require('package-info').install()<cr>",
+        desc = "Install",
+      },
+      {
+        "<leader>pc",
+        "<cmd>lua require('package-info').change_version()<cr>",
+        desc = "Change Version",
+      },
+      {
+        "<leader>z",
+        group = "Lazy",
       },
       {
         "<leader>zi",
