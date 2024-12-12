@@ -35,6 +35,7 @@
     unrar
     unzip
     viewnior
+    vscode
     wf-recorder
     wl-clipboard
     xclip
