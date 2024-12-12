@@ -30,7 +30,7 @@ return {
       --   custom = { ".git" },
       --   exclude = { ".gitignore", ".env", "~partytown", ".contentlayer", "dist", ".github", "neogit" },
       -- },
-      update_cwd = false,
+      update_cwd = true,
       renderer = {
         add_trailing = false,
         group_empty = false,
@@ -92,7 +92,7 @@ return {
       },
       update_focused_file = {
         enable = true,
-        update_cwd = false,
+        update_cwd = true,
         ignore_list = {},
       },
       git = {
