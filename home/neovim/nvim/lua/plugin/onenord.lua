@@ -7,6 +7,7 @@ return {
       disable = {
         background = true,
         float_background = true,
+        cursorline = true,
         eob_lines = true,
       },
       borders = true,
