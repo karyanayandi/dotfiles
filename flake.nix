@@ -12,7 +12,7 @@
       url = "github:hyprwm/contrib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    zen-browser.url = "github:ch4og/zen-browser-flake";
+    zen-browser.url = "github:omarcresp/zen-browser-flake";
     stylix.url = "github:danth/stylix";
     alejandra = {
       url = "github:kamadorueda/alejandra/3.0.0";
