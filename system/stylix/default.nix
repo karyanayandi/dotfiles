@@ -4,7 +4,7 @@
   ...
 }: let
   theme = ./aurora.yaml;
-  wallpaper-path = ../../wallpapers/onedark/od_tux.png;
+  wallpaper-path = ../../wallpapers/onedark/od_breadbrd.jpg;
 in {
   stylix = {
     enable = true;
