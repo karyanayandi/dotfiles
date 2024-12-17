@@ -4,7 +4,7 @@
   ...
 }: let
   theme = ./aurora.yaml;
-  wallpaper-path = ../../wallpapers/onedark/od_breadbrd.jpg;
+  wallpaper-path = ../../wallpapers/anime/fuwarin.png;
 in {
   stylix = {
     enable = true;
