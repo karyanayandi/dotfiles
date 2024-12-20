@@ -4,7 +4,7 @@
   ...
 }: let
   theme = ./aurora.yaml;
-  wallpaper-path = ../../wallpapers/anime/fuwarin.png;
+  wallpaper-path = ../../wallpapers/landscape/rice.jpg;
 in {
   stylix = {
     enable = true;
