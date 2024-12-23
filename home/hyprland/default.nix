@@ -39,7 +39,7 @@
       general = {
         gaps_in = 6;
         gaps_out = 12;
-        border_size = 1;
+        border_size = 2;
         layout = "dwindle";
       };
 
@@ -48,7 +48,7 @@
       };
 
       decoration = {
-        rounding = 3;
+        rounding = 5;
         dim_special = 0.7;
         blur = {
           special = false;
