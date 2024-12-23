@@ -5,7 +5,6 @@ return {
       { "zbirenbaum/copilot.lua" },
       { "nvim-lua/plenary.nvim" },
     },
-    build = "make tiktoken",
     opts = {},
   },
 }
