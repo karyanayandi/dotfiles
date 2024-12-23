@@ -120,7 +120,11 @@ return {
       },
       {
         "<leader>ap",
-        ":lua require('CopilotChat.integrations.telescope').pick(require('CopilotChat.actions').prompt_actions({selection = require('CopilotChat.select').visual}))<CR>",
+        function()
+          require("CopilotChat.integrations.telescope").pick(require("CopilotChat.actions").prompt_actions {
+            selection = require("CopilotChat.select").visual,
+          })
+        end,
         mode = "x",
         desc = "Prompt actions",
       },
@@ -174,7 +178,7 @@ return {
       -- Debug
       { "<leader>ad", "<cmd>CopilotChatDebugInfo<cr>", desc = "Debug Info" },
       -- Fix the issue with diagnostic
-      { "<leader>af", "<cmd>CopilotChatFixDiagnostic<cr>", desc = "Fix Diagnostic" },
+      { "<leader>af", "<cmd>CopilotChatFix<cr>", desc = "Fix Diagnostic" },
       -- Clear buffer and chat history
       { "<leader>al", "<cmd>CopilotChatReset<cr>", desc = "Clear buffer and chat history" },
       -- Toggle Copilot Chat Vsplit
