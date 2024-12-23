@@ -71,14 +71,6 @@ keymap("n", "<A-/>", "<cmd>lua require('Comment.api').toggle.linewise.current()<
 keymap("x", "<C-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 keymap("x", "<A-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 
--- AI
-keymap("n", ";a", function()
-  local input = vim.fn.input "Ask Copilot: "
-  if input ~= "" then
-    vim.cmd("CopilotChat " .. input)
-  end
-end, opts)
-
 -- Find
 keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", opts)
 
