@@ -55,8 +55,7 @@ return {
     local mappings = {
       {
         "<leader>a",
-        "<cmd>Alpha<cr>",
-        desc = "Alpha",
+        group = "AI",
       },
       { "<leader>A", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
       {
@@ -69,7 +68,12 @@ return {
         "<cmd>:Bdelete<cr>",
         desc = "Close",
       },
-      { "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
+      {
+        "<leader>d",
+        "<cmd>Alpha<cr>",
+        desc = "Dashboard",
+      },
+      { "<leader>D", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
       {
         "<leader>e",
         "<cmd>NvimTreeToggle<cr>",

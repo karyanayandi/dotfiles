@@ -1,5 +1,6 @@
 {
   "diagnostics.globals": ["vim", "notify"],
   "diagnostics.disable": ["missing-return",
-        "duplicate-set-field"]
+        "duplicate-set-field",
+        "param-type-mismatch"]
 }
