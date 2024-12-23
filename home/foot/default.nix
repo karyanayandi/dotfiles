@@ -5,6 +5,9 @@
       mouse = {
         hide-when-typing = "yes";
       };
+      main = {
+        pad = "20x20";
+      };
     };
   };
 }
