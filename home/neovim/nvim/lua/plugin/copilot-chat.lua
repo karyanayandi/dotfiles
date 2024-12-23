@@ -123,11 +123,12 @@ return {
         desc = "Prompt actions",
       },
       -- Code related commands
-      { "<leader>ae", "<cmd>CopilotChatExplain<cr>", desc = "Explain code" },
-      { "<leader>at", "<cmd>CopilotChatTests<cr>", desc = "Generate tests" },
-      { "<leader>ar", "<cmd>CopilotChatReview<cr>", desc = "Review code" },
       { "<leader>aR", "<cmd>CopilotChatRefactor<cr>", desc = "Refactor code" },
+      { "<leader>ae", "<cmd>CopilotChatExplain<cr>", desc = "Explain code" },
       { "<leader>an", "<cmd>CopilotChatBetterNamings<cr>", desc = "Better Naming" },
+      { "<leader>ao", "<cmd>CopilotChatReview<cr>", desc = "Optimize code" },
+      { "<leader>ar", "<cmd>CopilotChatReview<cr>", desc = "Review code" },
+      { "<leader>at", "<cmd>CopilotChatTests<cr>", desc = "Generate tests" },
       -- Chat with Copilot in visual mode
       {
         "<leader>av",
