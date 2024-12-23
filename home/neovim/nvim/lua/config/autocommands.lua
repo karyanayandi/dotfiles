@@ -149,3 +149,15 @@ vim.api.nvim_create_autocmd("FileType", {
     }
   end,
 })
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = "copilot-*",
+  callback = function()
+    vim.opt_local.relativenumber = false
+    vim.opt_local.number = false
+
+    vim.keymap.set("n", "<C-p>", function()
+      print(require("CopilotChat").response())
+    end, { buffer = true, remap = true })
+  end,
+})
