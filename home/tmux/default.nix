@@ -1,9 +1,9 @@
 {pkgs, ...}: let
-  custom-theme = pkgs.fetchFromGitHub {
+  aurora-theme = pkgs.fetchFromGitHub {
     owner = "karyanayandi";
-    repo = "custom-tmux-theme";
+    repo = "aurora.tmux";
     rev = "main";
-    sha256 = "1zvhpgfwdar10xk561r7plci8r1jqaf3di32zl9zjpnpnwxyq5ms";
+    sha256 = "19gv6bq607fvj8qhb1b0xr2gv0ycidhfdlmbm7lbsha9rhfdpwh7";
   };
 in {
   programs.tmux = {
@@ -63,7 +63,7 @@ in {
       bind-key k select-pane -U
       bind-key l select-pane -R
 
-      run-shell '~/.tmux/custom-tmux-theme/custom-theme.tmux'
+      run-shell '~/.tmux/aurora/aurora.tmux'
     '';
     plugins = with pkgs.tmuxPlugins; [
       better-mouse-mode
@@ -87,5 +87,5 @@ in {
       }
     ];
   };
-  home.file.".tmux/custom-tmux-theme".source = "${custom-theme}/";
+  home.file.".tmux/aurora".source = "${aurora-theme}/";
 }
