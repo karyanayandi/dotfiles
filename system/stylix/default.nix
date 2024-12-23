@@ -26,8 +26,8 @@ in {
         name = "Inter Variable";
       };
       monospace = {
-        package = pkgs.nerd-fonts.zed-mono;
-        name = "ZedMono NF";
+        package = pkgs.nerd-fonts.fira-code;
+        name = "Fira Code Nerd Font";
       };
       emoji = {
         package = pkgs.noto-fonts-emoji;
