@@ -7,7 +7,7 @@
         y = 2;
       };
       cursor.style = "Beam";
-      shell.program = "${pkgs.fish}/bin/fish";
+      terminal.shell = "${pkgs.fish}/bin/fish";
     };
   };
 }
