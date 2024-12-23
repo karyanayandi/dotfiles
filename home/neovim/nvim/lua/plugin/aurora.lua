@@ -1,15 +1,15 @@
 return {
-  "rmehri01/onenord.nvim",
+  "karyanayandi/aurora.nvim",
   lazy = false,
   config = function()
-    require("onenord").setup {
+    require("aurora").setup {
       theme = nil,
       fade_nc = false,
       disable = {
-        background = true,
-        float_background = true,
+        background = false,
+        float_background = false,
         cursorline = true,
-        eob_lines = true,
+        eob_lines = false,
       },
       borders = true,
       styles = {
