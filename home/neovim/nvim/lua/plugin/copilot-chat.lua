@@ -33,32 +33,26 @@ return {
       prompts = prompts,
       auto_follow_cursor = false,
       mappings = {
-        -- Use tab for completion
         complete = {
           detail = "Use @<Tab> or /<Tab> for options.",
           insert = "<Tab>",
         },
-        -- Close the chat
         close = {
           normal = "q",
           insert = "<C-c>",
         },
-        -- Reset the chat buffer
         reset = {
           normal = "<C-x>",
           insert = "<C-x>",
         },
-        -- Submit the prompt to Copilot
         submit_prompt = {
           normal = "<CR>",
           insert = "<C-CR>",
         },
-        -- Accept the diff
         accept_diff = {
           normal = "<C-y>",
           insert = "<C-y>",
         },
-        -- Show help
         show_help = {
           normal = "g?",
         },
@@ -175,12 +169,10 @@ return {
         end,
         desc = "Quick chat",
       },
-      -- Debug
       { "<leader>ad", "<cmd>CopilotChatDebugInfo<cr>", desc = "Debug Info" },
-      -- Fix the issue with diagnostic
       { "<leader>af", "<cmd>CopilotChatFix<cr>", desc = "Fix Diagnostic" },
       -- Clear buffer and chat history
-      { "<leader>al", "<cmd>CopilotChatReset<cr>", desc = "Clear buffer and chat history" },
+      { "<leader>ac", "<cmd>CopilotChatReset<cr>", desc = "Clear buffer and chat history" },
       -- Toggle Copilot Chat Vsplit
       { "<leader>av", "<cmd>CopilotChatToggle<cr>", desc = "Toggle" },
       -- Copilot Chat Models
