@@ -20,6 +20,7 @@
     ./starship
     ./tmux
     ./waybar
+    ./wezterm
     ./wofi
     ./yazi
   ];
