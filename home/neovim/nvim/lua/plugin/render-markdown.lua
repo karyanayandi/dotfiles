@@ -10,12 +10,15 @@ return {
       file_types = { "markdown", "copilot-chat" },
       anti_conceal = {
         enabled = true,
-        -- ignore = {
-        --   code_background = true,
-        --   sign = true,
-        -- },
+        ignore = {
+          code_background = true,
+          sign = true,
+        },
         above = 0,
         below = 0,
+      },
+      code = {
+        style = "normal",
       },
       callout = {
         note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
