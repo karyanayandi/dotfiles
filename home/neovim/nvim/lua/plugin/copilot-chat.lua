@@ -29,9 +29,9 @@ return {
     opts = {
       highlight_headers = false,
       -- separator = "---",
-      question_header = "> [!HELP] User ",
-      answer_header = "> [!SUMMARY] Copilot ",
-      error_header = "> [!ERROR] Error",
+      question_header = "[!HELP] User ",
+      answer_header = "[!SUMMARY] Copilot ",
+      error_header = "[!ERROR] Error",
       prompts = prompts,
       auto_follow_cursor = true,
       mappings = {

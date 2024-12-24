@@ -130,9 +130,18 @@ end, {
 
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
   callback = function()
-    if vim.bo.buftype:match "copilot-" then
-      vim.opt_local.number = false
-      vim.opt_local.relativenumber = false
+    local copilot_buffers = {
+      "copilot-chat",
+      "copilot-diff",
+      "copilot-overlay",
+    }
+
+    for _, buf_type in ipairs(copilot_buffers) do
+      if vim.bo.buftype == buf_type then
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+        break
+      end
     end
   end,
 })
