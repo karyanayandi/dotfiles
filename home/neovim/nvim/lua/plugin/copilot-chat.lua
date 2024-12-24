@@ -34,6 +34,9 @@ return {
       error_header = "[!ERROR] Error",
       prompts = prompts,
       auto_follow_cursor = true,
+      options = {
+        relativenumber = false,
+      },
       mappings = {
         complete = {
           detail = "Use @<Tab> or /<Tab> for options.",
