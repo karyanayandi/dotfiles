@@ -18,7 +18,7 @@ return {
         below = 0,
       },
       code = {
-        style = "normal",
+        style = "language",
       },
       callout = {
         note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
