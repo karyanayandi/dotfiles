@@ -18,7 +18,8 @@ return {
         below = 0,
       },
       code = {
-        style = "language",
+        style = "full",
+        position = "right",
       },
       callout = {
         note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
