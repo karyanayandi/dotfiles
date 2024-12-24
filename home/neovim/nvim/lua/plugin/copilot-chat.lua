@@ -34,9 +34,6 @@ return {
       error_header = "[!ERROR] Error",
       prompts = prompts,
       auto_follow_cursor = true,
-      options = {
-        relativenumber = false,
-      },
       mappings = {
         complete = {
           detail = "Use @<Tab> or /<Tab> for options.",
@@ -58,9 +55,7 @@ return {
           normal = "<C-y>",
           insert = "<C-y>",
         },
-        show_help = {
-          normal = "g?",
-        },
+        show_help = false,
       },
     },
     config = function(_, opts)
