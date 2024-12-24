@@ -38,6 +38,7 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
+    vim.opt_local.relativenumber = false
   end,
 })
 
@@ -131,7 +132,7 @@ end, {
 vim.api.nvim_create_autocmd({ "User" }, {
   pattern = "copilot-*",
   callback = function()
-    vim.opt_local.relativenumber = false
-    vim.opt_local.number = false
+    vim.opt_local.relativenumber = true
+    vim.opt_local.number = true
   end,
 })
