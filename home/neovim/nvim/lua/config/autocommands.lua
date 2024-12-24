@@ -13,11 +13,6 @@ vim.api.nvim_create_autocmd({ "User" }, {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
-  group = augroup "checktime",
-  command = "checktime",
-})
-
 vim.api.nvim_create_autocmd({ "FileType" }, {
   pattern = {
     "qf",
@@ -92,13 +87,6 @@ vim.api.nvim_create_autocmd("CursorHold", {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  pattern = { "*" },
-  callback = function()
-    vim.cmd "checktime"
-  end,
-})
-
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup "last_loc",
   callback = function()
@@ -138,16 +126,6 @@ vim.api.nvim_create_user_command("ToggleInlayHint", function()
 end, {
   desc = "Toggle inlay hint",
   bang = true,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "sh",
-  callback = function()
-    vim.lsp.start {
-      name = "bash-language-server",
-      cmd = { "bash-language-server", "start" },
-    }
-  end,
 })
 
 vim.api.nvim_create_autocmd("BufEnter", {
