@@ -127,3 +127,15 @@ end, {
   desc = "Toggle inlay hint",
   bang = true,
 })
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = "*",
+  callback = function()
+    local buf = vim.api.nvim_get_current_buf()
+    local bufname = vim.api.nvim_buf_get_name(buf)
+    if bufname:match "copilot%-" then
+      vim.opt_local.number = false
+      vim.opt_local.relativenumber = false
+    end
+  end,
+})
