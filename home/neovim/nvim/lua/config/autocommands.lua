@@ -131,6 +131,7 @@ end, {
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = { "copilot-*", "Copilot*" },
   callback = function()
-    vim.opt_local.number = false
+    vim.opt.number = false
+    vim.opt.relativenumber = false
   end,
 })
