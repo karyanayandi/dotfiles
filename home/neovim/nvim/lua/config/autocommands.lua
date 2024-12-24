@@ -131,11 +131,17 @@ end, {
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = "copilot-*",
   callback = function()
-    vim.opt_local.relativenumber = false
     vim.opt_local.number = false
     local ft = vim.bo.filetype
     if ft == "copilot-chat" then
       vim.bo.filetype = "markdown"
     end
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufLeave", {
+  pattern = "copilot-*",
+  callback = function()
+    vim.opt_local.number = true
   end,
 })

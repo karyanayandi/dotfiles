@@ -74,6 +74,7 @@ return {
           selection = select.visual,
           window = {
             layout = "float",
+            border = "single",
             relative = "cursor",
             width = 1,
             height = 0.4,
@@ -117,16 +118,16 @@ return {
       { "<leader>at", "<cmd>CopilotChatTests<cr>", desc = "Generate tests" },
       -- Chat with Copilot in visual mode
       {
-        "<leader>av",
+        "<leader>ai",
         ":CopilotChatVisual",
         mode = "x",
-        desc = "Open in vertical split Copilot Chat",
+        desc = "Copilot Chat (Visual)",
       },
       {
         "<leader>ax",
         ":CopilotChatInline<cr>",
         mode = "x",
-        desc = "Inline chat",
+        desc = "Copilot Chat (Inline)",
       },
       -- Custom input for CopilotChat
       {
