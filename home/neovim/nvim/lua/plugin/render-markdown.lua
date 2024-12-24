@@ -2,13 +2,21 @@ return {
   "MeanderingProgrammer/render-markdown.nvim",
   dependencies = { "nvim-treesitter/nvim-treesitter" },
   opts = {
-    render_modes = true,
+    render_modes = { "n", "c", "t" },
   },
-
   config = function()
     require("render-markdown").setup {
       enabled = true,
       file_types = { "markdown", "copilot-chat" },
+      anti_conceal = {
+        enabled = true,
+        -- ignore = {
+        --   code_background = true,
+        --   sign = true,
+        -- },
+        above = 0,
+        below = 0,
+      },
       callout = {
         note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
         tip = { raw = "[!TIP]", rendered = "󰌶 Tip", highlight = "RenderMarkdownSuccess" },
