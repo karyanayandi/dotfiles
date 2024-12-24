@@ -119,7 +119,7 @@ return {
       -- Chat with Copilot in visual mode
       {
         "<leader>ai",
-        ":CopilotChatVisual",
+        ":CopilotChatVisual<cr>",
         mode = "x",
         desc = "Copilot Chat (Visual)",
       },
