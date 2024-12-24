@@ -28,7 +28,7 @@ return {
     },
     opts = {
       highlight_headers = false,
-      separator = "---",
+      -- separator = "---",
       question_header = "> [!HELP] User ",
       answer_header = "> [!SUMMARY] Copilot ",
       error_header = "> [!ERROR] Error",
