@@ -28,7 +28,8 @@ return {
     },
     opts = {
       highlight_headers = false,
-      -- separator = "---",
+      allow_insecure = true,
+      separator = "",
       question_header = "[!HELP] User ",
       answer_header = "[!SUMMARY] Copilot ",
       error_header = "[!ERROR] Error",
@@ -85,21 +86,6 @@ return {
       vim.api.nvim_create_user_command("CopilotChatBuffer", function(args)
         chat.ask(args.args, { selection = select.buffer })
       end, { nargs = "*", range = true })
-
-      -- Custom buffer for CopilotChat
-      vim.api.nvim_create_autocmd("BufEnter", {
-        pattern = "copilot-*",
-        callback = function()
-          vim.opt_local.relativenumber = true
-          vim.opt_local.number = true
-
-          -- Get current filetype and set it to markdown if the current filetype is copilot-chat
-          local ft = vim.bo.filetype
-          if ft == "copilot-chat" then
-            vim.bo.filetype = "markdown"
-          end
-        end,
-      })
     end,
     event = "VeryLazy",
     keys = {
