@@ -10,6 +10,7 @@
       init.defaultBranch = "main";
       push.default = "simple";
     };
+    delta.enable = true;
   };
 
   programs.gh.enable = true;
