@@ -213,6 +213,11 @@ return {
         desc = "Cursorline",
       },
       {
+        "<leader>on",
+        '<cmd>lua require("config.functions").toggle_option("number")<cr>',
+        desc = "Number",
+      },
+      {
         "<leader>oS",
         '<cmd>lua require("config.functions").toggle_option("spell")<cr>',
         desc = "Spell",
