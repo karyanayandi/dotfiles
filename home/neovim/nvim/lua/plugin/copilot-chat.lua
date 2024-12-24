@@ -27,11 +27,13 @@ return {
       { "nvim-lua/plenary.nvim" },
     },
     opts = {
-      question_header = "## User ",
-      answer_header = "## Copilot ",
-      error_header = "## Error ",
+      highlight_headers = false,
+      separator = "---",
+      question_header = "> [!HELP] User ",
+      answer_header = "> [!SUMMARY] Copilot ",
+      error_header = "> [!ERROR] Error",
       prompts = prompts,
-      auto_follow_cursor = false,
+      auto_follow_cursor = true,
       mappings = {
         complete = {
           detail = "Use @<Tab> or /<Tab> for options.",
@@ -134,7 +136,7 @@ return {
         "<leader>av",
         ":CopilotChatVisual",
         mode = "x",
-        desc = "Open in vertical split",
+        desc = "Open in vertical split Copilot Chat",
       },
       {
         "<leader>ax",
