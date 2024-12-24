@@ -64,6 +64,7 @@ return {
       chat.setup(opts)
 
       local select = require "CopilotChat.select"
+
       vim.api.nvim_create_user_command("CopilotChatVisual", function(args)
         chat.ask(args.args, { selection = select.visual })
       end, { nargs = "*", range = true })
@@ -118,7 +119,7 @@ return {
       { "<leader>at", "<cmd>CopilotChatTests<cr>", desc = "Generate tests" },
       -- Chat with Copilot in visual mode
       {
-        "<leader>ai",
+        "<leader>av",
         ":CopilotChatVisual<cr>",
         mode = "x",
         desc = "Copilot Chat (Visual)",
