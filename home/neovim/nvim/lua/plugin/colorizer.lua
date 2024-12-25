@@ -1,10 +1,14 @@
 return {
   "NvChad/nvim-colorizer.lua",
   lazy = false,
+  event = "BufReadPre",
   config = function()
     require("colorizer").setup {
       filetypes = {
         "*",
+        "!prompt",
+        "!popup",
+        "!lazy",
       },
       user_default_options = {
         AARRGGBB = true,
