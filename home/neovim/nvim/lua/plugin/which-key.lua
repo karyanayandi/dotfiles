@@ -1,3 +1,5 @@
+--  TODO: organize keymaps to its own plugin file
+
 -- luacheck: ignore 631
 
 return {
