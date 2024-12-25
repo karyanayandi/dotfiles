@@ -1,5 +1,6 @@
 -- luacheck: globals Snacks
 -- luacheck: globals vim
+-- luacheck: globals M
 
 local icons = require "config.icons"
 
@@ -7,36 +8,25 @@ return {
   "folke/snacks.nvim",
   priority = 1000,
   lazy = false,
-  ---@type snacks.Config
   opts = {
-    animate = {
-      -- TODO: add toggle to option seting
-      duration = 20,
-      easing = "linear",
-      fps = 60,
-    },
     bigfile = { enabled = true },
     dashboard = {
-      enabled = true,
-      event = "VimEnter",
       width = 60,
       row = nil,
       col = nil,
       pane_gap = 4,
-      autokeys = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", -- autokey sequence
+      autokeys = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
       preset = {
-        ---@type fun(cmd:string, opts:table)|nil
         pick = nil,
-        ---@type snacks.dashboard.Item[]
         keys = {
           {
-            icon = icons.ducuments.NewFile,
+            icon = icons.documents.File,
             key = "e",
             desc = "New File",
             action = ":ene | startinsert",
           },
           {
-            icon = icons.ducuments.Files,
+            icon = icons.documents.Files,
             key = "f",
             desc = "Find File",
             action = ":Telescope find_files",
@@ -45,7 +35,7 @@ return {
             icon = icons.ui.History,
             key = "r",
             desc = "Recent Files",
-            action = ":lua Snacks.dashboard.pick('oldfiles')",
+            action = ":Telescope oldfiles",
           },
           {
             icon = icons.ui.List,
@@ -71,77 +61,226 @@ return {
             desc = "Update",
             action = ":Lazy update",
           },
-          { icon = icons.ui.SignOut, key = "q", desc = "Quit", action = ":qa" },
         },
-        header = {
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[  ▄████████ ████████▄   ▄█      ███      ▄██████▄     ▄████████   ]],
-          [[  ███    ███ ███   ▀███ ███  ▀█████████▄ ███    ███   ███    ███  ]],
-          [[  ███    █▀  ███    ███ ███▌    ▀███▀▀██ ███    ███   ███    ███  ]],
-          [[ ▄███▄▄▄     ███    ███ ███▌     ███   ▀ ███    ███  ▄███▄▄▄▄██▀  ]],
-          [[▀▀███▀▀▀     ███    ███ ███▌     ███     ███    ███ ▀▀███▀▀▀▀▀    ]],
-          [[  ███    █▄  ███    ███ ███      ███     ███    ███ ▀███████████  ]],
-          [[  ███    ███ ███   ▄███ ███      ███     ███    ███   ███    ███  ]],
-          [[  ██████████ ████████▀  █▀      ▄████▀    ▀██████▀    ███    ███  ]],
-          [[                                                      ███    ███  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
-          [[                                                                  ]],
+      },
+      formats = {
+        icon = function(item)
+          if item.file and item.icon == "file" or item.icon == "directory" then
+            return M.icon(item.file, item.icon)
+          end
+          return { item.icon, width = 2, hl = "icon" }
+        end,
+        footer = { "%s", align = "center" },
+        header = { "%s", align = "center" },
+      },
+      sections = {
+        { section = "terminal", cmd = "echo 'Code Editor' | cowsay", hl = "header", padding = 1, indent = 8 },
+        { section = "keys", gap = 1, padding = 1 },
+        { section = "startup" },
+      },
+    },
+    debug = { enabled = false },
+    dim = { enabled = false },
+    git = { enabled = false },
+    gitbrowse = {
+      enabled = true,
+      notify = true,
+      what = "file",
+      branch = nil,
+      line_start = nil,
+      line_end = nil,
+      remote_patterns = {
+        { "^(https?://.*)%.git$", "%1" },
+        { "^git@(.+):(.+)%.git$", "https://%1/%2" },
+        { "^git@(.+):(.+)$", "https://%1/%2" },
+        { "^git@(.+)/(.+)$", "https://%1/%2" },
+        { "^ssh://git@(.*)$", "https://%1" },
+        { "^ssh://([^:/]+)(:%d+)/(.*)$", "https://%1/%3" },
+        { "^ssh://([^/]+)/(.*)$", "https://%1/%2" },
+        { "ssh%.dev%.azure%.com/v3/(.*)/(.*)$", "dev.azure.com/%1/_git/%2" },
+        { "^https://%w*@(.*)", "https://%1" },
+        { "^git@(.*)", "https://%1" },
+        { ":%d+", "" },
+        { "%.git$", "" },
+      },
+      url_patterns = {
+        ["github%.com"] = {
+          branch = "/tree/{branch}",
+          file = "/blob/{branch}/{file}#L{line_start}-L{line_end}",
+          commit = "/commit/{commit}",
         },
-        formats = {
-          footer = { "%s", align = "center" },
-          header = { "%s", align = "center" },
-          file = function(item, ctx)
-            local fname = vim.fn.fnamemodify(item.file, ":~")
-            fname = ctx.width and #fname > ctx.width and vim.fn.pathshorten(fname) or fname
-            if #fname > ctx.width then
-              local dir = vim.fn.fnamemodify(fname, ":h")
-              local file = vim.fn.fnamemodify(fname, ":t")
-              if dir and file then
-                file = file:sub(-(ctx.width - #dir - 2))
-                fname = dir .. "/…" .. file
-              end
-            end
-            local dir, file = fname:match "^(.*)/(.+)$"
-            return dir and { { dir .. "/", hl = "dir" }, { file, hl = "file" } } or { { fname, hl = "file" } }
-          end,
+        ["gitlab%.com"] = {
+          branch = "/-/tree/{branch}",
+          file = "/-/blob/{branch}/{file}#L{line_start}-L{line_end}",
+          commit = "/-/commit/{commit}",
         },
-        sections = {
-          { section = "header" },
-          { section = "keys", gap = 1, padding = 1 },
-          { section = "startup" },
+        ["bitbucket%.org"] = {
+          branch = "/src/{branch}",
+          file = "/src/{branch}/{file}#lines-{line_start}-L{line_end}",
+          commit = "/commits/{commit}",
         },
       },
     },
-    indent = { enabled = false },
-    input = { enabled = false },
+    health = { enabled = false },
+    indent = {
+      enabled = true,
+      priority = 1,
+      char = icons.ui.Pipe,
+      only_scope = false,
+      only_current = false,
+      hl = "SnacksIndent",
+      scope = {
+        enabled = true,
+        priority = 200,
+        char = icons.ui.Pipe,
+        underline = false,
+        only_current = false,
+        hl = "SnacksIndentScope",
+      },
+      chunk = {
+        enabled = false,
+        only_current = false,
+        priority = 200,
+        hl = "SnacksIndentChunk",
+        char = {
+          corner_top = "┌",
+          corner_bottom = "└",
+          horizontal = "─",
+          vertical = icons.ui.Pipe,
+          arrow = ">",
+        },
+      },
+      blank = {
+        char = " ",
+        hl = "SnacksIndentBlank",
+      },
+      animate = {
+        enabled = vim.fn.has "nvim-0.10" == 1,
+        style = "out",
+        easing = "linear",
+        duration = {
+          step = 20,
+          total = 500,
+        },
+        fps = 60,
+      },
+      filter = function(buf)
+        return vim.g.snacks_indent ~= false and vim.b[buf].snacks_indent ~= false and vim.bo[buf].buftype == ""
+      end,
+    },
+    input = {
+      enabled = false,
+    },
+    lazygit = {
+      enabled = true,
+      configure = true,
+      config = {
+        os = { editPreset = "nvim-remote" },
+        gui = {
+          nerdFontsVersion = "3",
+        },
+      },
+      win = {
+        style = "lazygit",
+      },
+    },
     notifier = {
-      enabled = false,
-      timeout = 3000,
+      enabled = true,
+      width = { min = 40, max = 0.4 },
+      height = { min = 1, max = 0.6 },
+      margin = { top = 0, right = 1, bottom = 0 },
+      padding = true,
+      sort = { "level", "added" },
+      level = vim.log.levels.TRACE,
+      icons = {
+        error = icons.diagnostics.Error,
+        warn = icons.diagnostics.Warning,
+        info = icons.diagnostics.Information,
+        debug = icons.ui.Bug,
+        trace = icons.ui.Pencil,
+      },
+      keep = function()
+        return vim.fn.getcmdpos() > 0
+      end,
+      style = "compact",
+      top_down = true,
+      date_format = "%R",
+      more_format = " ↓ %d lines ",
+      refresh = 50,
     },
-    quickfile = { enabled = false },
-    scroll = { enabled = false },
-    statuscolumn = { enabled = false },
+    quickfile = { enabled = true },
+    profiler = { enabled = false },
+    scratch = { enabled = false },
+    scroll = {
+      animate = {
+        duration = { step = 15, total = 250 },
+        easing = "linear",
+      },
+      spamming = 10,
+      filter = function(buf)
+        return vim.g.snacks_scroll ~= false and vim.b[buf].snacks_scroll ~= false and vim.bo[buf].buftype ~= "terminal"
+      end,
+    },
+    statuscolumn = {
+      left = { "mark", "sign" },
+      right = { "fold", "git" },
+      folds = {
+        open = false,
+        git_hl = false,
+      },
+      git = {
+        patterns = { "GitSign", "MiniDiffSign" },
+      },
+      refresh = 50,
+    },
+    terminal = {
+      bo = {
+        filetype = "snacks_terminal",
+      },
+      wo = {},
+      keys = {
+        q = "hide",
+        gf = function(self)
+          local f = vim.fn.findfile(vim.fn.expand "<cfile>", "**")
+          if f == "" then
+            Snacks.notify.warn "No file under cursor"
+          else
+            self:hide()
+            vim.schedule(function()
+              vim.cmd("e " .. f)
+            end)
+          end
+        end,
+        term_normal = {
+          "<esc>",
+          function(self)
+            self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
+            if self.esc_timer:is_active() then
+              self.esc_timer:stop()
+              vim.cmd "stopinsert"
+            else
+              self.esc_timer:start(200, 0, function() end)
+              return "<esc>"
+            end
+          end,
+          mode = "t",
+          expr = true,
+          desc = "Double escape to normal mode",
+        },
+      },
+    },
+    toggle = { enabled = false },
     words = { enabled = false },
-    -- styles = {
-    -- notification = {
-    -- wo = { wrap = true } -- Wrap notifications
-    -- },
-    -- },
-    zen = {
-      enabled = false,
-    },
+    zen = { enabled = false },
   },
   keys = {
+    {
+      "<leader>",
+      function()
+        Snacks.bufdelete()
+      end,
+      desc = "Close",
+    },
     {
       "<leader>bd",
       function()
@@ -156,155 +295,48 @@ return {
       end,
       desc = "Delete All Buffer",
     },
-
-    --   {
-    --     "<leader>.",
-    --     function()
-    --       Snacks.scratch()
-    --     end,
-    --     desc = "Toggle Scratch Buffer",
-    --   },
-    --   {
-    --     "<leader>S",
-    --     function()
-    --       Snacks.scratch.select()
-    --     end,
-    --     desc = "Select Scratch Buffer",
-    --   },
-    --   {
-    --     "<leader>n",
-    --     function()
-    --       Snacks.notifier.show_history()
-    --     end,
-    --     desc = "Notification History",
-    --   },
-    --   {
-    --     "<leader>cR",
-    --     function()
-    --       Snacks.rename.rename_file()
-    --     end,
-    --     desc = "Rename File",
-    --   },
-    --   {
-    --     "<leader>gB",
-    --     function()
-    --       Snacks.gitbrowse()
-    --     end,
-    --     desc = "Git Browse",
-    --     mode = { "n", "v" },
-    --   },
-    --   {
-    --     "<leader>gb",
-    --     function()
-    --       Snacks.git.blame_line()
-    --     end,
-    --     desc = "Git Blame Line",
-    --   },
-    --   {
-    --     "<leader>gf",
-    --     function()
-    --       Snacks.lazygit.log_file()
-    --     end,
-    --     desc = "Lazygit Current File History",
-    --   },
-    --   {
-    --     "<leader>gg",
-    --     function()
-    --       Snacks.lazygit()
-    --     end,
-    --     desc = "Lazygit",
-    --   },
-    --   {
-    --     "<leader>gl",
-    --     function()
-    --       Snacks.lazygit.log()
-    --     end,
-    --     desc = "Lazygit Log (cwd)",
-    --   },
-    --   {
-    --     "<leader>un",
-    --     function()
-    --       Snacks.notifier.hide()
-    --     end,
-    --     desc = "Dismiss All Notifications",
-    --   },
-    --   {
-    --     "<c-/>",
-    --     function()
-    --       Snacks.terminal()
-    --     end,
-    --     desc = "Toggle Terminal",
-    --   },
-    --   {
-    --     "<c-_>",
-    --     function()
-    --       Snacks.terminal()
-    --     end,
-    --     desc = "which_key_ignore",
-    --   },
-    --   {
-    --     "]]",
-    --     function()
-    --       Snacks.words.jump(vim.v.count1)
-    --     end,
-    --     desc = "Next Reference",
-    --     mode = { "n", "t" },
-    --   },
-    --   {
-    --     "[[",
-    --     function()
-    --       Snacks.words.jump(-vim.v.count1)
-    --     end,
-    --     desc = "Prev Reference",
-    --     mode = { "n", "t" },
-    --   },
-    --   {
-    --     "<leader>N",
-    --     desc = "Neovim News",
-    --     function()
-    --       Snacks.win {
-    --         file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
-    --         width = 0.6,
-    --         height = 0.6,
-    --         wo = {
-    --           spell = false,
-    --           wrap = false,
-    --           signcolumn = "yes",
-    --           statuscolumn = " ",
-    --           conceallevel = 3,
-    --         },
-    --       }
-    --     end,
-    --   },
+    {
+      "<leader>gB",
+      function()
+        Snacks.gitbrowse()
+      end,
+      mode = { "n", "v" },
+      desc = "Browse",
+    },
+    {
+      "<leader>gf",
+      function()
+        Snacks.lazygit.log_file()
+      end,
+      desc = "Lazygit Current File History",
+    },
+    {
+      "<leader>gg",
+      function()
+        Snacks.lazygit.open()
+      end,
+      desc = "Lazygit",
+    },
+    {
+      "<leader>gL",
+      function()
+        Snacks.lazygit.log()
+      end,
+      desc = "Lazygit Log (cwd)",
+    },
+    {
+      "<leader>oN",
+      function()
+        Snacks.notifier.hide()
+      end,
+      desc = "Dismiss All Notifications",
+    },
+    {
+      "<C-t>",
+      function()
+        Snacks.terminal()
+      end,
+      desc = "which_key_ignore",
+    },
   },
-  -- init = function()
-  --   vim.api.nvim_create_autocmd("User", {
-  --     pattern = "VeryLazy",
-  --     callback = function()
-  --       -- Setup some globals for debugging (lazy-loaded)
-  --       _G.dd = function(...)
-  --         Snacks.debug.inspect(...)
-  --       end
-  --       _G.bt = function()
-  --         Snacks.debug.backtrace()
-  --       end
-  --       vim.print = _G.dd -- Override print to use snacks for `:=` command
-  --
-  --       -- Create some toggle mappings
-  --       Snacks.toggle.option("spell", { name = "Spelling" }):map "<leader>us"
-  --       Snacks.toggle.option("wrap", { name = "Wrap" }):map "<leader>uw"
-  --       Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map "<leader>uL"
-  --       Snacks.toggle.diagnostics():map "<leader>ud"
-  --       Snacks.toggle.line_number():map "<leader>ul"
-  --       Snacks.toggle
-  --         .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
-  --         :map "<leader>uc"
-  --       Snacks.toggle.treesitter():map "<leader>uT"
-  --       Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map "<leader>ub"
-  --       Snacks.toggle.inlay_hints():map "<leader>uh"
-  --       Snacks.toggle.indent():map "<leader>ug"
-  --       Snacks.toggle.dim():map "<leader>uD"
-  --     end,
-  -- })
-  -- end,
 }

@@ -1,8 +1,11 @@
 {
   "diagnostics.globals": ["vim", "notify",
-        "Snacks"],
+        "Snacks",
+        "M"],
   "diagnostics.disable": ["missing-return",
         "duplicate-set-field",
         "param-type-mismatch",
-        "undefined-doc-name"]
+        "undefined-doc-name",
+        "unused-local",
+        "undefined-field"]
 }

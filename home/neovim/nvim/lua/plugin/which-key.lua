@@ -68,11 +68,6 @@ return {
         desc = "Buffer List",
       },
       {
-        "<leader>c",
-        "<cmd>:Bdelete<cr>",
-        desc = "Close",
-      },
-      {
         "<leader>d",
         "<cmd>:lua require('snacks').dashboard()<cr>",
         desc = "Dashboard",
@@ -337,11 +332,6 @@ return {
       {
         "<leader>g",
         group = "Git",
-      },
-      {
-        "<leader>gg",
-        "<cmd>lua _LAZYGIT_TOGGLE()<CR>",
-        desc = "Lazygit",
       },
       {
         "<leader>gj",
