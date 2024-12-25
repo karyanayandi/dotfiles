@@ -14,15 +14,17 @@
     p.hcl
     p.javascript
     p.jq
-    p.json5
     p.json
+    p.json5
     p.lua
     p.make
     p.markdown
     p.nix
     p.prisma
+    p.prisma
     p.python
     p.rust
+    p.svelte
     p.toml
     p.tsx
     p.typescript
