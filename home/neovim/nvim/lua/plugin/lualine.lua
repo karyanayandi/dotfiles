@@ -15,6 +15,9 @@ return {
       sections = { "error", "warn" },
       symbols = { error = icons.diagnostics.Error .. "", warn = icons.diagnostics.Warning .. "" },
       colored = true,
+      color = function()
+        return { bg = "#42464e", fg = "#E5E9F0" }
+      end,
       update_in_insert = false,
       always_visible = true,
     }
@@ -47,6 +50,7 @@ return {
         theme = "auto",
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
+        always_divide_middle = true,
         disabled_filetypes = {
           "dashboard",
           "gitcommit",
@@ -58,7 +62,7 @@ return {
           "snacks_dashboard",
           "snacks_terminal",
         },
-        always_divide_middle = true,
+        disable_buftypes = { "snacks_dashboard", "snacks_terminal", "NvimTree", "copilot-*" },
       },
       sections = {
         lualine_a = { branch },
