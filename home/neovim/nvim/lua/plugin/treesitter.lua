@@ -116,7 +116,6 @@ return {
           "jsx",
           "markdown",
           "php",
-          "prisma",
           "rescript",
           "svelte",
           "tsx",
