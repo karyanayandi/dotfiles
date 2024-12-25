@@ -1,6 +1,6 @@
 return {
   "folke/noice.nvim",
-  dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
+  dependencies = { "MunifTanjim/nui.nvim" },
   config = function()
     require("noice").setup {
       lsp = {
