@@ -74,7 +74,7 @@ return {
       },
       {
         "<leader>d",
-        "<cmd>Alpha<cr>",
+        "<cmd>:lua require('snacks').dashboard()<cr>",
         desc = "Dashboard",
       },
       { "<leader>D", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },

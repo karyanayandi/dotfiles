@@ -1,6 +1,8 @@
 -- luacheck: globals Snacks
 -- luacheck: globals vim
 
+local icons = require "config.icons"
+
 return {
   "folke/snacks.nvim",
   priority = 1000,
@@ -14,7 +16,112 @@ return {
       fps = 60,
     },
     bigfile = { enabled = true },
-    dashboard = { enabled = false },
+    dashboard = {
+      enabled = true,
+      event = "VimEnter",
+      width = 60,
+      row = nil,
+      col = nil,
+      pane_gap = 4,
+      autokeys = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", -- autokey sequence
+      preset = {
+        ---@type fun(cmd:string, opts:table)|nil
+        pick = nil,
+        ---@type snacks.dashboard.Item[]
+        keys = {
+          {
+            icon = icons.ducuments.NewFile,
+            key = "e",
+            desc = "New File",
+            action = ":ene | startinsert",
+          },
+          {
+            icon = icons.ducuments.Files,
+            key = "f",
+            desc = "Find File",
+            action = ":Telescope find_files",
+          },
+          {
+            icon = icons.ui.History,
+            key = "r",
+            desc = "Recent Files",
+            action = ":lua Snacks.dashboard.pick('oldfiles')",
+          },
+          {
+            icon = icons.ui.List,
+            key = "t",
+            desc = "Find Text",
+            action = ":Telescope live_grep",
+          },
+          {
+            icon = icons.git.Repo,
+            key = "p",
+            desc = "Find Project",
+            action = ":lua require('telescope').extensions.projects.projects()",
+          },
+          {
+            icon = icons.ui.GearOutline,
+            key = "c",
+            desc = "Config",
+            action = ":e ~/.config/dotfiles/home/neovim/default.nix",
+          },
+          {
+            icon = icons.ui.CloudDownload,
+            key = "u",
+            desc = "Update",
+            action = ":Lazy update",
+          },
+          { icon = icons.ui.SignOut, key = "q", desc = "Quit", action = ":qa" },
+        },
+        header = {
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[  ▄████████ ████████▄   ▄█      ███      ▄██████▄     ▄████████   ]],
+          [[  ███    ███ ███   ▀███ ███  ▀█████████▄ ███    ███   ███    ███  ]],
+          [[  ███    █▀  ███    ███ ███▌    ▀███▀▀██ ███    ███   ███    ███  ]],
+          [[ ▄███▄▄▄     ███    ███ ███▌     ███   ▀ ███    ███  ▄███▄▄▄▄██▀  ]],
+          [[▀▀███▀▀▀     ███    ███ ███▌     ███     ███    ███ ▀▀███▀▀▀▀▀    ]],
+          [[  ███    █▄  ███    ███ ███      ███     ███    ███ ▀███████████  ]],
+          [[  ███    ███ ███   ▄███ ███      ███     ███    ███   ███    ███  ]],
+          [[  ██████████ ████████▀  █▀      ▄████▀    ▀██████▀    ███    ███  ]],
+          [[                                                      ███    ███  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+          [[                                                                  ]],
+        },
+        formats = {
+          footer = { "%s", align = "center" },
+          header = { "%s", align = "center" },
+          file = function(item, ctx)
+            local fname = vim.fn.fnamemodify(item.file, ":~")
+            fname = ctx.width and #fname > ctx.width and vim.fn.pathshorten(fname) or fname
+            if #fname > ctx.width then
+              local dir = vim.fn.fnamemodify(fname, ":h")
+              local file = vim.fn.fnamemodify(fname, ":t")
+              if dir and file then
+                file = file:sub(-(ctx.width - #dir - 2))
+                fname = dir .. "/…" .. file
+              end
+            end
+            local dir, file = fname:match "^(.*)/(.+)$"
+            return dir and { { dir .. "/", hl = "dir" }, { file, hl = "file" } } or { { fname, hl = "file" } }
+          end,
+        },
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
+          { section = "startup" },
+        },
+      },
+    },
     indent = { enabled = false },
     input = { enabled = false },
     notifier = {
