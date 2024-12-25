@@ -16,7 +16,7 @@ return {
       symbols = { error = icons.diagnostics.Error .. "", warn = icons.diagnostics.Warning .. "" },
       colored = true,
       color = function()
-        return { bg = "#42464e", fg = "#E5E9F0" }
+        return { bg = "#373b43", fg = "#E5E9F0" }
       end,
       update_in_insert = false,
       always_visible = true,
