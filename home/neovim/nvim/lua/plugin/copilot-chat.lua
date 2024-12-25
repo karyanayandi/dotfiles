@@ -145,7 +145,7 @@ return {
       },
       -- Generate commit message based on the git diff
       {
-        "<leader>am",
+        "<leader>ag",
         "<cmd>CopilotChatCommit<cr>",
         desc = "Generate commit message for all changes",
       },
