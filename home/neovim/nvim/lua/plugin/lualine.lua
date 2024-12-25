@@ -34,7 +34,7 @@ return {
       "filetype",
       icons_enabled = true,
       color = function()
-        return { fg = "#E5E9F0" }
+        return { bg = "#1b1f27", fg = "#E5E9F0" }
       end,
     }
 
@@ -62,7 +62,15 @@ return {
           "snacks_dashboard",
           "snacks_terminal",
         },
-        disable_buftypes = { "snacks_dashboard", "snacks_terminal", "NvimTree", "copilot-*" },
+        disable_buftypes = {
+          "nofile",
+          "snacks_dashboard",
+          "snacks_terminal",
+          "NvimTree",
+          "copilot-chat",
+          "copilot-overlay",
+          "copilot-diff",
+        },
       },
       sections = {
         lualine_a = { branch },
