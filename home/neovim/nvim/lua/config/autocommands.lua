@@ -5,7 +5,7 @@ local function augroup(name)
 end
 
 vim.api.nvim_create_autocmd({ "User" }, {
-  pattern = { "AlphaReady" },
+  pattern = { "snacks_dashboard" },
   callback = function()
     vim.cmd [[
       set laststatus=0 | autocmd BufUnload <buffer> set laststatus=3

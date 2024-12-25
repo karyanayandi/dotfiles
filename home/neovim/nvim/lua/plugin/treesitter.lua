@@ -52,7 +52,7 @@ return {
             javascript = { "string", "template_string" },
             java = false,
           },
-          disable_filetype = { "TelescopePrompt", "spectre_panel" },
+          disable_filetype = { "TelescopePrompt", "spectre_panel", "snacks_dashboard", "snacks_terminal" },
           ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
           enable_moveright = true,
           disable_in_macro = false,
