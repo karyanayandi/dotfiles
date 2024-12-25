@@ -88,7 +88,7 @@ return {
         lualine_c = { diff },
         lualine_x = { diagnostics },
         lualine_y = { filetype },
-        lualine_z = { "location" },
+        lualine_z = {},
       },
       extensions = {},
     }
