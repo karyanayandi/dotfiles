@@ -34,7 +34,7 @@ return {
       "filetype",
       icons_enabled = true,
       color = function()
-        return { bg = "#1b1f27", fg = "#E5E9F0" }
+        return { bg = "#252931", fg = "#E5E9F0" }
       end,
     }
 
