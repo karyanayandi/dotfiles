@@ -108,6 +108,9 @@ keymap("n", ";m", "<cmd>lua require('telescope').extensions.monorepo.monorepo()<
 -- Search and replace
 keymap("n", ";r", "<cmd>lua require('spectre').open_file_search()<cr>", opts)
 
+-- Bufdelete
+keymap("n", "Q", ":lua require('snacks').Snacks.bufdelete()<cr>", opts)
+
 -- Tree
 keymap("n", ";e", "<cmd>NvimTreeToggle<cr>", opts)
 

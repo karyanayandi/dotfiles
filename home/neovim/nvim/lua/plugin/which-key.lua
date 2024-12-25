@@ -60,8 +60,12 @@ return {
       { "<leader>A", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
       {
         "<leader>b",
+        group = "Buffer",
+      },
+      {
+        "<leader>bb",
         "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
-        desc = "Buffer",
+        desc = "Buffer List",
       },
       {
         "<leader>c",
