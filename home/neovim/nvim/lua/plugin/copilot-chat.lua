@@ -27,6 +27,8 @@ return {
       { "nvim-lua/plenary.nvim" },
     },
     opts = {
+      agent = "copilot",
+      model = "claude-3.5-sonnet",
       highlight_headers = false,
       allow_insecure = true,
       separator = "",
