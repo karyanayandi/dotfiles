@@ -49,6 +49,7 @@ return {
         section_separators = { left = "", right = "" },
         disabled_filetypes = {
           "dashboard",
+          "gitcommit",
           "TelescopePrompt",
           "qf",
           "undotree",
