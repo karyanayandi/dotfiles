@@ -1,6 +1,7 @@
 return {
-  "NvChad/nvim-colorizer.lua",
+  "catgoose/nvim-colorizer.lua",
   lazy = false,
+  commit = "4acf88d31b3a7a1a7f31e9c30bf2b23c6313abdb",
   event = "BufReadPre",
   config = function()
     require("colorizer").setup {
