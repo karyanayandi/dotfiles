@@ -4,6 +4,7 @@
     bat
     bottom
     chafa
+    cowsay
     distrobox
     eza
     fd
@@ -20,6 +21,7 @@
     insomnia
     inxi
     killport
+    lynx
     nemo-with-extensions
     obsidian
     openssl
