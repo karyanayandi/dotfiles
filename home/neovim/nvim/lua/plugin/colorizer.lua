@@ -10,6 +10,12 @@ return {
         "!prompt",
         "!popup",
         "!lazy",
+        "!nofile",
+        "!snacks_dashboard",
+        "!snacks_terminal",
+        "!copilot-chat",
+        "!copilot-diff",
+        "!copilot-overlay",
       },
       user_default_options = {
         AARRGGBB = true,
