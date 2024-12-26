@@ -7,7 +7,7 @@ return {
   config = function()
     require("render-markdown").setup {
       enabled = true,
-      file_types = { "markdown", "copilot-chat" },
+      file_types = { "markdown", "copilot-chat", "copilot-overlay", "copilot-diff" },
       anti_conceal = {
         enabled = true,
         ignore = {
