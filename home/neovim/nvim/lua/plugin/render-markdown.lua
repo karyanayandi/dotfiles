@@ -20,7 +20,7 @@ return {
       code = {
         enabled = true,
         sign = true,
-        style = "normal",
+        style = "full",
         position = "left",
         language_pad = 0,
         language_name = true,
