@@ -26,6 +26,8 @@ return {
       javascript = formatter_for_js_or_ts(),
       javascriptreact = formatter_for_js_or_ts(),
       json = { "prettierd" },
+      jsonc = { "prettierd" },
+      json5 = { "prettierd" },
       lua = { "stylua" },
       markdown = formatter_for_js_or_ts(),
       nix = { "alejandra" },
