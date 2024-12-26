@@ -2,7 +2,7 @@
   description = "Flake Config";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/master";
     hyprland.url = "git+https://github.com/hyprwm/hyprland?submodules=1";
     home-manager = {
       url = "github:nix-community/home-manager/master";
