@@ -1,4 +1,4 @@
---  TODO: organize keymaps to its own plugin file
+-- 
 
 -- luacheck: ignore 631
 
@@ -45,7 +45,7 @@ return {
       show_help = false,
     }
 
-    local opts = {
+    local whichkey_opts = {
       mode = "n",
       prefix = "<leader>",
       buffer = nil,
@@ -81,16 +81,6 @@ return {
         desc = "Explorer",
       },
       {
-        "<leader>F",
-        "<cmd>AutoFormatOnSaveToggle<cr>",
-        desc = "Toggle autoformat-on-save",
-      },
-      {
-        "<leader>h",
-        "<cmd>nohlsearch<CR>",
-        desc = "No HL",
-      },
-      {
         "<leader>q",
         "<cmd>lua require('config.functions').smart_quit()<CR>",
         desc = "Quit",
@@ -116,81 +106,52 @@ return {
         group = "Package",
       },
       {
-        "<leader>pp",
-        "<cmd>lua require('package-info').toggle()<cr>",
-        desc = "Toggle",
-      },
-      {
-        "<leader>pu",
-        "<cmd>lua require('package-info').update()<cr>",
-        desc = "Update",
-      },
-      {
-        "<leader>pd",
-        "<cmd>lua require('package-info').delete()<cr>",
-        desc = "Update",
+        "<leader>po",
+        "<cmd>Lazy<cr>",
+        desc = "Overview",
       },
       {
         "<leader>pi",
-        "<cmd>lua require('package-info').install()<cr>",
+        "<cmd>Lazy install<cr>",
         desc = "Install",
       },
       {
-        "<leader>pc",
-        "<cmd>lua require('package-info').change_version()<cr>",
-        desc = "Change Version",
-      },
-      {
-        "<leader>z",
-        group = "Lazy",
-      },
-      {
-        "<leader>zi",
-        "<cmd>Lazy<cr>",
-        desc = "Install",
-      },
-      {
-        "<leader>zi",
-        "<cmd>Lazy<cr>",
-        desc = "Install",
-      },
-      {
-        "<leader>zl",
+        "<leader>pl",
         "<cmd>Lazy log<cr>",
         desc = "Log",
       },
       {
-        "<leader>zs",
+        "<leader>ps",
         "<cmd>Lazy sync<cr>",
         desc = "Sync",
       },
       {
-        "<leader>zc",
+        "<leader>pc",
         "<cmd>Lazy check<cr>",
         desc = "Check",
       },
       {
-        "<leader>zx",
+        "<leader>px",
         "<cmd>Lazy clean<cr>",
         desc = "Clean",
       },
       {
-        "<leader>zu",
+        "<leader>pu",
         "<cmd>Lazy update<cr>",
         desc = "Update",
       },
       {
-        "<leader>zd",
+        "<leader>pd",
         "<cmd>Lazy debug<cr>",
         desc = "Debug",
       },
       {
-        "<leader>zp",
+        "<leader>pp",
         "<cmd>Lazy profile<cr>",
         desc = "Profile",
       },
       {
-        "<leader>zr",
+        "<leader>pr",
         "<cmd>Lazy restore<cr>",
         desc = "Restore",
       },
@@ -465,6 +426,12 @@ return {
         desc = "Toggle Diagnostics",
       },
       {
+        "<leader>lf",
+        "<cmd>AutoFormatOnSaveToggle<cr>",
+        desc = "Toggle autoformat-on-save",
+      },
+
+      {
         "<leader>lT",
         "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
         desc = "Todo Diagnostics",
@@ -548,6 +515,6 @@ return {
     }
 
     require("which-key").setup(setup)
-    require("which-key").add(mappings, opts)
+    require("which-key").add(mappings, whichkey_opts)
   end,
 }
