@@ -61,7 +61,7 @@ return {
           map_c_w = false,
           disable_in_visualblock = false,
           fast_wrap = {
-            map = "<M-e>",
+            map = "<M-w>",
             chars = { "{", "[", "(", '"', "'" },
             pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], "%s+", ""),
             offset = 0,

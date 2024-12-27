@@ -506,12 +506,6 @@ return {
         desc = "Sort selected lines",
         mode = "v",
       },
-      {
-        "<leader>c",
-        "<ESC>:'<,'>CarbonNow<CR>",
-        desc = "Capture Image",
-        mode = "v",
-      },
     }
 
     require("which-key").setup(setup)
