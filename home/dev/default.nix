@@ -19,13 +19,13 @@ in {
   };
 
   home.packages = with pkgs; [
+    beekeeper-studio
     bun
     cargo
     clippy
     corepack
     gcc
     go
-    jetbrains.datagrip
     nixpacks
     node-gyp
     nodePackages.vercel
