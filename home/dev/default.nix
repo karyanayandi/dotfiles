@@ -40,6 +40,7 @@ in {
     golines
     jq
     luajitPackages.luacheck
+    luajitPackages.luarocks
     nodePackages.jsonlint
     prettierd
     stylua
