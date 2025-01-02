@@ -16,7 +16,7 @@ return {
       symbols = { error = icons.diagnostics.Error .. "", warn = icons.diagnostics.Warning .. "" },
       colored = true,
       color = function()
-        return { bg = "#252931", fg = "#E5E9F0" }
+        return { bg = "#373b43", fg = "#E5E9F0" }
       end,
       update_in_insert = false,
       always_visible = true,
@@ -33,9 +33,14 @@ return {
     local filename = {
       "filename",
       icons_enabled = true,
+      symbols = {
+        modified = "  ",
+        readonly = "  ",
+        unnamed = "  ",
+      },
       cond = hide_in_width,
       color = function()
-        return { bg = "#373b43", fg = "#E5E9F0" }
+        return { bg = "#252931", fg = "#E5E9F0" }
       end,
     }
 
@@ -85,10 +90,10 @@ return {
       },
       sections = {
         lualine_a = { branch, filename },
-        lualine_b = { diagnostics },
+        lualine_b = {},
         lualine_c = {},
         lualine_x = {},
-        lualine_y = { filetype },
+        lualine_y = { diagnostics, filetype },
         lualine_z = {},
       },
       extensions = {},
