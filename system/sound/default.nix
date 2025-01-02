@@ -1,3 +1,3 @@
 {
-  services.pulseaudio.enable = false;
+  hardware.pulseaudio.enable = false;
 }
