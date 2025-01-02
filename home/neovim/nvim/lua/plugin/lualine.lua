@@ -22,22 +22,6 @@ return {
       always_visible = true,
     }
 
-    local diff = {
-      "diff",
-      colored = true,
-      color = function()
-        return { bg = "#373b43", fg = "#E5E9F0" }
-      end,
-      symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" },
-      diff_color = {
-        added = "LuaLineDiffAdd",
-        modified = "LuaLineDiffChange",
-        removed = "LuaLineDiffDelete",
-      },
-      cond = hide_in_width,
-      separator = "%#SLSeparator#" .. " " .. "%*",
-    }
-
     local filetype = {
       "filetype",
       icons_enabled = true,
@@ -49,6 +33,7 @@ return {
     local filename = {
       "filename",
       icons_enabled = true,
+      cond = hide_in_width,
       color = function()
         return { bg = "#373b43", fg = "#E5E9F0" }
       end,
@@ -99,10 +84,10 @@ return {
         },
       },
       sections = {
-        lualine_a = { branch },
-        lualine_b = { diff, diagnostics },
+        lualine_a = { branch, filename },
+        lualine_b = { diagnostics },
         lualine_c = {},
-        lualine_x = { filename },
+        lualine_x = {},
         lualine_y = { filetype },
         lualine_z = {},
       },
