@@ -16,7 +16,7 @@ return {
       symbols = { error = icons.diagnostics.Error .. "", warn = icons.diagnostics.Warning .. "" },
       colored = true,
       color = function()
-        return { bg = "#373b43", fg = "#E5E9F0" }
+        return { bg = "#252931", fg = "#E5E9F0" }
       end,
       update_in_insert = false,
       always_visible = true,
@@ -25,8 +25,10 @@ return {
     local diff = {
       "diff",
       colored = true,
-      -- symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" },
-      symbols = { added = "+", modified = "~", removed = "-" },
+      color = function()
+        return { bg = "#373b43", fg = "#E5E9F0" }
+      end,
+      symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" },
       diff_color = {
         added = "LuaLineDiffAdd",
         modified = "LuaLineDiffChange",
@@ -41,6 +43,14 @@ return {
       icons_enabled = true,
       color = function()
         return { bg = "#252931", fg = "#E5E9F0" }
+      end,
+    }
+
+    local filename = {
+      "filename",
+      icons_enabled = true,
+      color = function()
+        return { bg = "#373b43", fg = "#E5E9F0" }
       end,
     }
 
@@ -89,10 +99,10 @@ return {
         },
       },
       sections = {
-        lualine_a = { branch, diff },
-        lualine_b = {},
+        lualine_a = { branch },
+        lualine_b = { diff, diagnostics },
         lualine_c = {},
-        lualine_x = { diagnostics },
+        lualine_x = { filename },
         lualine_y = { filetype },
         lualine_z = {},
       },
