@@ -2,33 +2,37 @@
 
 return {
   "nvim-lualine/lualine.nvim",
+  dependencies = {
+    "meuter/lualine-so-fancy.nvim",
+  },
+  event = { "BufReadPost", "BufNewFile", "VeryLazy" },
   config = function()
-    local hide_in_width = function()
-      return vim.fn.winwidth(0) > 80
-    end
+    -- local hide_in_width = function()
+    --   return vim.fn.winwidth(0) > 80
+    -- end
 
     local icons = require "config.icons"
 
-    local diagnostics = {
-      "diagnostics",
-      sources = { "nvim_diagnostic" },
-      sections = { "error", "warn" },
-      symbols = { error = icons.diagnostics.Error .. "", warn = icons.diagnostics.Warning .. "" },
-      colored = true,
-      color = function()
-        return { bg = "#373b43", fg = "#E5E9F0" }
-      end,
-      update_in_insert = false,
-      always_visible = true,
-    }
-
-    local diff = {
-      "diff",
-      colored = true,
-      symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" },
-      cond = hide_in_width,
-      separator = "%#SLSeparator#" .. " " .. "%*",
-    }
+    -- local diagnostics = {
+    --   "diagnostics",
+    --   sources = { "nvim_diagnostic" },
+    --   sections = { "error", "warn" },
+    --   symbols = { error = icons.diagnostics.Error .. "", warn = icons.diagnostics.Warning .. "" },
+    --   colored = true,
+    --   color = function()
+    --     return { bg = "#373b43", fg = "#E5E9F0" }
+    --   end,
+    --   update_in_insert = false,
+    --   always_visible = true,
+    -- }
+    --
+    -- local diff = {
+    --   "diff",
+    --   colored = true,
+    --   symbols = { added = icons.git.Add .. "", modified = icons.git.Mod .. "", removed = icons.git.Remove .. "" },
+    --   cond = hide_in_width,
+    --   separator = "%#SLSeparator#" .. " " .. "%*",
+    -- }
 
     local filetype = {
       "filetype",
@@ -83,10 +87,24 @@ return {
         },
       },
       sections = {
-        lualine_a = { branch },
-        lualine_b = {},
-        lualine_c = { diff },
-        lualine_x = { diagnostics },
+        lualine_a = {},
+        lualine_b = { "fancy_branch" },
+        lualine_c = {
+          {
+            "filename",
+            path = 1, -- 2 for full path
+            symbols = {
+              modified = "  ",
+              readonly = "  ",
+              unnamed = "  ",
+            },
+          },
+          { "fancy_diagnostics", sources = { "nvim_lsp" }, symbols = { error = " ", warn = " ", info = " " } },
+          { "fancy_searchcount" },
+        },
+        -- lualine_x = { diagnostics },
+        lualine_x = { "fancy_lsp_servers", "fancy_diff", "progress" },
+        -- lualine_y = { filetype },
         lualine_y = { filetype },
         lualine_z = {},
       },
