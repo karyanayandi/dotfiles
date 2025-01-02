@@ -22,13 +22,13 @@ return {
       always_visible = true,
     }
 
-    local filetype = {
-      "filetype",
-      icons_enabled = true,
-      color = function()
-        return { bg = "#252931", fg = "#E5E9F0" }
-      end,
-    }
+    -- local filetype = {
+    --   "filetype",
+    --   icons_enabled = true,
+    --   color = function()
+    --     return { bg = "#252931", fg = "#E5E9F0" }
+    --   end,
+    -- }
 
     local branch = {
       "branch",
@@ -79,7 +79,7 @@ return {
         lualine_b = {},
         lualine_c = {},
         lualine_x = {},
-        lualine_y = { diagnostics, filetype },
+        lualine_y = { diagnostics },
         lualine_z = {},
       },
       extensions = {},
