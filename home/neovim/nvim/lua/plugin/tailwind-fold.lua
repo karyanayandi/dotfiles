@@ -1,7 +1,7 @@
 return {
   "razak17/tailwind-fold.nvim",
   opts = {
-    symbol = "...",
+    symbol = "…", -- 󱏿
     highlight = {
       fg = "#98c379",
     },
