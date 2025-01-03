@@ -1,9 +1,9 @@
 return {
   "razak17/tailwind-fold.nvim",
   opts = {
-    symbol = "󱏿",
+    symbol = "...",
     highlight = {
-      fg = "#E5E9F0",
+      fg = "#98c379",
     },
   },
   dependencies = { "nvim-treesitter/nvim-treesitter" },
