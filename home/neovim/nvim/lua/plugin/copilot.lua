@@ -41,6 +41,6 @@ return {
     }
 
     local opts = { noremap = true, silent = true }
-    vim.api.nvim_set_keymap("n", "<c-c>", ":lua require('copilot.suggestion').toggle_auto_trigger()<CR>", opts)
+    vim.api.nvim_set_keymap("n", "<C-space>", ":lua require('copilot.suggestion').toggle_auto_trigger()<CR>", opts)
   end,
 }

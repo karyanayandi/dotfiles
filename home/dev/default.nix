@@ -26,6 +26,7 @@ in {
     corepack
     gcc
     go
+    lua
     nixpacks
     node-gyp
     nodePackages.vercel

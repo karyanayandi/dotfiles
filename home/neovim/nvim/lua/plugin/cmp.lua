@@ -42,7 +42,7 @@ return {
     },
     {
       "zbirenbaum/copilot-cmp",
-      dependencies = "copilot.lua",
+      dependencies = "zbirenbaum/copilot.lua",
       config = function()
         require("copilot_cmp").setup()
       end,

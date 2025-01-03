@@ -1,5 +1,3 @@
--- 
-
 -- luacheck: ignore 631
 
 return {
@@ -440,30 +438,6 @@ return {
         "<leader>lu",
         "<cmd>LuaSnipUnlinkCurrent<cr>",
         desc = "Unlink Snippet",
-      },
-      {
-        "<leader>m",
-        group = "Monorepo",
-      },
-      {
-        "<leader>ma",
-        "<cmd>lua require('monorepo').add_project()<cr>",
-        desc = "Add Project",
-      },
-      {
-        "<leader>ml",
-        "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>",
-        desc = "Monorepo List",
-      },
-      {
-        "<leader>mr",
-        "<cmd>lua require('monorepo').remove_project()<cr>",
-        desc = "Remove Project",
-      },
-      {
-        "<leader>mm",
-        "<cmd>lua require('monorepo').toggle_project()<cr>",
-        desc = "Toggle Project",
       },
       {
         "<leader>t",
