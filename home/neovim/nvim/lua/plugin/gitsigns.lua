@@ -23,6 +23,26 @@ return {
           text = icons.git.SignUntracked,
         },
       },
+      signs_staged = {
+        add = {
+          text = icons.git.SignBold,
+        },
+        change = {
+          text = icons.git.SignBold,
+        },
+        delete = {
+          text = icons.git.SignDelete,
+        },
+        topdelete = {
+          text = icons.git.SignDelete,
+        },
+        changedelete = {
+          text = icons.git.SignBold,
+        },
+        untracked = {
+          text = icons.git.SignUntracked,
+        },
+      },
       watch_gitdir = {
         interval = 1000,
         follow_files = true,
