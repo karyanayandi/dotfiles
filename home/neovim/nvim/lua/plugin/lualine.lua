@@ -31,6 +31,15 @@ return {
       cond = hide_in_width,
     }
 
+    local filetype = {
+      "filetype",
+      icons_enabled = true,
+      color = function()
+        return { bg = "#252931", fg = "#E5E9F0" }
+      end,
+      cond = hide_in_width,
+    }
+
     local branch = {
       "branch",
       icon = { icons.git.Branch, align = "left" },
@@ -77,11 +86,11 @@ return {
       },
       sections = {
         lualine_a = { branch },
-        lualine_b = {},
+        lualine_b = { filename },
         lualine_c = {},
         lualine_x = {},
         lualine_y = { diagnostics },
-        lualine_z = { filename },
+        lualine_z = { filetype },
       },
       extensions = {},
     }
