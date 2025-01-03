@@ -18,6 +18,7 @@ return {
         wintypes = "sepecial",
         filetypes = {
           "NvimTree",
+          "COMMIT_EDITMSG",
           "TelescopePrompt",
           "copilot-chat",
           "copilot-diff",
