@@ -2,12 +2,9 @@
   treesitterWithGrammars = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
     p.astro
     p.bash
-    p.blade
     p.comment
     p.css
     p.dockerfile
-    p.edge
-    p.eruby
     p.fish
     p.gitattributes
     p.gitignore
