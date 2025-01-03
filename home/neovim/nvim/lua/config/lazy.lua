@@ -25,7 +25,7 @@ require("lazy").setup {
     fallback = false,
   },
   spec = {
-    import = { "plugin" },
+     import = "plugin",
   },
   install = { colorscheme = { "aurora" } },
   checker = { enabled = true, notify = false },

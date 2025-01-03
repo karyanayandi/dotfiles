@@ -3,9 +3,9 @@
 return {
   "nvim-lualine/lualine.nvim",
   config = function()
-    -- local hide_in_width = function()
-    --   return vim.fn.winwidth(0) > 80
-    -- end
+    local hide_in_width = function()
+      return vim.fn.winwidth(0) > 80
+    end
 
     local icons = require "config.icons"
 
@@ -28,6 +28,7 @@ return {
       color = function()
         return { bg = "#252931", fg = "#E5E9F0" }
       end,
+      cond = hide_in_width,
     }
 
     local branch = {
