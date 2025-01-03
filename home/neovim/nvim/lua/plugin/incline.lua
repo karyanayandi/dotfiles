@@ -14,8 +14,8 @@ return {
       },
       window = { margin = { vertical = 0, horizontal = 1 } },
       ignore = {
-        buftypes = "sepecial",
-        wintypes = "sepecial",
+        buftypes = "special",
+        wintypes = "special",
         filetypes = {
           "NvimTree",
           "COMMIT_EDITMSG",
