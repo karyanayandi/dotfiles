@@ -2,9 +2,12 @@
   treesitterWithGrammars = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
     p.astro
     p.bash
+    p.blade
     p.comment
     p.css
     p.dockerfile
+    p.edge
+    p.eruby
     p.fish
     p.gitattributes
     p.gitignore
@@ -12,6 +15,7 @@
     p.gomod
     p.gowork
     p.hcl
+    p.htmldjango
     p.javascript
     p.jq
     p.json
@@ -20,6 +24,7 @@
     p.make
     p.markdown
     p.nix
+    p.php
     p.prisma
     p.prisma
     p.python
