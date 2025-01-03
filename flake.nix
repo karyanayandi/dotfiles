@@ -1,9 +1,9 @@
 {
-  description = "Flake Config";
-
+  description = "NixOS Config";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     hyprland.url = "git+https://github.com/hyprwm/hyprland?submodules=1";
+    hyprland-qtutils.url = "github:hyprwm/hyprland-qtutils";
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -22,6 +22,7 @@
       wget
       inputs.alejandra.defaultPackage.${pkgs.system}
       inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
+      inputs.hyprland-qtutils.packages.${pkgs.system}.default
       inputs.zen-browser.packages.${pkgs.system}.default
     ];
   };
