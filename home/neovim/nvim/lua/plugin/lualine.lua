@@ -71,7 +71,7 @@ return {
       },
       colored = false,
       color = function()
-        return { bg = "#373b43", fg = colors.fg_light }
+        return { bg = "#252931", fg = colors.fg_light }
       end,
       update_in_insert = false,
       always_visible = false,
@@ -82,7 +82,7 @@ return {
       icons_enabled = true,
       icon_only = false,
       color = function()
-        return { bg = "#252931", fg = "#E5E9F0" }
+        return { bg = "#252931", fg = colors.fg_light }
       end,
     }
 
