@@ -10,6 +10,7 @@ in {
     enable = true;
     image = wallpaper-path;
     base16Scheme = theme;
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppucin-mocha.yaml";
     fonts = {
       sizes = {
         applications = 10;
