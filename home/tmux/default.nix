@@ -16,7 +16,7 @@ in {
       # set -g status off
       set -g status-position top
       set -Fg 'status-format[1]' '#{status-format[0]}'
-      set -g 'status-format[0]' ""
+      set -g 'status-format[1]' ""
       set -g status 2
       set -g prefix C-Space
       set -g mouse on
@@ -31,9 +31,11 @@ in {
       bind x kill-pane
       bind ? list-keys
       bind , command-prompt "rename-session %%"
+      bind . command-prompt "rename-window %%"
 
       bind -n M-':' command-prompt
       bind -n M-',' command-prompt "rename-session %%"
+      bind -n M-'.' command-prompt "rename-window %%"
       bind -n M-'=' choose-tree
       bind -n M-d detach
       bind -n M-'\' list-session
