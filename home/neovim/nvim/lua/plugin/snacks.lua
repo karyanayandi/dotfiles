@@ -207,7 +207,7 @@ return {
       icons = {
         error = icons.diagnostics.Error,
         warn = icons.diagnostics.Warning,
-        info = icons.diagnostics.Information,
+        info = icons.diagnostics.Info,
         debug = icons.ui.Bug,
         trace = icons.ui.Pencil,
       },

@@ -99,7 +99,7 @@ return {
         enable = true,
         icons = {
           hint = icons.diagnostics.Hint,
-          info = icons.diagnostics.Information,
+          info = icons.diagnostics.Info,
           warning = icons.diagnostics.Warning,
           error = icons.diagnostics.Error,
         },
