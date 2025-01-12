@@ -15,6 +15,9 @@ in {
 
       # set -g status off
       set -g status-position top
+      set -Fg 'status-format[1]' '#{status-format[0]}'
+      set -g 'status-format[0]' ""
+      set -g status 2
       set -g prefix C-Space
       set -g mouse on
       set -g history-limit 5000
