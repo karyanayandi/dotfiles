@@ -51,7 +51,7 @@ return {
         newfile = "  ",
       },
       cond = hide_in_width,
-      path = 0,
+      path = 4,
       shorting_target = 10,
       use_color_mode = true,
       color = function()
