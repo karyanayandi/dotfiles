@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt install \
-  exa \
+  eza \
   fish \
   git \
   neofetch \
