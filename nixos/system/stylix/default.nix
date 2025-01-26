@@ -4,7 +4,7 @@
   ...
 }: let
   theme = ./aurora.yaml;
-  wallpaper-path = ../../wallpapers/landscape/bandung.jpg;
+  wallpaper-path = ../../../wallpapers/landscape/bandung.jpg;
 in {
   stylix = {
     enable = true;

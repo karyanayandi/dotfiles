@@ -1,7 +1,8 @@
 return {
   "folke/noice.nvim",
+  event = "VeryLazy",
   dependencies = { "MunifTanjim/nui.nvim" },
-  opts = {
+  config = function()
     require("noice").setup {
       lsp = {
         override = {
@@ -17,6 +18,6 @@ return {
         inc_rename = false,
         lsp_doc_border = true,
       },
-    },
-  },
+    }
+  end
 }
