@@ -1,0 +1,7 @@
+[user]
+	name = Karyana Yandi
+	email = karyana@yandi.me
+[credential]
+	helper = cache --timeout=18000
+[push]
+	default = simple
