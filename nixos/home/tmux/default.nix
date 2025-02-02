@@ -1,9 +1,9 @@
 {pkgs, ...}: let
   aurora-theme = pkgs.fetchFromGitHub {
-    owner = "karyanayandi";
-    repo = "aurora.tmux";
+    owner = "aurora-theme";
+    repo = "tmux";
     rev = "main";
-    sha256 = "19gv6bq607fvj8qhb1b0xr2gv0ycidhfdlmbm7lbsha9rhfdpwh7";
+    sha256 = "19z4cb29wmmcvi4hxq0ibjq57spidzcwcp14p1p7km11a6m4id69";
   };
 in {
   programs.tmux = {
