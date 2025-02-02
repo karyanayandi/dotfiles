@@ -3,7 +3,7 @@
     owner = "aurora-theme";
     repo = "tmux";
     rev = "main";
-    sha256 = "19z4cb29wmmcvi4hxq0ibjq57spidzcwcp14p1p7km11a6m4id69";
+    sha256 = "01gk5glv527fyclypyxgcnjcxh5c68kywjx44dp4vhqk1bbmpg5j";
   };
 in {
   programs.tmux = {
