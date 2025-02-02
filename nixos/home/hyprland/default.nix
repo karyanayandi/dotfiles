@@ -28,7 +28,7 @@
         };
         accel_profile = "adaptive";
         sensitivity = 0.6;
-        kb_options = "altwin:swap_alt_win";
+        # kb_options = "altwin:swap_alt_win";
       };
 
       gestures = {
