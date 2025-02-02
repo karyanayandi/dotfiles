@@ -3,10 +3,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   config = function()
-    local custom_catppuccin = require "catppuccin.utils.lualine" "mocha"
-    custom_catppuccin.normal.a.bg = nil
-
-    local colors = require("catppuccin.palettes").get_palette "mocha"
+    local colors = require("aurora.colors").load()
 
     local hide_in_width = function()
       return vim.fn.winwidth(0) > 80
@@ -19,7 +16,7 @@ return {
       icon = { icons.git.Branch, align = "left" },
       use_mode_colors = false,
       color = function()
-        return { bg = colors.surface0, fg = colors.text, gui = "bold" }
+        return { bg = "#373b43", fg = colors.fg_light, gui = "bold" }
       end,
     }
 
@@ -40,7 +37,7 @@ return {
       cond = hide_in_width,
       separator = "%#SLSeparator#" .. " " .. "%*",
       color = function()
-        return { bg = colors.surface0, fg = colors.text }
+        return { bg = "#373b43", fg = colors.fg_light }
       end,
     }
 
@@ -58,7 +55,7 @@ return {
       shorting_target = 10,
       use_color_mode = true,
       color = function()
-        return { bg = colors.surface0, fg = colors.text }
+        return { bg = "#373b43", fg = colors.fg_light }
       end,
     }
 
@@ -74,7 +71,7 @@ return {
       },
       colored = false,
       color = function()
-        return { bg = colors.surface0, fg = colors.text }
+        return { bg = "#252931", fg = colors.fg_light }
       end,
       update_in_insert = false,
       always_visible = false,
@@ -85,7 +82,7 @@ return {
       icons_enabled = true,
       icon_only = false,
       color = function()
-        return { bg = colors.surface0, fg = colors.text }
+        return { bg = "#252931", fg = colors.fg_light }
       end,
     }
 
@@ -93,7 +90,7 @@ return {
       options = {
         globalstatus = true,
         icons_enabled = true,
-        theme = custom_catppuccin,
+        theme = "auto",
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
         always_divide_middle = true,
@@ -134,7 +131,7 @@ return {
         lualine_c = {},
         lualine_x = {},
         lualine_y = { diagnostics },
-        lualine_z = { filetype },
+        lualine_z = { filetype, "location" },
       },
       extensions = {},
     }
