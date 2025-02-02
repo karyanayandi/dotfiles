@@ -28,8 +28,8 @@ return {
     },
     opts = {
       agent = "copilot",
-      -- model = "claude-3.5-sonnet",
-      model = "gpt-4",
+      model = "claude-3.5-sonnet",
+      -- model = "gpt-4",
       highlight_headers = false,
       allow_insecure = true,
       separator = "",
