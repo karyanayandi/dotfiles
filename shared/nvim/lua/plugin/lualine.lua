@@ -16,7 +16,7 @@ return {
       icon = { icons.git.Branch, align = "left" },
       use_mode_colors = false,
       color = function()
-        return { bg = "#1f242f", fg = colors.fg_light, gui = "bold" }
+        return { bg = "#373b43", fg = colors.fg_light, gui = "bold" }
       end,
     }
 
@@ -37,7 +37,7 @@ return {
       cond = hide_in_width,
       separator = "%#SLSeparator#" .. " " .. "%*",
       color = function()
-        return { bg = "#1f242f", fg = colors.fg_light }
+        return { bg = "#373b43", fg = colors.fg_light }
       end,
     }
 
@@ -55,7 +55,7 @@ return {
       shorting_target = 10,
       use_color_mode = true,
       color = function()
-        return { bg = "#1f242f", fg = colors.fg_light }
+        return { bg = "#373b43", fg = colors.fg_light }
       end,
     }
 
