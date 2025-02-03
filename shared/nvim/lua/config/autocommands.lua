@@ -15,15 +15,16 @@ vim.api.nvim_create_autocmd({ "User" }, {
 
 vim.api.nvim_create_autocmd({ "FileType" }, {
   pattern = {
-    "qf",
-    "help",
-    "man",
-    "lspinfo",
-    "spectre_panel",
     "DressingSelect",
-    "notify",
-    "startuptime",
     "PlenaryTestPopup",
+    "SnacksInputNormal",
+    "help",
+    "lspinfo",
+    "man",
+    "notify",
+    "qf",
+    "spectre_panel",
+    "startuptime",
   },
   callback = function()
     vim.cmd [[
