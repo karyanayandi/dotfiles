@@ -1,7 +1,7 @@
 -- luacheck: globals vim
 
 return {
-  "smoka7/hop.nvim",
+  "brneor/hop.nvim",
   version = "*",
   opts = {
     keys = "etovxqpdygfblzhckisuran",
