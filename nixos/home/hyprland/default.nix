@@ -47,6 +47,10 @@
         force_default_wallpaper = false;
       };
 
+      ecosystem = {
+        no_update_news = true;
+      };
+
       decoration = {
         rounding = 5;
         dim_special = 0.7;
