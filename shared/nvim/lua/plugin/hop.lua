@@ -12,9 +12,7 @@ return {
       multi_windows = false,
     }
     vim.api.nvim_set_keymap("", "s", "<cmd>HopWord<cr>", { silent = true })
-    vim.api.nvim_set_keymap("", "h", "<cmd>HopChar2<cr>", { silent = true })
     vim.api.nvim_set_keymap("", "L", "<cmd>HopLine<cr>", { silent = true })
-    vim.api.nvim_set_keymap("", "l", "<cmd>HopLineStart<cr>", { silent = true })
     vim.api.nvim_set_keymap(
       "",
       "f",
