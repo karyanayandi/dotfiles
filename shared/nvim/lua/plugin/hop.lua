@@ -11,7 +11,6 @@ return {
       keys = "tnplvmdhsefucwyxriao",
       multi_windows = false,
     }
-    vim.api.nvim_set_keymap("", "s", "<cmd>HopWord<cr>", { silent = true })
     vim.api.nvim_set_keymap("", "L", "<cmd>HopLine<cr>", { silent = true })
     vim.api.nvim_set_keymap(
       "",
