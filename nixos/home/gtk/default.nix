@@ -6,8 +6,8 @@
   gtk = {
     enable = true;
     iconTheme = {
-      name = "Tela-nord";
-      package = pkgs.tela-icon-theme;
+      name = "Papirus";
+      package = pkgs.papipurs-nord;
     };
     gtk3 = {
       bookmarks = [

@@ -3,7 +3,7 @@
     enable = true;
     iconTheme = {
       package = pkgs.tela-icon-theme;
-      name = "Tela-nord";
+      name = "Papirus";
     };
     settings = {
       global = {
