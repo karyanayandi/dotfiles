@@ -7,7 +7,7 @@
     enable = true;
     iconTheme = {
       name = "Papirus";
-      package = pkgs.papipurs-nord;
+      package = pkgs.papirus-nord;
     };
     gtk3 = {
       bookmarks = [
