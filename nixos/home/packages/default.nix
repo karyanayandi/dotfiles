@@ -4,6 +4,7 @@
     bat
     bottom
     chafa
+    code-cursor
     cowsay
     distrobox
     eza
@@ -37,10 +38,9 @@
     unrar
     unzip
     viewnior
-    vscode
     wf-recorder
+    windsurf
     wl-clipboard
     xclip
-    zed-editor
   ];
 }
