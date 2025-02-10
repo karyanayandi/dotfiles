@@ -9,6 +9,7 @@
     npm config set prefix "${config.home.homeDirectory}/.cache/npm/global"
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
   '';
+  pnpm-shim = pkgs.callPackage ./pnpm-shim.nix {};
 in {
   home.activation.configureNode = ''
     ${nodeJsConfig}
@@ -31,6 +32,7 @@ in {
     node-gyp
     nodePackages.vercel
     nodejs
+    pnpm-shim
     rustc
     # Formatters and Linters
     alejandra
