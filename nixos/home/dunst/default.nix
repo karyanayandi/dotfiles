@@ -2,7 +2,7 @@
   services.dunst = {
     enable = true;
     iconTheme = {
-      package = pkgs.tela-icon-theme;
+      package = pkgs.papirus-nord;
       name = "Papirus";
     };
     settings = {

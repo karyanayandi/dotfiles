@@ -51,6 +51,7 @@ noto-fonts-extra \
 ntfs-3g \
 openssh \
 p7zip \
+papipurs-icon-theme \
 pavucontrol \
 polkit-gnome \
 postman-bin \
@@ -68,7 +69,6 @@ starship \
 stow \
 stylua \
 swaybg \
-tela-icon-theme \
 tmux \
 trash-cli \
 ttf-jetbrains-mono-nerd \
