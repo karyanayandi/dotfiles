@@ -40,7 +40,6 @@
     viewnior
     vscode
     wf-recorder
-    windsurf
     wl-clipboard
     xclip
   ];

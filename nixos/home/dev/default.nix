@@ -9,7 +9,6 @@
     npm config set prefix "${config.home.homeDirectory}/.cache/npm/global"
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
   '';
-  pnpm-shim = pkgs.callPackage ./pnpm-shim.nix {};
 in {
   home.activation.configureNode = ''
     ${nodeJsConfig}
@@ -24,15 +23,15 @@ in {
     bun
     cargo
     clippy
-    corepack
+    corepack_23
     gcc
     go
     lua
     nixpacks
     node-gyp
     nodePackages.vercel
-    nodejs
-    pnpm-shim
+    nodejs_23
+    pnpm
     rustc
     # Formatters and Linters
     alejandra
