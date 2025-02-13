@@ -24,6 +24,7 @@ in {
     cargo
     clippy
     corepack_23
+    deno
     gcc
     go
     lua
