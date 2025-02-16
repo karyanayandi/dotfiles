@@ -31,8 +31,7 @@ in {
     nixpacks
     node-gyp
     nodePackages.vercel
-    nodejs_23
-    pnpm
+    nodejs
     rustc
     # Formatters and Linters
     alejandra
