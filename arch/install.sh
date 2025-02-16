@@ -13,6 +13,7 @@ bottom \
 catppuccin-gtk-theme-mocha \
 chafa \
 cmake \
+corepack \
 cowsay \
 deno \
 docker-compose \
