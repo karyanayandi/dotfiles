@@ -8,22 +8,18 @@
     export NODE_OPTIONS=--max_old_space_size=4096
     npm config set prefix "${config.home.homeDirectory}/.cache/npm/global"
     mkdir -p "${config.home.homeDirectory}/.cache/npm/global"
+    npm install -g corepack
   '';
 in {
   home.activation.configureNode = ''
     ${nodeJsConfig}
   '';
 
-  home.sessionVariables = {
-    NPM_CONFIG_PREFIX = "${config.home.homeDirectory}/.cache/npm/global";
-  };
-
   home.packages = with pkgs; [
     beekeeper-studio
     bun
     cargo
     clippy
-    corepack
     deno
     gcc
     go
