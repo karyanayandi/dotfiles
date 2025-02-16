@@ -23,7 +23,7 @@ in {
     bun
     cargo
     clippy
-    corepack_23
+    corepack
     deno
     gcc
     go
