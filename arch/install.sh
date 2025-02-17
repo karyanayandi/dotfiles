@@ -30,6 +30,7 @@ gparted \
 grim \
 gvfs \
 gzip \
+imv \
 insomnia \
 inter-font \
 inxi \
@@ -87,7 +88,6 @@ udevil \
 udisks2 \
 unrar \
 unzip \
-viewnior \
 visual-studio-code-bin \
 wget \
 wireplumber \
