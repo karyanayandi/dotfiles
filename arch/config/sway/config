@@ -180,7 +180,7 @@ bindsym $mod+Shift+r reload
 bindsym $mod+BackSpace restart
 
 # exit i3 (logs you out of your X session):
-bindsym $mod+Shift+q exec shutdown-menu
+bindsym $mod+Shift+q exec ~/.local/bin/power-menu
 bindsym $mod+Shift+e exec loginctl terminate-user $USER
 
 # resize window (you can also use the mouse for that):
