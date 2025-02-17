@@ -68,6 +68,9 @@ eval "$(fnm env --use-on-cd --shell zsh)"
 # bun completions
 [ -s "/home/karyana/.bun/_bun" ] && source "/home/karyana/.bun/_bun"
 
+#fzf
+export FZF_DEFAULT_COMMAND='find .'
+
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
@@ -99,3 +102,5 @@ zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-history-substring-search
 zinit light zsh-users/zsh-syntax-highlighting
+zinit light hlissner/zsh-autopair
+zinit light Aloxaf/fzf-tab
