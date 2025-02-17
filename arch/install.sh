@@ -15,6 +15,7 @@ chafa \
 cmake \
 cowsay \
 dbus \
+delta-plugin-git \
 deno \
 dunst \
 eza \
