@@ -10,7 +10,7 @@ sh ./setup/corepack.sh
 sh ./setup/npm.sh
 sh ./tmux.sh
 
-cd ~/.config/dotfiles/shared/ && stow .
+cd ~/.config/dotfiles/shared/config && stow .
 cd ~/.config/dotfiles/arch/home && stow .
 cd ~/.config/dotfiles/arch/config && stow .
 cd ~/.config/dotfiles/arch/local && stow .

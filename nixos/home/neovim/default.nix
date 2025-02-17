@@ -57,7 +57,7 @@ in {
   };
 
   home.file."./.config/nvim/lua/" = {
-    source = ../../../shared/nvim/lua;
+    source = ../../../shared/config/nvim/lua;
     recursive = true;
   };
 
