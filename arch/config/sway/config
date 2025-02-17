@@ -214,18 +214,17 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# Caplock indicator
+bindsym --release Caps_Lock exec swayosd-client --caps-lock
+
 # Multimedia Keys:
 
 # volume
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% 
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%  
-
-# gradular volume control
-bindsym $mod+XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%
-bindsym $mod+XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%  
+bindsym XF86AudioRaiseVolume exec --no-startup-id swayosd-client --output-volume raise
+bindsym XF86AudioLowerVolume exec --no-startup-id swayosd-client --output-volume lower
 
 # mute
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle
+bindsym XF86AudioMute exec --no-startup-id swayosd-client --output-volume mute-toggle 
 bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
@@ -277,6 +276,7 @@ exec /usr/bin/dunst
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec gnome-keyring-daemon --start
 exec  export SSH_AUTH_SOCK
+exec swayosd-server
 
 #set wallpaper:
 exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/landscape/bandung.jpg

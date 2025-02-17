@@ -14,6 +14,7 @@ bottom \
 chafa \
 cmake \
 cowsay \
+dbus \
 deno \
 dunst \
 eza \
@@ -73,9 +74,10 @@ starship \
 stow \
 stylua \
 swaybg \
-swayidle \
 swayfx \
+swayidle \
 swaylock-effects-git \
+swayosd-git \
 tela-icon-theme \
 tmux \
 trash-cli \
@@ -98,3 +100,5 @@ youtube-dl \
 zen-browser-bin \
 zip \
 zoxide
+
+sudo systemctl enable --now swayosd-libinput-backend.service
