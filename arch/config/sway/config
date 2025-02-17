@@ -255,7 +255,7 @@ bindsym $mod+ctrl+y exec --no-startup-id bash -c 'b=$(xrandr --verbose | grep -i
 #bindsym $mod+ctrl+u exec xbacklight -inc 5
 #bindsym $mod+ctrl+y exec xbacklight -dec 5
 
-input * xkb_options "altwin:swap_alt_win"
+# input * xkb_options "altwin:swap_alt_win"
 input "type:touchpad" {
     dwt enabled
     tap enabled
@@ -265,11 +265,12 @@ input "type:touchpad" {
 #  Notification                    
 bindsym $mod+shift+backslash exec dunstctl set-paused toggle
 
-# dex execute .desktop files:
-exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart
-
-#set compositor
-# exec --no-startup-id picom -b 
+# Autostart
+exec eval $(gnome-keyring-daemon --start)
+exec /usr/bin/dunst
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec gnome-keyring-daemon --start
+exec  export SSH_AUTH_SOCK
 
 #set wallpaper:
 exec --no-startup-id swaybg -m center -i ~/.config/dotfiles/wallpapers/catppuccin/arch.png

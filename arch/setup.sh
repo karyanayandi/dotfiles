@@ -6,6 +6,7 @@ sh ./setup/git.sh
 sh ./setup/24-bit-color.sh
 sh ./setup/bun.sh
 sh ./setup/docker.sh
+sh ./setup/corepack.sh
 sh ./setup/npm.sh
 sh ./tmux.sh
 
