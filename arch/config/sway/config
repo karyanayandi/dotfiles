@@ -1,47 +1,29 @@
 set $mod Mod4
 
-set $rosewater #f5e0dc
-set $flamingo #f2cdcd
-set $pink #f5c2e7
-set $mauve #cba6f7
-set $red #f38ba8
-set $maroon #eba0ac
-set $peach #fab387
-set $yellow #f9e2af
-set $green #a6e3a1
-set $teal #94e2d5
-set $sky #89dceb
-set $sapphire #74c7ec
-set $blue #89b4fa
-set $lavender #b4befe
-set $text #cdd6f4
-set $subtext1 #bac2de
-set $subtext0 #a6adc8
-set $overlay2 #9399b2
-set $overlay1 #7f849c
-set $overlay0 #6c7086
-set $surface2 #585b70
-set $surface1 #45475a
-set $surface0 #313244
-set $base #1e1e2e
-set $mantle #181825
-set $crust #11111b
+set $accent #c8ccd4
+set $red #bf616a 
+set $text #eceff4
+set $shadow #565c64
+set $surface #545862
+set $dark #353b45
+set $base #282c34
 
 for_window [class="^.*"] border pixel 0
 gaps inner 16
 gaps outer 2
 smart_borders on
+
 corner_radius 5
 shadows enable
 shadow_blur_radius 3
-shadow_color $overlay1
+shadow_color $shadow
 
 default_border pixel
 
 set $term foot
-set $menu wmenu-run
+set $menu rofi
 
-font JetbrainsMono NF 11
+font SF Pro 11
 
 # thin borders:
 hide_edge_borders both
@@ -61,7 +43,7 @@ bindsym $mod+j focus down
 bindsym $mod+k focus up
 bindsym $mod+l focus right
 
-# alternatively, you can use the cursor keys:
+# change focus with arrow keys:
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
 bindsym $mod+Up focus up
@@ -73,7 +55,7 @@ bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
-# alternatively, you can use the cursor keys:
+# move focused window with arrow keys:
 bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
@@ -94,7 +76,7 @@ bindsym $mod+Shift+t layout tabbed
 bindsym $mod+Shift+x layout toggle split
 
 # toggle tiling / floating:
-bindsym $mod+Shift+i floating toggle
+bindsym $mod+Shift+f floating toggle
 
 # change focus between tiling / floating windows:
 bindsym $mod+i focus mode_toggle
@@ -102,14 +84,48 @@ bindsym $mod+i focus mode_toggle
 # focus the parent container:
 bindsym $mod+a focus parent
 
-# set floating (nontiling)for apps needing it:
-for_window [class="Yad" instance="yad"] floating enable
-for_window [class="Pavucontrol" instance="pavucontrol"] floating enable
-for_window [class="screenshot" instance="screenshot"] floating enable
-for_window [class="xdg-open" instance="xdg-open"] floating enable
-for_window [class="Viewnior" instance="viewnior"] floating enable
-for_window [class="mpv"] floating enable
+# Floating Windows
 for_window [class="Archive Manager"] floating enable
+for_window [class="Pavucontrol" instance="pavucontrol"] floating enable
+for_window [class="Rofi"] floating enable
+for_window [class="Viewnior" instance="viewnior"] floating enable
+for_window [class="Yad" instance="yad"] floating enable
+for_window [class="confirm"] floating enable
+for_window [class="confirmreset"] floating enable
+for_window [class="dialog"] floating enable
+for_window [class="download"] floating enable
+for_window [class="error"] floating enable
+for_window [class="feh"] floating enable
+for_window [class="file-roller"] floating enable
+for_window [class="file_progress"] floating enable
+for_window [class="mpv"] floating enable
+for_window [class="notification"] floating enable
+for_window [class="pavucontrol"] floating enable
+for_window [class="pavucontrol-qt"] floating enable
+for_window [class="screenshot" instance="screenshot"] floating enable
+for_window [class="splash"] floating enable
+for_window [class="viewnior"] floating enable
+for_window [class="xdg-open" instance="xdg-open"] floating enable
+for_window [title="Open File"] floating enable
+for_window [title="branchdialog"] floating enable
+
+# Fullscreen windows
+for_window [class="wlogout"] fullscreen enable
+for_window [title="wlogout"] fullscreen enable
+for_window [class="wlogout" title="wlogout"] fullscreen enable
+
+# Matching specific window titles
+for_window [title="^(Media viewer)$"] floating enable
+for_window [title="^(Volume Control)$"] floating enable
+for_window [title="^(Picture-in-Picture)$"] floating enable
+for_window [title="^(Extract)$"] floating enable
+for_window [title="^(Save File)$"] floating enable
+for_window [title="^(Open File)$"] floating enable
+
+# Size and position adjustments
+for_window [title="^(Save File)$"] floating enable, resize set 1200 800, move position 75 44%
+for_window [title="^(Open File)$"] floating enable, resize set 1200 800, move position 75 44%
+for_window [title="^(Volume Control)$"] floating enable, resize set 1200 800, move position 75 44%
 
 # resize floating windows with mouse scroll:
 bindsym --whole-window --border $mod+button4 resize shrink height 5 px or 5 ppt
@@ -170,11 +186,11 @@ bindsym $mod+Shift+e exec loginctl terminate-user $USER
 # resize window (you can also use the mouse for that):
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
-
         # Pressing left will shrink the window’s width.
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
+
         bindsym h resize shrink width 10 px or 10 ppt
         bindsym j resize grow height 10 px or 10 ppt
         bindsym k resize shrink height 10 px or 10 ppt
@@ -198,7 +214,6 @@ bindsym $mod+r mode "resize"
 # volume
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% 
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%  
-
 
 # gradular volume control
 bindsym $mod+XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%
@@ -225,10 +240,23 @@ bindsym $mod+Print exec grim -g "$(slurp)"
 bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshot/$(date +'%s_screenshot.png')
 
 # Lock the system
-bindsym $mod+u exec betterlockscreen -l dim
+bindsym $mod+u exec swaylock \
+	--screenshots \
+	--clock \
+	--indicator \
+	--indicator-radius 100 \
+	--indicator-thickness 7 \
+	--effect-blur 7x5 \
+	--effect-vignette 0.5:0.5 \
+	--ring-color 8fbcbb \
+	--key-hl-color eceff4 \
+	--line-color 282c34 \
+	--inside-color 282c34 \
+	--separator-color 282c34 \
+	--grace 2 \
+	--fade-in 0.2
 
 # rofi bindings fancy application menu
-# bindsym $mod+space exec $menu
 bindsym $mod+space exec rofi -show drun -config "~/.config/rofi/config.rasi"
 bindsym $mod+shift+space exec rofi -show run -config "~/.config/rofi/config.rasi"
                 
@@ -241,19 +269,6 @@ bindsym $mod+o exec rofi -show window -line-padding 4 \
 bindsym F10 exec rofi -show window -line-padding 4 \
                 -lines 6 -padding 50 -hide-scrollbar
 
-#bindsym F3 exec nmtui                
-
-# Sreen brightness controls
-bindsym XF86MonBrightnessUp exec --no-startup-id bash -c 'b=$(xrandr --verbose | grep -i brightness | head -n 1 | cut -d" " -f2) && b2=$(echo -e "import math\nf = lambda x: (1 - 1/(1+math.exp(4*x-2)))\nprint(\\\"%.2f\\\" % f(0.1+$b))" | python) && xrandr --output HDMI-0 --brightness $b2'
-bindsym XF86MonBrightnessDown exec --no-startup-id bash -c 'b=$(xrandr --verbose | grep -i brightness | head -n 1 | cut -d" " -f2) && b2=$(echo -e "import math\nf = lambda x: (1 - 1/(1+math.exp(4*x-2)))\nprint(\\\"%.2f\\\" % f(-0.1+$b))" | python) && xrandr --output HDMI-0 --brightness $b2'
-
-bindsym $mod+ctrl+u exec --no-startup-id bash -c 'b=$(xrandr --verbose | grep -i brightness | head -n 1 | cut -d" " -f2) && b2=$(echo -e "import math\nf = lambda x: (1 - 1/(1+math.exp(4*x-2)))\nprint(\\\"%.2f\\\" % f(0.1+$b))" | python) && xrandr --output HDMI-0 --brightness $b2'
-bindsym $mod+ctrl+y exec --no-startup-id bash -c 'b=$(xrandr --verbose | grep -i brightness | head -n 1 | cut -d" " -f2) && b2=$(echo -e "import math\nf = lambda x: (1 - 1/(1+math.exp(4*x-2)))\nprint(\\\"%.2f\\\" % f(-0.1+$b))" | python) && xrandr --output HDMI-0 --brightness $b2'
-
-#bindsym XF86MonBrightnessUp exec xbacklight -inc 5
-#bindsym XF86MonBrightnessDown exec xbacklight -dec 5
-#bindsym $mod+ctrl+u exec xbacklight -inc 5
-#bindsym $mod+ctrl+y exec xbacklight -dec 5
 
 # input * xkb_options "altwin:swap_alt_win"
 input "type:touchpad" {
@@ -273,7 +288,7 @@ exec gnome-keyring-daemon --start
 exec  export SSH_AUTH_SOCK
 
 #set wallpaper:
-exec --no-startup-id swaybg -m center -i ~/.config/dotfiles/wallpapers/catppuccin/arch.png
+exec --no-startup-id swaybg -m center -i ~/.config/dotfiles/wallpapers/landscape/bandung.jpg
 
 #set powersavings for display:
 exec --no-startup-id xset s 480 dpms 600 600 600
@@ -290,10 +305,10 @@ bar {
         focused_separator  $base
 
         # target           border bg        text
-        focused_workspace  $base  $mauve    $crust
-        active_workspace   $base  $surface2 $text
+        focused_workspace  $base  $accent   $dark
+        active_workspace   $base  $surface  $text
         inactive_workspace $base  $base     $text
-        urgent_workspace   $base  $red      $crust
+        urgent_workspace   $base  $red      $dark
       }
 }
 

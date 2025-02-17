@@ -73,6 +73,8 @@ starship \
 stow \
 stylua \
 swaybg \
+swayfx \
+swaylock-effects-git \
 tela-icon-theme \
 tmux \
 trash-cli \
