@@ -22,6 +22,7 @@ local prompts = {
 return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
+    commit = "7e6583c75f1231ea1eac70e06995dd3f97a58478",
     dependencies = {
       { "zbirenbaum/copilot.lua" },
       { "nvim-lua/plenary.nvim" },
