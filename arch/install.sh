@@ -29,6 +29,7 @@ gparted \
 grim \
 gvfs \
 gzip \
+insomnia \
 inter-font \
 inxi \
 iw \
@@ -59,7 +60,6 @@ papipurs-icon-theme \
 pavucontrol \
 podman-compose \
 polkit-gnome \
-postman-bin \
 python-pip \
 reflector \
 reiserfsprogs \
@@ -92,5 +92,6 @@ xfsprogs \
 xorg-xhost \
 yazi \
 youtube-dl \
+zen-browser-bin \
 zip \
 zoxide
