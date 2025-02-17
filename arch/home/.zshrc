@@ -1,6 +1,24 @@
 # Initialize Starship prompt
 eval "$(starship init zsh)"
-export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+
+# Environment
+export TERM=screen-256color
+export EDITOR=nvim
+export SHELL=/usr/bin/zsh
+export LANG=en_US.utf8
+export LC_COLLATE=C
+export LC_ADDRESS=en_US.utf8
+export LC_CTYPE=en_US.utf8
+export LC_IDENTIFICATION=en_US.utf8
+export LC_MEASUREMENT=en_US.utf8
+export LC_MESSAGES=en_US.utf8
+export LC_MONETARY=en_US.utf8
+export LC_NAME=en_US.utf8
+export LC_NUMERIC=en_US.utf8
+export LC_PAPER=en_US.utf8
+export LC_TELEPHONE=en_US.utf8
+export LC_TIME=en_US.utf8
 
 # Aliases
 alias autoclean="sudo pacman -R $(pacman -Qdtq)"
