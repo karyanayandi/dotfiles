@@ -1,6 +1,7 @@
 #!/bin/bash
 
 yay -S --needed \
+adw-gtk-theme \
 android-tools \
 apple-fonts \
 base-devel \
@@ -10,7 +11,6 @@ bibata-cursor-theme \
 bluez \
 bluez-utils \
 bottom \
-catppuccin-gtk-theme-mocha \
 chafa \
 cmake \
 cowsay \
