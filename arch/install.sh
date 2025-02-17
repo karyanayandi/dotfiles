@@ -73,6 +73,7 @@ starship \
 stow \
 stylua \
 swaybg \
+swayidle \
 swayfx \
 swaylock-effects-git \
 tela-icon-theme \
