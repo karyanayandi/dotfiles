@@ -98,7 +98,6 @@ termius \
 tmux \
 trash-cli \
 ttf-jetbrains-mono-nerd \
-ttf-ms-win11-auto \
 udevil \
 udisks2 \
 unrar \
