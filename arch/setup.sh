@@ -16,3 +16,4 @@ cd ~/.config/dotfiles/arch/config && stow .
 cd ~/.config/dotfiles/arch/local && stow .
 
 xdg-user-dirs-update
+gsettings set org.cinnamon.desktop.default-applications.terminal exec foot
