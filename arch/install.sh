@@ -73,6 +73,7 @@ starship \
 stow \
 stylua \
 swaybg \
+tela-icon-theme \
 tmux \
 trash-cli \
 ttf-jetbrains-mono-nerd \
@@ -91,5 +92,5 @@ xfsprogs \
 xorg-xhost \
 yazi \
 youtube-dl \
-z \
-zip
+zip \
+zoxide

@@ -1,7 +1,7 @@
 include "/home/karyana/.gtkrc-2.0.mine"
-gtk-theme-name="catppuccin-mocha-sapphire-standard+default"
+gtk-theme-name="Adwaita-One-Dark"
 gtk-icon-theme-name="Tela Dark"
-gtk-font-name="Inter 11"
+gtk-font-name="SF Pro 11"
 gtk-cursor-theme-name="Bibata Modern Ice"
 gtk-cursor-theme-size=0
 gtk-toolbar-style=GTK_TOOLBAR_BOTH
