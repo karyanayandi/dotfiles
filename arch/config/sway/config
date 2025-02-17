@@ -239,9 +239,9 @@ bindsym $mod+e exec "/usr/bin/nemo"
 
 # screenshot
 #bindsym $mod+p exec --no-startup-id maim "/home/$USER/dir/data/Pictures/screenshot/$(date +%s).png"
-bindsym Print exec grim - | wl-copy
-bindsym $mod+Print exec grim -g "$(slurp)"
-bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshot/$(date +'%s_screenshot.png')
+bindsym Print exec grim - | wl-copy && notify-send "Screenshot copied to clipboard"
+bindsym $mod+Print exec grim -g "$(slurp)" && notify-send "Screenshot copied to clipboard"
+bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshots/$(date +'%s_screenshot.png') && notify-send "Screenshot taken"
 
 # Lock the system
 bindsym $mod+u exec swaylock
