@@ -3,20 +3,22 @@ set $mod Mod4
 set $accent #c8ccd4
 set $red #bf616a 
 set $text #eceff4
-set $shadow #565c64
+set $shadow #eceff4
+set $shadow_inactive #565c64
 set $surface #545862
 set $dark #353b45
 set $base #282c34
 
-for_window [class="^.*"] border pixel 0
 gaps inner 16
 gaps outer 2
 smart_borders on
 
 corner_radius 5
 shadows enable
+shadows_on_csd enable
 shadow_blur_radius 3
 shadow_color $shadow
+shadow_inactive_color $shadow_inactive
 
 default_border pixel
 
@@ -83,6 +85,9 @@ bindsym $mod+i focus mode_toggle
 
 # focus the parent container:
 bindsym $mod+a focus parent
+
+# Hide border
+for_window [class="^.*"] border pixel 0
 
 # Floating Windows
 for_window [class="Archive Manager"] floating enable
