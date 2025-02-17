@@ -5,11 +5,11 @@
   ...
 }: let
   screenRecordScript = pkgs.writeShellScriptBin "screen-record" ''
-    ${builtins.readFile ./screen-record.sh}
+    ${builtins.readFile ../../../shared/local/bin/screen-record.sh}
   '';
 
   stopScreenRecordScript = pkgs.writeShellScriptBin "stop-screen-record" ''
-    ${builtins.readFile ./stop-screen-record.sh}
+    ${builtins.readFile ../../../shared/local/bin/stop-screen-record.sh}
   '';
 
   powerMenuScript = pkgs.writeShellScriptBin "power-menu" ''

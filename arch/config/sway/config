@@ -185,7 +185,7 @@ bindsym $mod+Shift+r reload
 bindsym $mod+BackSpace restart
 
 # exit i3 (logs you out of your X session):
-bindsym $mod+Shift+q exec ~/.local/bin/power-menu
+bindsym $mod+Shift+q exec ~/.local/bin/power-menu.sh
 bindsym $mod+Shift+e exec loginctl terminate-user $USER
 
 # resize window (you can also use the mouse for that):
@@ -231,8 +231,8 @@ bindsym XF86AudioPrev exec playerctl previous
 
 # App shortcuts
 bindsym $mod+b exec "/usr/bin/google-chrome-stable"
-bindsym $mod+g exec "screen-record"
-bindsym $mod+Shift+g exec "stop-screen-record"
+bindsym $mod+g exec "~/.local/bin/screen-record.sh"
+bindsym $mod+Shift+g exec "~/.local/bin/stop-screen-record.sh"
 #bindsym $mod+w exec "x-www-browser"
 bindsym $mod+w exec "zen-browser"
 bindsym $mod+e exec "/usr/bin/nemo"

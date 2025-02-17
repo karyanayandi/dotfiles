@@ -91,6 +91,7 @@ udisks2 \
 unrar \
 unzip \
 visual-studio-code-bin \
+wf-recorder \
 wget \
 wireplumber \
 wl-clipboard \
