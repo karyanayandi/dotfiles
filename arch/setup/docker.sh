@@ -1,7 +1,16 @@
 #!/bin/bash
+set -e  # Exit on any error
 
-sudo pacman -S podman
+# Install podman
+if ! sudo pacman -S --noconfirm podman; then
+    echo "Failed to install podman"
+    exit 1
+fi
+
+# Start and enable podman service
 sudo systemctl start podman.service
 sudo systemctl enable podman.service
-sudo usermod -aG docker $USER
-newgrp docker 
+
+# Add user to docker group
+sudo usermod -aG docker "$USER"
+newgrp docker
