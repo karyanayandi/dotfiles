@@ -1,5 +1,4 @@
-include "/home/karyana/.gtkrc-2.0.mine"
-gtk-theme-name="Adwaita-One-Dark"
+gtk-theme-name="Atom One Dark"
 gtk-icon-theme-name="Tela Dark"
 gtk-font-name="SF Pro 11"
 gtk-cursor-theme-name="Bibata Modern Ice"
