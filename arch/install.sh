@@ -25,6 +25,7 @@ gcc \
 gimp \
 github-cli \
 gnome-keyring \
+go \
 google-chrome \
 gparted \
 grim \
@@ -41,6 +42,7 @@ krita \
 lazygit \
 libxcrypt-compat \
 lshw \
+lua \
 luacheck \
 luarocks \
 mpv \

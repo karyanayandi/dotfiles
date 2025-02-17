@@ -5,4 +5,5 @@ npm install --global \
 eslint_d \
 firebase-tools \
 jsonlint \
-neovim
+neovim \
+node-gyp
