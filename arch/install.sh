@@ -61,6 +61,7 @@ openssh \
 p7zip \
 papipurs-icon-theme \
 pavucontrol \
+pfetch \
 podman-compose \
 polkit-gnome \
 python-pip \
@@ -99,6 +100,8 @@ xorg-xhost \
 yazi \
 youtube-dl \
 zathura \
+zathura-djvu \
+zathura-pdf-mupdf \
 zen-browser-bin \
 zip \
 zoxide
