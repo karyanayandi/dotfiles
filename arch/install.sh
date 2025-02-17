@@ -37,6 +37,7 @@ inxi \
 iw \
 jfsutils \
 jq \
+krita \
 lazygit \
 libxcrypt-compat \
 lshw \
