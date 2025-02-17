@@ -97,6 +97,7 @@ xfsprogs \
 xorg-xhost \
 yazi \
 youtube-dl \
+zathura \
 zen-browser-bin \
 zip \
 zoxide
