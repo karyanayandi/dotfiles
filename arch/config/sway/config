@@ -257,8 +257,8 @@ bindsym $mod+u exec swaylock \
 	--fade-in 0.2
 
 # rofi bindings fancy application menu
-bindsym $mod+space exec rofi -show drun -config "~/.config/rofi/config.rasi"
-bindsym $mod+shift+space exec rofi -show run -config "~/.config/rofi/config.rasi"
+bindsym $mod+space exec rofi -show drun
+bindsym $mod+shift+space exec rofi -show run
                 
 bindsym F9 exec rofi -modi drun -show drun -line-padding 4 \
                 -columns 2 -padding 50 -hide-scrollbar

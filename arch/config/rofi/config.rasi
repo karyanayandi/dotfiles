@@ -1,0 +1,11 @@
+configuration {
+  display-run: " ";
+  display-drun: "  ";
+  display-window: "  ";
+  drun-display-format: "{icon} {name}";
+  font: "SF Pro 10";
+  modi: "window,run,drun";
+  show-icons: true;
+}
+
+@theme "/home/karyana/.config/rofi/themes/aurora.rasi"
