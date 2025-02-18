@@ -279,7 +279,7 @@ exec  export SSH_AUTH_SOCK
 exec swayosd-server
 
 #set wallpaper:
-exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/landscape/bandung.jpg
+exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/onedark/od_breadbrd.jpg
 
 #set powersavings for display:
 exec --no-startup-id xset s 480 dpms 600 600 600
