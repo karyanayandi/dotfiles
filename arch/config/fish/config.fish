@@ -6,7 +6,7 @@ export STARSHIP_CONFIG=/home/karyana/.config/starship/starship.toml
 # Environment
 export TERM=screen-256color
 export EDITOR=nvim
-export SHELL=/usr/bin/zsh
+export SHELL=/usr/bin/fish
 export LANG=en_US.utf8
 export LC_COLLATE=C
 export LC_ADDRESS=en_US.utf8
@@ -38,6 +38,7 @@ alias delete "yay -Rns"
 alias docker podman
 alias e nvim
 alias eb "nvim ~/.bashrc"
+alias ef "nvim ~/config/fish/config.fish"
 alias en "nvim ~/.config/nvim/init.lua"
 alias es "nvim ~/.config/sway/config"
 alias exp "gh copilot explain"
