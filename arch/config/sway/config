@@ -283,9 +283,10 @@ exec swayosd-server
 #set wallpaper:
 exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/onedark/od_breadbrd.jpg
 
-#set powersavings for display:
-exec --no-startup-id xset s 480 dpms 600 600 600
+#set sway cursor theme:
+exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Ice
 
+# set gnome interface:
 set $gnome-schema org.gnome.desktop.interface
 
 exec_always {
