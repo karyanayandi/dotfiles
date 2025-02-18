@@ -1,5 +1,5 @@
-gtk-theme-name="Adwaita One Dark"
-gtk-icon-theme-name="Tela black dark"
+gtk-theme-name="adw-gtk3-dark"
+gtk-icon-theme-name="Tela black"
 gtk-font-name="SF Pro 11"
 gtk-cursor-theme-name="Bibata-Modern-Ice"
 gtk-cursor-theme-size=0
