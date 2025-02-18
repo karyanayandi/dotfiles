@@ -1,5 +1,7 @@
 set $mod Mod4
 
+output HDMI-A-1 mode 1920x1080@71.910Hz position 0,0
+
 set $accent #c8ccd4
 set $red #bf616a 
 set $text #eceff4
