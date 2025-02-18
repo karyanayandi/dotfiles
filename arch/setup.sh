@@ -21,4 +21,3 @@ cd ~/.config/dotfiles/arch/config && stow .
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv
-gsettings set org.cinnamon.desktop.default-applications.terminal exec foot

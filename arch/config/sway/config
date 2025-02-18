@@ -286,6 +286,16 @@ exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/onedark/od_
 #set powersavings for display:
 exec --no-startup-id xset s 480 dpms 600 600 600
 
+set $gnome-schema org.gnome.desktop.interface
+
+exec_always {
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec foot
+    gsettings set $gnome-schema gtk-theme 'Adwaita One Dark'
+    gsettings set $gnome-schema icon-theme 'Tela black dark'
+    gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Ice'
+    gsettings set $gnome-schema font-name 'SF Pro'
+}
+
 bar {
     position top
 
