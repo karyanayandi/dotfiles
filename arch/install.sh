@@ -116,7 +116,6 @@ zathura \
 zathura-djvu \
 zathura-pdf-mupdf \
 zen-browser-bin \
-zip \
-zoxide
+zip
 
 sudo systemctl enable --now swayosd-libinput-backend.service
