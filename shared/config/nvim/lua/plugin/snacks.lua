@@ -154,16 +154,7 @@ return {
         char = " ",
         hl = "SnacksIndentBlank",
       },
-      animate = {
-        enabled = vim.fn.has "nvim-0.10" == 1,
-        style = "out",
-        easing = "linear",
-        duration = {
-          step = 20,
-          total = 500,
-        },
-        fps = 60,
-      },
+      animate = { enabled = false },
       filter = function(buf)
         return vim.g.snacks_indent ~= false and vim.b[buf].snacks_indent ~= false and vim.bo[buf].buftype == ""
       end,
