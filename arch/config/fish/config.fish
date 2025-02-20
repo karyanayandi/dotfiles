@@ -30,9 +30,8 @@ alias cat bat
 alias cdc "cd ~/.config/dotfiles"
 alias cdp "cd ~/Codes"
 alias cl clear
-alias clean-code "find . -type d -name 'node_modules' -o -name '.next' -o -name '.turbo' -exec rm -rf {} + -o -type f -name '*.astro' -exec rm -f {} +;"
 alias clean "yay -Yc"
-alias d "yay -Rns"
+alias clean-code "find . -type d -name 'node_modules' -o -name '.next' -o -name '.turbo' -exec rm -rf {} + -o -type f -name '*.astro' -exec rm -f {} +;"
 alias dbox distrobox
 alias delete "yay -Rns"
 alias docker podman
@@ -60,6 +59,7 @@ alias pn "corepack pnpm"
 alias pnpm "corepack pnpm"
 alias pnpx "corepack pnpx"
 alias px "corepack pnpx"
+alias r "yay -Rns"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
 alias rm trash-put
 alias rmr rm
@@ -69,8 +69,8 @@ alias sug "gh copilot suggest"
 alias t tmux
 alias tree "exa --tree --group-directories-first --icons --ignore-glob '*node_modules*'"
 alias u "yay -Syyu"
-alias update-time "sudo ntpd -qg"
 alias update "yay -Syyu"
+alias update-time "sudo ntpd -qg"
 alias vim nvim
 alias vis "sudo nvim"
 alias x exit
