@@ -53,7 +53,7 @@ return {
             icon = icons.ui.GearOutline,
             key = "c",
             desc = "Config",
-            action = ":e ~/.config/dotfiles/arch/config/neovim/init.lua",
+            action = ":e ~/.config/dotfiles/shared/config/neovim/init.lua",
           },
           {
             icon = icons.ui.CloudDownload,
