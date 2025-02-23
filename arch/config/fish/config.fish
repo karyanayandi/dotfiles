@@ -51,6 +51,7 @@ alias install "yay -S"
 alias ll "eza -al -g --icons"
 alias ls "eza --group-directories-first --icons"
 alias lsl "eza --group-directories-first -lh --icons"
+alias lzd lazydocker
 alias lzg lazygit
 alias npm "corepack npm"
 alias npx "corepack npx"

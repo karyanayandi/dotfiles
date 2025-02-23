@@ -46,6 +46,7 @@ jfsutils \
 jq \
 killport \
 krita \
+lazydocker \
 lazygit \
 lib32-vulkan-intel \
 libxcrypt-compat \
