@@ -16,7 +16,6 @@ cmake \
 cowsay \
 cursor-bin \
 dbus \
-delta-plugin-git \
 deno \
 distrobox \
 dive \
@@ -105,6 +104,7 @@ udisks2 \
 unrar \
 unzip \
 visual-studio-code-bin \
+vivid \
 wf-recorder \
 wget \
 wireplumber \

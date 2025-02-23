@@ -18,6 +18,7 @@ cd ~/.config/dotfiles/shared/local && stow .
 cd ~/.config/dotfiles/arch/home && stow .
 cd ~/.config/dotfiles/arch/config && stow .
 
+vivid generate ~/.config/vivid/aurora.yaml
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv
