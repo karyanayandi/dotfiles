@@ -14,3 +14,4 @@ sudo systemctl enable podman.service
 # Add user to docker group
 sudo usermod -aG docker "$USER"
 newgrp docker
+systemctl --user enable --now podman.socket

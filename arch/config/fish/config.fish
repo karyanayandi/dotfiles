@@ -21,6 +21,7 @@ export LC_PAPER=en_US.utf8
 export LC_TELEPHONE=en_US.utf8
 export LC_TIME=en_US.utf8
 export LS_COLORS="(vivid generate aurora)"
+export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 
 ## Aliases
 alias autoclean "sudo pacman -R $(pacman -Qdtq)"
