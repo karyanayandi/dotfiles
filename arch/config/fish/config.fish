@@ -79,8 +79,9 @@ alias yarnpkg "corepack yarnpkg"
 
 ## Keybinding
 set fish_key_bindings fish_default_key_bindings
+source ~/.config/fish/functions/keybind.fish
 
-#pnpm
+# pnpm
 set -gx PNPM_HOME "$HOME/.local/share/pnpm"
 set -gx PATH "$PNPM_HOME" $PATH
 
@@ -88,5 +89,5 @@ set -gx PATH "$PNPM_HOME" $PATH
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-#fzf
+# fzf
 export FZF_DEFAULT_COMMAND='find .'
