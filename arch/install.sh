@@ -30,6 +30,7 @@ fzf \
 gcc \
 gimp \
 github-cli \
+glxinfo \
 gnome-keyring \
 go \
 google-chrome \
@@ -47,6 +48,7 @@ jq \
 killport \
 krita \
 lazygit \
+lib32-vulkan-intel \
 libxcrypt-compat \
 local-by-flywheel-bin \
 lshw \
