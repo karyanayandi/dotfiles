@@ -221,6 +221,13 @@ bindsym --release Caps_Lock exec swayosd-client --caps-lock
 
 # Multimedia Keys:
 
+# Screen brightness controls
+# bindsym XF86MonBrightnessUp exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
+# bindsym XF86MonBrightnessDown exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(-0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
+
+# bindsym $mod+ctrl+u exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
+# bindsym $mod+ctrl+y exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(-0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
+
 # volume
 bindsym XF86AudioRaiseVolume exec --no-startup-id swayosd-client --output-volume raise
 bindsym XF86AudioLowerVolume exec --no-startup-id swayosd-client --output-volume lower
