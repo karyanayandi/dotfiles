@@ -21,3 +21,5 @@ gui:
       - "#f9e2af"
   authorColors:
     "*": "#88c0d0"
+  border: "single"
+disableStartupPopups: true
