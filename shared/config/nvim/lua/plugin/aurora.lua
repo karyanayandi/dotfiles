@@ -1,6 +1,9 @@
+-- luacheck: globals vim
+
 return {
   "aurora-theme/nvim",
   lazy = false,
+  priority = 1000,
   config = function()
     require("aurora").setup {
       theme = nil,
@@ -21,5 +24,7 @@ return {
         diagnostics = "underline",
       },
     }
+
+    vim.cmd "colorscheme aurora"
   end,
 }
