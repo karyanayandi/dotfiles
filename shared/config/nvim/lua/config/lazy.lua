@@ -1,5 +1,9 @@
 -- luacheck: globals vim
 
+if vim.g.lazy_did_setup then
+  return {}
+end
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
