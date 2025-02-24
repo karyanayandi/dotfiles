@@ -20,6 +20,7 @@ deno \
 distrobox \
 dive \
 dunst \
+eglinfo \
 eza \
 fd \
 ffmpeg \
