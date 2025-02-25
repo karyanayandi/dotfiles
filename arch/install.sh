@@ -93,7 +93,6 @@ sof-firmware \
 starship \
 stow \
 stylua \
-swaybg \
 swayfx \
 swayidle \
 swaylock-effects-git \
@@ -109,6 +108,7 @@ unrar \
 unzip \
 visual-studio-code-bin \
 vivid \
+waybar \
 wf-recorder \
 wget \
 wireplumber \

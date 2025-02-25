@@ -288,10 +288,10 @@ exec export SSH_AUTH_SOCK
 exec swayosd-server
 
 # set wallpaper
-exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/schedule.png
+output * background '~/.config/dotfiles/wallpapers/schedule.png' fill
 
 # set sway cursor theme
-exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Ice
+exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Classic
 
 # autostart copyq clipboard manager
 exec --no-startup-id copyq
@@ -301,10 +301,14 @@ set $gnome-schema org.gnome.desktop.interface
 
 exec_always {
     gsettings set org.cinnamon.desktop.default-applications.terminal exec foot
-    gsettings set $gnome-schema gtk-theme 'Adwaita One Dark'
-    gsettings set $gnome-schema icon-theme 'Tela black dark'
-    gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Ice'
-    gsettings set $gnome-schema font-name 'SF Pro'
+    gsettings set $gnome-schema gtk-theme 'adw-gtk3-dark'
+    gsettings set $gnome-schema icon-theme 'Tela-grey-dark'
+    gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Classic'
+    gsettings set $gnome-schema font-name 'SF Pro 11'
+}
+
+bar {
+    swaybar_command waybar
 }
 
 # bar {
@@ -325,3 +329,5 @@ exec_always {
 #         urgent_workspace   $base  $red      $dark
 #       }
 # }
+
+include /etc/sway/config.d/*
