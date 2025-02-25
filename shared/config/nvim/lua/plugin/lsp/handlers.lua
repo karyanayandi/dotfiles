@@ -96,7 +96,7 @@ local function lsp_keymaps(bufnr)
     noremap = true,
     silent = true,
   })
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-f>", "<cmd>Format<cr>", {
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<M-f>", "<cmd>Format<cr>", {
     desc = "Format",
     noremap = true,
     silent = true,
