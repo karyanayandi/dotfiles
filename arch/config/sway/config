@@ -194,7 +194,7 @@ bindsym $mod+BackSpace restart
 
 # exit sway (logs out of wayland session)
 bindsym $mod+Shift+q exec ~/.local/bin/power-menu.sh
-bindsym $mod+Shift+e exec loginctl terminate-user $USER
+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
 
 # resize window (also it can use the mouse for that)
 mode "resize" {
