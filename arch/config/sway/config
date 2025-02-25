@@ -92,6 +92,8 @@ bindsym $mod+a focus parent
 for_window [class="^.*"] border pixel 0
 
 # Floating Windows
+for_window [app_id="mpv"] floating enable
+for_window [app_id="org.gnome.FileRoller"] floating enable, resize set 1200 800, move position 75 44%
 for_window [class="Archive Manager"] floating enable
 for_window [class="Pavucontrol" instance="pavucontrol"] floating enable
 for_window [class="Rofi"] floating enable
@@ -103,9 +105,7 @@ for_window [class="dialog"] floating enable
 for_window [class="download"] floating enable
 for_window [class="error"] floating enable
 for_window [class="feh"] floating enable
-for_window [class="file-roller"] floating enable
 for_window [class="file_progress"] floating enable
-for_window [class="mpv"] floating enable
 for_window [class="notification"] floating enable
 for_window [class="pavucontrol"] floating enable
 for_window [class="pavucontrol-qt"] floating enable
