@@ -93,6 +93,7 @@ sof-firmware \
 starship \
 stow \
 stylua \
+swaybg \
 swayfx \
 swayidle \
 swaylock-effects-git \

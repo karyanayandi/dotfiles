@@ -288,7 +288,8 @@ exec export SSH_AUTH_SOCK
 exec swayosd-server
 
 # set wallpaper
-output "*" bg '~/.config/dotfiles/wallpapers/schedule.png' fill
+exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/schedule.png
+# output * background '~/.config/dotfiles/wallpapers/schedule.png' fill
 
 # set sway cursor theme
 exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Classic
