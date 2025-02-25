@@ -57,6 +57,7 @@ lua \
 luacheck \
 luarocks \
 lynx \
+mkcert \
 mpv \
 nemo  \
 nemo-fileroller \
