@@ -6,7 +6,6 @@ local servers = {
   "astro",
   "bashls",
   "clangd",
-  "cssls",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
