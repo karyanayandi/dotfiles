@@ -13,6 +13,7 @@ bluez-utils \
 bottom \
 chafa \
 cmake \
+copyq \
 cowsay \
 cursor-bin \
 dbus \
