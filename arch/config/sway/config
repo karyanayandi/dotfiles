@@ -1,15 +1,17 @@
+# modifier
 set $mod Mod4
 
+# output monitor
 output HDMI-A-1 mode 1920x1080@71.910Hz position 0,0
 
-set $accent #c8ccd4
-set $red #bf616a 
-set $text #eceff4
+# set $accent #c8ccd4
+# set $red #bf616a 
+# set $text #eceff4
+# set $surface #545862
+# set $dark #353b45
+# set $base #282c34
 set $shadow #eceff4
 set $shadow_inactive #565c64
-set $surface #545862
-set $dark #353b45
-set $base #282c34
 
 gaps inner 16
 gaps outer 2
@@ -29,72 +31,72 @@ set $menu rofi
 
 font SF Pro 11
 
-# thin borders:
+# thin borders
 hide_edge_borders both
 
-# Use Mouse+$mod to drag floating windows to their wanted position:
+# use mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal:
+# start a terminal
 bindsym $mod+Return exec $term
 
-# kill focused window:
+# kill focused window
 bindsym $mod+c kill
 
-# change focus:
+# change focus
 bindsym $mod+h focus left
 bindsym $mod+j focus down
 bindsym $mod+k focus up
 bindsym $mod+l focus right
 
-# change focus with arrow keys:
+# change focus with arrow keys
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
 bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
-# move focused window:
+# move focused window
 bindsym $mod+Shift+h move left
 bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
-# move focused window with arrow keys:
+# move focused window with arrow keys
 bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
-# split in horizontal orientation:
+# split in horizontal orientation
 bindsym $mod+s split h
 
-# split in vertical orientation:
+# split in vertical orientation
 bindsym $mod+v split v
 
-# enter fullscreen mode for the focused container:
+# enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
-# change container layout (stacked, tabbed, toggle split):
+# change container layout (stacked, tabbed, toggle split)
 bindsym $mod+Shift+s layout stacking
 bindsym $mod+Shift+t layout tabbed
 bindsym $mod+Shift+x layout toggle split
 
-# toggle tiling / floating:
+# toggle tiling / floating
 bindsym $mod+Shift+f floating toggle
 
-# change focus between tiling / floating windows:
+# change focus between tiling / floating windows
 bindsym $mod+i focus mode_toggle
 
-# focus the parent container:
+# focus the parent container
 bindsym $mod+a focus parent
 
-# Hide border
+# hide border
 for_window [class="^.*"] border pixel 0
 
-# Floating maximum size
+# floating maximum size
 floating_maximum_size -1 x -1
 
-# Floating Windows
+# floating windows rules
 #TODO: window size not based on video resolution
 for_window [app_id="mpv"] floating enable, resize set 1200 800, move position 75 50%
 for_window [class="org.gnome.FileRoller"] floating enable, resize set 1200 800, move position 75 44%
@@ -120,12 +122,12 @@ for_window [class="xdg-open" instance="xdg-open"] floating enable
 for_window [title="Open File"] floating enable
 for_window [title="branchdialog"] floating enable
 
-# Fullscreen windows
+# fullscreen windows rules
 for_window [class="wlogout"] fullscreen enable
 for_window [title="wlogout"] fullscreen enable
 for_window [class="wlogout" title="wlogout"] fullscreen enable
 
-# Matching specific window titles
+# matching specific window titles
 for_window [title="^(Media viewer)$"] floating enable
 for_window [title="^(Volume Control)$"] floating enable
 for_window [title="^(Picture-in-Picture)$"] floating enable
@@ -133,18 +135,18 @@ for_window [title="^(Extract)$"] floating enable
 for_window [title="^(Save File)$"] floating enable
 for_window [title="^(Open File)$"] floating enable
 
-# Size and position adjustments
+# size and position adjustments
 for_window [title="^(Save File)$"] floating enable, resize set 1200 800, move position 75 44%
 for_window [title="^(Open File)$"] floating enable, resize set 1200 800, move position 75 44%
 for_window [title="^(Volume Control)$"] floating enable, resize set 1200 800, move position 75 44%
 
-# resize floating windows with mouse scroll:
+# resize floating windows with mouse scroll
 bindsym --whole-window --border $mod+button4 resize shrink height 5 px or 5 ppt
 bindsym --whole-window --border $mod+button5 resize grow height 5 px or 5 ppt
 bindsym --whole-window --border $mod+shift+button4 resize shrink width 5 px or 5 ppt
 bindsym --whole-window --border $mod+shift+button5 resize grow width 5 px or 5 ppt
 
-#assign workspace to screens
+# assign workspace to screens
 #workspace 1 output HDMI-1
 #workspace 2 output HDMI-1
 #workspace 3 output HDMI-1
@@ -156,7 +158,7 @@ bindsym --whole-window --border $mod+shift+button5 resize grow width 5 px or 5 p
 #workspace 9 output eDP-1
 #workspace 10 output eDP-1
 
-# switch to workspace:
+# switch to workspace
 bindsym $mod+1 workspace 1
 bindsym $mod+2 workspace 2
 bindsym $mod+3 workspace 3
@@ -168,7 +170,7 @@ bindsym $mod+8 workspace 8
 bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
 
-# move focused container to workspace:
+# move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
 bindsym $mod+Shift+2 move container to workspace 2
 bindsym $mod+Shift+3 move container to workspace 3
@@ -184,23 +186,23 @@ bindsym $mod+Shift+0 move container to workspace 10
 #bindsym $mod+shift+n focus output HDMI1
 #bindsym $mod+shift+m focus output eDP1
 
-# reload the configuration file:
+# reload the configuration file
 bindsym $mod+Shift+r reload
 
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3):
+# restart sway inplace (preserves your layout/session, can be used to upgrade sway)
 bindsym $mod+BackSpace restart
 
-# exit i3 (logs you out of your X session):
+# exit sway (logs out of wayland session)
 bindsym $mod+Shift+q exec ~/.local/bin/power-menu.sh
 bindsym $mod+Shift+e exec loginctl terminate-user $USER
 
-# resize window (you can also use the mouse for that):
+# resize window (also it can use the mouse for that)
 mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
+        # these bindings trigger as soon as enter the resize mode
+        # pressing left will shrink the window’s width.
+        # pressing right will grow the window’s width.
+        # pressing up will shrink the window’s height.
+        # pressing down will grow the window’s height.
 
         bindsym h resize shrink width 10 px or 10 ppt
         bindsym j resize grow height 10 px or 10 ppt
@@ -220,15 +222,14 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Caplock indicator
+# caplock indicator
 bindsym --release Caps_Lock exec swayosd-client --caps-lock
 
-# Multimedia Keys:
+# multimedia Keys
 
 # Screen brightness controls
 # bindsym XF86MonBrightnessUp exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
 # bindsym XF86MonBrightnessDown exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(-0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
-
 # bindsym $mod+ctrl+u exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
 # bindsym $mod+ctrl+y exec --no-startup-id bash -c 'b=$(wlr-randr | grep -i brightness | head -n 1 | cut -d" " -f2); b2=$(python -c "import math; f = lambda x: (1 - 1/(1+math.exp(4*x-2))); print(f\"{f(-0.1 + float($b)):.2f}\")"); wlr-randr --output HDMI-A-1 "$b2"'
 
@@ -242,65 +243,60 @@ bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
-# App shortcuts
+# app shortcuts
 bindsym $mod+b exec "/usr/bin/google-chrome-stable"
-bindsym $mod+g exec "~/.local/bin/screen-record.sh"
-bindsym $mod+Shift+g exec "~/.local/bin/stop-screen-record.sh"
 #bindsym $mod+w exec "x-www-browser"
 bindsym $mod+w exec "zen-browser"
 bindsym $mod+e exec "/usr/bin/nemo"
 
+# custom script shortcuts
+bindsym $mod+g exec "~/.local/bin/screen-record.sh"
+bindsym $mod+Shift+g exec "~/.local/bin/stop-screen-record.sh"
+
 # screenshot
-#bindsym $mod+p exec --no-startup-id maim "/home/$USER/dir/data/Pictures/screenshot/$(date +%s).png"
 bindsym Print exec grim - | wl-copy && notify-send "Screenshot copied to clipboard"
 bindsym $mod+Print exec grim -g "$(slurp)" && notify-send "Screenshot copied to clipboard"
-bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshots/$(date +'%s_screenshot.png') && notify-send "Screenshot saved"
+bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshots/$(date +'%s_screenshot.png') && notify-send "Screenshot has been saved"
 
-# Lock the system
+# lock the system
 bindsym $mod+u exec swaylock
 
-# rofi bindings fancy application menu
+# application menu
 bindsym $mod+space exec rofi -show drun
 bindsym $mod+shift+space exec rofi -show run
-                
-bindsym F9 exec rofi -modi drun -show drun -line-padding 4 \
-                -columns 2 -padding 50 -hide-scrollbar
+bindsym $mod+o exec rofi -show window
 
-bindsym $mod+o exec rofi -show window -line-padding 4 \
-                -lines 6 -padding 50 -hide-scrollbar
-
-bindsym F10 exec rofi -show window -line-padding 4 \
-                -lines 6 -padding 50 -hide-scrollbar
-
-
+# swap alt and win key
 # input * xkb_options "altwin:swap_alt_win"
+
+# touchpad settings
 input "type:touchpad" {
     dwt enabled
     tap enabled
     middle_emulation enabled
 }
 
-#  Notification                    
-bindsym $mod+shift+backslash exec dunstctl set-paused toggle
+# notification                    
+bindsym $mod+shift+backslash exec dunstctl set-paused toggle && notify-send "Notification toggled"
 
-# Autostart
+# autostart
 exec eval $(gnome-keyring-daemon --start)
 exec /usr/bin/dunst
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec gnome-keyring-daemon --start
-exec  export SSH_AUTH_SOCK
+exec export SSH_AUTH_SOCK
 exec swayosd-server
 
-# Set wallpaper:
+# set wallpaper
 exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/schedule.png
 
-# Set sway cursor theme:
+# set sway cursor theme
 exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Ice
 
-# Autostart copyq
+# autostart copyq clipboard manager
 exec --no-startup-id copyq
 
-# set gnome interface:
+# set gnome interface
 set $gnome-schema org.gnome.desktop.interface
 
 exec_always {
@@ -311,23 +307,21 @@ exec_always {
     gsettings set $gnome-schema font-name 'SF Pro'
 }
 
-bar {
-    position top
-
-    status_command while date +'%Y-%m-%d %H:%M'; do sleep 1; done
-
-     colors {
-        background         $base
-        statusline         $text
-        focused_statusline $text
-        focused_separator  $base
-
-        # target           border bg        text
-        focused_workspace  $base  $accent   $dark
-        active_workspace   $base  $surface  $text
-        inactive_workspace $base  $base     $text
-        urgent_workspace   $base  $red      $dark
-      }
-}
-
-
+# bar {
+#     position top
+#
+#     status_command while date +'%Y-%m-%d %H:%M'; do sleep 1; done
+#
+#      colors {
+#         background         $base
+#         statusline         $text
+#         focused_statusline $text
+#         focused_separator  $base
+#
+#         # target           border bg        text
+#         focused_workspace  $base  $accent   $dark
+#         active_workspace   $base  $surface  $text
+#         inactive_workspace $base  $base     $text
+#         urgent_workspace   $base  $red      $dark
+#       }
+# }
