@@ -31,6 +31,7 @@ return {
   },
   opts = {
     provider = "copilot",
+    auto_suggestions_provider = "copilot",
     copilot = {
       endpoint = "https://api.githubcopilot.com",
       model = "claude-3.7-sonnet",
@@ -40,6 +41,16 @@ return {
       temperature = 0,
       max_tokens = 8192,
       disable_tools = false,
+    },
+    behaviour = {
+      auto_suggestions = true, -- Experimental stage
+      auto_set_highlight_group = true,
+      auto_set_keymaps = true,
+      auto_apply_diff_after_generation = false,
+      support_paste_from_clipboard = false,
+      minimize_diff = true,
+      enable_token_counting = true,
+      enable_cursor_planning_mode = false,
     },
     mappings = {
       diff = {
