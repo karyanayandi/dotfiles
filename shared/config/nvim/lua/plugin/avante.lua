@@ -46,7 +46,8 @@ return {
       allow_insecure = true,
       timeout = 30000,
       temperature = 0,
-      max_tokens = 4096,
+      max_tokens = 8192,
+      disable_tools = false,
     },
     mappings = {
       diff = {
