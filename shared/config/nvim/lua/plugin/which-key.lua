@@ -56,25 +56,29 @@ return {
     local mappings = {
       {
         "<leader>a",
-        group = "AI",
+        group = "AI (Cursor)",
       },
       {
-        "<leader>aa",
+        "<leader>A",
+        group = "AI (Coilot Chat)",
+      },
+      {
+        "<leader>Aa",
         "<cmd>CopilotChatToggle<cr>",
         desc = "Toggle",
       },
       {
-        "<leader>aA",
+        "<leader>AA",
         "<cmd>CopilotChatAgents<cr>",
         desc = "Select Agents",
       },
       {
-        "<leader>ac",
+        "<leader>Ac",
         "<cmd>CopilotChatReset<cr>",
         desc = "Clear buffer and chat history",
       },
       {
-        "<leader>ai",
+        "<leader>Ai",
         function()
           local input = vim.fn.input "Ask Copilot: "
           if input ~= "" then
@@ -84,7 +88,7 @@ return {
         desc = "Ask input",
       },
       {
-        "<leader>am",
+        "<leader>Am",
         "<cmd>CopilotChatModels<cr>",
         desc = "Select Models",
       },

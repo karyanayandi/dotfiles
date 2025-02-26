@@ -36,42 +36,42 @@ return {
         },
         prompts = {
           Explain = {
-            mapping = "<leader>ae",
+            mapping = "<leader>Ae",
             description = "Explain",
           },
           Review = {
-            mapping = "<leader>ar",
+            mapping = "<leader>Ar",
             description = "Review",
           },
           Tests = {
-            mapping = "<leader>at",
+            mapping = "<leader>At",
             description = "Tests",
           },
           Fix = {
-            mapping = "<leader>af",
+            mapping = "<leader>Af",
             description = "Fix",
           },
           Optimize = {
-            mapping = "<leader>ao",
+            mapping = "<leader>Ao",
             description = "Optimize",
           },
           Docs = {
-            mapping = "<leader>ad",
+            mapping = "<leader>Ad",
             description = "Documentation",
           },
           Commit = {
-            mapping = "<leader>ag",
+            mapping = "<leader>Ag",
             description = "Generate Commit",
             selection = select.buffer,
           },
           Refactor = {
             prompt = "> /COPILOT_GENERATE\n\nPlease refactor the following code to improve its clarity and readability.",
-            mapping = "<leader>aR",
+            mapping = "<leader>AR",
             description = "Refactor",
           },
           BetterNamings = {
             prompt = "> /COPILOT_GENERATE\n\nPlease provide better names for the following variables and functions.",
-            mapping = "<leader>ab",
+            mapping = "<leader>Ab",
             description = "Better Naming",
           },
           -- Summarize = {
@@ -149,7 +149,7 @@ return {
           },
           submit_prompt = {
             normal = "<CR>",
-            insert = "<C-s>",
+            insert = "<C-S>",
           },
           toggle_sticky = {
             detail = "Makes line under cursor sticky or deletes sticky line.",
@@ -188,19 +188,19 @@ return {
         },
       }
 
-      vim.keymap.set({ "n" }, "<leader>ap", function()
+      vim.keymap.set({ "n" }, "<leader>Ap", function()
         require("CopilotChat.integrations.telescope").pick(actions.prompt_actions {
           context = { "buffers", "files" },
         })
       end, { desc = "Prompts" })
 
-      vim.keymap.set({ "v" }, "<leader>ap", function()
+      vim.keymap.set({ "v" }, "<leader>Ap", function()
         require("CopilotChat.integrations.telescope").pick(actions.prompt_actions {
           selection = select.visual,
         })
       end, { desc = "Prompts" })
 
-      vim.keymap.set({ "n" }, "<leader>aq", function()
+      vim.keymap.set({ "n" }, "<leader>Aq", function()
         vim.ui.input({
           prompt = "Question: ",
         }, function(input)
@@ -212,7 +212,7 @@ return {
         end)
       end, { desc = "Question" })
 
-      vim.keymap.set({ "v" }, "<leader>aq", function()
+      vim.keymap.set({ "v" }, "<leader>Aq", function()
         vim.ui.input({
           prompt = "Question: ",
         }, function(input)
@@ -224,7 +224,7 @@ return {
         end)
       end, { desc = "Question" })
 
-      vim.keymap.set({ "n" }, "<leader>as", function()
+      vim.keymap.set({ "n" }, "<leader>As", function()
         vim.ui.input({
           prompt = "Save as: ",
         }, function(input)
@@ -234,7 +234,7 @@ return {
         end)
       end, { desc = "Save Chat" })
 
-      vim.keymap.set({ "n" }, "<leader>al", function()
+      vim.keymap.set({ "n" }, "<leader>Al", function()
         vim.ui.input({
           prompt = "Chat name: ",
         }, function(input)
