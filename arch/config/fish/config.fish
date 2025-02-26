@@ -104,3 +104,5 @@ export FZF_DEFAULT_OPTS="\
 --multi"
 
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
+
+envsource ~/.env
