@@ -1,14 +1,11 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
   dependencies = { "nvim-treesitter/nvim-treesitter" },
-  opts = {
-    render_modes = { "n", "c", "t" },
-  },
+  ft = { "markdown", "copilot-chat", "copilot-overlay", "copilot-diff", "Avante" },
   config = function()
     require("render-markdown").setup {
-      enabled = true,
       file_types = { "markdown", "copilot-chat", "copilot-overlay", "copilot-diff", "Avante" },
-      ft = { "markdown", "copilot-chat", "copilot-overlay", "copilot-diff", "Avante" },
+      enabled = true,
       anti_conceal = {
         enabled = true,
         ignore = {
