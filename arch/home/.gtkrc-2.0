@@ -1,3 +1,4 @@
+include "/home/karyana/.gtkrc-2.0.mine"
 gtk-theme-name="adw-gtk3-dark"
 gtk-icon-theme-name="Tela-grey-dark"
 gtk-font-name="SF Pro 11"
@@ -14,4 +15,3 @@ gtk-xft-hinting=1
 gtk-xft-hintstyle="hintfull"
 gtk-xft-rgba="rgb"
 gtk-modules="gail:atk-bridge"
-gtk-application-prefer-dark-theme=1
