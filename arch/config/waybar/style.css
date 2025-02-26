@@ -29,7 +29,7 @@ window#waybar {
 
 #workspaces button.focused {
   box-shadow: inset 0 -3px #eceff4;
-  background: #353b45;
+  /* background: #353b45; */
 }
 
 #workspaces button:hover {
