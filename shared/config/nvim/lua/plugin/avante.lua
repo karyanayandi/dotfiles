@@ -8,11 +8,10 @@ return {
     "stevearc/dressing.nvim",
     "nvim-lua/plenary.nvim",
     "MunifTanjim/nui.nvim",
+    "MeanderingProgrammer/render-markdown.nvim",
     --- Optional dependencies
-    "echasnovski/mini.pick",
     "nvim-telescope/telescope.nvim",
     "hrsh7th/nvim-cmp",
-    "ibhagwan/fzf-lua",
     "nvim-tree/nvim-web-devicons",
     "zbirenbaum/copilot.lua",
     {
@@ -28,13 +27,6 @@ return {
           use_absolute_path = true,
         },
       },
-    },
-    {
-      "MeanderingProgrammer/render-markdown.nvim",
-      opts = {
-        file_types = { "markdown", "Avante" },
-      },
-      ft = { "markdown", "Avante" },
     },
   },
   opts = {
