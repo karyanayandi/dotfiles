@@ -103,6 +103,7 @@ termius \
 tmux \
 trash-cli \
 ttf-jetbrains-mono-nerd \
+ttf-martian-mono-nerd \
 udevil \
 udisks2 \
 unrar \
