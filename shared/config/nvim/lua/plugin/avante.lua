@@ -42,6 +42,10 @@ return {
       max_tokens = 8192,
       disable_tools = false,
     },
+    file_selector = {
+      provider = "telescope",
+      provider_opts = {},
+    },
     behaviour = {
       auto_suggestions = true, -- Experimental stage
       auto_set_highlight_group = true,
