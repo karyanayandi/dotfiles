@@ -1,26 +1,35 @@
 -- luacheck: globals vim
 
 return {
-  "hrsh7th/nvim-cmp",
+  "iguanacucumber/magazine.nvim",
+  name = "nvim-cmp",
   dependencies = {
     {
-      "hrsh7th/cmp-nvim-lsp",
+      "iguanacucumber/mag-nvim-lsp",
+      name = "cmp-nvim-lsp",
+      event = "InsertEnter",
+    },
+    {
+      "iguanacucumber/mag-nvim-lua",
+      name = "cmp-nvim-lua",
+      event = "InsertEnter",
+    },
+    {
+      "iguanacucumber/mag-buffer",
+      name = "cmp-buffer",
+      event = "InsertEnter",
+    },
+    {
+      "iguanacucumber/mag-cmdline",
+      name = "cmp-cmdline",
+      event = "InsertEnter",
+    },
+    {
+      url = "https://codeberg.org/FelipeLema/cmp-async-path",
       event = "InsertEnter",
     },
     {
       "hrsh7th/cmp-emoji",
-      event = "InsertEnter",
-    },
-    {
-      "hrsh7th/cmp-buffer",
-      event = "InsertEnter",
-    },
-    {
-      "hrsh7th/cmp-path",
-      event = "InsertEnter",
-    },
-    {
-      "hrsh7th/cmp-cmdline",
       event = "InsertEnter",
     },
     {
@@ -171,14 +180,14 @@ return {
             nvim_lua = "",
             luasnip = "",
             buffer = "",
-            path = "",
+            async_path = "",
             emoji = "",
           })[entry.source.name]
 
           if vim.tbl_contains({ "nvim_lsp" }, entry.source.name) then
             local duplicates = {
               buffer = 1,
-              path = 1,
+              async_path = 1,
               nvim_lsp = 0,
               luasnip = 1,
             }
@@ -298,7 +307,7 @@ return {
         { name = "luasnip" },
         { name = "nvim_lua" },
         { name = "buffer" },
-        { name = "path" },
+        { name = "async_path" },
         { name = "calc" },
         { name = "emoji" },
         { name = "treesitter" },
