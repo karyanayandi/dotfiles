@@ -33,7 +33,6 @@ return {
       build = "make install_jsregexp",
       dependencies = {
         "rafamadriz/friendly-snippets",
-        "stevearc/vim-vscode-snippets",
       },
     },
     {
@@ -56,10 +55,12 @@ return {
       color_square_width = 2,
     }
 
-    vim.api.nvim_set_hl(0, "Pmenu", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#8ec07c" })
-    vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#eebd35" })
-    vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d65d0e" })
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#353b45" })
+    vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#5e81ac" })
+    vim.api.nvim_set_hl(0, "CmpDoc", { bg = "#353b45" })
+    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#a3be8c" })
+    vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#ebcb8b" })
+    vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d08770" })
 
     local cmp = require "cmp"
     local luasnip = require "luasnip"
@@ -74,19 +75,6 @@ return {
 
     local icons = require "config.icons"
     local types = require "cmp.types"
-
-    local function border(hl_name)
-      return {
-        { "╭", hl_name },
-        { "─", hl_name },
-        { "╮", hl_name },
-        { "│", hl_name },
-        { "╯", hl_name },
-        { "─", hl_name },
-        { "╰", hl_name },
-        { "│", hl_name },
-      }
-    end
 
     cmp.setup {
       snippet = {
@@ -319,14 +307,12 @@ return {
       window = {
         completion = {
           winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:None",
-          border = border "CmpBorder",
           col_offset = -3,
           side_padding = 1,
           scrollbar = false,
           scrolloff = 8,
         },
         documentation = {
-          border = border "CmpDocBorder",
           winhighlight = "Normal:CmpDoc",
         },
       },
