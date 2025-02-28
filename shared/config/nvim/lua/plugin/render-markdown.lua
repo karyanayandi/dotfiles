@@ -1,5 +1,6 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
+  lazy = false,
   dependencies = { "nvim-treesitter/nvim-treesitter" },
   ft = { "markdown", "markdown_inline", "copilot-chat", "copilot-overlay", "copilot-diff", "Avante" },
   opts = {
