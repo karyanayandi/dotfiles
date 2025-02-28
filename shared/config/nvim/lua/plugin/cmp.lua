@@ -33,6 +33,7 @@ return {
       build = "make install_jsregexp",
       dependencies = {
         "rafamadriz/friendly-snippets",
+        "stevearc/vim-vscode-snippets",
       },
     },
     {
@@ -63,6 +64,7 @@ return {
     local cmp = require "cmp"
     local luasnip = require "luasnip"
     require("luasnip/loaders/from_vscode").lazy_load()
+    require("luasnip").filetype_extend("javascriptreact", { "html" })
     require("luasnip").filetype_extend("typescriptreact", { "html" })
 
     local check_backspace = function()
