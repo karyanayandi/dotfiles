@@ -55,9 +55,9 @@ return {
       color_square_width = 2,
     }
 
-    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#353b45" })
+    -- vim.api.nvim_set_hl(0, "Pmenu", { bg = "#353b45" })
     vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#5e81ac" })
-    vim.api.nvim_set_hl(0, "CmpDoc", { bg = "#353b45" })
+    -- vim.api.nvim_set_hl(0, "CmpDoc", { bg = "#353b45" })
     vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#a3be8c" })
     vim.api.nvim_set_hl(0, "CmpItemKindEmoji", { fg = "#ebcb8b" })
     vim.api.nvim_set_hl(0, "CmpItemKindCrate", { fg = "#d08770" })
@@ -75,6 +75,19 @@ return {
 
     local icons = require "config.icons"
     local types = require "cmp.types"
+
+    local function border(hl_name)
+      return {
+        { "╭", hl_name },
+        { "─", hl_name },
+        { "╮", hl_name },
+        { "│", hl_name },
+        { "╯", hl_name },
+        { "─", hl_name },
+        { "╰", hl_name },
+        { "│", hl_name },
+      }
+    end
 
     cmp.setup {
       snippet = {
@@ -307,6 +320,7 @@ return {
       window = {
         completion = {
           winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:None",
+          border = border "CmpBorder",
           col_offset = -3,
           side_padding = 1,
           scrollbar = false,
@@ -314,6 +328,7 @@ return {
         },
         documentation = {
           winhighlight = "Normal:CmpDoc",
+          border = border "CmpDocBorder",
         },
       },
       experimental = {
