@@ -2,7 +2,6 @@
 -- luacheck: ignore 631
 
 return {
-
   "brneor/hop.nvim",
   version = "*",
   event = "BufRead",

@@ -1,4 +1,4 @@
-set font "MartianMono NF 10"
+set font "JetbrainsMono NF 10"
 set completion-bg "#353b45"
 set completion-fg "#ebcb8b"
 set completion-group-bg "#252423"
