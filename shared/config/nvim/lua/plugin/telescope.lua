@@ -37,6 +37,12 @@ return {
         require("telescope").load_extension "media_files"
       end,
     },
+    {
+      "debugloop/telescope-undo.nvim",
+      config = function()
+        require("telescope").load_extension "undo"
+      end,
+    },
   },
   config = function()
     local actions = require "telescope.actions"
@@ -163,6 +169,13 @@ return {
         media_files = {
           filetypes = { "png", "webp", "jpg", "jpeg" },
           find_cmd = "rg",
+        },
+        undo = {
+          side_by_side = true,
+          layout_strategy = "vertical",
+          layout_config = {
+            preview_height = 0.8,
+          },
         },
       },
     }

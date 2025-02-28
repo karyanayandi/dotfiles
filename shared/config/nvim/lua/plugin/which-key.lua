@@ -321,8 +321,8 @@ return {
       },
       {
         "<leader>fu",
-        "<cmd>lua require('undotree').toggle()<cr>",
-        desc = "Undotree",
+        "<cmd>lua require('telescope').extensions.undo.undo()<cr>",
+        desc = "Undo History",
       },
       {
         "<leader>g",
