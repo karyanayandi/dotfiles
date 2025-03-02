@@ -79,7 +79,6 @@ papipurs-icon-theme \
 pavucontrol \
 pfetch \
 podman-compose \
-podman-tui \
 polkit-gnome \
 python-pip \
 reflector \
