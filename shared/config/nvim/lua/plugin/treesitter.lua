@@ -1,7 +1,7 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   lazy = false,
-  event = { "BufReadPost", "BufNewFile" },
+  -- event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
   dependencies = {
     {
@@ -82,6 +82,26 @@ return {
   },
   config = function()
     require("nvim-treesitter.configs").setup {
+      ensure_installed = {
+        "astro",
+        "bash",
+        "c",
+        "fish",
+        "go",
+        "javascript",
+        "lua",
+        "markdown",
+        "markdown_inline",
+        "python",
+        "query",
+        "rust",
+        "svelte",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+        "vue",
+      },
       incremental_selection = {
         enable = true,
         keymaps = {
