@@ -119,7 +119,6 @@ return {
       },
       highlight = {
         enable = true,
-        disable = { "markdown" },
       },
       autopairs = {
         enable = true,
