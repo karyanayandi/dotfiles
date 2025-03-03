@@ -99,6 +99,7 @@ floating_maximum_size -1 x -1
 # floating windows rules
 #TODO: window size not based on video resolution
 for_window [app_id="mpv"] floating enable, resize set 1200 800, move position 75 50%
+for_window [app_id="org.gnome.FileRoller"] floating enable, resize set 1200 800, move position 75 44%
 for_window [class="org.gnome.FileRoller"] floating enable, resize set 1200 800, move position 75 44%
 for_window [class="Archive Manager"] floating enable
 for_window [class="Pavucontrol" instance="pavucontrol"] floating enable
