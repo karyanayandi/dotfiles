@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "MeanderingProgrammer/render-markdown.nvim",
   lazy = false,
@@ -18,7 +20,7 @@ return {
     code = {
       enabled = true,
       sign = true,
-      style = "normal",
+      style = "full",
       position = "left",
       language_pad = 0,
       language_name = true,
@@ -65,4 +67,9 @@ return {
       cite = { raw = "[!CITE]", rendered = "󱆨 Cite", highlight = "RenderMarkdownQuote" },
     },
   },
+  config = function()
+    -- local colors = require("aurora.colors").load()
+    -- vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = colors.highlight })
+    vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#252931" })
+  end,
 }
