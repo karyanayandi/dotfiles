@@ -1,4 +1,10 @@
 return {
+  default_config = {
+    filetypes = {
+      "javascript",
+      "typescript",
+    },
+  },
   settings = {
     typescript = {
       inlayHints = {
