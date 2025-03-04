@@ -11,13 +11,8 @@ return {
     {
       "JoosepAlviste/nvim-ts-context-commentstring",
       lazy = true,
-      "nvim-treesitter/nvim-treesitter",
       config = function()
-        require("nvim-treesitter.configs").setup {
-          highlight = {
-            enable = true,
-          },
-        }
+        require("ts_context_commentstring").setup {}
       end,
     },
     {
@@ -85,6 +80,32 @@ return {
     },
   },
   config = function()
+    -- local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+    -- parser_config.astro = {
+    --   install_info = {
+    --     url = "https://github.com/virchau13/tree-sitter-astro",
+    --     files = { "src/parser.c" },
+    --     branch = "main",
+    --   },
+    --   filetype = "astro",
+    -- }
+    --
+    -- vim.filetype.add {
+    --   extension = {
+    --     astro = "astro",
+    --   },
+    -- }
+    --
+    -- vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+    --   pattern = "*.astro",
+    --   callback = function(ev)
+    --     if vim.bo[ev.buf].filetype == "astro" then
+    --       vim.cmd "TSEnable highlight"
+    --     end
+    --   end,
+    --   group = vim.api.nvim_create_augroup("AstroTreesitter", { clear = true }),
+    -- })
+
     require("nvim-treesitter.configs").setup {
       ensure_installed = {
         "astro",
@@ -122,6 +143,7 @@ return {
       auto_install = true,
       highlight = {
         enable = true,
+        -- additional_vim_regex_highlighting = false,
       },
       incremental_selection = {
         enable = true,
