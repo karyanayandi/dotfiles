@@ -22,6 +22,8 @@ return {
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
+        "rshkarin/mason-nvim-lint",
+        "LittleEndianRoot/mason-conform",
         lazy = true,
       },
     },

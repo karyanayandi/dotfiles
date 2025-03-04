@@ -29,6 +29,32 @@ local servers = {
   "yamlls",
 }
 
+local formatters = {
+  "alejandra",
+  "black",
+  "clang-format",
+  "gofumpt",
+  "goimports-reviser",
+  "golines",
+  "isort",
+  "php-cs-fixer",
+  "prettierd",
+  "shfmt",
+  "stylua",
+}
+
+local linters = {
+  "eslint_d",
+  "flake8",
+  "golangci-lint",
+  "jsonlint",
+  "luacheck",
+  "markdownlint",
+  "phpcs",
+  "stylelint",
+  "yamllint",
+}
+
 local settings = {
   ui = {
     border = "none",
@@ -45,6 +71,15 @@ local settings = {
 require("mason").setup(settings)
 require("mason-lspconfig").setup {
   ensure_installed = servers,
+  automatic_installation = true,
+}
+require("mason-conform").setup {
+  ensure_installed = formatters,
+  automatic_installation = false,
+}
+require("mason-nvim-lint").setup {
+  ensure_installed = linters,
+  ignore_install = { "fish", "nix", "php" },
   automatic_installation = true,
 }
 

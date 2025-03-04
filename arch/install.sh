@@ -55,7 +55,6 @@ libxcrypt-compat \
 local-by-flywheel-bin \
 lshw \
 lua \
-luacheck \
 luarocks \
 lynx \
 mkcert \
@@ -91,7 +90,6 @@ slurp \
 sof-firmware \
 starship \
 stow \
-stylua \
 swaybg \
 swayfx \
 swayidle \
