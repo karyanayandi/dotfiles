@@ -12,21 +12,29 @@ return {
       return vim.fn.glob "deno.json" ~= ""
     end
 
+    local function lint_for_js_or_ts()
+      return has_deno_json() and { "deno" } or { "eslint_d" }
+    end
+
     lint.linters_by_ft = {
-      astro = has_deno_json() and { "deno" } or { "eslint_d" },
+      astro = lint_for_js_or_ts(),
+      css = { "stylelint", "eslint_d" },
       fish = { "fish" },
       go = { "golangcilint" },
-      javascript = has_deno_json() and { "deno" } or { "eslint_d" },
-      javascriptreact = has_deno_json() and { "deno" } or { "eslint_d" },
+      javascript = lint_for_js_or_ts(),
+      javascriptreact = lint_for_js_or_ts(),
       json = { "jsonlint" },
       lua = { "luacheck" },
+      markdown = { "markdownlint" },
       nix = { "nix" },
       php = { "php", "phpcs" },
+      python = { "python", "flake8" },
       -- sh = { "shellcheck" },
-      svelte = has_deno_json() and { "deno" } or { "eslint_d" },
-      typescript = has_deno_json() and { "deno" } or { "eslint_d" },
-      typescriptreact = has_deno_json() and { "deno" } or { "eslint_d" },
-      vue = has_deno_json() and { "deno" } or { "eslint_d" },
+      svelte = lint_for_js_or_ts(),
+      typescript = lint_for_js_or_ts(),
+      typescriptreact = lint_for_js_or_ts(),
+      vue = lint_for_js_or_ts(),
+      yaml = { "yamllint" },
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })

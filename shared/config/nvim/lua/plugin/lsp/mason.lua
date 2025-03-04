@@ -6,6 +6,7 @@ local servers = {
   "astro",
   "bashls",
   "clangd",
+  -- "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
@@ -25,7 +26,7 @@ local servers = {
   "taplo",
   "templ",
   "ts_ls",
-  "vtsls",
+  -- "vtsls",
   "yamlls",
 }
 
@@ -79,7 +80,7 @@ require("mason-conform").setup {
 }
 require("mason-nvim-lint").setup {
   ensure_installed = linters,
-  ignore_install = { "fish", "nix", "php" },
+  ignore_install = { "fish", "nix", "php", "python" },
   automatic_installation = true,
 }
 
