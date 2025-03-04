@@ -1,4 +1,5 @@
 -- luacheck: globals vim
+-- luacheck: ignore 631
 
 local function augroup(name)
   return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
@@ -145,4 +146,38 @@ vim.api.nvim_create_autocmd("BufLeave", {
   callback = function()
     vim.opt_local.number = true
   end,
+})
+
+-- TODO: this is temporary until we have a better way to handle this because now every open .astro file treesitter highlight not auto enabled.
+-- Enable Treesitter highlighting for Astro files
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "astro",
+  callback = function()
+    -- Ensure parser is installed
+    local ok, parsers = pcall(require, "nvim-treesitter.parsers")
+    if ok and not parsers.has_parser "astro" then
+      vim.cmd "TSInstall astro"
+    end
+
+    -- Enable highlighting for this buffer
+    vim.schedule(function()
+      vim.cmd "TSBufEnable highlight"
+
+      -- Force refresh syntax
+      vim.cmd "syntax enable"
+      vim.cmd "redraw!"
+    end)
+  end,
+  group = vim.api.nvim_create_augroup("AstroTreesitter", { clear = true }),
+})
+
+-- Fallback to ensure highlighting is enabled
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.astro",
+  callback = function()
+    vim.schedule(function()
+      vim.cmd "TSBufEnable highlight"
+    end)
+  end,
+  group = vim.api.nvim_create_augroup("AstroTreesitterFallback", { clear = true }),
 })
