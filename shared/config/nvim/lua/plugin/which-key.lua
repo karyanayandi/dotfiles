@@ -462,7 +462,11 @@ return {
         "<cmd>AutoFormatOnSaveToggle<cr>",
         desc = "Toggle autoformat-on-save",
       },
-
+      {
+        "<leader>lt",
+        "<cmd>TSToggle highlight<cr>",
+        desc = "Toggle Treesitter Highlight",
+      },
       {
         "<leader>lT",
         "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
