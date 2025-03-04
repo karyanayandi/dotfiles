@@ -1,6 +1,8 @@
 return {
   init_options = {
-    typescript = {},
+    typescript = {
+      tsdk = "node_modules/typescript/lib",
+    },
   },
   settings = {
     typescript = {
