@@ -116,6 +116,7 @@ return {
       "xml",
       "yaml",
     },
+    auto_install = true,
     incremental_selection = {
       enable = true,
       keymaps = {
