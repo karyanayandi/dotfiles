@@ -1,5 +1,5 @@
--- luacheck: globals vim
 -- TODO: add linting for github action, deno
+-- luacheck: globals vim
 
 return {
   "mfussenegger/nvim-lint",
@@ -62,5 +62,16 @@ return {
         end
       end,
     })
+
+    vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+      group = lint_augroup,
+      callback = function()
+        lint.try_lint()
+      end,
+    })
+
+    vim.keymap.set("n", "<leader>ll", function()
+      lint.try_lint()
+    end, { desc = "Trigger linting for current file" })
   end,
 }
