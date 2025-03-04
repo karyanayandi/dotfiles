@@ -89,6 +89,7 @@ return {
       "astro",
       "bash",
       "c",
+      "css",
       "diff",
       "go",
       "html",
