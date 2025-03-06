@@ -256,7 +256,7 @@ bindsym $mod+Shift+g exec "~/.local/bin/stop-screen-record.sh"
 
 # screenshot
 bindsym Print exec grim - | wl-copy && notify-send "Screenshot copied to clipboard"
-bindsym $mod+Print exec grim -g "$(slurp)" && notify-send "Screenshot copied to clipboard"
+bindsym $mod+Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot copied to clipboard"
 bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshots/$(date +'%s_screenshot.png') && notify-send "Screenshot has been saved"
 
 # lock the system
