@@ -22,7 +22,10 @@ return {
     dependencies = {
       {
         "williamboman/mason-lspconfig.nvim",
-        "rshkarin/mason-nvim-lint",
+        {
+          "TabulateJarl8/mason-nvim-lint",
+          branch = "patch-1",
+        },
         "LittleEndianRoot/mason-conform",
         lazy = true,
       },

@@ -7,35 +7,37 @@ return {
   config = function()
     local conform = require "conform"
 
-    local function has_deno_json()
-      return vim.fn.glob "deno.json" ~= ""
-    end
-
-    local function formatter_for_js_or_ts()
-      return has_deno_json() and { "deno_fmt" } or { "prettierd" }
+    local function javascript_formatter()
+      if vim.fn.glob "biome.json" ~= "" then
+        return { "biome" }
+      elseif vim.fn.glob "deno.json" ~= "" then
+        return { "deno_fmt" }
+      else
+        return { "prettierd" }
+      end
     end
 
     local formatters_by_ft = {
-      astro = formatter_for_js_or_ts(),
+      astro = javascript_formatter(),
       c = { "clang_format" },
       css = { "prettierd" },
       go = { "gofumpt", "goimports-reviser", "golines" },
       graphql = { "prettierd" },
       html = { "prettierd" },
-      javascript = formatter_for_js_or_ts(),
-      javascriptreact = formatter_for_js_or_ts(),
+      javascript = javascript_formatter(),
+      javascriptreact = javascript_formatter(),
       json = { "prettierd" },
       json5 = { "prettierd" },
       lua = { "stylua" },
-      markdown = formatter_for_js_or_ts(),
+      markdown = javascript_formatter(),
       nix = { "alejandra" },
       php = { "phpcs_fixer", "prettierd" },
       python = { "isort", "black" },
       sh = { "shfmt" },
-      svelte = formatter_for_js_or_ts(),
-      typescript = formatter_for_js_or_ts(),
-      typescriptreact = formatter_for_js_or_ts(),
-      vue = formatter_for_js_or_ts(),
+      svelte = javascript_formatter(),
+      typescript = javascript_formatter(),
+      typescriptreact = javascript_formatter(),
+      vue = javascript_formatter(),
       yaml = { "prettierd", stop_after_first = true },
     }
 

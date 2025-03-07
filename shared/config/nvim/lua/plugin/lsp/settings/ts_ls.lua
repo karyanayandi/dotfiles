@@ -1,3 +1,5 @@
+-- TODO: dont run ts_ls when there is deno.json or deno.jsonc file
+
 return {
   default_config = {
     filetypes = {

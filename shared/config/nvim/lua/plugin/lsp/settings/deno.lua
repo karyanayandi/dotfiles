@@ -8,7 +8,7 @@ return {
       parameterTypes = { enabled = true },
       variableTypes = { enabled = true, suppressWhenTypeMatchesName = true },
       propertyDeclarationTypes = { enabled = true },
-      functionLikeReturnTypes = { enable = true },
+      functionLikeReturnTypes = { enabled = true },
       enumMemberValues = { enabled = true },
     },
   },

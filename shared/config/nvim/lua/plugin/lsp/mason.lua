@@ -6,7 +6,7 @@ local servers = {
   "astro",
   "bashls",
   "clangd",
-  -- "denols",
+  "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
@@ -32,6 +32,7 @@ local servers = {
 
 local formatters = {
   "alejandra",
+  "biome",
   "black",
   "clang-format",
   "gofumpt",
@@ -45,6 +46,7 @@ local formatters = {
 }
 
 local linters = {
+  "biome",
   "eslint_d",
   "flake8",
   "golangci-lint",
