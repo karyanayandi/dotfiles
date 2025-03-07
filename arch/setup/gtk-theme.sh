@@ -1,18 +1,18 @@
 #!/bin/bash
-set -e  # Exit on any error
+set -e # Exit on any error
 
 # Create themes directory if it doesn't exist
 mkdir -p ~/.local/share/themes
 
 # Download and install theme
 if ! wget https://github.com/lonr/adwaita-one-dark/releases/download/v0.47.0/Adwaita-One-Dark.tar.xz; then
-    echo "Failed to download theme"
-    exit 1
+  echo "Failed to download theme"
+  exit 1
 fi
 
 if ! tar -xf Adwaita-One-Dark.tar.xz; then
-    echo "Failed to extract theme"
-    exit 1
+  echo "Failed to extract theme"
+  exit 1
 fi
 
 rm -rf ~/.local/share/themes/Adwaita-One-Dark && mv Adwaita-One-Dark ~/.local/share/themes/

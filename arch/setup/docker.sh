@@ -1,10 +1,10 @@
 #!/bin/bash
-set -e  # Exit on any error
+set -e # Exit on any error
 
 # Install podman
 if ! sudo pacman -S --noconfirm podman; then
-    echo "Failed to install podman"
-    exit 1
+  echo "Failed to install podman"
+  exit 1
 fi
 
 # Start and enable podman service
