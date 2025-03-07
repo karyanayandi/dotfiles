@@ -6,7 +6,7 @@ local servers = {
   "astro",
   "bashls",
   "clangd",
-  "denols",
+  -- "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
@@ -25,8 +25,9 @@ local servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  "ts_ls",
-  -- "vtsls",
+  -- "ts_ls",
+  "volar",
+  "vtsls",
   "yamlls",
 }
 
