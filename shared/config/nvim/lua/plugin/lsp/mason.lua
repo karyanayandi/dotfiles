@@ -51,7 +51,6 @@ local formatters = {
 
 local linters = {
   "biome",
-  "eslint_d",
   "flake8",
   "golangci-lint",
   "jsonlint",
@@ -85,7 +84,7 @@ require("mason-conform").setup {
 }
 require("mason-nvim-lint").setup {
   ensure_installed = linters,
-  ignore_install = { "fish", "nix", "php", "python" },
+  ignore_install = { "eslint", "fish", "nix", "php", "python" },
   automatic_installation = true,
 }
 

@@ -8,19 +8,18 @@ return {
   config = function()
     local lint = require "lint"
 
+    -- eslint handled by eslint-lsp
     local function javascript_linter()
       if vim.fn.glob "biome.json" ~= "" then
         return { "biomejs" }
       elseif vim.fn.glob "deno.json" ~= "" then
         return { "deno" }
-      else
-        return { "eslint_d" }
       end
     end
 
     lint.linters_by_ft = {
       astro = javascript_linter(),
-      css = { "stylelint", "eslint_d" },
+      css = { "stylelint", "eslint" },
       fish = { "fish" },
       go = { "golangcilint" },
       javascript = javascript_linter(),
