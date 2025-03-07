@@ -5,6 +5,7 @@ local icons = require "config.icons"
 local servers = {
   "astro",
   "bashls",
+  "biome",
   "clangd",
   -- "denols",
   "docker_compose_language_service",
