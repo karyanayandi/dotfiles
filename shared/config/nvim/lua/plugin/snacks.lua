@@ -250,8 +250,12 @@ return {
       more_format = " ↓ %d lines ",
       refresh = 50,
     },
-    quickfile = { enabled = true },
+    picker = {
+      enabled = true,
+      ui_select = true,
+    },
     profiler = { enabled = false },
+    quickfile = { enabled = true },
     scratch = { enabled = false },
     scroll = { enabled = false },
     statuscolumn = {
