@@ -36,42 +36,42 @@ return {
         },
         prompts = {
           Explain = {
-            mapping = "<leader>Ae",
+            mapping = "<leader>ae",
             description = "Explain",
           },
           Review = {
-            mapping = "<leader>Ar",
+            mapping = "<leader>ar",
             description = "Review",
           },
           Tests = {
-            mapping = "<leader>At",
+            mapping = "<leader>at",
             description = "Tests",
           },
           Fix = {
-            mapping = "<leader>Af",
+            mapping = "<leader>af",
             description = "Fix",
           },
           Optimize = {
-            mapping = "<leader>Ao",
+            mapping = "<leader>ao",
             description = "Optimize",
           },
           Docs = {
-            mapping = "<leader>Ad",
+            mapping = "<leader>ad",
             description = "Documentation",
           },
           Commit = {
-            mapping = "<leader>Ag",
+            mapping = "<leader>ag",
             description = "Generate Commit",
             selection = select.buffer,
           },
           Refactor = {
             prompt = "> /COPILOT_GENERATE\n\nPlease refactor the following code to improve its clarity and readability.",
-            mapping = "<leader>AR",
+            mapping = "<leader>aR",
             description = "Refactor",
           },
           BetterNamings = {
             prompt = "> /COPILOT_GENERATE\n\nPlease provide better names for the following variables and functions.",
-            mapping = "<leader>Ab",
+            mapping = "<leader>ab",
             description = "Better Naming",
           },
           -- Summarize = {
@@ -188,19 +188,19 @@ return {
         },
       }
 
-      vim.keymap.set({ "n" }, "<leader>Ap", function()
+      vim.keymap.set({ "n" }, "<leader>ap", function()
         require("CopilotChat.integrations.telescope").pick(actions.prompt_actions {
           context = { "buffers", "files" },
         })
       end, { desc = "Prompts" })
 
-      vim.keymap.set({ "v" }, "<leader>Ap", function()
+      vim.keymap.set({ "v" }, "<leader>ap", function()
         require("CopilotChat.integrations.telescope").pick(actions.prompt_actions {
           selection = select.visual,
         })
       end, { desc = "Prompts" })
 
-      vim.keymap.set({ "n" }, "<leader>Aq", function()
+      vim.keymap.set({ "n" }, "<leader>aq", function()
         vim.ui.input({
           prompt = "Question: ",
         }, function(input)
@@ -212,7 +212,7 @@ return {
         end)
       end, { desc = "Question" })
 
-      vim.keymap.set({ "v" }, "<leader>Aq", function()
+      vim.keymap.set({ "v" }, "<leader>aq", function()
         vim.ui.input({
           prompt = "Question: ",
         }, function(input)
@@ -224,7 +224,7 @@ return {
         end)
       end, { desc = "Question" })
 
-      vim.keymap.set({ "n" }, "<leader>As", function()
+      vim.keymap.set({ "n" }, "<leader>as", function()
         vim.ui.input({
           prompt = "Save as: ",
         }, function(input)
@@ -234,7 +234,7 @@ return {
         end)
       end, { desc = "Save Chat" })
 
-      vim.keymap.set({ "n" }, "<leader>Al", function()
+      vim.keymap.set({ "n" }, "<leader>al", function()
         vim.ui.input({
           prompt = "Chat name: ",
         }, function(input)
