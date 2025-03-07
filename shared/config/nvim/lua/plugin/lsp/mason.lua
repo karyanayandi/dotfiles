@@ -19,7 +19,7 @@ local servers = {
   "jsonls",
   "lua_ls",
   "marksman",
-  "nil_ls",
+  -- "nil_ls",
   "prismals",
   "pyright",
   "rust_analyzer",
