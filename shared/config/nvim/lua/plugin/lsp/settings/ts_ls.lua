@@ -7,14 +7,28 @@ return {
     filetypes = {
       "javascript",
       "typescript",
+      "astro",
+      "svelte",
+      "vue",
     },
   },
   init_options = {
-    plugins = {
+    globalPlugins = {
       {
         name = "@vue/typescript-plugin",
-        location = vim.fn.stdpath "data" .. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
+        location = require("mason-registry").get_package("vue-language-server"):get_install_path()
+          .. "/node_modules/@vue/language-server",
         languages = { "vue" },
+        configNamespace = "typescript",
+        enableForWorkspaceTypeScriptVersions = true,
+      },
+      {
+        name = "@astrojs/ts-plugin",
+        location = require("mason-registry").get_package("astro-language-server"):get_install_path()
+          .. "/node_modules/@astrojs/language-server",
+        languages = { "astro" },
+        configNamespace = "typescript",
+        enableForWorkspaceTypeScriptVersions = true,
       },
     },
   },

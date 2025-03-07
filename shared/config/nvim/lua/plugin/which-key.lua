@@ -394,6 +394,11 @@ return {
         desc = "Info",
       },
       {
+        "<leader>lc",
+        "<cmd>lua vim.lsp.buf.code_action()<cr>",
+        desc = "Code Action",
+      },
+      {
         "<leader>lh",
         "<cmd>ToggleInlayHint<cr>",
         desc = "Toggle Inlay Hint",
