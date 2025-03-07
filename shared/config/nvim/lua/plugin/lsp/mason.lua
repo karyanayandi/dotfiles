@@ -50,7 +50,7 @@ local formatters = {
 }
 
 local linters = {
-  "biome",
+  -- "biome",
   "flake8",
   "golangci-lint",
   "jsonlint",
