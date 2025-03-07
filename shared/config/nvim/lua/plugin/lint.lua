@@ -8,21 +8,24 @@ return {
   config = function()
     local lint = require "lint"
 
-    -- eslint handled by eslint-lsp
-    -- biome handled by biome-lsp
-    local function javascript_linter()
-      if vim.fn.glob "deno.json" ~= "" then
-        return { "deno" }
-      end
-    end
+    -- INFO: handle by LSP
+    -- local function javascript_linter()
+    --   if vim.fn.glob "biome.json" ~= "" then
+    --     return { "biomejs" }
+    --   elseif vim.fn.glob "deno.json" ~= "" then
+    --     return { "deno" }
+    --   else
+    --     return { "eslint" }
+    --   end
+    -- end
 
     lint.linters_by_ft = {
-      astro = javascript_linter(),
+      -- astro = javascript_linter(),
       css = { "stylelint", "eslint" },
       fish = { "fish" },
       go = { "golangcilint" },
-      javascript = javascript_linter(),
-      javascriptreact = javascript_linter(),
+      -- javascript = javascript_linter(),
+      -- javascriptreact = javascript_linter(),
       json = { "jsonlint" },
       lua = { "luacheck" },
       markdown = { "markdownlint" },
@@ -30,10 +33,10 @@ return {
       nix = { "nix" },
       php = { "php", "phpcs" },
       python = { "python", "flake8" },
-      svelte = javascript_linter(),
-      typescript = javascript_linter(),
-      typescriptreact = javascript_linter(),
-      vue = javascript_linter(),
+      -- svelte = javascript_linter(),
+      -- typescript = javascript_linter(),
+      -- typescriptreact = javascript_linter(),
+      -- vue = javascript_linter(),
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
