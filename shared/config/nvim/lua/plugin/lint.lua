@@ -9,10 +9,9 @@ return {
     local lint = require "lint"
 
     -- eslint handled by eslint-lsp
+    -- biome handled by biome-lsp
     local function javascript_linter()
-      if vim.fn.glob "biome.json" ~= "" then
-        return { "biomejs" }
-      elseif vim.fn.glob "deno.json" ~= "" then
+      if vim.fn.glob "deno.json" ~= "" then
         return { "deno" }
       end
     end
