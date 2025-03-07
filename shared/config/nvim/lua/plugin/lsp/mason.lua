@@ -53,7 +53,6 @@ local linters = {
   "markdownlint",
   "phpcs",
   "stylelint",
-  "yamllint",
 }
 
 local settings = {

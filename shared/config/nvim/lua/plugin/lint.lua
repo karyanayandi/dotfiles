@@ -34,7 +34,6 @@ return {
       typescript = lint_for_js_or_ts(),
       typescriptreact = lint_for_js_or_ts(),
       vue = lint_for_js_or_ts(),
-      yaml = { "yamllint" },
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
