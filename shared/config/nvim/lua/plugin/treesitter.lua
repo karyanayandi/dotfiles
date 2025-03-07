@@ -125,6 +125,7 @@ return {
         "luap",
         "markdown",
         "markdown_inline",
+        "nix",
         "php",
         "printf",
         "python",
