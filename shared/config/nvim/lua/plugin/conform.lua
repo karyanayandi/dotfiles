@@ -27,6 +27,7 @@ return {
       javascript = javascript_formatter(),
       javascriptreact = javascript_formatter(),
       json = { "prettierd" },
+      jsonc = { "prettierd" },
       json5 = { "prettierd" },
       lua = { "stylua" },
       markdown = javascript_formatter(),

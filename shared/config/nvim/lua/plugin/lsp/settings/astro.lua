@@ -2,6 +2,7 @@ return {
   init_options = {
     typescript = {},
   },
+  autostart = true,
   settings = {
     typescript = {
       inlayHints = {

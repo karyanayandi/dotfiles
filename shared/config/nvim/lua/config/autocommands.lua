@@ -147,16 +147,3 @@ vim.api.nvim_create_autocmd("BufLeave", {
     vim.opt_local.number = true
   end,
 })
-
--- TODO: this is temporary until we have a better way to handle this because now every open .astro file treesitter highlight not auto enabled.
-
--- Fallback to ensure highlighting is enabled
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = "*.astro",
-  callback = function()
-    vim.schedule(function()
-      vim.cmd "TSBufEnable highlight"
-    end)
-  end,
-  group = vim.api.nvim_create_augroup("AstroTreesitterFallback", { clear = true }),
-})
