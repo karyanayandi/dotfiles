@@ -25,6 +25,7 @@ export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 # Aliases
 alias autoclean="sudo pacman -R $(pacman -Qdtq)"
 alias bn="bun"
+alias br="bun run"
 alias bx="bunx"
 alias c="clear"
 alias cat="bat"

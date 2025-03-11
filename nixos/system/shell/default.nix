@@ -2,6 +2,7 @@
   aliases = {
     autoclean = "nix store gc";
     bn = "bun";
+    br = "bun run";
     bx = "bunx";
     c = "clear";
     cat = "bat";
