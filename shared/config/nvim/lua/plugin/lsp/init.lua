@@ -131,13 +131,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      {
-        "b0o/SchemaStore.nvim",
-        version = false,
-        config = function()
-          require "plugin.lsp.settings.jsonls"
-        end,
-      },
+      "b0o/SchemaStore.nvim",
     },
     lazy = true,
     config = function()
