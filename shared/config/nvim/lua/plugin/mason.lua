@@ -27,7 +27,7 @@ M.servers = {
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
-  "eslint",
+  -- "eslint",
   "golangci_lint_ls",
   "gopls",
   "html",
@@ -67,6 +67,7 @@ M.formatters = {
 
 M.linters = {
   -- "biome",
+  "eslint_d",
   "flake8",
   "golangci-lint",
   "jsonlint",
