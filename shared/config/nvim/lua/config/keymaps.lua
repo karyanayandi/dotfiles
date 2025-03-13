@@ -84,7 +84,7 @@ keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", opts)
 keymap(
   "n",
   ";b",
-  "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+  "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false})<cr>",
   opts
 )
 
@@ -92,7 +92,7 @@ keymap(
 keymap(
   "n",
   ";g",
-  "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+  "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false})<cr>",
   opts
 )
 
