@@ -14,13 +14,13 @@ return {
       elseif vim.fn.glob "deno.json" ~= "" then
         return { "deno" }
       else
-        return { "eslint" }
+        return { "eslint_d" }
       end
     end
 
     lint.linters_by_ft = {
       astro = javascript_linter(),
-      css = { "stylelint", "eslint" },
+      css = { "stylelint", "eslint_d" },
       fish = { "fish" },
       go = { "golangcilint" },
       javascript = javascript_linter(),
