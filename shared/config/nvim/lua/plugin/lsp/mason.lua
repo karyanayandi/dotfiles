@@ -92,8 +92,8 @@ local lspconfig = require "lspconfig"
 
 for _, server in pairs(servers) do
   local opts = {
-    on_attach = require("plugin.lsp.handlers").on_attach,
-    capabilities = require("plugin.lsp.handlers").capabilities,
+    on_attach = require("plugin.lsp").on_attach,
+    capabilities = require("plugin.lsp").capabilities,
   }
 
   server = vim.split(server, "@")[1]
