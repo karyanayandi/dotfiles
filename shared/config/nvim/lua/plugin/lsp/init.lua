@@ -1,11 +1,9 @@
 -- luacheck: globals vim
 
+local cmp_nvim_lsp = require "cmp_nvim_lsp"
 local M = {}
 
 M.capabilities = vim.lsp.protocol.make_client_capabilities()
-
-local cmp_nvim_lsp = require "cmp_nvim_lsp"
-
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 M.capabilities.textDocument.completion.completionItem.resolveSupport = {
   properties = {
@@ -144,25 +142,6 @@ return {
     lazy = true,
     config = function()
       handlers()
-    end,
-  },
-  {
-    "williamboman/mason.nvim",
-    cmd = "Mason",
-    event = "BufReadPre",
-    dependencies = {
-      {
-        "williamboman/mason-lspconfig.nvim",
-        {
-          "TabulateJarl8/mason-nvim-lint",
-          branch = "patch-1",
-        },
-        "LittleEndianRoot/mason-conform",
-        lazy = true,
-      },
-    },
-    config = function()
-      require "plugin.lsp.mason"
     end,
   },
 }
