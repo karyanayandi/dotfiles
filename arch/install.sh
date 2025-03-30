@@ -65,6 +65,7 @@ yay -S --needed \
   neovim \
   networkmanager \
   nilfs-utils \
+  notesnook \
   noto-fonts \
   noto-fonts-cjk \
   noto-fonts-emoji \
