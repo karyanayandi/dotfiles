@@ -74,7 +74,6 @@ M.linters = {
   "luacheck",
   "markdownlint",
   "phpcs",
-  "stylelint",
 }
 
 function M.config()

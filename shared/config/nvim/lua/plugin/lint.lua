@@ -20,7 +20,7 @@ return {
 
     lint.linters_by_ft = {
       astro = javascript_linter(),
-      css = { "stylelint", "eslint_d" },
+      css = { "eslint_d" },
       fish = { "fish" },
       go = { "golangcilint" },
       javascript = javascript_linter(),
