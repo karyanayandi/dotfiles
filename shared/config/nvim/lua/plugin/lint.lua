@@ -56,7 +56,7 @@ return {
         end
 
         -- Disable shellcheck for .env files
-        if filetype == "sh" and filename:match "%.env$" then
+        if filetype == "sh" and filename:match "%.env" then
           lint.linters_by_ft["sh"] = {}
         elseif filetype == "sh" then
           lint.linters_by_ft["sh"] = { "shellcheck" }
