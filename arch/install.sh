@@ -16,6 +16,7 @@ yay -S --needed \
   cowsay \
   cursor-bin \
   datagrip \
+  datagrip-jre \
   dbus \
   deno \
   distrobox \
