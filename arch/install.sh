@@ -6,7 +6,6 @@ yay -S --needed \
   apple-fonts \
   base-devel \
   bat \
-  beekeeper-studio \
   bibata-cursor-theme \
   bluez \
   bluez-utils \
@@ -16,6 +15,7 @@ yay -S --needed \
   copyq \
   cowsay \
   cursor-bin \
+  datagrip \
   dbus \
   deno \
   distrobox \

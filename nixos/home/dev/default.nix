@@ -16,13 +16,13 @@ in {
   '';
 
   home.packages = with pkgs; [
-    beekeeper-studio
     bun
     cargo
     clippy
     deno
     gcc
     go
+    jetbrains.datagrip
     lua
     nixpacks
     node-gyp
