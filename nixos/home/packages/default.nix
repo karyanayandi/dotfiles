@@ -3,6 +3,8 @@
     android-tools
     bat
     bottom
+    brave
+    bruno
     chafa
     code-cursor
     cowsay
@@ -19,7 +21,6 @@
     gimp
     google-chrome
     grim
-    insomnia
     inxi
     killport
     lynx

@@ -10,6 +10,8 @@ yay -S --needed \
   bluez \
   bluez-utils \
   bottom \
+  brave \
+  bruno \
   chafa \
   cmake \
   copyq \
@@ -41,7 +43,6 @@ yay -S --needed \
   gvfs \
   gzip \
   imv \
-  insomnia \
   inter-font \
   inxi \
   iw \
