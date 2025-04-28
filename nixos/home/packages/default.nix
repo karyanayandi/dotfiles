@@ -4,7 +4,6 @@
     bat
     bottom
     brave
-    bruno
     chafa
     code-cursor
     cowsay
@@ -43,5 +42,6 @@
     wf-recorder
     wl-clipboard
     xclip
+    yaak
   ];
 }

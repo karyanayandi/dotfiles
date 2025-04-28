@@ -10,8 +10,7 @@ yay -S --needed \
   bluez \
   bluez-utils \
   bottom \
-  brave \
-  bruno \
+  brave-bin \
   chafa \
   cmake \
   copyq \
@@ -117,6 +116,7 @@ yay -S --needed \
   xdg-user-dirs \
   xfsprogs \
   xorg-xhost \
+  yaak-bin \
   yazi \
   youtube-dl \
   zathura \
