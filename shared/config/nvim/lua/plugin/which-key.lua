@@ -479,35 +479,6 @@ return {
         desc = "Unlink Snippet",
       },
       {
-        "<leader>t",
-        group = "Test",
-      },
-      {
-        "<leader>tt",
-        "<cmd>TestNearest<cr>",
-        desc = "Nearest",
-      },
-      {
-        "<leader>tf",
-        "<cmd>TestFile<cr>",
-        desc = "File",
-      },
-      {
-        "<leader>ta",
-        "<cmd>TestSuite<cr>",
-        desc = "All",
-      },
-      {
-        "<leader>tl",
-        "<cmd>TestLast<cr>",
-        desc = "Last",
-      },
-      {
-        "<leader>tv",
-        "<cmd>TestVisit<cr>",
-        desc = "Visit",
-      },
-      {
         "<leader>/",
         '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>',
         desc = "Comment",
