@@ -1,12 +1,12 @@
 -- luacheck: globals vim
 
 local M = {
-  "williamboman/mason.nvim",
+  "mason-org/mason.nvim",
   cmd = "Mason",
   event = "BufReadPre",
   dependencies = {
     {
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason-lspconfig.nvim",
       {
         "TabulateJarl8/mason-nvim-lint",
         branch = "patch-1",
@@ -44,9 +44,9 @@ M.servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  -- "ts_ls",
+  "ts_ls",
   "volar",
-  "vtsls",
+  -- "vtsls",
   "yamlls",
 }
 
@@ -96,6 +96,7 @@ function M.config()
   require("mason-lspconfig").setup {
     ensure_installed = M.servers,
     automatic_installation = true,
+    automatic_enable = true,
   }
   require("mason-conform").setup {
     ensure_installed = M.formatters,
