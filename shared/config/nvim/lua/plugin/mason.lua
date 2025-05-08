@@ -6,6 +6,10 @@ local M = {
   event = "VeryLazy",
   dependencies = {
     {
+      "mason-org/mason-lspconfig.nvim",
+      lazy = true,
+    },
+    {
       "TabulateJarl8/mason-nvim-lint",
       branch = "patch-1",
     },
@@ -95,6 +99,11 @@ function M.config()
   require("mason-conform").setup {
     ensure_installed = M.formatters,
     automatic_installation = false,
+  }
+  require("mason-lspconfig").setup {
+    ensure_installed = M.servers,
+    automatic_installation = true,
+    automatic_enable = false,
   }
   require("mason-nvim-lint").setup {
     ensure_installed = M.linters,
