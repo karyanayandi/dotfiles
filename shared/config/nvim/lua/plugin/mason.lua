@@ -103,6 +103,7 @@ function M.config()
   require("mason-lspconfig").setup {
     ensure_installed = M.servers,
     automatic_installation = true,
+    -- lsp handle with lspconfig on plugin/lsp/init.lua
     automatic_enable = false,
   }
   require("mason-nvim-lint").setup {
