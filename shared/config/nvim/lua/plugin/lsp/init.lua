@@ -4,12 +4,12 @@ return {
   {
     "neovim/nvim-lspconfig",
     dependencies = {
+      "mason-org/mason-lspconfig.nvim",
       "b0o/SchemaStore.nvim",
     },
-    lazy = true,
+    event = { "BufReadPost", "BufNewFile" },
     config = function()
       local cmp_nvim_lsp = require "cmp_nvim_lsp"
-      local mason = require "plugin.mason"
 
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -129,23 +129,27 @@ return {
         vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
       end
 
+      local mason = require "plugin.mason"
       local lspconfig = require "lspconfig"
 
-      for _, server in pairs(mason.servers) do
-        local opts = {
-          on_attach = on_attach,
-          capabilities = capabilities,
-        }
+      require("mason-lspconfig").setup {
+        ensure_installed = mason.servers,
+        automatic_installation = true,
 
-        server = vim.split(server, "@")[1]
+        function(server_name)
+          local opts = {
+            on_attach = on_attach,
+            capabilities = capabilities,
+          }
 
-        local require_ok, conf_opts = pcall(require, "plugin.lsp.settings." .. server)
-        if require_ok then
-          opts = vim.tbl_deep_extend("force", conf_opts, opts)
-        end
+          local require_ok, conf_opts = pcall(require, "plugin.lsp.settings." .. server_name)
+          if require_ok then
+            opts = vim.tbl_deep_extend("force", conf_opts, opts)
+          end
 
-        lspconfig[server].setup(opts)
-      end
+          lspconfig[server_name].setup(opts)
+        end,
+      }
     end,
   },
 }

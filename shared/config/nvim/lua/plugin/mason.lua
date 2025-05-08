@@ -3,14 +3,13 @@
 local M = {
   "mason-org/mason.nvim",
   cmd = "Mason",
-  event = "BufReadPre",
+  event = "VeryLazy",
   dependencies = {
     {
-      "mason-org/mason-lspconfig.nvim",
-      {
-        "TabulateJarl8/mason-nvim-lint",
-        branch = "patch-1",
-      },
+      "TabulateJarl8/mason-nvim-lint",
+      branch = "patch-1",
+    },
+    {
       "LittleEndianRoot/mason-conform",
       lazy = true,
     },
@@ -44,9 +43,9 @@ M.servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  "ts_ls",
+  -- "ts_ls",
   "volar",
-  -- "vtsls",
+  "vtsls",
   "yamlls",
 }
 
@@ -93,11 +92,6 @@ function M.config()
   }
 
   require("mason").setup(settings)
-  require("mason-lspconfig").setup {
-    ensure_installed = M.servers,
-    automatic_installation = true,
-    automatic_enable = true,
-  }
   require("mason-conform").setup {
     ensure_installed = M.formatters,
     automatic_installation = false,
