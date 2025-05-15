@@ -14,6 +14,7 @@ max_height = 1280
 fetchers = [
   { id = "mime", name = "*", run = "mime", if = "!mime", prio = "high" },
 ]
+
 preloaders = [
   { mime = "image/{avif,hei?,jxl,svg+xml}", run = "magick" },
   { mime = "image/*", run = "image" },
@@ -22,6 +23,7 @@ preloaders = [
   { mime = "font/*", run = "font" },
   { mime = "application/vnd.ms-opentype", run = "font" },
 ]
+
 previewers = [
   { name = "*/", run = "folder", sync = true },
   { mime = "text/*", run = "nvim" },
