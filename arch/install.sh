@@ -101,7 +101,7 @@ yay -S --needed \
   termius \
   tmux \
   trash-cli \
-  ttf-jetbrains-mono-nerd \
+  ttf-firacode-nerd \
   udevil \
   udisks2 \
   unrar \
