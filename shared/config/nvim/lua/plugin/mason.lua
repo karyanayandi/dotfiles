@@ -48,7 +48,7 @@ M.servers = {
   "taplo",
   "templ",
   -- "ts_ls",
-  "volar",
+  "vue_ls",
   "vtsls",
   "yamlls",
 }
