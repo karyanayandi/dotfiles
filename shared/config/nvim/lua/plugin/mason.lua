@@ -31,7 +31,6 @@ M.servers = {
   "dockerls",
   "emmet_ls",
   -- "eslint",
-  "golangci_lint_ls",
   "gopls",
   "html",
   "intelephense",

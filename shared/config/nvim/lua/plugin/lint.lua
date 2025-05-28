@@ -22,7 +22,6 @@ return {
       astro = javascript_linter(),
       css = { "eslint_d" },
       fish = { "fish" },
-      go = { "golangcilint" },
       javascript = javascript_linter(),
       javascriptreact = javascript_linter(),
       json = { "jsonlint" },
