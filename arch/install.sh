@@ -51,6 +51,7 @@ yay -S --needed \
   krita \
   lazydocker \
   lazygit \
+  less \
   lib32-vulkan-intel \
   libxcrypt-compat \
   local-by-flywheel-bin \
