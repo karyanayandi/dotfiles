@@ -23,6 +23,7 @@ export LC_TIME=en_US.utf8
 export LS_COLORS="(vivid generate aurora)"
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 
+
 ## Aliases
 alias autoclean "sudo pacman -R $(pacman -Qdtq)"
 alias bn bun
@@ -84,6 +85,11 @@ alias yarnpkg "corepack yarnpkg"
 ## Keybinding
 set fish_key_bindings fish_default_key_bindings
 source ~/.config/fish/functions/keybind.fish
+
+# go
+set -x GOPATH $HOME/go
+set -x GOBIN $GOPATH/bin
+set -x PATH $GOBIN $PATH
 
 # pnpm
 set -gx PNPM_HOME "$HOME/.local/share/pnpm"
