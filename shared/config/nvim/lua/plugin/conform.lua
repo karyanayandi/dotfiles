@@ -32,7 +32,7 @@ return {
       lua = { "stylua" },
       markdown = javascript_formatter(),
       nix = { "alejandra" },
-      php = { "pretty-php" },
+      php = { "pretty-php", "blade-formatter" },
       python = { "isort", "black" },
       sh = { "shfmt" },
       svelte = javascript_formatter(),
