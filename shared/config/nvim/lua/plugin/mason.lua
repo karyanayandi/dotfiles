@@ -61,7 +61,7 @@ M.formatters = {
   "goimports-reviser",
   "golines",
   "isort",
-  "php-cs-fixer",
+  "pretty-php",
   "prettierd",
   "shfmt",
   "stylua",
@@ -75,7 +75,7 @@ M.linters = {
   "jsonlint",
   "luacheck",
   "markdownlint",
-  "phpcs",
+  -- "phpcs",
 }
 
 function M.config()

@@ -29,7 +29,7 @@ return {
       markdown = { "markdownlint" },
       sh = { "shellcheck" },
       nix = { "nix" },
-      php = { "php", "phpcs" },
+      php = { "php" },
       python = { "python", "flake8" },
       svelte = javascript_linter(),
       typescript = javascript_linter(),

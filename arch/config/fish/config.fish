@@ -91,6 +91,10 @@ set -x GOPATH $HOME/go
 set -x GOBIN $GOPATH/bin
 set -x PATH $GOBIN $PATH
 
+# composer
+
+set -x PATH $HOME/.config/composer/vendor/bin $HOME/.composer/vendor/bin $PATH
+
 # pnpm
 set -gx PNPM_HOME "$HOME/.local/share/pnpm"
 set -gx PATH "$PNPM_HOME" $PATH
