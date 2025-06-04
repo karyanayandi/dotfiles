@@ -19,6 +19,7 @@ return {
 
     local formatters_by_ft = {
       astro = javascript_formatter(),
+      blade = { "blade-formatter" },
       c = { "clang_format" },
       css = { "prettierd" },
       go = { "gofumpt", "goimports-reviser", "golines" },
@@ -32,7 +33,7 @@ return {
       lua = { "stylua" },
       markdown = javascript_formatter(),
       nix = { "alejandra" },
-      php = { "pretty-php", "blade-formatter" },
+      php = { "pretty-php" },
       python = { "isort", "black" },
       sh = { "shfmt" },
       svelte = javascript_formatter(),
