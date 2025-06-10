@@ -177,19 +177,12 @@ vim.api.nvim_create_autocmd("BufEnter", {
   pattern = "copilot-*",
   callback = function()
     vim.opt_local.number = false
+    vim.opt_local.relativenumber = false -- Also disable relative numbers
     local ft = vim.bo.filetype
     if ft == "copilot-chat" then
       vim.bo.filetype = "markdown"
+      -- Make the settings stick to the buffer
+      vim.cmd "setlocal nonumber norelativenumber"
     end
-  end,
-})
-
---- Restores line numbers when leaving GitHub Copilot buffers
---- This ensures that normal line number display settings are re-applied
---- when moving from Copilot interfaces back to regular code buffers
-vim.api.nvim_create_autocmd("BufLeave", {
-  pattern = "copilot-*",
-  callback = function()
-    vim.opt_local.number = true
   end,
 })
