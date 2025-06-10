@@ -183,6 +183,8 @@ vim.api.nvim_create_autocmd("BufEnter", {
       vim.bo.filetype = "markdown"
       -- Make the settings stick to the buffer
       vim.cmd "setlocal nonumber norelativenumber"
+      -- Set a smaller window size
+      vim.cmd "vertical resize 50"
     end
   end,
 })
