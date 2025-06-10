@@ -115,6 +115,7 @@ yay -S --needed \
   wireplumber \
   wl-clipboard \
   xdg-desktop-portal \
+  xdg-desktop-portal-gtk \
   xdg-desktop-portal-wlr \
   xdg-user-dirs \
   xfsprogs \
