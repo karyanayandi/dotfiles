@@ -114,6 +114,8 @@ yay -S --needed \
   wget \
   wireplumber \
   wl-clipboard \
+  xdg-desktop-portal \
+  xdg-desktop-portal-wlr \
   xdg-user-dirs \
   xfsprogs \
   xorg-xhost \
