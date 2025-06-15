@@ -9,7 +9,7 @@ return {
       theme = nil,
       fade_nc = false,
       disable = {
-        background = false,
+        background = true,
         float_background = false,
         cursorline = true,
         eob_lines = false,
