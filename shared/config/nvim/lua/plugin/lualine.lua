@@ -118,6 +118,7 @@ return {
           "copilot-overlay",
           "dashboard",
           "gitcommit",
+          "lazy",
           "nofile",
           "qf",
           "snacks_dashboard",
