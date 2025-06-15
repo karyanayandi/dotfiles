@@ -31,7 +31,7 @@ context = ctrl+shift+period
 
 [urgency_low]
 msg_urgency = "low"
-background = "#353b45"
+background = "#32363e"
 foreground = "#545862"
 
 [urgency_normal]
