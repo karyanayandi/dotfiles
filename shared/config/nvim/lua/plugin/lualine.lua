@@ -71,7 +71,7 @@ return {
       },
       colored = false,
       color = function()
-        return { bg = "#252931", fg = colors.fg_light }
+        return { bg = "#32363e", fg = colors.fg_light }
       end,
       update_in_insert = false,
       always_visible = false,
@@ -133,7 +133,7 @@ return {
         lualine_c = {},
         lualine_x = {},
         lualine_y = { diagnostics },
-        lualine_z = { filetype, "location" },
+        lualine_z = { "location" },
       },
       extensions = {},
     }
