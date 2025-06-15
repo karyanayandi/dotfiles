@@ -77,14 +77,14 @@ return {
       always_visible = false,
     }
 
-    local filetype = {
-      "filetype",
-      icons_enabled = true,
-      icon_only = false,
-      color = function()
-        return { bg = "#252931", fg = colors.fg_light }
-      end,
-    }
+    -- local filetype = {
+    --   "filetype",
+    --   icons_enabled = true,
+    --   icon_only = false,
+    --   color = function()
+    --     return { bg = "#252931", fg = colors.fg_light }
+    --   end,
+    -- }
 
     require("lualine").setup {
       options = {
@@ -133,6 +133,7 @@ return {
         lualine_c = {},
         lualine_x = {},
         lualine_y = { diagnostics },
+        -- lualine_z = { filetype, "location" },
         lualine_z = { "location" },
       },
       extensions = {},
