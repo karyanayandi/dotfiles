@@ -69,7 +69,7 @@ return {
         info = icons.diagnostics.Info .. "",
         hint = icons.diagnostics.Hint .. "",
       },
-      colored = false,
+      colored = true,
       color = function()
         return { bg = "#32363e", fg = colors.fg_light }
       end,
