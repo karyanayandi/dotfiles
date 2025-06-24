@@ -23,4 +23,4 @@ ufw allow http
 ufw allow https
 ufw enable
 
-systemctl enable fail2ban
+systemctl enable --now fail2ban
