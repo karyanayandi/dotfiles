@@ -4,7 +4,7 @@ return {
   config = function()
     require("presence").setup {
       auto_update = true,
-      neovim_image_text = "text editor for non-skill isssue engineers",
+      neovim_image_text = "just VS Code without mouse",
       main_image = "neovim",
       log_level = nil,
       debounce_timeout = 10,
