@@ -23,8 +23,9 @@ return {
 
       chat.setup {
         agent = "copilot",
-        model = "claude-3.7-sonnet",
+        -- model = "claude-3.7-sonnet",
         -- model = "gpt-4",
+        model = "gpt-4.1",
         debug = false,
         allow_insecure = true,
         selection = function(source)
