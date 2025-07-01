@@ -32,45 +32,54 @@ return {
         end,
         sticky = {
           "/COPILOT_GENERATE",
+          "@models Using gemini-2.5-pro",
           "#buffers",
         },
         prompts = {
           Explain = {
+            model = "gpt-4.1",
             mapping = "<leader>ae",
             description = "Explain",
           },
           Review = {
+            model = "gpt-4.1",
             mapping = "<leader>ar",
             description = "Review",
           },
           Tests = {
+            model = "gpt-4.1",
             mapping = "<leader>at",
             description = "Tests",
           },
           Fix = {
+            model = "gpt-4.1",
             mapping = "<leader>af",
             description = "Fix",
           },
           Optimize = {
+            model = "gpt-4.1",
             mapping = "<leader>ao",
             description = "Optimize",
           },
           Docs = {
+            model = "gpt-4.1",
             mapping = "<leader>ad",
             description = "Documentation",
           },
           Commit = {
-            mapping = "<leader>ag",
             model = "gpt-4o",
+            mapping = "<leader>ag",
             description = "Generate Commit",
             selection = select.buffer,
           },
           Refactor = {
+            model = "gpt-4.1",
             prompt = "> /COPILOT_GENERATE\n\nPlease refactor the following code to improve its clarity and readability.",
             mapping = "<leader>aR",
             description = "Refactor",
           },
           BetterNamings = {
+            model = "gpt-4.1",
             prompt = "> /COPILOT_GENERATE\n\nPlease provide better names for the following variables and functions.",
             mapping = "<leader>ab",
             description = "Better Naming",
@@ -119,7 +128,7 @@ return {
           border = "single",
           row = nil,
           col = nil,
-          title = "Copilot Chat",
+          title = "Copilot",
           footer = nil,
           zindex = 1,
         },
