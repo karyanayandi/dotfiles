@@ -61,6 +61,7 @@ return {
           },
           Commit = {
             mapping = "<leader>ag",
+            model = "gpt-4o",
             description = "Generate Commit",
             selection = select.buffer,
           },
