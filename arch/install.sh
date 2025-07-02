@@ -7,6 +7,7 @@ yay -S --needed \
   base-devel \
   bat \
   bibata-cursor-theme \
+  bluetui \
   bluez \
   bluez-utils \
   bottom \
