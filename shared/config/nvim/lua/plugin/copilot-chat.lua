@@ -23,8 +23,8 @@ return {
 
       chat.setup {
         agent = "copilot",
-        -- model = "claude-3.7-sonnet",
-        model = "gpt-4.1",
+        model = "claude-3.7-sonnet",
+        -- model = "gpt-4.1",
         debug = false,
         allow_insecure = true,
         selection = function(source)
@@ -52,7 +52,7 @@ return {
             description = "Tests",
           },
           Fix = {
-            model = "gpt-4.1",
+            -- model = "gpt-4.1",
             mapping = "<leader>af",
             description = "Fix",
           },
@@ -73,7 +73,7 @@ return {
             selection = select.buffer,
           },
           Refactor = {
-            model = "gpt-4.1",
+            -- model = "gpt-4.1",
             prompt = "> /COPILOT_GENERATE\n\nPlease refactor the following code to improve its clarity and readability.",
             mapping = "<leader>aR",
             description = "Refactor",
