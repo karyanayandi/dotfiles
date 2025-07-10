@@ -32,7 +32,7 @@ return {
         end,
         sticky = {
           "/COPILOT_GENERATE",
-          "@models Using gemini-2.5-pro",
+          -- "@models Using gemini-2.5-pro",
           "#buffers",
         },
         prompts = {
