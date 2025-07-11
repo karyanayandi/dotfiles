@@ -1,0 +1,89 @@
+pane	auth	0	0	:	0	~/C/P/auth	:/home/karyana/Codes/Project/auth	1	fish	:
+pane	auth	1	0	:	0	nvim ~/C/P/auth	:/home/karyana/Codes/Project/auth	1	nvim	:nvim
+pane	auth	2	1	:*	0	~/C/P/auth	:/home/karyana/Codes/Project/auth	1	fish	:
+pane	auth	2	1	:*	1	~/C/P/oa-nextjs2	:/home/karyana/Codes/Project/oa-nextjs2	0	fish	:
+pane	auth	3	0	:-	0	nvim ~/C/P/oa-nextjs2	:/home/karyana/Codes/Project/oa-nextjs2	1	nvim	:nvim
+pane	dotfiles	0	1	:*	0	lzg ~/.c/dotfiles	:/home/karyana/.config/dotfiles	1	lazygit	:lazygit
+pane	dotfiles	1	0	:-	0	~/.c/dotfiles	:/home/karyana/.config/dotfiles	1	fish	:
+pane	nova	0	1	:*	0	~/C/P/nova	:/home/karyana/Codes/Project/nova	1	fish	:
+pane	nova	1	0	:-	0	~/C/P/nova	:/home/karyana/Codes/Project/nova	1	fish	:
+pane	nova	2	0	:	0	~/C/P/nova	:/home/karyana/Codes/Project/nova	0	fish	:
+pane	nova	2	0	:	1	~/C/P/nova	:/home/karyana/Codes/Project/nova	1	fish	:
+pane	nova-extension	0	1	:*	0	~/C/P/nova-extension	:/home/karyana/Codes/Project/nova-extension	1	fish	:
+pane	nova-extension	1	0	:-	0	~/C/P/nova-extension	:/home/karyana/Codes/Project/nova-extension	1	fish	:
+pane	nova-extension	3	0	:	0	~/C/P/nova-extension	:/home/karyana/Codes/Project/nova-extension	1	fish	:
+pane	pintudesa	0	0	:	0	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	pintudesa	1	0	:	0	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	pintudesa	2	0	:-	0	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	pintudesa	2	0	:-	1	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	0	fish	:
+pane	pintudesa	3	1	:*	0	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	search	0	1	:*	0	~/C/P/metasearch	:/home/karyana/Codes/Project/metasearch	1	fish	:
+pane	search	1	0	:-	0	~/C/P/metasearch	:/home/karyana/Codes/Project/metasearch	1	fish	:
+pane	search	2	0	:	0	~/C/P/metasearch	:/home/karyana/Codes/Project/metasearch	1	fish	:
+pane	tokodaim	0	1	:*	0	~/C/P/tokodaim	:/home/karyana/Codes/Project/tokodaim	1	fish	:
+pane	tokodaim	1	0	:-	0	~/C/P/tokodaim	:/home/karyana/Codes/Project/tokodaim	1	fish	:
+pane	tokodaim	2	0	:	0	~/C/P/tokodaim	:/home/karyana/Codes/Project/tokodaim	0	fish	:
+pane	tokodaim	2	0	:	1	~/C/P/tokodaim	:/home/karyana/Codes/Project/tokodaim	1	fish	:
+pane	tokodaim	2	0	:	2	~/C/P/tokodaim	:/home/karyana/Codes/Project/tokodaim	0	fish	:
+pane	tokodaim	2	0	:	3	~/.l/s/T/f/tokodaim	:/home/karyana/.local/share/Trash/files/tokodaim	0	fish	:
+pane	tooling	0	0	:	0	~/C/A/tooling	:/home/karyana/Codes/Area/tooling	1	fish	:
+pane	tooling	1	0	:-	0	~/C/A/tooling	:/home/karyana/Codes/Area/tooling	1	fish	:
+pane	tooling	2	1	:*	0	~/C/A/tooling	:/home/karyana/Codes/Area/tooling	1	fish	:
+pane	tooling	2	1	:*	1	~/C/A/tooling	:/home/karyana/Codes/Area/tooling	0	fish	:
+pane	tooling	2	1	:*	2	~/C/A/tooling	:/home/karyana/Codes/Area/tooling	0	fish	:
+pane	ui	0	0	:-	0	~/C/A/ui	:/home/karyana/Codes/Area/ui	1	fish	:
+pane	ui	1	0	:	0	~/C/A/ui	:/home/karyana/Codes/Area/ui	1	fish	:
+pane	ui	2	1	:*	0	~/C/A/ui	:/home/karyana/Codes/Area/ui	1	fish	:
+pane	ui	2	1	:*	1	~/C/A/ui	:/home/karyana/Codes/Area/ui	0	fish	:
+pane	ui	2	1	:*	2	~/C/A/ui	:/home/karyana/Codes/Area/ui	0	fish	:
+pane	utils	0	1	:*	0	~/C/A/utils	:/home/karyana/Codes/Area/utils	1	fish	:
+pane	utils	1	0	:-	0	~/C/A/utils	:/home/karyana/Codes/Area/utils	1	fish	:
+pane	utils	2	0	:	0	~/C/A/utils	:/home/karyana/Codes/Area/utils	1	fish	:
+pane	utils	2	0	:	1	~/C/A/utils	:/home/karyana/Codes/Area/utils	0	fish	:
+pane	utils	2	0	:	2	~/C/A/utils	:/home/karyana/Codes/Area/utils	0	fish	:
+pane	vps	0	1	:*	0	~	:/home/karyana	1	fish	:
+pane	yopem	0	0	:	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	1	0	:	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	2	0	:-	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	2	0	:-	1	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+pane	yopem	2	0	:-	2	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+pane	yopem	3	1	:*	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	3	1	:*	1	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+pane	yopem	3	1	:*	2	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+window	auth	0	:git	0	:	c680,184x46,0,0,3	off
+window	auth	1	:nvim	0	:	c681,184x46,0,0,4	:
+window	auth	2	:code	1	:*	8190,184x46,0,0{92x46,0,0,5,91x46,93,0,6}	off
+window	auth	3	:nvim	0	:-	c684,184x46,0,0,7	:
+window	dotfiles	0	:git	1	:*	c685,184x46,0,0,8	off
+window	dotfiles	1	:code	0	:-	c686,184x46,0,0,9	off
+window	nova	0	:git	1	:*	6373,184x46,0,0,14	off
+window	nova	1	:code	0	:-	6374,184x46,0,0,15	off
+window	nova	2	:run	0	:	a494,184x46,0,0{92x46,0,0,16,91x46,93,0,17}	off
+window	nova-extension	0	:git	1	:*	6377,184x46,0,0,18	off
+window	nova-extension	1	:code	0	:-	6378,184x46,0,0,19	off
+window	nova-extension	3	:fish	0	:	e36f,184x46,0,0,20	:
+window	pintudesa	0	:git	0	:	e370,184x46,0,0,21	off
+window	pintudesa	1	:code	0	:	e371,184x46,0,0,22	off
+window	pintudesa	2	:run	0	:-	648e,184x46,0,0{92x46,0,0,23,91x46,93,0,24}	off
+window	pintudesa	3	:fish	1	:*	e374,184x46,0,0,25	:
+window	search	0	:git	1	:*	e375,184x46,0,0,26	off
+window	search	1	:code	0	:-	e376,184x46,0,0,27	off
+window	search	2	:run	0	:	e377,184x46,0,0,28	off
+window	tokodaim	0	:git	1	:*	e378,184x46,0,0,29	off
+window	tokodaim	1	:code	0	:-	6370,184x46,0,0,30	off
+window	tokodaim	2	:run	0	:	c188,184x46,0,0{92x46,0,0,31,91x46,93,0[91x23,93,0,32,91x22,93,24{45x22,93,24,33,45x22,139,24,34}]}	off
+window	tooling	0	:git	0	:	6375,184x46,0,0,35	off
+window	tooling	1	:code	0	:-	6376,184x46,0,0,36	off
+window	tooling	2	:run	1	:*	cd0c,184x46,0,0{92x46,0,0,37,91x46,93,0[91x23,93,0,38,91x22,93,24,39]}	off
+window	ui	0	:git	0	:-	e370,184x46,0,0,40	off
+window	ui	1	:code	0	:	e371,184x46,0,0,41	off
+window	ui	2	:run	1	:*	6be9,184x46,0,0{92x46,0,0,42,91x46,93,0[91x23,93,0,43,91x22,93,24,44]}	off
+window	utils	0	:git	1	:*	e375,184x46,0,0,45	off
+window	utils	1	:code	0	:-	e376,184x46,0,0,46	off
+window	utils	2	:run	0	:	2d2d,184x46,0,0{92x46,0,0,47,91x46,93,0[91x23,93,0,48,91x22,93,24,49]}	off
+window	vps	0	:ssh	1	:*	6371,184x46,0,0,50	off
+window	yopem	0	:git	0	:	6372,184x46,0,0,51	off
+window	yopem	1	:code	0	:	6373,184x46,0,0,52	off
+window	yopem	2	:run	0	:-	8c4a,184x46,0,0{92x46,0,0,53,91x46,93,0[91x23,93,0,54,91x22,93,24,55]}	off
+window	yopem	3	:test	1	:*	cd0c,184x46,0,0{92x46,0,0,56,91x46,93,0[91x23,93,0,57,91x22,93,24,58]}	off
+state	nova-extension	vps
