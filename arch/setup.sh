@@ -22,3 +22,5 @@ vivid generate ~/.config/vivid/aurora.yaml
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv
+
+ya pkg add yazi-rs/plugins:no-status
