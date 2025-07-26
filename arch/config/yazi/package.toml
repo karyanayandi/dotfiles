@@ -7,8 +7,3 @@ hash = "3e023d31f29201efdac2a6ae35fedb78"
 use = "lpnh/fr"
 rev = "3d32e55"
 hash = "f7ab219b58675582ef855a9414dbc659"
-
-[[flavor.deps]]
-use = "BennyOe/onedark"
-rev = "668d71d"
-hash = "5e616226586a2af1ecaf116e08e9a8ec"
