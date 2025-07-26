@@ -154,7 +154,12 @@ return {
         char = " ",
         hl = "SnacksIndentBlank",
       },
-      animate = { enabled = false },
+      animate = {
+        enabled = true,
+        duration = 20,
+        easing = "linear",
+        fps = 75,
+      },
       filter = function(buf)
         return vim.g.snacks_indent ~= false and vim.b[buf].snacks_indent ~= false and vim.bo[buf].buftype == ""
       end,
@@ -328,13 +333,6 @@ return {
         Snacks.bufdelete()
       end,
       desc = "Delete Buffer",
-    },
-    {
-      "<leader>bz",
-      function()
-        Snacks.picker.highlights { pattern = "hl_group:^Snacks" }
-      end,
-      desc = "highlights",
     },
     {
       "<leader>bD",

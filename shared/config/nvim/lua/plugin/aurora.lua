@@ -7,7 +7,7 @@ return {
   config = function()
     require("aurora").setup {
       theme = nil,
-      fade_nc = false,
+      fade_nc = true,
       disable = {
         background = true,
         float_background = true,
