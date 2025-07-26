@@ -6,6 +6,16 @@ linemode = "size"
 scrolloff = 200
 show_hidden = true
 
+[[mgr.prepend_keymap]]
+on = ["f", "r"]
+run = "plugin fr rg"
+desc = "Search file by content (rg)"
+
+[[mgr.prepend_keymap]]
+on = ["f", "a"]
+run = "plugin fr rga"
+desc = "Search file by content (rga)"
+
 [preview]
 max_width = 720
 max_height = 1280
