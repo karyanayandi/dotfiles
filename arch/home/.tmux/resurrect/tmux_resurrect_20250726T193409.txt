@@ -1,0 +1,87 @@
+pane	auth	3	1	:*	0	~/C/P/auth	:/home/karyana/Codes/Project/auth	1	fish	:
+pane	config	0	1	:*	0	~/C/A/config	:/home/karyana/Codes/Area/config	1	fish	:
+pane	config	1	0	:-	0	~/C/A/config	:/home/karyana/Codes/Area/config	1	fish	:
+pane	config	2	0	:	0	~/C/A/config	:/home/karyana/Codes/Area/config	1	fish	:
+pane	dotfiles	0	1	:*	0	~/.c/dotfiles	:/home/karyana/.config/dotfiles	1	fish	:
+pane	dotfiles	1	0	:-	0	~/.c/dotfiles	:/home/karyana/.config/dotfiles	1	fish	:
+pane	feed	0	1	:*	0	~/C/Project	:/home/karyana/Codes/Project	1	fish	:
+pane	feed	1	0	:-	0	~	:/home/karyana	0	fish	:
+pane	feed	1	0	:-	1	~/Codes	:/home/karyana/Codes	1	fish	:
+pane	nova	0	1	:*	0	~/C/P/nova	:/home/karyana/Codes/Project/nova	1	fish	:
+pane	nova	1	0	:-	0	~/C/P/nova	:/home/karyana/Codes/Project/nova	1	fish	:
+pane	nova	2	0	:	0	~/C/P/nova	:/home/karyana/Codes/Project/nova	0	fish	:
+pane	nova	2	0	:	1	~/C/P/nova	:/home/karyana/Codes/Project/nova	1	fish	:
+pane	nova-click	0	0	:-	0	~/C/P/nova-click	:/home/karyana/Codes/Project/nova-click	1	fish	:
+pane	nova-click	1	1	:*	0	~/C/P/nova-click	:/home/karyana/Codes/Project/nova-click	1	fish	:
+pane	nova-click	1	1	:*	1	~/C/P/nova-click	:/home/karyana/Codes/Project/nova-click	0	fish	:
+pane	nova-extension	0	0	:	0	lzg ~/C/P/nova-extension	:/home/karyana/Codes/Project/nova-extension	1	lazygit	:lazygit
+pane	nova-extension	1	0	:-	0	e ~/C/P/nova-extension	:/home/karyana/Codes/Project/nova-extension	1	nvim	:nvim
+pane	nova-extension	2	1	:*	0	br dev ~/C/P/nova-extension	:/home/karyana/Codes/Project/nova-extension	1	bun	:bun run dev
+pane	pintudesa	0	1	:*	0	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	pintudesa	1	0	:-	0	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	pintudesa	2	0	:	0	~/C/P/p/a/web	:/home/karyana/Codes/Project/pintudesa/apps/web	0	fish	:
+pane	pintudesa	2	0	:	1	~/C/P/pintudesa	:/home/karyana/Codes/Project/pintudesa	1	fish	:
+pane	search	0	1	:*	0	~/C/P/metasearch	:/home/karyana/Codes/Project/metasearch	1	fish	:
+pane	search	1	0	:-	0	~/C/P/metasearch	:/home/karyana/Codes/Project/metasearch	1	fish	:
+pane	search	2	0	:	0	~/C/P/metasearch	:/home/karyana/Codes/Project/metasearch	1	fish	:
+pane	tokodaim	0	1	:*	0	nvim .env ~/Codes	:/home/karyana/Codes	1	nvim	:nvim .env
+pane	tokodaim	1	0	:-	0	~/C/A/tokodaim	:/home/karyana/Codes/Area/tokodaim	1	fish	:
+pane	tokodaim	2	0	:	0	~/C/A/tokodaim	:/home/karyana/Codes/Area/tokodaim	0	fish	:
+pane	tokodaim	2	0	:	1	~/C/A/tokodaim	:/home/karyana/Codes/Area/tokodaim	1	fish	:
+pane	tokodaim	2	0	:	2	~/C/A/tokodaim	:/home/karyana/Codes/Area/tokodaim	0	fish	:
+pane	tokodaim	2	0	:	3	~/.l/s/T/f/tokodaim	:/home/karyana/.local/share/Trash/files/tokodaim	0	fish	:
+pane	ui	0	1	:*	0	~/C/A/ui	:/home/karyana/Codes/Area/ui	1	fish	:
+pane	ui	1	0	:-	0	~/C/A/ui	:/home/karyana/Codes/Area/ui	1	fish	:
+pane	ui	2	0	:	0	~/C/A/u/p/c/react	:/home/karyana/Codes/Area/ui/packages/components/react	1	fish	:
+pane	ui	2	0	:	1	~/C/A/ui	:/home/karyana/Codes/Area/ui	0	fish	:
+pane	ui	2	0	:	2	~/C/A/ui	:/home/karyana/Codes/Area/ui	0	fish	:
+pane	utils	0	0	:	0	~/C/A/utils	:/home/karyana/Codes/Area/utils	1	fish	:
+pane	utils	1	0	:-	0	~/C/A/utils	:/home/karyana/Codes/Area/utils	1	fish	:
+pane	utils	2	1	:*	0	~/C/A/utils	:/home/karyana/Codes/Area/utils	1	fish	:
+pane	utils	2	1	:*	1	~/C/A/utils	:/home/karyana/Codes/Area/utils	0	fish	:
+pane	vps	0	1	:*	0	~	:/home/karyana	1	fish	:
+pane	yopem	0	0	:	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	1	0	:	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	2	0	:-	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	2	0	:-	1	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+pane	yopem	2	0	:-	2	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+pane	yopem	3	1	:*	0	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	1	fish	:
+pane	yopem	3	1	:*	1	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+pane	yopem	3	1	:*	2	~/C/P/yopem	:/home/karyana/Codes/Project/yopem	0	fish	:
+window	auth	3	:fish	1	:*	c67e,184x46,0,0,1	:
+window	config	0	:git	1	:*	c67f,184x46,0,0,2	off
+window	config	1	:code	0	:-	c680,184x46,0,0,3	off
+window	config	2	:run	0	:	c681,184x46,0,0,4	off
+window	dotfiles	0	:git	1	:*	c682,184x46,0,0,5	off
+window	dotfiles	1	:code	0	:-	c683,184x46,0,0,6	off
+window	feed	0	:code	1	:*	e375,184x46,0,0,45	off
+window	feed	1	:run	0	:-	6498,184x46,0,0{92x46,0,0,46,91x46,93,0,47}	off
+window	nova	0	:git	1	:*	c684,184x46,0,0,7	off
+window	nova	1	:code	0	:-	c685,184x46,0,0,8	off
+window	nova	2	:run	0	:	8125,184x46,0,0{92x46,0,0,9,91x46,93,0,10}	off
+window	nova-click	0	:code	0	:-	e378,184x46,0,0,48	off
+window	nova-click	1	:run	1	:*	249b,184x46,0,0{92x46,0,0,49,91x46,93,0,50}	off
+window	nova-extension	0	:git	0	:	6370,184x46,0,0,11	off
+window	nova-extension	1	:code	0	:-	6371,184x46,0,0,12	off
+window	nova-extension	2	:run	1	:*	6372,184x46,0,0,13	off
+window	pintudesa	0	:git	1	:*	6373,184x46,0,0,14	off
+window	pintudesa	1	:code	0	:-	6374,184x46,0,0,15	off
+window	pintudesa	2	:run	0	:	a494,184x46,0,0{92x46,0,0,16,91x46,93,0,17}	off
+window	search	0	:git	1	:*	6377,184x46,0,0,18	off
+window	search	1	:code	0	:-	6378,184x46,0,0,19	off
+window	search	2	:run	0	:	e36f,184x46,0,0,20	off
+window	tokodaim	0	:git	1	:*	e370,184x46,0,0,21	off
+window	tokodaim	1	:code	0	:-	e371,184x46,0,0,22	off
+window	tokodaim	2	:run	0	:	248f,184x46,0,0{92x46,0,0,23,91x46,93,0[91x23,93,0,24,91x22,93,24{45x22,93,24,25,45x22,139,24,26}]}	off
+window	ui	0	:git	1	:*	e376,184x46,0,0,27	off
+window	ui	1	:code	0	:-	e377,184x46,0,0,28	off
+window	ui	2	:run	0	:	cd66,184x46,0,0{92x46,0,0,29,91x46,93,0[91x23,93,0,30,91x22,93,24,31]}	off
+window	utils	0	:git	0	:	6372,184x46,0,0,32	off
+window	utils	1	:code	0	:-	6373,184x46,0,0,33	off
+window	utils	2	:run	1	:*	2492,184x46,0,0{92x46,0,0,34,91x46,93,0,35}	off
+window	vps	0	:ssh	1	:*	6376,184x46,0,0,36	off
+window	yopem	0	:git	0	:	6377,184x46,0,0,37	off
+window	yopem	1	:code	0	:	6378,184x46,0,0,38	off
+window	yopem	2	:run	0	:-	2d87,184x46,0,0{92x46,0,0,39,91x46,93,0[91x23,93,0,40,91x22,93,24,41]}	off
+window	yopem	3	:test	1	:*	6be9,184x46,0,0{92x46,0,0,42,91x46,93,0[91x23,93,0,43,91x22,93,24,44]}	off
+state	nova-extension	nova-click

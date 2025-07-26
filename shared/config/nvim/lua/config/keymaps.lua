@@ -72,20 +72,20 @@ keymap("x", "<C-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.f
 keymap("x", "<A-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 
 -- AI
-keymap("n", ";a", "<cmd>CopilotChatToggle<cr>", opts)
+keymap("n", ";a", "<cmd>CopilotChatToggle<cr>", { desc = "Open Copilot Chat", noremap = true, silent = true })
 
 -- Find
-keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", opts)
+keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", { desc = "Find files", noremap = true, silent = true })
 
 -- Find texts
-keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", opts)
+keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", { desc = "Find text", noremap = true, silent = true })
 
 -- Find buffers
 keymap(
   "n",
   ";b",
   "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false})<cr>",
-  opts
+  { desc = "Find buffers", noremap = true, silent = true }
 )
 
 -- Find git branches
@@ -93,35 +93,55 @@ keymap(
   "n",
   ";g",
   "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false})<cr>",
-  opts
+  { desc = "Find git branches", noremap = true, silent = true }
 )
 
 -- Find help tags
-keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", opts)
+keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", { desc = "Find help tags", noremap = true, silent = true })
 
 -- Find Projects
-keymap("n", ";p", "<cmd>lua require('telescope').extensions.projects.projects()<cr>", opts)
+keymap(
+  "n",
+  ";p",
+  "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
+  { desc = "Find projects", noremap = true, silent = true }
+)
+
+-- Tree
+keymap("n", ";e", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle NvimTree", noremap = true, silent = true })
 
 -- Find monorepo
-keymap("n", ";m", "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>", opts)
+-- keymap(
+--   "n",
+--   ";m",
+--   "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>",
+--   { desc = "Find monorepo", noremap = true, silent = true }
+-- )
 
 -- Search and replace
-keymap("n", ";r", "<cmd>lua require('spectre').open_file_search()<cr>", opts)
+keymap(
+  "n",
+  ";r",
+  "<cmd>lua require('spectre').open_file_search()<cr>",
+  { desc = "Search and replace", noremap = true, silent = true }
+)
+
+-- Undo history
+keymap(
+  "n",
+  ";u",
+  "<cmd>lua require('telescope').extensions.undo.undo()<cr>",
+  { desc = "Undo history", noremap = true, silent = true }
+)
 
 -- Bufdelete
 keymap("n", "Q", ":lua require('snacks').bufdelete()<cr>", opts)
-
--- Tree
-keymap("n", ";e", "<cmd>NvimTreeToggle<cr>", opts)
-
--- Undotree
-keymap("n", ";u", "<cmd>lua require('undotree').toggle()<cr>", opts)
 
 -- Show document symbol
 keymap("n", "<m-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
 
 -- No HL
-keymap("n", ";z", "<cmd>nohlsearch<cr>", opts)
+keymap("n", ";z", "<cmd>nohlsearch<cr>", { desc = "No highlight", noremap = true, silent = true })
 
 -- Resume Telescope
 keymap("n", "<F3>", "<cmd>Telescope resume<cr>", opts)
@@ -136,7 +156,12 @@ keymap("n", "<F7>", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
 keymap("n", "<F8>", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
 
 -- Show tags
-keymap("v", "//", [[y/\v<c-r>=escape(@",'/\')<cr><cr>]], opts)
+keymap(
+  "v",
+  "//",
+  [[y/\v<c-r>=escape(@",'/\')<cr><cr>]],
+  { desc = "Search for selected text", noremap = true, silent = true }
+)
 
 -- Show in Browser
 keymap("n", "gx", [[:silent execute '!$BROWSER ' . shellescape(expand('<cfile>'), 1)<CR>]], opts)
