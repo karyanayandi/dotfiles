@@ -10,7 +10,7 @@ return {
       fade_nc = false,
       disable = {
         background = true,
-        float_background = false,
+        float_background = true,
         cursorline = true,
         eob_lines = false,
       },

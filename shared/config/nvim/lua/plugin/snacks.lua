@@ -273,8 +273,12 @@ return {
     terminal = {
       bo = {
         filetype = "snacks_terminal",
+        buftype = "terminal",
       },
-      wo = {},
+      wo = {
+        winhighlight = "NormalFloat:Normal,FloatBorder:NormalBorder",
+      },
+      backdrop = { transparent = true, blend = 40 },
       keys = {
         q = "hide",
         gf = function(self)
@@ -304,11 +308,11 @@ return {
           expr = true,
           desc = "Double escape to normal mode",
         },
+        toggle = { enabled = false },
+        words = { enabled = false },
+        zen = { enabled = false },
       },
     },
-    toggle = { enabled = false },
-    words = { enabled = false },
-    zen = { enabled = false },
   },
   keys = {
     {
@@ -324,6 +328,13 @@ return {
         Snacks.bufdelete()
       end,
       desc = "Delete Buffer",
+    },
+    {
+      "<leader>bz",
+      function()
+        Snacks.picker.highlights { pattern = "hl_group:^Snacks" }
+      end,
+      desc = "highlights",
     },
     {
       "<leader>bD",
