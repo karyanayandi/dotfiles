@@ -165,7 +165,7 @@ return {
       end,
     },
     input = {
-      enabled = false,
+      enabled = true,
       icon = " ",
       icon_hl = "SnacksInputIcon",
       icon_pos = "left",
@@ -262,8 +262,9 @@ return {
     profiler = { enabled = false },
     quickfile = { enabled = true },
     scratch = { enabled = false },
-    scroll = { enabled = false },
+    scroll = { enabled = true },
     statuscolumn = {
+      enabaled = true,
       left = { "mark", "sign" },
       right = { "fold", "git" },
       folds = {
@@ -278,12 +279,8 @@ return {
     terminal = {
       bo = {
         filetype = "snacks_terminal",
-        buftype = "terminal",
       },
-      wo = {
-        winhighlight = "NormalFloat:Normal,FloatBorder:NormalBorder",
-      },
-      backdrop = { transparent = true, blend = 40 },
+      win = { style = "terminal" },
       keys = {
         q = "hide",
         gf = function(self)

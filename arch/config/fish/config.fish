@@ -81,10 +81,15 @@ alias vis "sudo nvim"
 alias x exit
 alias yarn "corepack yarn"
 alias yarnpkg "corepack yarnpkg"
+alias yz yazi
 
 ## Keybinding
 set fish_key_bindings fish_default_key_bindings
 source ~/.config/fish/functions/keybind.fish
+
+function fish_user_key_bindings
+  fish_vi_key_bindings
+end
 
 # go
 set -x GOPATH $HOME/go
