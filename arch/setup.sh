@@ -22,3 +22,5 @@ vivid generate ~/.config/vivid/aurora.yaml
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv
+
+fish_config theme save "Aurora"
