@@ -118,7 +118,11 @@ return {
         "<cmd>w<CR>",
         desc = "Write",
       },
-
+      {
+        "<leader>ao",
+        "<cmd>lua _OPENCODE_TOGGLE()<CR>",
+        desc = "Toggle",
+      },
       {
         "<leader>/",
         '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>',

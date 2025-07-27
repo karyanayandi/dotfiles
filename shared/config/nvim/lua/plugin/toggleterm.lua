@@ -76,6 +76,24 @@ return {
       lazygitlog:toggle()
     end
 
+    local opencode = Terminal:new {
+      cmd = "opencode",
+      hidden = true,
+      direction = "tab",
+      on_open = function(_)
+        vim.cmd "startinsert!"
+        vim.cmd "set laststatus=0"
+      end,
+      on_close = function(_)
+        vim.cmd "set laststatus=3"
+      end,
+      count = 100,
+    }
+
+    function _OPENCODE_TOGGLE()
+      opencode:toggle()
+    end
+
     local float_term = Terminal:new {
       direction = "float",
       on_open = function(term)
@@ -111,5 +129,7 @@ return {
 
     vim.api.nvim_set_keymap("n", "<C-t>", "<cmd>lua _FLOAT_TERM()<CR>", { noremap = true, silent = true })
     vim.api.nvim_set_keymap("i", "<C-t>", "<cmd>lua _FLOAT_TERM()<CR>", { noremap = true, silent = true })
+    vim.api.nvim_set_keymap("n", ";o", "<cmd>lua _OPENCODE_TOGGLE()<CR>", { noremap = true, silent = true })
+    vim.api.nvim_set_keymap("i", ";o", "<cmd>lua _OPENCODE_TOGGLE()<CR>", { noremap = true, silent = true })
   end,
 }
