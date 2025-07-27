@@ -103,6 +103,7 @@ yay -S --needed \
   termius \
   tmux \
   trash-cli \
+  ttf-cascadia-code-nerd \
   ttf-firacode-nerd \
   udevil \
   udisks2 \
