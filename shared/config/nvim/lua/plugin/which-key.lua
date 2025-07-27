@@ -330,6 +330,11 @@ return {
         desc = "Lazygit",
       },
       {
+        "<leader>gl",
+        "<cmd>lua _LAZYGIT_LOG_TOGGLE()<CR>",
+        desc = "Lazygit log",
+      },
+      {
         "<leader>gj",
         "<cmd>lua require 'gitsigns'.next_hunk()<cr>",
         desc = "Next Hunk",
@@ -340,7 +345,7 @@ return {
         desc = "Prev Hunk",
       },
       {
-        "<leader>gl",
+        "<leader>gL",
         "<cmd>lua require 'gitsigns'.toggle_current_line_blame()<cr>",
         desc = "Blame",
       },
