@@ -42,6 +42,7 @@ local options = {
   scrolloff = 8, -- is one of my fav
   sidescrolloff = 8,
   guifont = "monescape:h12", -- the font used in graphical neovim applications
+  -- winborder = "rounded",
 }
 
 vim.g.loaded_netrw = 1
@@ -52,6 +53,20 @@ vim.opt.fillchars:append {
 }
 
 vim.opt.shortmess:append "c"
+
+vim.filetype.add {
+  extension = {
+    env = "dotenv",
+  },
+  filename = {
+    [".env"] = "dotenv",
+    ["env"] = "dotenv",
+  },
+  pattern = {
+    ["[jt]sconfig.*.json"] = "jsonc",
+    ["%.env%.[%w_.-]+"] = "dotenv",
+  },
+}
 
 for k, v in pairs(options) do
   vim.opt[k] = v
