@@ -43,7 +43,7 @@ return {
     local lazygit = Terminal:new {
       cmd = "lazygit",
       hidden = true,
-      direction = "tab",
+      direction = "float",
       on_open = function(_)
         vim.cmd "startinsert!"
         vim.cmd "set laststatus=0"
@@ -61,7 +61,7 @@ return {
     local lazygitlog = Terminal:new {
       cmd = "lazygit log",
       hidden = true,
-      direction = "tab",
+      direction = "float",
       on_open = function(_)
         vim.cmd "startinsert!"
         vim.cmd "set laststatus=0"
@@ -79,7 +79,10 @@ return {
     local opencode = Terminal:new {
       cmd = "opencode",
       hidden = true,
-      direction = "tab",
+      direction = "float",
+      float_opts = {
+        border = "single",
+      },
       on_open = function(_)
         vim.cmd "startinsert!"
         vim.cmd "set laststatus=0"
