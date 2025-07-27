@@ -325,6 +325,11 @@ return {
         group = "Git",
       },
       {
+        "<leader>gg",
+        "<cmd>lua _LAZYGIT_TOGGLE()<CR>",
+        desc = "Lazygit",
+      },
+      {
         "<leader>gj",
         "<cmd>lua require 'gitsigns'.next_hunk()<cr>",
         desc = "Next Hunk",

@@ -206,31 +206,7 @@ return {
         q = "cancel",
       },
     },
-    lazygit = {
-      enabled = true,
-      configure = true,
-      config = {
-        os = { editPreset = "nvim-remote" },
-        gui = {
-          nerdFontsVersion = "3",
-        },
-      },
-      win = {
-        style = "lazygit",
-      },
-      theme = {
-        [241] = { fg = "Special" },
-        activeBorderColor = { fg = "MatchParen", bold = true },
-        cherryPickedCommitBgColor = { fg = "Identifier" },
-        cherryPickedCommitFgColor = { fg = "Function" },
-        defaultFgColor = { fg = "Normal" },
-        inactiveBorderColor = { fg = "FloatBorder" },
-        optionsTextColor = { fg = "Function" },
-        searchingActiveBorderColor = { fg = "MatchParen", bold = true },
-        selectedLineBgColor = { bg = "Visual" },
-        unstagedChangesColor = { fg = "DiagnosticError" },
-      },
-    },
+    lazygit = { enabled = false },
     notifier = {
       enabled = true,
       width = { min = 40, max = 0.4 },
@@ -276,45 +252,10 @@ return {
       },
       refresh = 50,
     },
-    terminal = {
-      bo = {
-        filetype = "snacks_terminal",
-      },
-      win = { style = "terminal" },
-      keys = {
-        q = "hide",
-        gf = function(self)
-          local f = vim.fn.findfile(vim.fn.expand "<cfile>", "**")
-          if f == "" then
-            Snacks.notify.warn "No file under cursor"
-          else
-            self:hide()
-            vim.schedule(function()
-              vim.cmd("e " .. f)
-            end)
-          end
-        end,
-        term_normal = {
-          "<esc>",
-          function(self)
-            self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
-            if self.esc_timer:is_active() then
-              self.esc_timer:stop()
-              vim.cmd "stopinsert"
-            else
-              self.esc_timer:start(200, 0, function() end)
-              return "<esc>"
-            end
-          end,
-          mode = "t",
-          expr = true,
-          desc = "Double escape to normal mode",
-        },
-        toggle = { enabled = false },
-        words = { enabled = false },
-        zen = { enabled = false },
-      },
-    },
+    terminal = { enabled = false },
+    toggle = { enabled = false },
+    words = { enabled = false },
+    zen = { enabled = false },
   },
   keys = {
     {
@@ -345,27 +286,6 @@ return {
       end,
       mode = { "n", "v" },
       desc = "Browse",
-    },
-    {
-      "<leader>gf",
-      function()
-        Snacks.lazygit.log_file()
-      end,
-      desc = "Lazygit Current File History",
-    },
-    {
-      "<leader>gg",
-      function()
-        Snacks.lazygit.open()
-      end,
-      desc = "Lazygit",
-    },
-    {
-      "<leader>gL",
-      function()
-        Snacks.lazygit.log()
-      end,
-      desc = "Lazygit Log (cwd)",
     },
     {
       "<leader>oN",
