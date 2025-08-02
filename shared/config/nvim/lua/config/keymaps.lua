@@ -111,12 +111,12 @@ keymap(
 keymap("n", ";e", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle NvimTree", noremap = true, silent = true })
 
 -- Find monorepo
--- keymap(
---   "n",
---   ";m",
---   "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>",
---   { desc = "Find monorepo", noremap = true, silent = true }
--- )
+keymap(
+  "n",
+  ";m",
+  "<cmd>lua require('telescope').extensions.monorepo.monorepo()<cr>",
+  { desc = "Find monorepo", noremap = true, silent = true }
+)
 
 -- Search and replace
 keymap(
