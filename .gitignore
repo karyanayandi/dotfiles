@@ -2,3 +2,4 @@ lazy-lock.json
 .env
 yazi.toml-*
 fish_variables
+tmux_resurrect_*
