@@ -7,15 +7,23 @@
   "spacing": 4,
   "modules-left": [
     "sway/workspaces",
-    "sway/mode"
-    // "sway/window"
+    "sway/mode",
+    "sway/window"
   ],
-  "modules-right": [
+  "modules-center": [
+    // "tray",
+    // "pulseaudio",
     // "network",
     // "disk",
-    // "memory",
-    // "pulseaudio",
+    // "memory"
     "clock"
+  ],
+  "modules-right": [
+    "network",
+    "disk",
+    "memory",
+    "pulseaudio",
+    "tray"
   ],
   // Modules configuration
   "sway/workspaces": {

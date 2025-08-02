@@ -44,17 +44,18 @@ window#waybar {
   font-style: italic;
 }
 
-#disk,
-#network,
 #clock,
-#pulseaudio,
+#disk,
 #memory,
+#network,
+#pulseaudio,
+#tray,
 #window {
   padding-left: 10px;
   padding-right: 10px;
 }
 
-#clock {
+#tray {
   margin-right: 20px;
 }
 
