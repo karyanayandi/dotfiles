@@ -126,7 +126,7 @@ return {
       chat = {
         show_references = true,
         show_header_separator = true,
-        show_settings = false,
+        show_settings = true,
         icons = {
           tool_success = "󰸞",
         },
