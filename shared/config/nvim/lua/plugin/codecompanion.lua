@@ -36,15 +36,14 @@ return {
         prompt_library = {
           ["Generate a Commit Message"] = {
             strategy = "chat",
-            description = "Generate a commit message",
+            description = "Generate a commit message (custom)",
             opts = {
               name = "github",
               model = "gpt-4o",
-              ignore_system_prompt = true,
               index = 9,
               is_default = true,
               is_slash_cmd = true,
-              short_name = "gencommit",
+              short_name = "commit",
               auto_submit = true,
             },
             prompts = {
@@ -189,7 +188,7 @@ return {
     },
     {
       "<leader>ag",
-      "<cmd>CodeCompanion /gencommit<CR>",
+      "<cmd>CodeCompanion /commit<CR>",
       desc = "Generate commit message",
       mode = { "n", "v" },
     },
