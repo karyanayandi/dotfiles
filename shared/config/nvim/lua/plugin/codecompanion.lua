@@ -1,3 +1,5 @@
+-- luacheck: globals vim
+
 return {
   "olimorris/codecompanion.nvim",
   cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
@@ -31,6 +33,34 @@ return {
         adapter = {
           name = "copilot",
           model = "gpt-4.1",
+        },
+        variables = {
+          ["buffer"] = {
+            opts = {
+              default_params = "pin",
+            },
+          },
+        },
+        prompt_library = {
+          ["Generate a Commit Message"] = {
+            strategy = "chat",
+            description = "Generate a commit message",
+            opts = {
+              name = "github",
+              model = "gpt-4.1",
+              index = 9,
+              is_default = true,
+              is_slash_cmd = true,
+              short_name = "commit",
+              auto_submit = true,
+            },
+            prompts = {
+              {
+                role = "user",
+                content = "Write commit message for the change with commitizen convention. Keep the title under 50 characters and wrap message at 72 characters. Format as a gitcommit code block.",
+              },
+            },
+          },
         },
         roles = {
           user = "user",
@@ -83,6 +113,17 @@ return {
         adapter = {
           name = "copilot",
           model = "gpt-4.1",
+        },
+        keymaps = {
+          accept_change = {
+            modes = { n = "ga" },
+            description = "Accept the suggested change",
+          },
+          reject_change = {
+            modes = { n = "gr" },
+            opts = { nowait = true },
+            description = "Reject the suggested change",
+          },
         },
       },
     },
