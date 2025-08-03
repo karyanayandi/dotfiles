@@ -5,15 +5,7 @@ return {
   cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
   dependencies = {
     "ravitemer/mcphub.nvim",
-    {
-      "echasnovski/mini.diff",
-      config = function()
-        local diff = require "mini.diff"
-        diff.setup {
-          source = diff.gen_source.none(),
-        }
-      end,
-    },
+    "echasnovski/mini.diff",
     {
       "HakonHarnes/img-clip.nvim",
       opts = {
@@ -48,6 +40,7 @@ return {
             opts = {
               name = "github",
               model = "gpt-4.1",
+              ignore_system_prompt = true,
               index = 9,
               is_default = true,
               is_slash_cmd = true,
@@ -186,25 +179,50 @@ return {
       "<leader>ae",
       "<cmd>CodeCompanion /explain<CR>",
       desc = "Explain code",
-      mode = { "n", "v" },
+      mode = { "n" },
     },
     {
       "<leader>af",
       "<cmd>CodeCompanion /fix<CR>",
       desc = "Fix code",
-      mode = { "n", "v" },
+      mode = { "n" },
     },
     {
       "<leader>ag",
       "<cmd>CodeCompanion /commit<CR>",
       desc = "Generate commit message",
-      mode = { "n", "v" },
+      mode = { "n" },
     },
     {
       "<leader>at",
       "<cmd>CodeCompanion /tests<CR>",
       desc = "Generate unit tests",
-      mode = { "n", "v" },
+      mode = { "n" },
+    },
+    -- V
+    {
+      "<leader>ae",
+      ":'<,'>CodeCompanion /explain<CR>",
+      desc = "Explain code",
+      mode = { "v" },
+    },
+    {
+      "<leader>af",
+      ":'<,'>CodeCompanion /fix<CR>",
+      desc = "Fix code",
+      mode = { "v" },
+    },
+    {
+      "<leader>ag",
+      ":'<,'>CodeCompanion /commit<CR>",
+      desc = "Generate commit message",
+      mode = { "v" },
+    },
+    {
+      "<leader>at",
+      ":'<,'>CodeCompanion /tests<CR>",
+      desc = "Generate unit tests",
+      mode = { "v" },
     },
   },
 }
