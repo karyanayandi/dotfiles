@@ -72,7 +72,12 @@ keymap("x", "<C-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.f
 keymap("x", "<A-/>", '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>', opts)
 
 -- AI
-keymap("n", ";a", "<cmd>CopilotChatToggle<cr>", { desc = "Open Copilot Chat", noremap = true, silent = true })
+keymap(
+  "n",
+  ";a",
+  "<cmd>CodeCompanionChat Toggle<cr>",
+  { desc = "Open Code Companion Chat", noremap = true, silent = true }
+)
 
 -- Find
 keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", { desc = "Find files", noremap = true, silent = true })

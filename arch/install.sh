@@ -84,6 +84,7 @@ yay -S --needed \
   podman-compose \
   polkit-gnome \
   python-pip \
+  python-pipx \
   reflector \
   reiserfsprogs \
   ripgrep \

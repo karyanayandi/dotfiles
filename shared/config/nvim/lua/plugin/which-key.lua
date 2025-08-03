@@ -58,36 +58,36 @@ return {
         "<leader>a",
         group = "AI",
       },
-      {
-        "<leader>aa",
-        "<cmd>CopilotChatToggle<cr>",
-        desc = "Toggle",
-      },
-      {
-        "<leader>aA",
-        "<cmd>CopilotChatAgents<cr>",
-        desc = "Select Agents",
-      },
-      {
-        "<leader>ac",
-        "<cmd>CopilotChatReset<cr>",
-        desc = "Clear buffer and chat history",
-      },
-      {
-        "<leader>ai",
-        function()
-          local input = vim.fn.input "Ask Copilot: "
-          if input ~= "" then
-            vim.cmd("CopilotChat " .. input)
-          end
-        end,
-        desc = "Ask input",
-      },
-      {
-        "<leader>am",
-        "<cmd>CopilotChatModels<cr>",
-        desc = "Select Models",
-      },
+      -- {
+      --   "<leader>aa",
+      --   "<cmd>CopilotChatToggle<cr>",
+      --   desc = "Toggle",
+      -- },
+      -- {
+      --   "<leader>aA",
+      --   "<cmd>CopilotChatAgents<cr>",
+      --   desc = "Select Agents",
+      -- },
+      -- {
+      --   "<leader>ac",
+      --   "<cmd>CopilotChatReset<cr>",
+      --   desc = "Clear buffer and chat history",
+      -- },
+      -- {
+      --   "<leader>ai",
+      --   function()
+      --     local input = vim.fn.input "Ask Copilot: "
+      --     if input ~= "" then
+      --       vim.cmd("CopilotChat " .. input)
+      --     end
+      --   end,
+      --   desc = "Ask input",
+      -- },
+      -- {
+      --   "<leader>am",
+      --   "<cmd>CopilotChatModels<cr>",
+      --   desc = "Select Models",
+      -- },
       {
         "<leader>b",
         group = "Buffer",

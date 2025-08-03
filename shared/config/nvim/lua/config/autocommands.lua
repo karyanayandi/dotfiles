@@ -174,12 +174,11 @@ end, {
 --- Configures special settings for GitHub Copilot chat buffers
 --- Disables line numbers and sets filetype to markdown for better syntax highlighting
 vim.api.nvim_create_autocmd("BufEnter", {
-  pattern = "copilot-*",
   callback = function()
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false -- Also disable relative numbers
     local ft = vim.bo.filetype
-    if ft == "copilot-chat" then
+    if ft == "CodeCompanion" then
       vim.bo.filetype = "markdown"
       -- Make the settings stick to the buffer
       vim.cmd "setlocal nonumber norelativenumber"

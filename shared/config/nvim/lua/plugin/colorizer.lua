@@ -15,6 +15,7 @@ return {
         "!copilot-chat",
         "!copilot-diff",
         "!copilot-overlay",
+        "!codecompanion",
       },
       buftypes = {},
       user_commands = true,
