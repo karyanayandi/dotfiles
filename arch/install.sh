@@ -24,7 +24,6 @@ yay -S --needed \
   deno \
   distrobox \
   dive \
-  dunst \
   eglinfo \
   eza \
   fd \
@@ -101,6 +100,7 @@ yay -S --needed \
   swayfx \
   swayidle \
   swaylock-effects-git \
+  swaync \
   swayosd-git \
   tela-icon-theme \
   termius \

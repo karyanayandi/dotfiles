@@ -1,6 +1,6 @@
 * {
   border: none;
-  font-family: "CaskaydiaCove NFM";
+  font-family: "JetBrains Mono NF";
   font-size: 15px;
   min-height: 30px;
 }
@@ -50,6 +50,7 @@ window#waybar {
 #network,
 #pulseaudio,
 #tray,
+#custom-notification,
 #window {
   padding-left: 10px;
   padding-right: 10px;

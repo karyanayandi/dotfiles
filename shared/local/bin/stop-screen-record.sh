@@ -2,4 +2,4 @@
 
 pkill -f wf-recorder
 
-dunstify -h string:x-dunst-stack-tag:default 'Screen Recording Stopped'
+notify-send 'Screen Recording Stopped'

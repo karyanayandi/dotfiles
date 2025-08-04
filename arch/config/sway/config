@@ -286,16 +286,16 @@ input "type:touchpad" {
 }
 
 # notification                    
-bindsym $mod+shift+backslash exec dunstctl set-paused toggle && notify-send "Notification toggled"
+bindsym $mod+Shift+n exec swaync-client -t -sw
 
 # autostart
 exec eval $(gnome-keyring-daemon --start)
-exec /usr/bin/dunst
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec gnome-keyring-daemon --start
 exec export SSH_AUTH_SOCK
 exec swayosd-server
 exec walker --gapplication-service
+exec swaync
 
 # set wallpaper
 exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/landscape/forest-in-the-sun.jpg
