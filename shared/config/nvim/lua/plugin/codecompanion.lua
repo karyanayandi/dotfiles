@@ -43,11 +43,8 @@ return {
               index = 9,
               is_default = true,
               is_slash_cmd = true,
-              short_name = "gencommit",
+              short_name = "generate_commit",
               auto_submit = true,
-              opts = {
-                mapping = "<leader>az",
-              },
             },
             prompts = {
               {
@@ -184,19 +181,7 @@ return {
       mode = { "n", "v" },
     },
     {
-      "<leader>ac",
-      "<cmd>CodeCompanion /gencommit<CR>",
-      desc = "Generate commit message",
-      mode = { "n", "v" },
-    },
-    {
       "<leader>ag",
-      "<cmd>CodeCompanion /commit<CR>",
-      desc = "Generate commit message",
-      mode = { "n", "v" },
-    },
-    {
-      "<leader>ac",
       "<cmd>CodeCompanion /generate_commit<CR>",
       desc = "Generate commit message",
       mode = { "n", "v" },
