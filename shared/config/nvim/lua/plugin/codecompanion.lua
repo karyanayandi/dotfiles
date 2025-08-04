@@ -19,36 +19,31 @@ return {
         },
       },
     },
-    {
-      "Davidyz/VectorCode",
-      version = "*",
-      dependencies = { "nvim-lua/plenary.nvim" },
-    },
   },
   opts = {
-    prompt_library = {
-      ["Generate a Commit Message"] = {
-        strategy = "inline",
-        description = "Generate a commit message (custom)",
-        opts = {
-          adapter = {
-            name = "copilot",
-            model = "gpt-4.1",
-          },
-          index = 9,
-          is_default = true,
-          is_slash_cmd = true,
-          short_name = "generate_commit",
-          auto_submit = true,
-        },
-        prompts = {
-          {
-            role = "user",
-            content = "Write commit message for the change with commitizen convention. Keep the title under 50 characters and wrap message at 72 characters. Format as a gitcommit code block.",
-          },
-        },
-      },
-    },
+    -- prompt_library = {
+    --   ["Generate a Commit Message"] = {
+    --     strategy = "inline",
+    --     description = "Generate a commit message (custom)",
+    --     opts = {
+    --       adapter = {
+    --         name = "copilot",
+    --         model = "gpt-4.1",
+    --       },
+    --       index = 9,
+    --       is_default = true,
+    --       is_slash_cmd = true,
+    --       short_name = "generate_commit",
+    --       auto_submit = true,
+    --     },
+    --     prompts = {
+    --       {
+    --         role = "user",
+    --         content = "@{get_changed_files} Write commit message for the change with commitizen convention. Keep the title under 50 characters and wrap message at 72 characters. Format as a gitcommit code block.",
+    --       },
+    --     },
+    --   },
+    -- },
     strategies = {
       chat = {
         adapter = {
@@ -71,6 +66,9 @@ return {
             modes = {
               i = { "<C-CR>", "<C-s>" },
             },
+          },
+          close = {
+            modes = { n = { "<C-c>", "<Esc>" }, i = "<C-c>" },
           },
           completion = {
             modes = {
@@ -135,7 +133,7 @@ return {
       chat = {
         show_references = true,
         show_header_separator = true,
-        show_settings = true,
+        show_settings = false,
         icons = {
           tool_success = "󰸞",
         },
