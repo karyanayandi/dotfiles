@@ -1,16 +1,14 @@
 terminal_title_flag = ""
 locale = ""
-close_when_open = false
+close_when_open = true
 theme = "aurora"
+theme_base = []
 monitor = ""
-hotreload_theme = false
+hotreload_theme = true
 as_window = true
 timeout = 0
 disable_click_to_close = false
-force_keyboard_focus = false
-theme_location = []
-plugin_location = []
-js_runtime = "node"
+force_keyboard_focus = true
 
 [keys]
 accept_typeahead = ["tab"]
@@ -30,7 +28,7 @@ alternate = "alt"
 clear_session = ["ctrl x"]
 copy_last_response = ["ctrl c"]
 resume_session = ["ctrl r"]
-run_last_response = ["ctrl e"]
+run_last_responstruee = ["ctrl e"]
 
 [events]
 on_activate = ""
@@ -42,7 +40,7 @@ on_query_change = ""
 [list]
 dynamic_sub = true
 keyboard_scroll_style = "emacs"
-max_entries = 50
+max_entries = 200
 show_initial_entries = true
 single_click = true
 visibility_threshold = 20
@@ -50,37 +48,31 @@ placeholder = "No Results"
 
 [search]
 argument_delimiter = "#"
-placeholder = "Search..."
+placeholder = " Search..."
 delay = 0
 resume_last_query = false
 
 [activation_mode]
 labels = "jkl;asdf"
 
-[builtins.hyprland_keybinds]
-show_sub_when_single = true
-weight = 5
-name = "hyprland_keybinds"
-placeholder = "Hyprland Keybinds"
-switcher_only = true
-
 [builtins.applications]
 weight = 5
 name = "applications"
-placeholder = "Applications"
-prioritize_new = true
+placeholder = " Search..."
+prioritize_new = false
 hide_actions_with_empty_query = true
-context_aware = true
+context_aware = false
 refresh = true
-show_sub_when_single = true
+show_sub_when_single = false
 show_icon_when_single = true
 show_generic = true
-history = true
-icon = "applications-other"
+history = false
+icon = ""
+hidden = true
 
 [builtins.applications.actions]
-enabled = true
-hide_category = false
+enabled = false
+hide_category = true
 hide_without_query = true
 
 [builtins.bookmarks]
@@ -89,11 +81,12 @@ placeholder = "Bookmarks"
 name = "bookmarks"
 icon = "bookmark"
 switcher_only = true
+hidden = true
 
 [[builtins.bookmarks.entries]]
-label = "Walker"
-url = "https://github.com/abenz1267/walker"
-keywords = ["walker", "github"]
+label = "Github"
+url = "https://github.coma"
+keywords = ["github"]
 
 [builtins.xdph_picker]
 hidden = true
@@ -121,10 +114,11 @@ prompt = "You are a helpful general assistant. Keep your answers short and preci
 [builtins.calc]
 require_number = true
 weight = 5
-name = "calc"
+name = "Calculator"
 icon = "accessories-calculator"
 placeholder = "Calculator"
-min_chars = 4
+min_chars = 3
+prefix = "="
 
 [builtins.windows]
 weight = 5
@@ -132,18 +126,20 @@ icon = "view-restore"
 name = "windows"
 placeholder = "Windows"
 show_icon_when_single = true
+switcher_only = true
+hidden = true
 
 [builtins.clipboard]
 always_put_new_on_top = true
 exec = "wl-copy"
 weight = 5
-icon = "user-bookmarks"
 name = "clipboard"
 avoid_line_breaks = true
 placeholder = "Clipboard"
 image_height = 300
 max_entries = 10
 switcher_only = true
+hidden = true
 
 [builtins.commands]
 weight = 5
@@ -151,47 +147,52 @@ icon = "utilities-terminal"
 switcher_only = true
 name = "commands"
 placeholder = "Commands"
+hidden = true
 
 [builtins.custom_commands]
 weight = 5
 icon = "utilities-terminal"
 name = "custom_commands"
 placeholder = "Custom Commands"
+hidden = true
 
 [builtins.emojis]
 exec = "wl-copy"
 weight = 5
-icon = "face-smile"
-name = "emojis"
+name = "Emojis"
 placeholder = "Emojis"
 switcher_only = true
 history = true
 typeahead = true
 show_unqualified = false
+prefix = ":"
 
 [builtins.symbols]
-exec = "wl-copy '%RESULT%'"
+after_copy = ""
 weight = 5
 name = "symbols"
 placeholder = "Symbols"
 switcher_only = true
 history = true
 typeahead = true
+hidden = true
 
 [builtins.finder]
-use_fd = false
+use_fd = true
 fd_flags = "--ignore-vcs --type file --type directory"
 cmd_alt = "xdg-open $(dirname ~/%RESULT%)"
 weight = 5
-icon = "folder"
-name = "finder"
+icon = "file"
+name = "Finder"
 placeholder = "Finder"
 switcher_only = true
 ignore_gitignore = true
 refresh = true
 concurrency = 8
 show_icon_when_single = true
-preview_images = false
+preview_images = true
+hidden = false
+prefix = "."
 
 [builtins.runner]
 eager_loading = true
@@ -202,8 +203,11 @@ placeholder = "Runner"
 typeahead = true
 history = true
 generic_entry = false
+shell_config = ""
 refresh = true
 use_fd = false
+switcher_only = true
+hidden = true
 
 [builtins.ssh]
 weight = 5
@@ -213,6 +217,7 @@ placeholder = "SSH"
 switcher_only = true
 history = true
 refresh = true
+hidden = true
 
 [builtins.switcher]
 weight = 5
@@ -226,6 +231,8 @@ weight = 5
 icon = "applications-internet"
 name = "websearch"
 placeholder = "Websearch"
+switcher_only = true
+hidden = true
 
 [[builtins.websearch.entries]]
 name = "Google"
@@ -262,6 +269,7 @@ icon = "accessories-dictionary"
 placeholder = "Translation"
 switcher_only = true
 provider = "googlefree"
+hidden = true
 
 [[plugins]]
 keep_sort = false
