@@ -20,6 +20,29 @@ return {
     },
   },
   opts = {
+    prompt_library = {
+      ["Generate a Commit Message"] = {
+        strategy = "inline",
+        description = "Generate a commit message (custom)",
+        opts = {
+          adapter = {
+            name = "copilot",
+            model = "gpt-4.1",
+          },
+          index = 9,
+          is_default = true,
+          is_slash_cmd = true,
+          short_name = "generate_commit",
+          auto_submit = true,
+        },
+        prompts = {
+          {
+            role = "user",
+            content = "Write commit message for the change with commitizen convention. Keep the title under 50 characters and wrap message at 72 characters. Format as a gitcommit code block.",
+          },
+        },
+      },
+    },
     strategies = {
       chat = {
         adapter = {
@@ -30,27 +53,6 @@ return {
           ["buffer"] = {
             opts = {
               default_params = "pin",
-            },
-          },
-        },
-        prompt_library = {
-          ["Generate a Commit Message"] = {
-            strategy = "chat",
-            description = "Generate a commit message (custom)",
-            opts = {
-              name = "github",
-              model = "gpt-4o",
-              index = 9,
-              is_default = true,
-              is_slash_cmd = true,
-              short_name = "generate_commit",
-              auto_submit = true,
-            },
-            prompts = {
-              {
-                role = "user",
-                content = "Write commit message for the change with commitizen convention. Keep the title under 50 characters and wrap message at 72 characters. Format as a gitcommit code block.",
-              },
             },
           },
         },
