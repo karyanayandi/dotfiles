@@ -43,7 +43,7 @@ return {
           {
             role = "user",
             content = fmt(
-              "You are an expert at following the commitizen convention, keep the title under 50 characters and wrap message at 72 characters. Given the git diff listed below, please generate a commit message for me:\n\n```diff\n%s\n```\n",
+              "You are an expert at following the commitizen convention and conventional commit specification, keep the title under 50 characters and wrap message at maximum 72 characters. Given the git diff listed below, please generate a commit message for me:\n\n```diff\n%s\n```\n",
               git_diff
             ),
           },
