@@ -1,7 +1,9 @@
 terminal_title_flag = ""
 locale = ""
 close_when_open = true
-theme = "default"
+theme = "aurora"
+theme_base = []
+theme_location = ["~/.config/walker/themes/"]
 monitor = ""
 hotreload_theme = true
 as_window = true
@@ -47,7 +49,7 @@ placeholder = "No Results"
 
 [search]
 argument_delimiter = "#"
-placeholder = " Search..."
+placeholder = "Search..."
 delay = 0
 resume_last_query = false
 
@@ -57,7 +59,7 @@ labels = "jkl;asdf"
 [builtins.applications]
 weight = 5
 name = "applications"
-placeholder = " Search..."
+placeholder = "Search..."
 prioritize_new = false
 hide_actions_with_empty_query = true
 context_aware = false
