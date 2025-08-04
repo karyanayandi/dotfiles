@@ -1,6 +1,9 @@
 -- luacheck: globals vim
 -- luacheck: ignore 631
 
+local fmt = string.format
+local git_diff = vim.fn.system("git diff --no-ext-diff --staged"):gsub("%s+$", "")
+
 return {
   "olimorris/codecompanion.nvim",
   cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
@@ -21,29 +24,32 @@ return {
     },
   },
   opts = {
-    -- prompt_library = {
-    --   ["Generate a Commit Message"] = {
-    --     strategy = "inline",
-    --     description = "Generate a commit message (custom)",
-    --     opts = {
-    --       adapter = {
-    --         name = "copilot",
-    --         model = "gpt-4.1",
-    --       },
-    --       index = 9,
-    --       is_default = true,
-    --       is_slash_cmd = true,
-    --       short_name = "generate_commit",
-    --       auto_submit = true,
-    --     },
-    --     prompts = {
-    --       {
-    --         role = "user",
-    --         content = "@{get_changed_files} Write commit message for the change with commitizen convention. Keep the title under 50 characters and wrap message at 72 characters. Format as a gitcommit code block.",
-    --       },
-    --     },
-    --   },
-    -- },
+    prompt_library = {
+      ["Generate a Commit Message"] = {
+        strategy = "inline",
+        description = "Generate a commit message (custom)",
+        opts = {
+          adapter = {
+            name = "copilot",
+            model = "gpt-4.1",
+          },
+          index = 9,
+          is_default = true,
+          is_slash_cmd = true,
+          short_name = "generate_commit",
+          auto_submit = true,
+        },
+        prompts = {
+          {
+            role = "user",
+            content = fmt(
+              "You are an expert at following the commitizen convention, keep the title under 50 characters and wrap message at 72 characters. Given the git diff listed below, please generate a commit message for me:\n\n```diff\n%s\n```\n",
+              git_diff
+            ),
+          },
+        },
+      },
+    },
     strategies = {
       chat = {
         adapter = {
