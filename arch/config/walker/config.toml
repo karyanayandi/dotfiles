@@ -1,8 +1,7 @@
 terminal_title_flag = ""
 locale = ""
 close_when_open = true
-theme = "aurora"
-theme_base = []
+theme = "default"
 monitor = ""
 hotreload_theme = true
 as_window = true
