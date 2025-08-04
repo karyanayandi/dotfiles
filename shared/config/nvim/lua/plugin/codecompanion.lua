@@ -1,4 +1,5 @@
 -- luacheck: globals vim
+-- luacheck: ignore 631
 
 return {
   "olimorris/codecompanion.nvim",
@@ -17,6 +18,11 @@ return {
           },
         },
       },
+    },
+    {
+      "Davidyz/VectorCode",
+      version = "*",
+      dependencies = { "nvim-lua/plenary.nvim" },
     },
   },
   opts = {
@@ -47,6 +53,7 @@ return {
       chat = {
         adapter = {
           name = "copilot",
+          -- model = "claude-3.7-sonnet",
           model = "gpt-4.1",
         },
         variables = {
@@ -181,6 +188,27 @@ return {
       "<cmd>CodeCompanion /explain<CR>",
       desc = "Explain code",
       mode = { "n", "v" },
+    },
+    {
+      "<leader>af",
+      "<cmd>CodeCompanion /fix<CR>",
+      desc = "Fix code",
+      mode = { "n", "v" },
+    },
+    {
+      "<leader>aq",
+      function()
+        vim.ui.input({
+          prompt = "Question: ",
+          default = "'<,'>CodeCompanion ",
+        }, function(input)
+          if input and input ~= "" then
+            vim.cmd(input)
+          end
+        end)
+      end,
+      desc = "Ask a question",
+      mode = { "v" },
     },
     {
       "<leader>ag",
