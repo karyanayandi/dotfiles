@@ -12,6 +12,7 @@ yay -S --needed \
   bluez-utils \
   bottom \
   brave-bin \
+  bzmenu \
   chafa \
   cmake \
   copyq \
@@ -54,6 +55,7 @@ yay -S --needed \
   lazygit \
   less \
   lib32-vulkan-intel \
+  libqalculate \
   libxcrypt-compat \
   local-by-flywheel-bin \
   lshw \
@@ -83,12 +85,12 @@ yay -S --needed \
   pfetch \
   podman-compose \
   polkit-gnome \
+  pulsemixer \
   python-pip \
   python-pipx \
   reflector \
   reiserfsprogs \
   ripgrep \
-  rofi \
   rustup \
   sed \
   slurp \
@@ -112,6 +114,7 @@ yay -S --needed \
   unzip \
   visual-studio-code-bin \
   vivid \
+  walker \
   waybar \
   wf-recorder \
   wget \
