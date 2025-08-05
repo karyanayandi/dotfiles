@@ -267,8 +267,8 @@ bindsym $mod+Shift+p exec grim $(xdg-user-dir PICTURES)/Screenshots/$(date +'%s_
 bindsym $mod+u exec swaylock
 
 # application menu
-bindsym $mod+space exec $menu -m applications
-bindsym $mod+shift+space exec $menu
+bindsym $mod+space exec $menu
+bindsym $mod+shift+space exec $menu -m runner
 bindsym $mod+shift+w exec $menu -m websearch
 bindsym $mod+t exec $menu -m ssh
 bindsym $mod+p exec $menu -m clipboard
