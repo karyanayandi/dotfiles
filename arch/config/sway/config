@@ -302,9 +302,6 @@ exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/landscape/f
 # set sway cursor theme
 exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Classic
 
-# autostart copyq clipboard manager
-exec --no-startup-id copyq
-
 # set gnome interface
 set $gnome-schema org.gnome.desktop.interface
 

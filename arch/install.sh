@@ -14,7 +14,6 @@ yay -S --needed \
   brave-bin \
   chafa \
   cmake \
-  copyq \
   cowsay \
   cursor-bin \
   datagrip \
