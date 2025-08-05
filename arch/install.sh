@@ -82,7 +82,6 @@ yay -S --needed \
   pfetch \
   podman-compose \
   polkit-gnome \
-  pulsemixer \
   python-pip \
   python-pipx \
   reflector \
@@ -116,6 +115,7 @@ yay -S --needed \
   waybar \
   wf-recorder \
   wget \
+  wiremix \
   wireplumber \
   wl-clipboard \
   xdg-desktop-portal \

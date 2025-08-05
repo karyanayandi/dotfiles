@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Activity
+Comment=System activity from bottom
+Exec=foot -e btm
+Terminal=false
+Type=Application
+Icon=Activity
+Categories=GTK;
+StartupNotify=false
+
