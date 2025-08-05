@@ -121,7 +121,7 @@ return {
       {
         "<leader>ao",
         "<cmd>lua _OPENCODE_TOGGLE()<CR>",
-        desc = "Toggle",
+        desc = "Open Code",
       },
       {
         "<leader>/",
