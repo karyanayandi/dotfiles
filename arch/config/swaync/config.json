@@ -2,6 +2,9 @@
   "$schema": "/etc/xdg/swaync/configSchema.json",
   "positionX": "right",
   "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "layer-shell": true,
   "cssPriority": "user",
 
   "control-center-width": 380,
@@ -25,6 +28,7 @@
   "transition-time": 200,
   "hide-on-clear": false,
   "hide-on-action": false,
+  "text-empty": "No Notifications",
   "script-fail-notify": true,
   "scripts": {
     "example-script": {
