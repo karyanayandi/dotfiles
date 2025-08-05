@@ -24,7 +24,7 @@ h_expand = true
 h_align = "center"
 h_expand = true
 pixel_size = 24
-theme = "Papirus-Dark"
+theme = "Tela-grey-dark"
 
 [ui.window.box.margins]
 top = 200
