@@ -23,8 +23,7 @@
     "disk",
     "memory",
     "pulseaudio",
-    "custom/notification",
-    "tray"
+    "custom/notification"
   ],
   // Modules configuration
   "sway/workspaces": {

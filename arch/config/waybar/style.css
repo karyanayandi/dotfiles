@@ -49,14 +49,13 @@ window#waybar {
 #memory,
 #network,
 #pulseaudio,
-#tray,
 #custom-notification,
 #window {
   padding-left: 10px;
   padding-right: 10px;
 }
 
-#tray {
+#custom-notification {
   margin-right: 20px;
 }
 
