@@ -19,7 +19,7 @@
     "clock"
   ],
   "modules-right": [
-    "network",
+    // "network",
     "disk",
     "memory",
     "pulseaudio",
@@ -47,38 +47,41 @@
     "format": "{}"
   },
   "clock": {
-    "format": "󱑎 {:%H:%M}",
+    "format": "{:%H:%M}",
     "tooltip": true,
     "tooltip-format": "{:%A, %B %d, %Y}"
   },
   "disk": {
     "interfal": 30,
-    "format": " {used}",
-    "path": "/"
+    "format": "",
+    "path": "/",
+    "on-click": "foot -e yazi"
   },
-  "network": {
-    "format-wifi": "{essid} ({signalStrength}%) ",
-    "format-ethernet": "󰓅 {bandwidthUpBits}",
-    "interfal": 5,
-    "on-click": "foot -e ping 8.8.8.8"
-  },
+  // "network": {
+  //   "interfal": 5,
+  //   "format-ethernet": "󰓅",
+  //   "tooltip-format-ethernet": "󰓅 {bandwidthUpBits}",
+  //   "format-disconnected": "", 
+  //   "on-click": "foot -e ping 8.8.8.8"
+  // },
   "tray": {
     "icon-size": 20,
     "spacing": 4
   },
   "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": "󰸈 {volume}%",
-    "tooltip": false,
+    "format": "{icon}",
+    "format-muted": "󰸈",
     "format-icons": {
       "headphone": "󰋋",
-      "default": "󰕾"
+      "default": ["", "", "󰕾", "󰕾", ""]
     },
+    "tooltip": true,
+    "tooltip-format": "{icon} {volume}%",
     "scroll-step": 1,
-    "on-click": "amixer set Master toggle"
+    "on-click": "swayosd-client --output-volume mute-toggle"
   },
   "memory": {
-    "format": "󰍛 {used}GiB",
+    "format": "󰍛",
     "on-click": "foot -e btm",
     "interval": 5
   },
