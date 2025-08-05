@@ -74,7 +74,7 @@ bindsym $mod+s split h
 bindsym $mod+v split v
 
 # enter fullscreen mode for the focused container
-bindsym $mod+f fulllscreen toggle
+bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+Shift+s layout stacking
@@ -201,7 +201,6 @@ bindsym $mod+BackSpace restart
 
 # exit sway (logs out of wayland session)
 bindsym $mod+Shift+q exec $menu -m power
-bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
 
 # resize window (also it can use the mouse for that)
 mode "resize" {
@@ -251,9 +250,8 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 # app shortcuts
-bindsym $mod+w exec "/usr/bin/google-chrome-stable"
+bindsym $mod+b exec "/usr/bin/google-chrome-stable"
 #bindsym $mod+w exec "x-www-browser"
-bindsym $mod+b exec "bzmenu -l walker"
 bindsym $mod+e exec "/usr/bin/nemo"
 
 # custom script shortcuts
@@ -270,7 +268,7 @@ bindsym $mod+u exec swaylock
 
 # application menu
 bindsym $mod+space exec $menu -m applications
-bindsym $mod+shift+space exec $menu -m runner
+bindsym $mod+shift+space exec $menu
 bindsym $mod+shift+w exec $menu -m websearch
 bindsym $mod+t exec $menu -m ssh
 bindsym $mod+p exec $menu -m clipboard

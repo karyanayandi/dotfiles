@@ -296,6 +296,6 @@ icon = "system-reboot"
 label = "Reboot"
 
 [[plugins.entries]]
-exec = "playerctl --all-players pause & hyprlock"
+exec = "playerctl --all-players pause & swaylock"
 icon = "system-lock-screen"
 label = "Lock Screen"

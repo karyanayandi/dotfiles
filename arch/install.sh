@@ -12,7 +12,6 @@ yay -S --needed \
   bluez-utils \
   bottom \
   brave-bin \
-  bzmenu \
   chafa \
   cmake \
   copyq \
