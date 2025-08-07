@@ -101,6 +101,7 @@ floating_maximum_size -1 x -1
 for_window [app_id="dev.benz.walker"] border none
 for_window [app_id="dev.benz.walker"] floating enable 
 for_window [app_id="dev.benz.walker"] shadows disable
+for_window [app_id="chrome-nngceckbapebfimnlniiiahkandclblb-Default"] floating enable 
 for_window [app_id="mpv"] floating enable, resize set 1920 1080, move position 75 50%
 for_window [app_id="org.gnome.FileRoller"] floating enable, resize set 1200 800, move position 75 44%
 for_window [app_id="org.gnome.FileRoller"] shadows disable
@@ -335,5 +336,6 @@ bar {
 #         urgent_workspace   $base  $red      $dark
 #       }
 # }
+
 
 include /etc/sway/config.d/*
