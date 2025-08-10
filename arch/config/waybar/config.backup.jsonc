@@ -1,16 +1,25 @@
 // -*- mode: jsonc -*-
 {
+  "layer": "top",
   "position": "top",
   "height": 30,
+  "width": 1280,
   "spacing": 4,
   "modules-left": [
     "sway/workspaces",
-    "sway/mode"
+    "sway/mode",
+    "sway/window"
   ],
   "modules-center": [
+    "tray",
+    "pulseaudio",
+    "network",
+    "disk",
+    "memory",
     "clock"
   ],
   "modules-right": [
+    "network",
     "disk",
     "memory",
     "bluetooth",
@@ -21,7 +30,17 @@
     "disable-scroll": true,
     "all-outputs": true,
     "warp-on-scroll": false,
-    "format": "{name}"
+    "format": "{icon}",
+    "format-icons": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        "5": "",
+        "urgent": "",
+        "focused": "",
+        "default": ""
+    }
   },
   "sway/mode": {
     "format": "{}"
@@ -44,6 +63,17 @@
     "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
     "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
     "on-click": "foot -e bluetui"
+  },
+  "network": {
+    "interfal": 5,
+    "format-ethernet": "󰓅",
+    "tooltip-format-ethernet": "󰓅 {bandwidthUpBits}",
+    "format-disconnected": "", 
+    "on-click": "foot -e ping 8.8.8.8"
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 4
   },
   "pulseaudio": {
     "format": "{icon}",
