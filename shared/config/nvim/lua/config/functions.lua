@@ -72,4 +72,26 @@ function M.smart_quit()
   end
 end
 
+function M.load_env_file(filepath)
+  filepath = filepath:gsub("^~", vim.loop.os_homedir())
+
+  local env = {}
+  local file = io.open(filepath, "r")
+  if not file then
+    return env
+  end
+
+  for line in file:lines() do
+    if not line:match "^%s*#" and line:match "%S" then
+      local key, value = line:match "^%s*([%w_]+)%s*=%s*(.-)%s*$"
+      if key and value then
+        env[key] = value
+        vim.env[key] = value
+      end
+    end
+  end
+
+  file:close()
+  return env
+end
 return M

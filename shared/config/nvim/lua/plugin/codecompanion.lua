@@ -3,6 +3,7 @@
 
 local fmt = string.format
 local git_diff = vim.fn.system("git diff --no-ext-diff --staged"):gsub("%s+$", "")
+local env = require("config.functions").load_env_file "~/.env"
 
 return {
   "olimorris/codecompanion.nvim",
@@ -24,6 +25,24 @@ return {
     },
   },
   opts = {
+    adapters = {
+      openrouter = function()
+        local openrouter = require "util.openrouter"
+        return require("codecompanion.adapters").extend(openrouter, {
+          name = "openrouter",
+          formatted_name = "Open Router",
+          env = {
+            url = "https://openrouter.ai/api",
+            api_key = env["OPENAI_API_KEY"],
+          },
+          schema = {
+            model = {
+              default = "qwen/qwen3-coder:free",
+            },
+          },
+        })
+      end,
+    },
     prompt_library = {
       ["Generate a Commit Message"] = {
         strategy = "inline",
@@ -53,9 +72,9 @@ return {
     strategies = {
       chat = {
         adapter = {
-          name = "copilot",
+          name = "openrouter",
           -- model = "claude-sonnet-4",
-          model = "gpt-4.1",
+          model = "qwen/qwen3-coder:free",
         },
         variables = {
           ["buffer"] = {
@@ -116,8 +135,8 @@ return {
       },
       inline = {
         adapter = {
-          name = "copilot",
-          model = "gpt-4.1",
+          name = "openrouter",
+          model = "qwen/qwen3-coder:free",
         },
         keymaps = {
           accept_change = {
