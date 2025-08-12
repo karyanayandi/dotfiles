@@ -257,6 +257,7 @@ bindsym $mod+e exec "/usr/bin/nemo"
 
 # custom script shortcuts
 bindsym $mod+g exec "~/.local/bin/screen-record.sh"
+bindsym $mod+Alt+g exec "~/.local/bin/screen-record-area.sh"
 bindsym $mod+Shift+g exec "~/.local/bin/stop-screen-record.sh"
 
 # screenshot
