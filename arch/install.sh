@@ -82,6 +82,7 @@ yay -S --needed \
   pfetch \
   podman-compose \
   polkit-gnome \
+  postman \
   python-pip \
   python-pipx \
   reflector \
