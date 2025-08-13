@@ -29,7 +29,7 @@ default_border pixel
 set $term foot
 set $menu walker
 
-font SF Pro 11
+font Adwaita Sans 11
 
 # thin borders
 hide_edge_borders both
@@ -312,7 +312,7 @@ exec_always {
     gsettings set $gnome-schema gtk-theme 'adw-gtk3-dark'
     gsettings set $gnome-schema icon-theme 'Tela-grey-dark'
     gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Classic'
-    gsettings set $gnome-schema font-name 'SF Pro 11'
+    gsettings set $gnome-schema font-name 'Adwaita Sans 11'
 }
 
 bar {

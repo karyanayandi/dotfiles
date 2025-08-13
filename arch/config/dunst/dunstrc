@@ -2,7 +2,7 @@
 alignment = "center"
 corner_radius = 4
 follow = mouse
-font = SF Pro 9
+font = Adwaita Sans 9
 format = <b>%s</b>\n%b
 frame_color = "#abb2bf"
 frame_width = 0
