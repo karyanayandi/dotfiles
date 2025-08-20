@@ -1,5 +1,12 @@
 return {
   settings = {
+    svelte = {
+      plugin = {
+        svelte = {
+          defaultScriptLanguage = "ts",
+        },
+      },
+    },
     typescript = {
       inlayHints = {
         parameterNames = { enabled = "all" },
