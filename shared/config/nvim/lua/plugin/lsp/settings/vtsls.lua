@@ -18,6 +18,14 @@ return {
           configNamespace = "typescript",
           enableForWorkspaceTypeScriptVersions = true,
         },
+        {
+          name = "typescript-svelte-plugin",
+          location = require("mason-registry").get_package("svelte-language-server"):get_install_path()
+            .. "/node_modules/svelte-language-server",
+          languages = { "svelte" },
+          configNamespace = "typescript",
+          enableForWorkspaceTypeScriptVersions = true,
+        },
       },
     },
     typescript = {
