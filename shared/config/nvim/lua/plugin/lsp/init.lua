@@ -96,6 +96,16 @@ return {
       local function on_attach(client, bufnr)
         lsp_keymaps(bufnr)
         lsp_highlight_document(client)
+
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = { "*.js", "*.ts" },
+          group = vim.api.nvim_create_augroup("svelte_ondidchangetsorjsfile", { clear = true }),
+          callback = function(ctx)
+            if client.name == "svelte" then
+              client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.file })
+            end
+          end,
+        })
       end
 
       local icons = require "config.icons"

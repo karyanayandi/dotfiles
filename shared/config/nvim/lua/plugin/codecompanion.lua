@@ -72,9 +72,10 @@ return {
     strategies = {
       chat = {
         adapter = {
-          name = "openrouter",
-          -- model = "claude-sonnet-4",
-          model = "qwen/qwen3-coder:free",
+          -- name = "openrouter",
+          -- model = "qwen/qwen3-coder:free",
+          name = "copilot",
+          model = "claude-sonnet-4",
         },
         variables = {
           ["buffer"] = {
@@ -135,8 +136,10 @@ return {
       },
       inline = {
         adapter = {
-          name = "openrouter",
-          model = "qwen/qwen3-coder:free",
+          -- name = "openrouter",
+          -- model = "qwen/qwen3-coder:free",
+          name = "copilot",
+          model = "claude-sonnet-4",
         },
         keymaps = {
           accept_change = {
