@@ -75,6 +75,7 @@ yay -S --needed \
   ntfs-3g \
   ntfsprogs \
   obsidian \
+  opencode-bin \
   openssh \
   p7zip \
   papipurs-icon-theme \
@@ -85,6 +86,7 @@ yay -S --needed \
   postman \
   python-pip \
   python-pipx \
+  qwen-code \
   reflector \
   reiserfsprogs \
   ripgrep \

@@ -13,11 +13,11 @@ return {
       buttons = true,
       file_assets = {},
       show_time = true,
-      editing_text = "Editing %s",
-      file_explorer_text = "Exploring %s",
-      git_commit_text = "Committing changes",
-      workspace_text = "Working on %s",
-      line_number_text = "Line %s out of %s",
+      editing_text = false,
+      file_explorer_text = false,
+      git_commit_text = false,
+      workspace_text = false,
+      line_number_text = false,
     }
   end,
 }
