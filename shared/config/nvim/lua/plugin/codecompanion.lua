@@ -26,22 +26,24 @@ return {
   },
   opts = {
     adapters = {
-      openrouter = function()
-        local openrouter = require "util.openrouter"
-        return require("codecompanion.adapters").extend(openrouter, {
-          name = "openrouter",
-          formatted_name = "Open Router",
-          env = {
-            url = "https://openrouter.ai/api",
-            api_key = env["OPENAI_API_KEY"],
-          },
-          schema = {
-            model = {
-              default = "qwen/qwen3-coder:free",
+      http = {
+        openrouter = function()
+          local openrouter = require "util.openrouter"
+          return require("codecompanion.adapters").extend(openrouter, {
+            name = "openrouter",
+            formatted_name = "Open Router",
+            env = {
+              url = "https://openrouter.ai/api",
+              api_key = env["OPENAI_API_KEY"],
             },
-          },
-        })
-      end,
+            schema = {
+              model = {
+                default = "qwen/qwen3-coder:free",
+              },
+            },
+          })
+        end,
+      },
     },
     prompt_library = {
       ["Generate a Commit Message"] = {
