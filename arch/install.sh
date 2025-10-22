@@ -30,6 +30,7 @@ yay -S --needed \
   elephant-clipboard \
   elephant-desktopapplications \
   elephant-files \
+  elephant-menus \
   elephant-providerlist \
   elephant-runner \
   elephant-symbols \

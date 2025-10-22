@@ -27,7 +27,7 @@ shadow_inactive_color $shadow_inactive
 default_border pixel
 
 set $term foot
-set $menu walker
+set $menu walker --width 1280 --minheight 720
 
 font Adwaita Sans 11
 
@@ -272,6 +272,7 @@ bindsym $mod+u exec swaylock
 bindsym $mod+space exec $menu
 bindsym $mod+shift+space exec $menu -m runner
 bindsym $mod+shift+w exec $menu -m websearch
+bindsym $mod+shift+b exec $menu -m bluetooth
 bindsym $mod+t exec $menu -m ssh
 bindsym $mod+p exec $menu -m clipboard
 
@@ -303,7 +304,7 @@ exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/landscape/f
 # output * background '~/.config/dotfiles/wallpapers/schedule.png' fill
 
 # set sway cursor theme
-exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Classic
+exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Ice
 
 # set gnome interface
 set $gnome-schema org.gnome.desktop.interface
@@ -312,7 +313,7 @@ exec_always {
     gsettings set org.cinnamon.desktop.default-applications.terminal exec $term
     gsettings set $gnome-schema gtk-theme 'adw-gtk3-dark'
     gsettings set $gnome-schema icon-theme 'Tela-grey-dark'
-    gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Classic'
+    gsettings set $gnome-schema cursor-theme 'Bibata-Modern-Ice'
     gsettings set $gnome-schema font-name 'Adwaita Sans 11'
 }
 
