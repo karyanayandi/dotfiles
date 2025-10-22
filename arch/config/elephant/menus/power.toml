@@ -1,23 +1,23 @@
 name = "power"
 name_pretty = "Power"
-icon = "power"
+icon = "Arch"
 
 [[entries]]
 text = "Logout"
 keyword = ["logout", "log out", "signout"]
-value = "swaymsg exit"
+actions = "swaymsg exit"
 
 [[entries]]
 text = "Suspend"
 keyword = ["suspend", "sleep", "hibernate"]
-value = "systemctl suspend"
+actions = "systemctl suspend"
 
 [[entries]]
 text = "Reboot"
 keyword = ["reboot", "restart"]
-value = "systemctl reboot"
+actions = "systemctl reboot"
 
 [[entries]]
 text = "Shutdown"
 keyword = ["shutdown", "power off", "turn off"]
-value = "systemctl poweroff"
+actions = "systemctl poweroff"
