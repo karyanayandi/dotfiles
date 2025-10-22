@@ -295,7 +295,6 @@ exec gnome-keyring-daemon --start
 exec export SSH_AUTH_SOCK
 exec swayosd-server
 exec walker --gapplication-service
-exec elephant
 exec swaync
 
 # set wallpaper
