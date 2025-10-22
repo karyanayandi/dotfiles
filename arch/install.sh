@@ -27,6 +27,7 @@ yay -S --needed \
   elephant-archlinuxpkgs \
   elephant-bluetooth \
   elephant-calc \
+  elephant-clipboard \
   elephant-desktopapplications \
   elephant-files \
   elephant-providerlist \
