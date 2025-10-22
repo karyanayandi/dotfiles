@@ -23,6 +23,8 @@ yay -S --needed \
   distrobox \
   dive \
   eglinfo \
+  elephant \
+  elephant-desktopapplications \
   eza \
   fd \
   ffmpeg \
