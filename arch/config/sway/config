@@ -27,7 +27,7 @@ shadow_inactive_color $shadow_inactive
 default_border pixel
 
 set $term foot
-set $menu walker --width 1280 --minheight 720
+set $menu walker --width 1280
 
 font Adwaita Sans 11
 
