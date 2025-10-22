@@ -259,6 +259,7 @@ bindsym $mod+e exec "/usr/bin/nemo"
 bindsym $mod+g exec "~/.local/bin/screen-record.sh"
 bindsym $mod+Alt+g exec "~/.local/bin/screen-record-area.sh"
 bindsym $mod+Shift+g exec "~/.local/bin/stop-screen-record.sh"
+bindsym $mod+Shift+c exec "~/.local/bin/color-picker.sh"
 
 # screenshot
 bindsym Print exec grim - | wl-copy && notify-send "Screenshot copied to clipboard"
