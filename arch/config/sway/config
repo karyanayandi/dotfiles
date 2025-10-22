@@ -201,7 +201,7 @@ bindsym $mod+Shift+r reload
 bindsym $mod+BackSpace restart
 
 # exit sway (logs out of wayland session)
-bindsym $mod+Shift+q exec $menu -m power
+bindsym $mod+Shift+q exec $menu -m "menus:power"
 
 # resize window (also it can use the mouse for that)
 mode "resize" {
