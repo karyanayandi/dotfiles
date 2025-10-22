@@ -12,7 +12,6 @@ sh ./setuop/gtk-theme.sh
 sh ./setup/npm.sh
 sh ./setup/rust.sh
 sh ./setup/tmux.sh
-sh ./setup/elephant.sh
 
 cd ~/.config/dotfiles/shared/config && stow .
 cd ~/.config/dotfiles/shared/local && stow .

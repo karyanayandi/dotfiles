@@ -294,6 +294,7 @@ exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec gnome-keyring-daemon --start
 exec export SSH_AUTH_SOCK
 exec swayosd-server
+exec elephant
 exec walker --gapplication-service
 exec swaync
 
