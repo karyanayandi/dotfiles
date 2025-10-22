@@ -24,8 +24,18 @@ yay -S --needed \
   dive \
   eglinfo \
   elephant \
+  elephant-archlinuxpkgs \
+  elephant-bluetooth \
+  elephant-calc \
   elephant-desktopapplications \
+  elephant-files \
   elephant-providerlist \
+  elephant-runner \
+  elephant-symbols \
+  elephant-todo \
+  elephant-unicode \
+  elephant-websearch \
+  elephant-windows \
   eza \
   fd \
   ffmpeg \
