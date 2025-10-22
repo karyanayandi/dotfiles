@@ -2,35 +2,52 @@
 
 return {
   "numToStr/Comment.nvim",
-  event = "BufRead",
+  lazy = false,
+  dependencies = {
+    {
+      "JoosepAlviste/nvim-ts-context-commentstring",
+      event = "VeryLazy",
+    },
+  },
+
   config = function()
+    vim.keymap.set("n", "<leader>/", "<Plug>(comment_toggle_linewise_current)", { desc = "Comment" })
+    vim.keymap.set("x", "<leader>/", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment" })
+    vim.keymap.set("v", "<leader>/", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment" })
+    vim.keymap.set("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", { desc = "Comment" })
+    vim.keymap.set("x", "<C-/>", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment" })
+    vim.keymap.set("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment" })
+    vim.keymap.set("n", "<A-/>", "<Plug>(comment_toggle_linewise_current)", { desc = "Comment" })
+    vim.keymap.set("x", "<A-/>", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment" })
+    vim.keymap.set("v", "<A-/>", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment" })
+
+    vim.g.skip_ts_context_commentstring_module = true
+    ---@diagnostic disable: missing-fields
+    require("ts_context_commentstring").setup {
+      enable_autocmd = false,
+    }
+
     require("Comment").setup {
-      pre_hook = function(ctx)
-        if
-          vim.bo.filetype == "typescriptreact"
-          or vim.bo.filetype == "javascriptreact"
-          or vim.bo.filetype == "javascript"
-          or vim.bo.filetype == "typescript"
-        then
-          local U = require "Comment.utils"
-
-          local type = ctx.ctype == U.ctype.linewise and "__default" or "__multiline"
-
-          local location = nil
-
-          if ctx.ctype == U.ctype.blockwise then
-            location = require("ts_context_commentstring.utils").get_cursor_location()
-          elseif ctx.cmotion == U.cmotion.v or ctx.cmotion == U.cmotion.V then
-            location = require("ts_context_commentstring.utils").get_visual_start_location()
-          end
-
-          ---@diagnostic disable-next-line: return-type-mismatch
-          return require("ts_context_commentstring.internal").calculate_commentstring {
-            key = type,
-            location = location,
-          }
-        end
-      end,
+      padding = true,
+      sticky = true,
+      toggler = {
+        line = "gcc",
+        block = "gbc",
+      },
+      opleader = {
+        line = "gc",
+        block = "gb",
+      },
+      extra = {
+        above = "gcO",
+        below = "gco",
+        eol = "gcA",
+      },
+      mappings = {
+        basic = true,
+        extra = true,
+      },
+      pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
     }
   end,
 }

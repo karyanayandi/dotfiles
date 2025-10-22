@@ -124,11 +124,6 @@ return {
         desc = "Open Code",
       },
       {
-        "<leader>/",
-        '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>',
-        desc = "Comment",
-      },
-      {
         "<leader>P",
         "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
         desc = "Projects",
