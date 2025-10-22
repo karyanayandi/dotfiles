@@ -107,6 +107,7 @@ yay -S --needed \
   reiserfsprogs \
   ripgrep \
   rustup \
+  satty \
   sed \
   slurp \
   sof-firmware \
