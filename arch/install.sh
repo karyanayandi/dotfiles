@@ -55,6 +55,7 @@ yay -S --needed \
   grim \
   gvfs \
   gzip \
+  hyprpicker \
   imv \
   inter-font \
   inxi \
