@@ -25,6 +25,7 @@ yay -S --needed \
   eglinfo \
   elephant \
   elephant-desktopapplications \
+  elephant-providerlist \
   eza \
   fd \
   ffmpeg \
