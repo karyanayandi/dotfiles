@@ -1,23 +1,28 @@
 name = "power"
 name_pretty = "Power"
-icon = "Arch"
+icon = "shutdown"
+global_search = true
 
 [[entries]]
 text = "Logout"
+icon = "logout"
 keyword = ["logout", "log out", "signout"]
-actions = "swaymsg exit"
+actions = { "logout" = "swaymsg exit" }
 
 [[entries]]
 text = "Suspend"
+icon = "suspend"
 keyword = ["suspend", "sleep", "hibernate"]
-actions = "systemctl suspend"
+actions = { "suspend" = "systemctl suspend" }
 
 [[entries]]
 text = "Reboot"
+icon = "reboot"
 keyword = ["reboot", "restart"]
-actions = "systemctl reboot"
+actions = { "reboot" = "systemctl reboot" }
 
 [[entries]]
 text = "Shutdown"
+icon = "shutdown"
 keyword = ["shutdown", "power off", "turn off"]
-actions = "systemctl poweroff"
+actions = { "poweroff" = "systemctl poweroff" }
