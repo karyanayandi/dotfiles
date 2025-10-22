@@ -5,18 +5,8 @@ local M = {
   cmd = "Mason",
   event = "VeryLazy",
   dependencies = {
-    {
-      "mason-org/mason-lspconfig.nvim",
-      lazy = true,
-    },
-    {
-      "TabulateJarl8/mason-nvim-lint",
-      branch = "patch-1",
-    },
-    {
-      "LittleEndianRoot/mason-conform",
-      lazy = true,
-    },
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    "mason-org/mason-lspconfig.nvim",
   },
 }
 
@@ -96,20 +86,12 @@ function M.config()
   }
 
   require("mason").setup(settings)
-  require("mason-conform").setup {
-    ensure_installed = M.formatters,
-    automatic_installation = false,
-  }
-  require("mason-lspconfig").setup {
-    ensure_installed = M.servers,
-    automatic_installation = true,
-    -- lsp handle with lspconfig on plugin/lsp/init.lua
-    automatic_enable = false,
-  }
-  require("mason-nvim-lint").setup {
-    ensure_installed = M.linters,
-    ignore_install = { "eslint", "fish", "nix", "php", "python" },
-    automatic_installation = true,
+  require("mason-tool-installer").setup {
+    ensure_installed = {
+      M.servers,
+      M.formatters,
+      M.linters,
+    },
   }
 end
 

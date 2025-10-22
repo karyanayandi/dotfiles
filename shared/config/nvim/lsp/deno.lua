@@ -1,7 +1,7 @@
-local lspconfig = require "lspconfig"
+-- local lspconfig = require "lspconfig"
 
 return {
-  root_dir = lspconfig.util.root_pattern "deno.json",
+  -- root_dir = lspconfig.util.root_pattern "deno.json",
   settings = {
     inlayHints = {
       parameterNames = { enabled = "all", suppressWhenArgumentMatchesName = true },
