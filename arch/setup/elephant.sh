@@ -1,3 +1,3 @@
 #!/bin/bash
 
-systemctl --user start elephant
+elephant service enable
