@@ -273,10 +273,10 @@ mode $printscreen_mode {
     bindsym Escape mode "default"
 }
 
-bindsym $mod+Shift+p mode $printscreen_mode
+bindsym Print mode $printscreen_mode
 
-bindsym Print exec grim - | wl-copy && notify-send "Screenshot copied to clipboard"
 bindsym $mod+Print exec grim $(xdg-user-dir PICTURES)/Screenshots/$(date +'%s_screenshot.png') && notify-send "Screenshot has been saved"
+# bindsym Print exec grim - | wl-copy && notify-send "Screenshot copied to clipboard"
 # bindsym $mod+Print exec grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot copied to clipboard"
 
 # lock the system
