@@ -20,7 +20,7 @@ smart_borders on
 corner_radius 5
 shadows enable
 shadows_on_csd enable
-shadow_blur_radius 5
+shadow_blur_radius 7
 shadow_color $shadow
 shadow_inactive_color $shadow_inactive
 
