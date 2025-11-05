@@ -26,6 +26,15 @@ return {
   },
   opts = {
     adapters = {
+      acp = {
+        gemini_cli = function()
+          return require("codecompanion.adapters").extend("gemini_cli", {
+            env = {
+              api_key = env["GEMINI_API_KEY"],
+            },
+          })
+        end,
+      },
       http = {
         openrouter = function()
           local openrouter = require "util.openrouter"
@@ -77,7 +86,10 @@ return {
           -- name = "openrouter",
           -- model = "qwen/qwen3-coder:free",
           name = "copilot",
-          model = "claude-sonnet-4",
+          model = "claude-sonnet-4.5",
+        },
+        opts = {
+          completion_provider = "cmp",
         },
         variables = {
           ["buffer"] = {
@@ -127,7 +139,8 @@ return {
           ["image"] = {
             keymaps = {
               modes = {
-                i = "<C-i>",
+                n = "<nop>",
+                i = "<nop>",
               },
             },
             opts = {

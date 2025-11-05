@@ -39,16 +39,33 @@ return {
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 
-    -- Handle disabling linters based on filetype/filename
-    vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
+    -- Handle disabling linters
+    vim.api.nvim_create_autocmd({
+      "BufEnter",
+      "BufWinEnter",
+      "BufRead",
+      "BufReadPost",
+      "BufNewFile",
+      "BufAdd",
+      "BufCreate",
+      "FileType",
+      "WinEnter",
+      "TabEnter",
+      "FocusGained",
+      "VimEnter",
+      "SessionLoadPost",
+    }, {
       group = lint_augroup,
       callback = function()
         local bufnr = vim.api.nvim_get_current_buf()
         local filename = vim.fn.bufname(bufnr)
         local filetype = vim.bo[bufnr].filetype
 
-        -- Disable markdownlint for Avante and copilot-*
-        if filetype == "markdown" and (filetype == "Avante" or filename:match "^copilot%-") then
+        -- Disable markdownlint for codecompanion, Avante and copilot-*
+        if
+          filetype == "markdown"
+          and (filetype == "Avante" or filetype == "codecompanion" or filename:match "^copilot%-")
+        then
           lint.linters_by_ft["markdown"] = {}
         elseif filetype == "markdown" then
           lint.linters_by_ft["markdown"] = { "markdownlint" }

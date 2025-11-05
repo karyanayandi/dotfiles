@@ -171,12 +171,40 @@ end, {
   bang = true,
 })
 
-vim.api.nvim_create_autocmd("BufEnter", {
-  callback = function()
-    if vim.bo.filetype == "codecompanion" then
-      vim.bo.filetype = "markdown"
-      vim.opt_local.number = false
-      vim.opt_local.relativenumber = false
+local codecompanion_augroup = vim.api.nvim_create_augroup("CodeCompanionFiletype", { clear = true })
+
+vim.api.nvim_create_autocmd({
+  "BufEnter",
+  "BufWinEnter",
+  "BufRead",
+  "BufReadPost",
+  "BufNewFile",
+  "BufAdd",
+  "BufCreate",
+  "FileType",
+  "WinEnter",
+  "TabEnter",
+  "FocusGained",
+  "VimEnter",
+  "SessionLoadPost",
+}, {
+  group = codecompanion_augroup,
+  pattern = "*",
+  callback = function(args)
+    if not vim.api.nvim_buf_is_valid(args.buf) then
+      return
+    end
+
+    -- Only process if filetype is codecompanion and not already processed
+    if vim.bo[args.buf].filetype == "codecompanion" then
+      -- Check if already processed to avoid redundant operations
+      if not vim.b[args.buf].codecompanion_processed then
+        vim.b[args.buf].codecompanion_processed = true
+
+        vim.bo[args.buf].filetype = "markdown"
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+      end
     end
   end,
 })
