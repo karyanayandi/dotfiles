@@ -26,15 +26,6 @@ return {
   },
   opts = {
     adapters = {
-      acp = {
-        gemini_cli = function()
-          return require("codecompanion.adapters").extend("gemini_cli", {
-            env = {
-              api_key = env["GEMINI_API_KEY"],
-            },
-          })
-        end,
-      },
       http = {
         openrouter = function()
           local openrouter = require "util.openrouter"
