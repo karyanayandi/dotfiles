@@ -122,3 +122,6 @@ export FZF_DEFAULT_OPTS="\
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 envsource ~/.env
+
+# opencode
+fish_add_path /home/karyana/.opencode/bin
