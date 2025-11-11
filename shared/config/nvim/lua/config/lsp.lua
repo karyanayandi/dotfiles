@@ -23,6 +23,7 @@ vim.lsp.enable {
   "rust_analyzer",
   "sqls",
   "svelte",
+  "svelteserver",
   "tailwindcss",
   "taplo",
   "templ",
