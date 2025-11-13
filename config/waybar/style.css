@@ -1,3 +1,5 @@
+@import "../../.config/dotfiles/themes/current/waybar/waybar.css";
+
 * {
   border: none;
   font-family: "JetBrains Mono NF";
@@ -6,8 +8,8 @@
 }
 
 window#waybar {
-  background-color: #252931;
-  color: #eceff4;
+  background-color: @background;
+  color: @foreground;
   border-radius: 0px;
   transition-property: background-color;
   transition-duration: 0.5s;
@@ -22,22 +24,22 @@ window#waybar {
 
 #workspaces button {
   background-color: transparent;
-  color: #eceff4;
+  color: @foreground;
   padding-left: 10px;
   padding-right: 10px;
 }
 
 #workspaces button.focused {
-  box-shadow: inset 0 -3px #eceff4;
+  box-shadow: inset 0 -3px @foreground;
   /* background: #353b45; */
 }
 
 #workspaces button:hover {
-  background: #3e4451;
+  background: @accent;
 }
 
 #workspaces button.urgent {
-  background-color: #bf616a;
+  background-color: @urgent;
 }
 
 #mode {
@@ -68,5 +70,5 @@ button {
 
 button:hover {
   background: inherit;
-  box-shadow: inset 0 -3px #eceff4;
+  box-shadow: inset 0 -3px @foreground;
 }
