@@ -1,0 +1,30 @@
+-- luacheck: globals vim
+
+return {
+  "ghillb/cybu.nvim",
+  lazy = true,
+  config = function()
+    require("cybu").setup {
+      position = {
+        relative_to = "win",
+        anchor = "topright",
+      },
+      display_time = 1750,
+      style = {
+        path = "relative",
+        border = "rounded",
+        separator = " ",
+        prefix = "…",
+        padding = 1,
+        hide_buffer_id = true,
+        devicons = {
+          enabled = true,
+          colored = true,
+        },
+      },
+    }
+
+    vim.keymap.set("n", "H", "<Plug>(CybuPrev)")
+    vim.keymap.set("n", "L", "<Plug>(CybuNext)")
+  end,
+}
