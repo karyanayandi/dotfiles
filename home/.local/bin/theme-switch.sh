@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, and Swaylock Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, and swaylock
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, and Swaync Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, and swaync
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, and swaylock."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, and swaync."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -64,6 +64,7 @@ discover_themes() {
     local has_lazydocker=false
     local has_sway=false
     local has_swaylock=false
+    local has_swaync=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -105,15 +106,19 @@ discover_themes() {
       has_swaylock=true
     fi
     
+    if [[ -f "$theme_dir/swaync/notifications.css" && -f "$theme_dir/swaync/central_control.css" ]]; then
+      has_swaync=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, or swaylock/config" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, or swaync/{notifications.css,central_control.css}" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -605,6 +610,55 @@ reload_swaylock() {
   echo "  ✓ Swaylock theme updated (will apply on next lock)"
 }
 
+# Update swaync theme symlinks
+update_swaync_theme() {
+  local theme_name="$1"
+  local source_notifications="$THEMES_DIR/$theme_name/swaync/notifications.css"
+  local source_control="$THEMES_DIR/$theme_name/swaync/central_control.css"
+  
+  # Check if theme has swaync support
+  if [[ ! -f "$source_notifications" || ! -f "$source_control" ]]; then
+    echo "Note: Theme '$theme_name' does not have swaync support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/swaync"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlinks
+  local relative_notifications="../../$theme_name/swaync/notifications.css"
+  local relative_control="../../$theme_name/swaync/central_control.css"
+
+  # Update symlinks atomically
+  ln -sf "$relative_notifications" "$target_dir/notifications.css"
+  ln -sf "$relative_control" "$target_dir/central_control.css"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update swaync symlinks in $target_dir" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("swaync")
+}
+
+# Reload swaync
+reload_swaync() {
+  if pgrep -x swaync >/dev/null; then
+    swaync-client --reload-css &>/dev/null
+    if [[ $? -eq 0 ]]; then
+      echo "  ✓ Swaync reloaded successfully"
+    else
+      echo "  ! Warning: Failed to reload swaync" >&2
+    fi
+  else
+    echo "  - Swaync is not running. Theme will apply on next start."
+  fi
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -656,6 +710,7 @@ main() {
   update_lazydocker_theme "$theme_name"
   update_sway_theme "$theme_name"
   update_swaylock_theme "$theme_name"
+  update_swaync_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -698,6 +753,9 @@ main() {
         ;;
       swaylock)
         reload_swaylock
+        ;;
+      swaync)
+        reload_swaync
         ;;
     esac
   done
