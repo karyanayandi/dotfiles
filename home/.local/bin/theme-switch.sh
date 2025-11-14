@@ -331,17 +331,18 @@ update_fish_theme() {
     return 0
   fi
   
+  # Check if fish is installed
+  if ! command -v fish &>/dev/null; then
+    echo "Warning: fish shell not found" >&2
+    return 1
+  fi
+  
   # Use fish_config to choose the theme
-  if command -v fish_config &>/dev/null; then
-    fish -c "fish_config theme choose '$theme_name'" &>/dev/null
-    if [[ $? -eq 0 ]]; then
-      UPDATED_COMPONENTS+=("fish")
-    else
-      echo "Warning: Failed to set fish theme" >&2
-      return 1
-    fi
+  fish -c "fish_config theme choose '$theme_name'" &>/dev/null
+  if [[ $? -eq 0 ]]; then
+    UPDATED_COMPONENTS+=("fish")
   else
-    echo "Warning: fish_config command not found" >&2
+    echo "Warning: Failed to set fish theme" >&2
     return 1
   fi
 }
