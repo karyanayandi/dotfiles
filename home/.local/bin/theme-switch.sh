@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar and Foot Theme Switcher
-# Automatically discover and switch between themes for waybar and foot terminal
+# Waybar, Foot, and Bat Theme Switcher
+# Automatically discover and switch between themes for waybar, foot terminal, and bat
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar and foot terminal with real-time reload."
+  echo "Switch themes for waybar, foot terminal, and bat with real-time reload."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -53,9 +53,10 @@ discover_themes() {
       continue
     fi
 
-    # Check if theme has required files (waybar or foot)
+    # Check if theme has required files (waybar, foot, or bat)
     local has_waybar=false
     local has_foot=false
+    local has_bat=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -65,15 +66,19 @@ discover_themes() {
       has_foot=true
     fi
     
+    if [[ -f "$theme_dir/bat/config" ]]; then
+      has_bat=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css or foot/colors.ini" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, or bat/config" >&2
     exit 1
   fi
 }
@@ -197,6 +202,39 @@ update_foot_theme() {
   UPDATED_COMPONENTS+=("foot")
 }
 
+# Update bat theme symlink
+update_bat_theme() {
+  local theme_name="$1"
+  local source_config="$THEMES_DIR/$theme_name/bat/config"
+  
+  # Check if theme has bat support
+  if [[ ! -f "$source_config" ]]; then
+    echo "Note: Theme '$theme_name' does not have bat support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/bat"
+  local target_config="$target_dir/config"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/bat/config)
+  local relative_path="../../$theme_name/bat/config"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_config"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update bat symlink at $target_config" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("bat")
+}
+
 # Reload waybar
 reload_waybar() {
   if pgrep -x waybar >/dev/null; then
@@ -227,6 +265,17 @@ reload_foot() {
     echo "  - Foot theme updated (open new terminal to see changes)"
   else
     echo "  - Foot is not running. Theme will apply on next start."
+  fi
+}
+
+# Reload bat cache
+reload_bat() {
+  echo "  - Rebuilding bat cache for new theme..."
+  bat cache --build &>/dev/null
+  if [[ $? -eq 0 ]]; then
+    echo "  ✓ Bat cache rebuilt successfully"
+  else
+    echo "  ! Warning: Failed to rebuild bat cache" >&2
   fi
 }
 
@@ -273,6 +322,7 @@ main() {
   # Update component themes
   update_waybar_theme "$theme_name"
   update_foot_theme "$theme_name"
+  update_bat_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -291,6 +341,9 @@ main() {
         ;;
       foot)
         reload_foot
+        ;;
+      bat)
+        reload_bat
         ;;
     esac
   done
