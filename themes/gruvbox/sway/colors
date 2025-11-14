@@ -1,0 +1,9 @@
+# Gruvbox theme colors for Sway
+set $accent #bdae93
+set $red #fb4934
+set $text #ebdbb2
+set $surface #504945
+set $dark #3c3836
+set $base #282828
+set $shadow #ebdbb2
+set $shadow_inactive #665c54

@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, and Lazydocker Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, and lazydocker
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, and Sway Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, and sway
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, and lazydocker."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, and sway."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -62,6 +62,7 @@ discover_themes() {
     local has_fish=false
     local has_lazygit=false
     local has_lazydocker=false
+    local has_sway=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -95,15 +96,19 @@ discover_themes() {
       has_lazydocker=true
     fi
     
+    if [[ -f "$theme_dir/sway/colors" ]]; then
+      has_sway=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, or lazydocker/config.yml" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, or sway/colors" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -423,6 +428,39 @@ update_lazydocker_theme() {
   UPDATED_COMPONENTS+=("lazydocker")
 }
 
+# Update sway theme symlink
+update_sway_theme() {
+  local theme_name="$1"
+  local source_colors="$THEMES_DIR/$theme_name/sway/colors"
+  
+  # Check if theme has sway support
+  if [[ ! -f "$source_colors" ]]; then
+    echo "Note: Theme '$theme_name' does not have sway support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/sway"
+  local target_colors="$target_dir/colors"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/sway/colors)
+  local relative_path="../../$theme_name/sway/colors"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_colors"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update sway symlink at $target_colors" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("sway")
+}
+
 # Reload waybar
 reload_waybar() {
   if pgrep -x waybar >/dev/null; then
@@ -510,6 +548,20 @@ reload_lazydocker() {
   fi
 }
 
+# Reload sway
+reload_sway() {
+  if pgrep -x sway >/dev/null; then
+    swaymsg reload &>/dev/null
+    if [[ $? -eq 0 ]]; then
+      echo "  ✓ Sway reloaded successfully"
+    else
+      echo "  ! Warning: Failed to reload sway" >&2
+    fi
+  else
+    echo "  - Sway is not running. Theme will apply on next start."
+  fi
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -559,6 +611,7 @@ main() {
   update_fish_theme "$theme_name"
   update_lazygit_theme "$theme_name"
   update_lazydocker_theme "$theme_name"
+  update_sway_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -595,6 +648,9 @@ main() {
         ;;
       lazydocker)
         reload_lazydocker
+        ;;
+      sway)
+        reload_sway
         ;;
     esac
   done

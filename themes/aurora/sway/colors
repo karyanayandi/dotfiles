@@ -1,0 +1,9 @@
+# Aurora theme colors for Sway
+set $accent #c8ccd4
+set $red #bf616a 
+set $text #eceff4
+set $surface #545862
+set $dark #353b45
+set $base #282c34
+set $shadow #eceff4
+set $shadow_inactive #565c64
