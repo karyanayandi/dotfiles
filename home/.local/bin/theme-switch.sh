@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, and Fish Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, and fish
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, and Lazydocker Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, and lazydocker
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), and fish shell."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, and lazydocker."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -60,6 +60,8 @@ discover_themes() {
     local has_bottom=false
     local has_vivid=false
     local has_fish=false
+    local has_lazygit=false
+    local has_lazydocker=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -85,15 +87,23 @@ discover_themes() {
       has_fish=true
     fi
     
+    if [[ -f "$theme_dir/lazygit/config.yml" ]]; then
+      has_lazygit=true
+    fi
+    
+    if [[ -f "$theme_dir/lazydocker/config.yml" ]]; then
+      has_lazydocker=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, or bottom/bottom.toml" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, or lazydocker/config.yml" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -347,6 +357,72 @@ update_fish_theme() {
   fi
 }
 
+# Update lazygit theme symlink
+update_lazygit_theme() {
+  local theme_name="$1"
+  local source_yml="$THEMES_DIR/$theme_name/lazygit/config.yml"
+  
+  # Check if theme has lazygit support
+  if [[ ! -f "$source_yml" ]]; then
+    echo "Note: Theme '$theme_name' does not have lazygit support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/lazygit"
+  local target_yml="$target_dir/config.yml"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/lazygit/config.yml)
+  local relative_path="../../$theme_name/lazygit/config.yml"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_yml"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update lazygit symlink at $target_yml" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("lazygit")
+}
+
+# Update lazydocker theme symlink
+update_lazydocker_theme() {
+  local theme_name="$1"
+  local source_yml="$THEMES_DIR/$theme_name/lazydocker/config.yml"
+  
+  # Check if theme has lazydocker support
+  if [[ ! -f "$source_yml" ]]; then
+    echo "Note: Theme '$theme_name' does not have lazydocker support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/lazydocker"
+  local target_yml="$target_dir/config.yml"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/lazydocker/config.yml)
+  local relative_path="../../$theme_name/lazydocker/config.yml"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_yml"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update lazydocker symlink at $target_yml" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("lazydocker")
+}
+
 # Reload waybar
 reload_waybar() {
   if pgrep -x waybar >/dev/null; then
@@ -414,6 +490,26 @@ reload_fish() {
   echo "    Note: Open new fish terminal to see theme changes"
 }
 
+# Reload lazygit
+reload_lazygit() {
+  if pgrep -x lazygit >/dev/null; then
+    echo "  - Lazygit is running. Restart it to see theme changes."
+    echo "    Tip: Press 'q' to quit and reopen lazygit"
+  else
+    echo "  - Lazygit theme updated (will apply on next start)"
+  fi
+}
+
+# Reload lazydocker
+reload_lazydocker() {
+  if pgrep -x lazydocker >/dev/null; then
+    echo "  - Lazydocker is running. Restart it to see theme changes."
+    echo "    Tip: Press 'q' to quit and reopen lazydocker"
+  else
+    echo "  - Lazydocker theme updated (will apply on next start)"
+  fi
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -461,6 +557,8 @@ main() {
   update_bottom_theme "$theme_name"
   update_ls_colors "$theme_name"
   update_fish_theme "$theme_name"
+  update_lazygit_theme "$theme_name"
+  update_lazydocker_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -491,6 +589,12 @@ main() {
         ;;
       fish)
         reload_fish
+        ;;
+      lazygit)
+        reload_lazygit
+        ;;
+      lazydocker)
+        reload_lazydocker
         ;;
     esac
   done

@@ -16,7 +16,7 @@ sh ./setup/tmux.sh
 cd ~/.config/dotfiles/home && stow .
 cd ~/.config/dotfiles/config && stow .
 
-vivid generate ~/.config/vivid/aurora.yaml
+sh ./home/.local/bin/theme-switch.sh aurora
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv
