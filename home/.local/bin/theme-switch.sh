@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, and Swaync Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, and swaync
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, and Walker Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, and walker
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, and swaync."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, and walker."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -65,6 +65,7 @@ discover_themes() {
     local has_sway=false
     local has_swaylock=false
     local has_swaync=false
+    local has_walker=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -110,15 +111,19 @@ discover_themes() {
       has_swaync=true
     fi
     
+    if [[ -f "$theme_dir/walker/style.css" ]]; then
+      has_walker=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, or swaync/{notifications.css,central_control.css}" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, or walker/style.css" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -659,6 +664,48 @@ reload_swaync() {
   fi
 }
 
+# Update walker theme symlink
+update_walker_theme() {
+  local theme_name="$1"
+  local source_css="$THEMES_DIR/$theme_name/walker/style.css"
+  
+  # Check if theme has walker support
+  if [[ ! -f "$source_css" ]]; then
+    echo "Note: Theme '$theme_name' does not have walker support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/walker"
+  local target_css="$target_dir/style.css"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink
+  local relative_path="../../$theme_name/walker/style.css"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_css"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update walker symlink at $target_css" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("walker")
+}
+
+# Reload walker
+reload_walker() {
+  if pgrep -x walker >/dev/null; then
+    echo "  - Walker is running. Restart it to see theme changes."
+  else
+    echo "  ✓ Walker theme updated (will apply on next start)"
+  fi
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -711,6 +758,7 @@ main() {
   update_sway_theme "$theme_name"
   update_swaylock_theme "$theme_name"
   update_swaync_theme "$theme_name"
+  update_walker_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -756,6 +804,9 @@ main() {
         ;;
       swaync)
         reload_swaync
+        ;;
+      walker)
+        reload_walker
         ;;
     esac
   done

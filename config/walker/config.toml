@@ -4,7 +4,7 @@ selection_wrap = true
 click_to_close = true
 global_argument_delimiter = "#"
 exact_search_prefix = "'"
-theme = "aurora"
+theme = "current"
 disable_mouse = false
 additional_theme_location = "~/.config/walker/themes/"
 

@@ -5,7 +5,8 @@
 # TODO
 
 - [ ] realtime terminal theme changes
-- [ ] add neovim support
-- [ ] add tmux support
-- [ ] add walker support
+- [ ] add theme switcher neovim support
+- [ ] add theme switcher tmux support
+- [x] add theme switcher walker support
+- [ ] add theme switcher yazi support
 - [ ] add wallpaper changer
