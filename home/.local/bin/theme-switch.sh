@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, and Bottom Theme Switcher
-# Automatically discover and switch between themes for waybar, foot terminal, bat, and bottom
+# Waybar, Foot, Bat, Bottom, Vivid, and Fish Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, and fish
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot terminal, bat, and bottom with real-time reload."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), and fish shell."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -53,11 +53,13 @@ discover_themes() {
       continue
     fi
 
-    # Check if theme has required files (waybar, foot, bat, or bottom)
+    # Check if theme has required files (waybar, foot, bat, bottom, or vivid)
     local has_waybar=false
     local has_foot=false
     local has_bat=false
     local has_bottom=false
+    local has_vivid=false
+    local has_fish=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -75,8 +77,16 @@ discover_themes() {
       has_bottom=true
     fi
     
+    if [[ -f "$DOTFILES_DIR/config/vivid/${discovered_theme}.yaml" ]]; then
+      has_vivid=true
+    fi
+    
+    if [[ -f "$DOTFILES_DIR/config/fish/themes/${discovered_theme}.theme" ]]; then
+      has_fish=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
@@ -84,6 +94,8 @@ discover_themes() {
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
     echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, or bottom/bottom.toml" >&2
+    echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
+    echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
   fi
 }
@@ -273,6 +285,67 @@ update_bottom_theme() {
   UPDATED_COMPONENTS+=("bottom")
 }
 
+# Update LS_COLORS for vivid
+update_ls_colors() {
+  local theme_name="$1"
+  local vivid_theme_file="$DOTFILES_DIR/config/vivid/${theme_name}.yaml"
+  
+  # Check if theme has vivid support
+  if [[ ! -f "$vivid_theme_file" ]]; then
+    echo "Note: Theme '$theme_name' does not have vivid support, skipping."
+    return 0
+  fi
+  
+  # Generate LS_COLORS using vivid
+  local ls_colors=$(vivid generate "$vivid_theme_file" 2>/dev/null)
+  
+  if [[ $? -ne 0 || -z "$ls_colors" ]]; then
+    echo "Warning: Failed to generate LS_COLORS with vivid" >&2
+    return 1
+  fi
+  
+  # Create export files for bash and fish
+  local export_dir="$HOME/.config/ls_colors"
+  mkdir -p "$export_dir"
+  
+  # Bash export
+  echo "export LS_COLORS='$ls_colors'" > "$export_dir/ls_colors.sh"
+  
+  # Fish export
+  echo "set -gx LS_COLORS '$ls_colors'" > "$export_dir/ls_colors.fish"
+  
+  # Store current theme name
+  echo "$theme_name" > "$export_dir/current_theme"
+  
+  UPDATED_COMPONENTS+=("vivid")
+}
+
+# Update fish shell theme
+update_fish_theme() {
+  local theme_name="$1"
+  local fish_theme_file="$DOTFILES_DIR/config/fish/themes/${theme_name}.theme"
+  
+  # Check if theme has fish support
+  if [[ ! -f "$fish_theme_file" ]]; then
+    echo "Note: Theme '$theme_name' does not have fish theme support, skipping."
+    return 0
+  fi
+  
+  # Use fish_config to choose the theme
+  if command -v fish_config &>/dev/null; then
+    fish -c "fish_config theme choose '$theme_name'" &>/dev/null
+    if [[ $? -eq 0 ]]; then
+      UPDATED_COMPONENTS+=("fish")
+    else
+      echo "Warning: Failed to set fish theme" >&2
+      return 1
+    fi
+  else
+    echo "Warning: fish_config command not found" >&2
+    return 1
+  fi
+}
+
 # Reload waybar
 reload_waybar() {
   if pgrep -x waybar >/dev/null; then
@@ -327,6 +400,19 @@ reload_bottom() {
   fi
 }
 
+# Reload vivid colors
+reload_vivid() {
+  echo "  ✓ LS_COLORS generated for both bash and fish"
+  echo "    Note: Current shell will reload LS_COLORS on next login or source"
+  echo "    Tip: Run 'source ~/.config/ls_colors/ls_colors.sh' (bash) or 'source ~/.config/ls_colors/ls_colors.fish' (fish)"
+}
+
+# Reload fish theme
+reload_fish() {
+  echo "  ✓ Fish theme applied successfully"
+  echo "    Note: Open new fish terminal to see theme changes"
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -372,6 +458,8 @@ main() {
   update_foot_theme "$theme_name"
   update_bat_theme "$theme_name"
   update_bottom_theme "$theme_name"
+  update_ls_colors "$theme_name"
+  update_fish_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -396,6 +484,12 @@ main() {
         ;;
       bottom)
         reload_bottom
+        ;;
+      vivid)
+        reload_vivid
+        ;;
+      fish)
+        reload_fish
         ;;
     esac
   done

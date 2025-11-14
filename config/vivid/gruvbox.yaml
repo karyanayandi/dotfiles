@@ -1,0 +1,150 @@
+colors:
+  color0: "282828" # background (bg0_h)
+  color1: "3c3836" # black (bg1)
+  color2: "504945" # selection (bg2)
+  color3: "665c54" # brightblack (bg3)
+  color4: "bdae93" # foreground (fg2)
+  color5: "ebdbb2" # white (fg1)
+  color6: "d5c4a1" # brightwhite (fg3)
+  color7: "8ec07c" # brightcyan (bright_aqua)
+  color8: "689d6a" # cyan (aqua)
+  color9: "83a598" # blue (bright_blue)
+  color10: "458588" # darkblue (blue)
+  color11: "fb4934" # red (bright_red)
+  color12: "fe8019" # orange (bright_orange)
+  color13: "fabd2f" # yellow (bright_yellow)
+  color14: "b8bb26" # green (bright_green)
+
+  dim-foreground: "b6bdca"
+
+core:
+  normal_text:
+    foreground: dim-foreground
+
+  reset_to_normal:
+    background: aurora0
+    foreground: aurora4
+    font-style: regular
+
+  # File Types
+
+  regular_file:
+    foreground: aurora4
+
+  directory:
+    foreground: aurora10 # aurora9
+    font-style: bold
+
+  multi_hard_link:
+    foreground: aurora8
+    font-style: underline
+
+  symlink:
+    foreground: aurora8
+
+  broken_symlink:
+    foreground: aurora11
+
+  missing_symlink_target:
+    # NOTE: Also used for readline completion shell builtin and function suffix
+    background: aurora11
+    foreground: aurora5 # aurora4
+    font-style: bold
+
+  fifo:
+    foreground: aurora7
+    font-style:
+      - bold
+      - underline
+
+  character_device:
+    foreground: aurora13
+
+  block_device:
+    foreground: aurora13
+    font-style: underline
+
+  door:
+    foreground: aurora13
+    font-style: italic
+
+  socket:
+    # NOTE: Swapped with block device as used for readline completion prefix
+    foreground: aurora13
+    font-style: bold
+
+  # File Permissions
+
+  executable_file:
+    foreground: aurora7
+    font-style: bold
+
+  file_with_capability:
+    foreground: aurora4
+    font-style:
+      - bold
+      - underline
+
+  setuid:
+    foreground: aurora4
+    font-style:
+      - bold
+      - underline
+
+  setgid:
+    foreground: aurora4
+    font-style:
+      - bold
+      - underline
+
+  sticky:
+    background: aurora10 # aurora9
+    foreground: aurora5 # aurora4
+    font-style: underline
+
+  other_writable:
+    background: aurora10 # aurora9
+    foreground: aurora5 # aurora4
+    font-style: bold
+
+  sticky_other_writable:
+    background: aurora10 # aurora9
+    foreground: aurora5 # aurora4
+    font-style:
+      - bold
+      - underline
+
+# Document Types
+
+archives:
+  foreground: aurora5
+  font-style: bold
+
+executable:
+  foreground: aurora7
+  font-style: bold
+
+markup:
+  foreground: aurora6
+  web:
+    foreground: aurora4
+
+media:
+  foreground: aurora15
+  fonts:
+    foreground: aurora4
+
+office:
+  foreground: aurora14
+
+programming:
+  source:
+    foreground: aurora7
+  tooling:
+    foreground: aurora4
+
+text:
+  foreground: aurora4
+
+unimportant:
+  foreground: aurora3
