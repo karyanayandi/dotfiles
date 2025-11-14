@@ -1,0 +1,149 @@
+colors:
+  lackluster0: "0A0A0A" # background
+  lackluster1: "080808" # black
+  lackluster2: "444444" # bright black
+  lackluster3: "7A7A7A" # selection
+  lackluster4: "DEEEED" # foreground/white
+  lackluster5: "DEEEED" # bright white
+  lackluster6: "DEEEED" # text
+  lackluster7: "708090" # cyan
+  lackluster8: "708090" # bright cyan
+  lackluster9: "7788AA" # blue
+  lackluster10: "7788AA" # bright blue
+  lackluster11: "D70000" # red
+  lackluster12: "FFAA88" # yellow
+  lackluster13: "FFAA88" # bright yellow
+  lackluster14: "789978" # green
+  lackluster15: "D7007D" # magenta
+
+  dim-foreground: "DEEEED"
+
+core:
+  normal_text:
+    foreground: dim-foreground
+
+  reset_to_normal:
+    background: lackluster0
+    foreground: lackluster4
+    font-style: regular
+
+  # File Types
+
+  regular_file:
+    foreground: lackluster4
+
+  directory:
+    foreground: lackluster10
+    font-style: bold
+
+  multi_hard_link:
+    foreground: lackluster8
+    font-style: underline
+
+  symlink:
+    foreground: lackluster8
+
+  broken_symlink:
+    foreground: lackluster11
+
+  missing_symlink_target:
+    background: lackluster11
+    foreground: lackluster5
+    font-style: bold
+
+  fifo:
+    foreground: lackluster7
+    font-style:
+      - bold
+      - underline
+
+  character_device:
+    foreground: lackluster13
+
+  block_device:
+    foreground: lackluster13
+    font-style: underline
+
+  door:
+    foreground: lackluster13
+    font-style: italic
+
+  socket:
+    foreground: lackluster13
+    font-style: bold
+
+  # File Permissions
+
+  executable_file:
+    foreground: lackluster7
+    font-style: bold
+
+  file_with_capability:
+    foreground: lackluster4
+    font-style:
+      - bold
+      - underline
+
+  setuid:
+    foreground: lackluster4
+    font-style:
+      - bold
+      - underline
+
+  setgid:
+    foreground: lackluster4
+    font-style:
+      - bold
+      - underline
+
+  sticky:
+    background: lackluster10
+    foreground: lackluster5
+    font-style: underline
+
+  other_writable:
+    background: lackluster10
+    foreground: lackluster5
+    font-style: bold
+
+  sticky_other_writable:
+    background: lackluster10
+    foreground: lackluster5
+    font-style:
+      - bold
+      - underline
+
+# Document Types
+
+archives:
+  foreground: lackluster5
+  font-style: bold
+
+executable:
+  foreground: lackluster7
+  font-style: bold
+
+markup:
+  foreground: lackluster6
+  web:
+    foreground: lackluster4
+
+media:
+  foreground: lackluster15
+  fonts:
+    foreground: lackluster4
+
+office:
+  foreground: lackluster14
+
+programming:
+  source:
+    foreground: lackluster7
+  tooling:
+    foreground: lackluster4
+
+text:
+  foreground: lackluster4
+
+unimportant:
+  foreground: lackluster3

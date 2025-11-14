@@ -9,4 +9,6 @@
 - [ ] add theme switcher tmux support
 - [x] add theme switcher walker support
 - [ ] add theme switcher yazi support
+- [ ] add gtk theme switcher support
+- [ ] add qt / kde theme switcher support
 - [ ] add wallpaper changer

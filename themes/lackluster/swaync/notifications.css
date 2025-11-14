@@ -1,35 +1,35 @@
-@define-color aurora0 #282c34;
-@define-color aurora1 #353b45;
-@define-color aurora2 #3e4451;
-@define-color aurora3 #545862;
-@define-color aurora4 #abb2bf;
-@define-color aurora5 #eceff4;
-@define-color aurora6 #c8ccd4;
-@define-color aurora7 #8fbcbb;
-@define-color aurora8 #88c0d0;
-@define-color aurora9 #81a1c1;
-@define-color aurora10 #5e81ac;
-@define-color aurora11 #bf616a;
-@define-color aurora12 #d08770;
-@define-color aurora13 #ebcb8b;
-@define-color aurora14 #a3be8c;
-@define-color aurora15 #b48ead;
+@define-color lackluster0 #0A0A0A;
+@define-color lackluster1 #080808;
+@define-color lackluster2 #444444;
+@define-color lackluster3 #7A7A7A;
+@define-color lackluster4 #DEEEED;
+@define-color lackluster5 #DEEEED;
+@define-color lackluster6 #DEEEED;
+@define-color lackluster7 #708090;
+@define-color lackluster8 #708090;
+@define-color lackluster9 #7788AA;
+@define-color lackluster10 #7788AA;
+@define-color lackluster11 #D70000;
+@define-color lackluster12 #FFAA88;
+@define-color lackluster13 #FFAA88;
+@define-color lackluster14 #789978;
+@define-color lackluster15 #D7007D;
 
-@define-color foreground    #aurora4;
-@define-color background    @aurora0;
+@define-color foreground    @lackluster4;
+@define-color background    @lackluster0;
 
 @define-color text            @foreground;
-@define-color background-alt  @aurora1;
-@define-color selected        @aurora3;
-@define-color hover           @aurora5;
-@define-color urgent          @aurora11;
-@define-color critical        @aurora11;
+@define-color background-alt  @lackluster2;
+@define-color selected        @lackluster3;
+@define-color hover           @lackluster4;
+@define-color urgent          @lackluster11;
+@define-color critical        @lackluster11;
 
 * {
-  background-alt: @aurora1;
-  selected: @aurora2;
-  hover: @aurora5;
-  urgent: @aurora11;
+  background-alt: @lackluster2;
+  selected: @lackluster3;
+  hover: @lackluster4;
+  urgent: @lackluster11;
   text-selected: @background;
   color: @text;
   all: unset;
@@ -46,7 +46,7 @@
 
 .floating-notifications.background .notification-row .notification-background {
   background: alpha(@background, 0.85);
-  box-shadow: 0 0 5px 0 @aurora0;
+  box-shadow: 0 0 5px 0 @lackluster0;
   border-radius: 24px;
   margin: 16px;
   padding: 0;
@@ -58,7 +58,7 @@
   .notification {
   background: alpha(@background, 0.85);
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.6);
-  border: 1px solid @aurora0;
+  border: 1px solid @lackluster0;
   border-radius: 24px;
   padding: 6px;
 }
@@ -150,7 +150,7 @@
   .notification-row
   .notification-background
   .close-button:hover {
-  background-color: @aurora2;
+  background-color: @lackluster2;
 }
 
 .floating-notifications.background

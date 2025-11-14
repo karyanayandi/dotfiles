@@ -16,6 +16,7 @@
 @define-color gruvbox15 #d3869b;
 
 @define-color foreground    @gruvbox5;
+@define-color background    @gruvbox0;
 
 @define-color text            @foreground;
 @define-color background-alt  @gruvbox1;

@@ -1,0 +1,9 @@
+# Lackluster color scheme for Sway
+set $accent #7788AA
+set $red #D70000
+set $text #DEEEED
+set $surface #7A7A7A
+set $dark #080808
+set $base #0A0A0A
+set $shadow #DEEEED
+set $shadow_inactive #444444
