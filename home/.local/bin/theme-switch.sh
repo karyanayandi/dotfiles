@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, and Sway Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, and sway
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, and Swaylock Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, and swaylock
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, and sway."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, and swaylock."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -63,6 +63,7 @@ discover_themes() {
     local has_lazygit=false
     local has_lazydocker=false
     local has_sway=false
+    local has_swaylock=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -100,15 +101,19 @@ discover_themes() {
       has_sway=true
     fi
     
+    if [[ -f "$theme_dir/swaylock/config" ]]; then
+      has_swaylock=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, or sway/colors" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, or swaylock/config" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -461,6 +466,39 @@ update_sway_theme() {
   UPDATED_COMPONENTS+=("sway")
 }
 
+# Update swaylock theme symlink
+update_swaylock_theme() {
+  local theme_name="$1"
+  local source_config="$THEMES_DIR/$theme_name/swaylock/config"
+  
+  # Check if theme has swaylock support
+  if [[ ! -f "$source_config" ]]; then
+    echo "Note: Theme '$theme_name' does not have swaylock support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/swaylock"
+  local target_config="$target_dir/config"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/swaylock/config)
+  local relative_path="../../$theme_name/swaylock/config"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_config"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update swaylock symlink at $target_config" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("swaylock")
+}
+
 # Reload waybar
 reload_waybar() {
   if pgrep -x waybar >/dev/null; then
@@ -562,6 +600,11 @@ reload_sway() {
   fi
 }
 
+# Reload swaylock
+reload_swaylock() {
+  echo "  ✓ Swaylock theme updated (will apply on next lock)"
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -612,6 +655,7 @@ main() {
   update_lazygit_theme "$theme_name"
   update_lazydocker_theme "$theme_name"
   update_sway_theme "$theme_name"
+  update_swaylock_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -651,6 +695,9 @@ main() {
         ;;
       sway)
         reload_sway
+        ;;
+      swaylock)
+        reload_swaylock
         ;;
     esac
   done
