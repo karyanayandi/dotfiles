@@ -1,7 +1,7 @@
 set font "Jetbrains Mono NF 10"
 set completion-bg "#353b45"
 set completion-fg "#ebcb8b"
-set completion-group-bg "#252423"
+set completion-group-bg "#282c34"
 set completion-group-fg "#ebcb8b"
 set completion-highlight-bg "#ebcb8b"
 set completion-highlight-fg "#353b45"
@@ -10,21 +10,21 @@ set default-fg "#ebcb8b"
 set inputbar-bg "#353b45"
 set inputbar-fg "#a3be8c"
 set notification-bg "#a3be8c"
-set notification-fg "#252423"
+set notification-fg "#282c34"
 set notification-error-bg "#bf616a"
-set notification-error-fg "#252423"
-set notification-warning-bg "#d8a657"
-set notification-warning-fg "#252423"
-set statusbar-bg "#252423"
+set notification-error-fg "#282c34"
+set notification-warning-bg "#d08770"
+set notification-warning-fg "#282c34"
+set statusbar-bg "#282c34"
 set statusbar-fg "#ebcb8b"
 set statusbar-h-padding 10
 set statusbar-v-padding 5
 set incremental-search "true"
-set highlight-fg rgba(37,36,35,1)
+set highlight-fg rgba(40,44,52,1)
 set highlight-color #a3be8c
 set highlight-active-color #d08770
 set recolor "true"
-set recolor-lightcolor "#ddc7a1"
+set recolor-lightcolor "#eceff4"
 set recolor-darkcolor "#282c34"
 set recolor-keephue "true"
 set recolor-reverse-video "true"

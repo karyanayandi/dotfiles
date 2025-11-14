@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, and Walker Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, and walker
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, and Zathura Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, and zathura
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, and walker."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, and zathura."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -66,6 +66,7 @@ discover_themes() {
     local has_swaylock=false
     local has_swaync=false
     local has_walker=false
+    local has_zathura=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -115,15 +116,19 @@ discover_themes() {
       has_walker=true
     fi
     
+    if [[ -f "$theme_dir/zathura/zathurarc" ]]; then
+      has_zathura=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, or walker/style.css" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, or zathura/zathurarc" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -706,6 +711,48 @@ reload_walker() {
   fi
 }
 
+# Update zathura theme symlink
+update_zathura_theme() {
+  local theme_name="$1"
+  local source_rc="$THEMES_DIR/$theme_name/zathura/zathurarc"
+  
+  # Check if theme has zathura support
+  if [[ ! -f "$source_rc" ]]; then
+    echo "Note: Theme '$theme_name' does not have zathura support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/zathura"
+  local target_rc="$target_dir/zathurarc"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink
+  local relative_path="../../$theme_name/zathura/zathurarc"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_rc"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update zathura symlink at $target_rc" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("zathura")
+}
+
+# Reload zathura
+reload_zathura() {
+  if pgrep -x zathura >/dev/null; then
+    echo "  - Zathura is running. Restart it to see theme changes."
+  else
+    echo "  ✓ Zathura theme updated (will apply on next start)"
+  fi
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -759,6 +806,7 @@ main() {
   update_swaylock_theme "$theme_name"
   update_swaync_theme "$theme_name"
   update_walker_theme "$theme_name"
+  update_zathura_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -807,6 +855,9 @@ main() {
         ;;
       walker)
         reload_walker
+        ;;
+      zathura)
+        reload_zathura
         ;;
     esac
   done
