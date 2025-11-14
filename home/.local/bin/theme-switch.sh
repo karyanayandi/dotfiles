@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, and Bat Theme Switcher
-# Automatically discover and switch between themes for waybar, foot terminal, and bat
+# Waybar, Foot, Bat, and Bottom Theme Switcher
+# Automatically discover and switch between themes for waybar, foot terminal, bat, and bottom
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot terminal, and bat with real-time reload."
+  echo "Switch themes for waybar, foot terminal, bat, and bottom with real-time reload."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -53,10 +53,11 @@ discover_themes() {
       continue
     fi
 
-    # Check if theme has required files (waybar, foot, or bat)
+    # Check if theme has required files (waybar, foot, bat, or bottom)
     local has_waybar=false
     local has_foot=false
     local has_bat=false
+    local has_bottom=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -70,15 +71,19 @@ discover_themes() {
       has_bat=true
     fi
     
+    if [[ -f "$theme_dir/bottom/bottom.toml" ]]; then
+      has_bottom=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, or bat/config" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, or bottom/bottom.toml" >&2
     exit 1
   fi
 }
@@ -235,6 +240,39 @@ update_bat_theme() {
   UPDATED_COMPONENTS+=("bat")
 }
 
+# Update bottom theme symlink
+update_bottom_theme() {
+  local theme_name="$1"
+  local source_toml="$THEMES_DIR/$theme_name/bottom/bottom.toml"
+  
+  # Check if theme has bottom support
+  if [[ ! -f "$source_toml" ]]; then
+    echo "Note: Theme '$theme_name' does not have bottom support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/bottom"
+  local target_toml="$target_dir/bottom.toml"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/bottom/bottom.toml)
+  local relative_path="../../$theme_name/bottom/bottom.toml"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_toml"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update bottom symlink at $target_toml" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("bottom")
+}
+
 # Reload waybar
 reload_waybar() {
   if pgrep -x waybar >/dev/null; then
@@ -276,6 +314,16 @@ reload_bat() {
     echo "  ✓ Bat cache rebuilt successfully"
   else
     echo "  ! Warning: Failed to rebuild bat cache" >&2
+  fi
+}
+
+# Reload bottom
+reload_bottom() {
+  if pgrep -x btm >/dev/null; then
+    echo "  - Bottom is running. Restart it to see theme changes."
+    echo "    Tip: Press 'q' in bottom and reopen it"
+  else
+    echo "  - Bottom theme updated (will apply on next start)"
   fi
 }
 
@@ -323,6 +371,7 @@ main() {
   update_waybar_theme "$theme_name"
   update_foot_theme "$theme_name"
   update_bat_theme "$theme_name"
+  update_bottom_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -344,6 +393,9 @@ main() {
         ;;
       bat)
         reload_bat
+        ;;
+      bottom)
+        reload_bottom
         ;;
     esac
   done
