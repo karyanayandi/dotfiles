@@ -123,6 +123,7 @@ yay -S --needed \
   termius \
   tmux \
   trash-cli \
+  tree \
   ttf-cascadia-code-nerd \
   ttf-firacode-nerd \
   udevil \
