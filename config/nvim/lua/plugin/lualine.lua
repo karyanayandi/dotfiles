@@ -3,7 +3,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   config = function()
-    local colors = require("aurora.colors").load()
+    local colors = require("base16-colorscheme").colors
 
     local hide_in_width = function()
       return vim.fn.winwidth(0) > 80
@@ -16,7 +16,7 @@ return {
       icon = { icons.git.Branch, align = "left" },
       use_mode_colors = false,
       color = function()
-        return { bg = "#373b43", fg = colors.fg_light, gui = "bold" }
+        return { bg = colors.base03, fg = colors.base05, gui = "bold" }
       end,
     }
 
@@ -37,7 +37,7 @@ return {
       cond = hide_in_width,
       separator = "%#SLSeparator#" .. " " .. "%*",
       color = function()
-        return { bg = "#373b43", fg = colors.fg_light }
+        return { bg = colors.base03, fg = colors.base05 }
       end,
     }
 
@@ -55,7 +55,7 @@ return {
       shorting_target = 10,
       use_color_mode = true,
       color = function()
-        return { bg = "#373b43", fg = colors.fg_light }
+        return { bg = colors.base03, fg = colors.base05 }
       end,
     }
 
@@ -71,7 +71,7 @@ return {
       },
       colored = true,
       color = function()
-        return { bg = "#32363e", fg = colors.fg_light }
+        return { bg = colors.base03, fg = colors.base05 }
       end,
       update_in_insert = false,
       always_visible = false,
@@ -82,7 +82,7 @@ return {
     --   icons_enabled = true,
     --   icon_only = false,
     --   color = function()
-    --     return { bg = "#252931", fg = colors.fg_light }
+    --     return { bg = colors.base03, fg = colors.base05 }
     --   end,
     -- }
 
