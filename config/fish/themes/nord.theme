@@ -1,0 +1,30 @@
+# name: 'nord'
+# url: 'https://www.nordtheme.com/'
+# preferred_background: 2e3440
+
+fish_color_normal eceff4
+fish_color_command 81a1c1
+fish_color_param d8dee9
+fish_color_keyword bf616a
+fish_color_quote a3be8c
+fish_color_redirection 8fbcbb
+fish_color_end d08770
+fish_color_comment 4c566a
+fish_color_error bf616a
+fish_color_gray 4c566a
+fish_color_selection --background=434c5e
+fish_color_search_match --background=434c5e
+fish_color_option a3be8c
+fish_color_operator 8fbcbb
+fish_color_escape bf616a
+fish_color_autosuggestion 4c566a
+fish_color_cancel bf616a
+fish_color_cwd ebcb8b
+fish_color_user 81a1c1
+fish_color_host 81a1c1
+fish_color_host_remote a3be8c
+fish_color_status bf616a
+fish_pager_color_progress 4c566a
+fish_pager_color_prefix 8fbcbb
+fish_pager_color_completion eceff4
+fish_pager_color_description 4c566a

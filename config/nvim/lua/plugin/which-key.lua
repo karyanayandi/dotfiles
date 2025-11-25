@@ -223,8 +223,8 @@ return {
       },
       {
         "<leader>oc",
-        "<cmd>Telescope colorscheme<cr>",
-        desc = "Colorscheme",
+        "<cmd>ThemeSwitch ",
+        desc = "Theme",
       },
       {
         "<leader>r",

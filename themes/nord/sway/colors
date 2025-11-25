@@ -1,0 +1,9 @@
+# Nord theme colors for Sway
+set $accent #88c0d0
+set $red #bf616a 
+set $text #eceff4
+set $surface #434c5e
+set $dark #3b4252
+set $base #2e3440
+set $shadow #eceff4
+set $shadow_inactive #4c566a

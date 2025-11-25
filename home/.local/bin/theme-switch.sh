@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, and Zathura Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, and zathura
+# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, and Neovim Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, and zathura."
+  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -120,15 +120,20 @@ discover_themes() {
       has_zathura=true
     fi
     
+    local has_nvim=false
+    if [[ -f "$theme_dir/nvim/theme.lua" ]]; then
+      has_nvim=true
+    fi
+    
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, or zathura/zathurarc" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, or nvim/theme.lua" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -607,6 +612,13 @@ reload_sway() {
     swaymsg reload &>/dev/null
     if [[ $? -eq 0 ]]; then
       echo "  ✓ Sway reloaded successfully"
+      # Reset cursor theme after reload
+      swaymsg seat seat0 xcursor_theme Bibata-Modern-Ice &>/dev/null
+      if [[ $? -eq 0 ]]; then
+        echo "  ✓ Cursor theme reset to Bibata-Modern-Ice"
+      else
+        echo "  ! Warning: Failed to reset cursor theme" >&2
+      fi
     else
       echo "  ! Warning: Failed to reload sway" >&2
     fi
@@ -753,6 +765,52 @@ reload_zathura() {
   fi
 }
 
+# Update nvim theme symlink
+update_nvim_theme() {
+  local theme_name="$1"
+  local source_theme="$THEMES_DIR/$theme_name/nvim/theme.lua"
+  
+  # Check if theme has nvim support
+  if [[ ! -f "$source_theme" ]]; then
+    echo "Note: Theme '$theme_name' does not have nvim support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/nvim"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$CURRENT_THEME_DIR" ]]; then
+    mkdir -p "$CURRENT_THEME_DIR"
+  fi
+
+  # Remove old nvim symlink/directory
+  if [[ -e "$target_dir" ]]; then
+    rm -rf "$target_dir"
+  fi
+
+  # Create relative symlink to theme's nvim directory
+  local relative_path="../$theme_name/nvim"
+
+  # Update symlink atomically
+  cd "$CURRENT_THEME_DIR" && ln -sf "$relative_path" nvim
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update nvim symlink at $target_dir" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("nvim")
+}
+
+# Reload nvim
+reload_nvim() {
+  if pgrep -x nvim >/dev/null; then
+    echo "  - Neovim is running. Restart it to see theme changes."
+  else
+    echo "  ✓ Neovim theme updated (will apply on next start)"
+  fi
+}
+
 # Main function
 main() {
   local theme_name=""
@@ -807,6 +865,7 @@ main() {
   update_swaync_theme "$theme_name"
   update_walker_theme "$theme_name"
   update_zathura_theme "$theme_name"
+  update_nvim_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -858,6 +917,9 @@ main() {
         ;;
       zathura)
         reload_zathura
+        ;;
+      nvim)
+        reload_nvim
         ;;
     esac
   done

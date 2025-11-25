@@ -1,0 +1,150 @@
+colors:
+  color0: "2e3440" # background (polar night 0)
+  color1: "3b4252" # black (polar night 1)
+  color2: "434c5e" # selection (polar night 2)
+  color3: "4c566a" # brightblack (polar night 3)
+  color4: "d8dee9" # foreground (snow storm 0)
+  color5: "e5e9f0" # white (snow storm 1)
+  color6: "eceff4" # brightwhite (snow storm 2)
+  color7: "8fbcbb" # brightcyan (frost 0)
+  color8: "88c0d0" # cyan (frost 1)
+  color9: "81a1c1" # blue (frost 2)
+  color10: "5e81ac" # darkblue (frost 3)
+  color11: "bf616a" # red (aurora red)
+  color12: "d08770" # orange (aurora orange)
+  color13: "ebcb8b" # yellow (aurora yellow)
+  color14: "a3be8c" # green (aurora green)
+
+  dim-foreground: "d8dee9"
+
+core:
+  normal_text:
+    foreground: dim-foreground
+
+  reset_to_normal:
+    background: color0
+    foreground: color4
+    font-style: regular
+
+  # File Types
+
+  regular_file:
+    foreground: color4
+
+  directory:
+    foreground: color10
+    font-style: bold
+
+  multi_hard_link:
+    foreground: color8
+    font-style: underline
+
+  symlink:
+    foreground: color8
+
+  broken_symlink:
+    foreground: color11
+
+  missing_symlink_target:
+    # NOTE: Also used for readline completion shell builtin and function suffix
+    background: color11
+    foreground: color5
+    font-style: bold
+
+  fifo:
+    foreground: color7
+    font-style:
+      - bold
+      - underline
+
+  character_device:
+    foreground: color13
+
+  block_device:
+    foreground: color13
+    font-style: underline
+
+  door:
+    foreground: color13
+    font-style: italic
+
+  socket:
+    # NOTE: Swapped with block device as used for readline completion prefix
+    foreground: color13
+    font-style: bold
+
+  # File Permissions
+
+  executable_file:
+    foreground: color7
+    font-style: bold
+
+  file_with_capability:
+    foreground: color4
+    font-style:
+      - bold
+      - underline
+
+  setuid:
+    foreground: color4
+    font-style:
+      - bold
+      - underline
+
+  setgid:
+    foreground: color4
+    font-style:
+      - bold
+      - underline
+
+  sticky:
+    background: color10
+    foreground: color5
+    font-style: underline
+
+  other_writable:
+    background: color10
+    foreground: color5
+    font-style: bold
+
+  sticky_other_writable:
+    background: color10
+    foreground: color5
+    font-style:
+      - bold
+      - underline
+
+# Document Types
+
+archives:
+  foreground: color5
+  font-style: bold
+
+executable:
+  foreground: color7
+  font-style: bold
+
+markup:
+  foreground: color6
+  web:
+    foreground: color4
+
+media:
+  foreground: color12
+  fonts:
+    foreground: color4
+
+office:
+  foreground: color14
+
+programming:
+  source:
+    foreground: color7
+  tooling:
+    foreground: color4
+
+text:
+  foreground: color4
+
+unimportant:
+  foreground: color3
