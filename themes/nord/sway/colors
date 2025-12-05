@@ -5,5 +5,5 @@ set $text #eceff4
 set $surface #434c5e
 set $dark #3b4252
 set $base #2e3440
-set $shadow #eceff4
-set $shadow_inactive #4c566a
+set $border #eceff4
+set $border_inactive #4c566a

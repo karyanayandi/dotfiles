@@ -11,11 +11,19 @@ gaps outer 2
 smart_borders on
 
 corner_radius 5
-shadows enable
-shadows_on_csd enable
-shadow_blur_radius 7
-shadow_color $shadow
-shadow_inactive_color $shadow_inactive
+
+# shadow
+# shadows enable
+# shadows_on_csd enable
+# shadow_blur_radius 7
+# shadow_color $shadow
+# shadow_inactive_color $shadow_inactive
+
+# thin borders
+# hide_edge_borders both
+
+client.focused            $border $border $border
+client.unfocused          $border_inactive $border_inactive $border_inactive
 
 default_border pixel
 
@@ -23,9 +31,6 @@ set $term foot
 set $menu walker --width 1280
 
 font Adwaita Sans 11
-
-# thin borders
-hide_edge_borders both
 
 # use mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -83,8 +88,8 @@ bindsym $mod+i focus mode_toggle
 # focus the parent container
 bindsym $mod+a focus parent
 
-# hide border
-for_window [class="^.*"] border pixel 0
+# border
+for_window [class="^.*"] border pixel 10 $shadow
 
 # floating maximum size
 floating_maximum_size -1 x -1

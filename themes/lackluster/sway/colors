@@ -5,5 +5,5 @@ set $text #DEEEED
 set $surface #7A7A7A
 set $dark #080808
 set $base #0A0A0A
-set $shadow #DEEEED
-set $shadow_inactive #444444
+set $border #DEEEED
+set $border_inactive #444444
