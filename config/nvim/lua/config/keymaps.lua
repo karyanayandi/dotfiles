@@ -74,16 +74,16 @@ keymap(
 )
 
 -- Find
-keymap("n", ";f", "<cmd>Telescope find_files theme=ivy<cr>", { desc = "Find files", noremap = true, silent = true })
+keymap("n", ";f", "<cmd>Telescope find_files<cr>", { desc = "Find files", noremap = true, silent = true })
 
 -- Find texts
-keymap("n", ";t", "<cmd>Telescope live_grep theme=ivy<cr>", { desc = "Find text", noremap = true, silent = true })
+keymap("n", ";t", "<cmd>Telescope live_grep<cr>", { desc = "Find text", noremap = true, silent = true })
 
 -- Find buffers
 keymap(
   "n",
   ";b",
-  "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false})<cr>",
+  "<cmd>lua require('telescope.builtin').buffers({previewer = false})<cr>",
   { desc = "Find buffers", noremap = true, silent = true }
 )
 
@@ -91,12 +91,12 @@ keymap(
 keymap(
   "n",
   ";g",
-  "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false})<cr>",
+  "<cmd>lua require('telescope.builtin').git_branches({previewer = false})<cr>",
   { desc = "Find git branches", noremap = true, silent = true }
 )
 
 -- Find help tags
-keymap("n", ";h", "<cmd>Telescope help_tags theme=ivy<cr>", { desc = "Find help tags", noremap = true, silent = true })
+keymap("n", ";h", "<cmd>Telescope help_tags<cr>", { desc = "Find help tags", noremap = true, silent = true })
 
 -- Find Projects
 keymap(

@@ -94,7 +94,7 @@ return {
       },
       {
         "<leader>bb",
-        "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+        "<cmd>lua require('telescope.builtin').buffers({previewer = false, initial_mode='normal'})<cr>",
         desc = "Buffer List",
       },
       {
@@ -251,27 +251,27 @@ return {
       },
       {
         "<leader>fb",
-        "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+        "<cmd>lua require('telescope.builtin').buffers({previewer = false, initial_mode='normal'})<cr>",
         desc = "Buffer",
       },
       {
         "<leader>fB",
-        "<cmd>lua require('telescope.builtin').git_branches(require('telescope.themes').get_ivy{previewer = false, initial_mode='normal'})<cr>",
+        "<cmd>lua require('telescope.builtin').git_branches({previewer = false, initial_mode='normal'})<cr>",
         desc = "Checkout Branch",
       },
       {
         "<leader>ff",
-        "<cmd>lua require('telescope.builtin').find_files(require('telescope.themes').get_ivy{previewer = false})<cr>",
+        "<cmd>lua require('telescope.builtin').find_files({previewer = false})<cr>",
         desc = "Find Files",
       },
       {
         "<leader>ft",
-        "<cmd>Telescope live_grep theme=ivy<cr>",
+        "<cmd>Telescope live_grep<cr>",
         desc = "Find Text",
       },
       {
         "<leader>fT",
-        "<cmd>TodoTelescope theme=ivy<cr>",
+        "<cmd>TodoTelescope<cr>",
         desc = "Find Todo",
       },
       {
