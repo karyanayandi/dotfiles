@@ -4,7 +4,7 @@
 WP_FOLDER=~/.config/dotfiles/wallpapers
 
 # Time in seconds to change wallpaper
-WAIT_TIME=599
+WAIT_TIME=10800
 
 while true; do
   PID=$(pidof swaybg)

@@ -309,8 +309,8 @@ exec swayosd-server
 exec elephant
 exec walker --gapplication-service
 exec swaync
+exec swayidle -w
 
-# set wallpaper
 exec --no-startup-id ~/.local/bin/random-wallpaper.sh
 
 # set sway cursor theme
