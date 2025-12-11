@@ -311,8 +311,7 @@ exec walker --gapplication-service
 exec swaync
 
 # set wallpaper
-exec --no-startup-id swaybg -m fill -i ~/.config/dotfiles/wallpapers/landscape/forest-in-the-sun.jpg
-# output * background '~/.config/dotfiles/wallpapers/schedule.png' fill
+exec --no-startup-id ~/.local/bin/random-wallpaper.sh
 
 # set sway cursor theme
 exec --no-startup-id swaymsg seat seat0 xcursor_theme Bibata-Modern-Ice
