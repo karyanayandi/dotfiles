@@ -66,6 +66,25 @@ return {
       quote = { raw = "[!QUOTE]", rendered = "󱆨 Quote", highlight = "RenderMarkdownQuote" },
       cite = { raw = "[!CITE]", rendered = "󱆨 Cite", highlight = "RenderMarkdownQuote" },
     },
+    overrides = {
+      filetype = {
+        codecompanion = {
+          html = {
+            tag = {
+              buf = { icon = " ", highlight = "CodeCompanionChatIcon" },
+              file = { icon = " ", highlight = "CodeCompanionChatIcon" },
+              group = { icon = " ", highlight = "CodeCompanionChatIcon" },
+              help = { icon = "󰘥 ", highlight = "CodeCompanionChatIcon" },
+              image = { icon = " ", highlight = "CodeCompanionChatIcon" },
+              rules = { icon = "󰧑 ", highlight = "CodeCompanionChatIcon" },
+              symbols = { icon = " ", highlight = "CodeCompanionChatIcon" },
+              tool = { icon = "󰯠 ", highlight = "CodeCompanionChatIcon" },
+              url = { icon = "󰌹 ", highlight = "CodeCompanionChatIcon" },
+            },
+          },
+        },
+      },
+    },
   },
   config = function()
     -- local colors = require("aurora.colors").load()

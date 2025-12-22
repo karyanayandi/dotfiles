@@ -47,7 +47,7 @@ return {
     },
     prompt_library = {
       ["Generate a Commit Message"] = {
-        strategy = "inline",
+        interaction = "inline",
         description = "Generate a commit message (custom)",
         opts = {
           adapter = {
@@ -58,6 +58,7 @@ return {
           is_default = true,
           is_slash_cmd = true,
           short_name = "generate_commit",
+          alias = "generate_commit",
           auto_submit = true,
         },
         prompts = {
