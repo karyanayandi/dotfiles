@@ -5,7 +5,32 @@ return {
 		"RRethy/base16-nvim",
 		priority = 10,
 		config = function()
-			vim.cmd("colorscheme base16-gruvbox-dark-medium")
+			require("base16-colorscheme").setup({
+				base00 = "#282828",
+				base01 = "#32302f",
+				base02 = "#3c3836",
+				base03 = "#504945",
+				base04 = "#7c6f64",
+				base05 = "#d4be98",
+				base06 = "#e6d5ae",
+				base07 = "#fbf1c7",
+				base08 = "#bdae93",
+				base09 = "#a89984",
+				base0A = "#c0b090",
+				base0B = "#8f8a7a",
+				base0C = "#9c9484",
+				base0D = "#b0a890",
+				base0E = "#c8bfa5",
+				base0F = "#6f655b",
+			})
+			vim.api.nvim_set_hl(0, "DiagnosticError", { fg = "#fb4934" })
+			vim.api.nvim_set_hl(0, "DiagnosticWarn", { fg = "#fe8019" })
+			vim.api.nvim_set_hl(0, "DiagnosticInfo", { fg = "#83a598" })
+			vim.api.nvim_set_hl(0, "DiagnosticHint", { fg = "#b8bb26" })
+			vim.api.nvim_set_hl(0, "DiagnosticUnderlineError", { fg = "#fb4934" })
+			vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", { fg = "#fe8019" })
+			vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { fg = "#83a598" })
+			vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { fg = "#b8bb26" })
 		end,
 	},
 	{

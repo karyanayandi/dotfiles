@@ -1,0 +1,30 @@
+# name: 'gruvbox-monochrome'
+# url: 'https://github.com/morhetz/gruvbox'
+# preferred_background: 282828
+
+fish_color_normal d4be98
+fish_color_command 9c9484
+fish_color_param e6d5ae
+fish_color_keyword bdae93
+fish_color_quote 8f8a7a
+fish_color_redirection b0a890
+fish_color_end a89984
+fish_color_comment 7c6f64
+fish_color_error bdae93
+fish_color_gray a89984
+fish_color_selection --background=504945
+fish_color_search_match --background=504945
+fish_color_option 8f8a7a
+fish_color_operator b0a890
+fish_color_escape bdae93
+fish_color_autosuggestion a89984
+fish_color_cancel bdae93
+fish_color_cwd c0b090
+fish_color_user 9c9484
+fish_color_host 9c9484
+fish_color_host_remote 8f8a7a
+fish_color_status bdae93
+fish_pager_color_progress a89984
+fish_pager_color_prefix b0a890
+fish_pager_color_completion d4be98
+fish_pager_color_description a89984

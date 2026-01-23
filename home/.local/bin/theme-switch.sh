@@ -278,14 +278,19 @@ update_bat_theme() {
     mkdir -p "$target_dir"
   fi
 
-  # Create relative symlink (../../theme/bat/config)
-  local relative_path="../../$theme_name/bat/config"
+  # Check if theme has a custom bat theme name mapping
+  local bat_theme_name="$theme_name"
+  local theme_map_file="$THEMES_DIR/$theme_name/bat/theme-name"
+  if [[ -f "$theme_map_file" ]]; then
+    bat_theme_name=$(cat "$theme_map_file" | tr -d '[:space:]')
+    echo "  Using custom bat theme name: $bat_theme_name"
+  fi
 
-  # Update symlink atomically
-  ln -sf "$relative_path" "$target_config"
+  # Create bat config with the theme name
+  echo "--theme=\"$bat_theme_name\"" > "$target_config"
 
   if [[ $? -ne 0 ]]; then
-    echo "Error: Failed to update bat symlink at $target_config" >&2
+    echo "Error: Failed to update bat config at $target_config" >&2
     exit 1
   fi
   
