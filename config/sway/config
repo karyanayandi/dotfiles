@@ -25,7 +25,7 @@ corner_radius 5
 client.focused            $border $border $border
 client.unfocused          $border_inactive $border_inactive $border_inactive
 
-default_border pixel
+default_border pixel 5
 
 set $term foot
 set $menu walker --width 1280
