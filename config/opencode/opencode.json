@@ -3,7 +3,13 @@
   "autoupdate": false,
   "plugin": ["opencode-gemini-auth"],
   "compaction": {
-    "auto": false
+    "auto": true
+  },
+  "small_model": "github-copilot/gpt-5-mini",
+  "agent": {
+    "compaction": {
+      "model": "github-copilot/gpt-5-mini"
+    }
   },
   "provider": {
     "google": {
@@ -102,11 +108,6 @@
     }
   },
   "mcp": {
-    "next-devtools": {
-      "type": "local",
-      "command": ["bun", "x", "next-devtools-mcp@latest"],
-      "enabled": true
-    },
     "shadcn": {
       "type": "local",
       "command": ["bun", "x", "shadcn@latest", "mcp"],
