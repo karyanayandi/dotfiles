@@ -7,7 +7,7 @@ global_search = true
 text = "Logout"
 icon = "logout"
 keyword = ["logout", "log out", "signout"]
-actions = { "logout" = "swaymsg exit" }
+actions = { "logout" = "pkill -f niri && pkill -f sway" }
 
 [[entries]]
 text = "Suspend"
