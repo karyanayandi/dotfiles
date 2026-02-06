@@ -52,6 +52,7 @@ M.formatters = {
   "goimports-reviser",
   "golines",
   "isort",
+  "oxfmt",
   "prettierd",
   "pretty-php",
   "shfmt",
@@ -59,13 +60,14 @@ M.formatters = {
 }
 
 M.linters = {
-  -- "biome",
+  "biome",
   "eslint_d",
   "flake8",
   "golangci-lint",
   "jsonlint",
   "luacheck",
   "markdownlint",
+  "oxlint",
   -- "phpcs",
 }
 
