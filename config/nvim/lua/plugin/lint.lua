@@ -9,21 +9,37 @@ return {
     local lint = require "lint"
 
     local function javascript_linter()
-      if vim.fn.glob "biome.json" ~= "" then
+      if
+        vim.fn.glob "oxlint.json" ~= ""
+        or vim.fn.glob ".oxlint.json" ~= ""
+        or vim.fn.glob ".oxlint.jsonc" ~= ""
+        or vim.fn.glob "oxc.json" ~= ""
+      then
+        return { "oxlint" }
+      elseif vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= "" then
         return { "biomejs" }
-      elseif vim.fn.glob "deno.json" ~= "" then
+      elseif vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= "" then
         return { "deno" }
+      elseif
+        vim.fn.glob ".eslintrc" ~= ""
+        or vim.fn.glob ".eslintrc.json" ~= ""
+        or vim.fn.glob ".eslintrc.js" ~= ""
+        or vim.fn.glob "eslint.config.cjs" ~= ""
+        or vim.fn.glob "eslint.config.js" ~= ""
+        or vim.fn.glob "eslint.config.mjs" ~= ""
+      then
+        return { "eslint_d" }
       else
         return { "eslint_d" }
       end
     end
 
     lint.linters_by_ft = {
-      astro = javascript_linter(),
+      astro = javascript_linter,
       css = { "eslint_d" },
       fish = { "fish" },
-      javascript = javascript_linter(),
-      javascriptreact = javascript_linter(),
+      javascript = javascript_linter,
+      javascriptreact = javascript_linter,
       json = { "jsonlint" },
       lua = { "luacheck" },
       markdown = { "markdownlint" },
@@ -31,10 +47,10 @@ return {
       nix = { "nix" },
       php = { "php" },
       python = { "python", "flake8" },
-      svelte = javascript_linter(),
-      typescript = javascript_linter(),
-      typescriptreact = javascript_linter(),
-      vue = javascript_linter(),
+      svelte = javascript_linter,
+      typescript = javascript_linter,
+      typescriptreact = javascript_linter,
+      vue = javascript_linter,
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
