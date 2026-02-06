@@ -1,15 +1,15 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
-  "plugin": ["opencode-gemini-auth"],
+  "plugin": ["opencode-gemini-auth", "@mohak34/opencode-notifier@latest"],
   "compaction": {
     "auto": true
   },
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
-    "compaction": {
-      "model": "github-copilot/gpt-5-mini"
-    }
+    "general": { "model": "github-copilot/gpt-5-mini" },
+    "explore": { "model": "github-copilot/gpt-5-mini" },
+    "compaction": { "model": "github-copilot/gpt-5-mini" }
   },
   "provider": {
     "google": {
@@ -113,9 +113,9 @@
       "command": ["bun", "x", "shadcn@latest", "mcp"],
       "enabled": true
     },
-    "browsermcp": {
+    "playwriter": {
       "type": "local",
-      "command": ["bun", "x", "@browsermcp/mcp@latest"],
+      "command": ["bun", "x", "playwriter@latest"],
       "enabled": true
     }
   }

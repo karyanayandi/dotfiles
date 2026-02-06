@@ -8,38 +8,52 @@ return {
     local conform = require "conform"
 
     local function javascript_formatter()
-      if vim.fn.glob "biome.json" ~= "" then
+      if
+        vim.fn.glob "oxlint.json" ~= ""
+        or vim.fn.glob "oxc.json" ~= ""
+        or vim.fn.glob ".oxfmtrc.json" ~= ""
+        or vim.fn.glob ".oxfmtrc.jsonc" ~= ""
+      then
+        return { "oxfmt" }
+      elseif vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= "" then
         return { "biome" }
-      elseif vim.fn.glob "deno.json" ~= "" then
+      elseif vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= "" then
         return { "deno_fmt" }
+      elseif
+        vim.fn.glob ".prettierrc" ~= ""
+        or vim.fn.glob ".prettierrc.json" ~= ""
+        or vim.fn.glob ".prettierrc.js" ~= ""
+        or vim.fn.glob "prettier.config.js" ~= ""
+      then
+        return { "prettierd" }
       else
         return { "prettierd" }
       end
     end
 
     local formatters_by_ft = {
-      astro = javascript_formatter(),
+      astro = javascript_formatter,
       blade = { "blade-formatter" },
       c = { "clang_format" },
       css = { "prettierd" },
       go = { "gofumpt", "goimports-reviser", "golines" },
       graphql = { "prettierd" },
       html = { "prettierd" },
-      javascript = javascript_formatter(),
-      javascriptreact = javascript_formatter(),
+      javascript = javascript_formatter,
+      javascriptreact = javascript_formatter,
       json = { "prettierd" },
       jsonc = { "prettierd" },
       json5 = { "prettierd" },
       lua = { "stylua" },
-      markdown = javascript_formatter(),
+      markdown = javascript_formatter,
       nix = { "alejandra" },
       php = { "pretty-php" },
       python = { "isort", "black" },
       sh = { "shfmt" },
-      svelte = javascript_formatter(),
-      typescript = javascript_formatter(),
-      typescriptreact = javascript_formatter(),
-      vue = javascript_formatter(),
+      svelte = javascript_formatter,
+      typescript = javascript_formatter,
+      typescriptreact = javascript_formatter,
+      vue = javascript_formatter,
       yaml = { "prettierd", stop_after_first = true },
     }
 
