@@ -1,16 +1,31 @@
 -- luacheck: globals vim
 
--- Enable LSP servers
-vim.lsp.enable {
+-- Conditionally enable LSP servers based on config files
+local function should_enable_biome()
+  return vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= ""
+end
+
+local function should_enable_eslint()
+  return vim.fn.glob ".eslintrc" ~= ""
+    or vim.fn.glob ".eslintrc.json" ~= ""
+    or vim.fn.glob ".eslintrc.js" ~= ""
+    or vim.fn.glob "eslint.config.cjs" ~= ""
+    or vim.fn.glob "eslint.config.js" ~= ""
+    or vim.fn.glob "eslint.config.mjs" ~= ""
+end
+
+local function should_enable_deno()
+  return vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= ""
+end
+
+-- Build server list
+local servers = {
   "astro",
   "bashls",
-  "biome",
   "clangd",
-  -- "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
-  -- "eslint",
   "gopls",
   "html",
   "intelephense",
@@ -27,11 +42,30 @@ vim.lsp.enable {
   "tailwindcss",
   "taplo",
   "templ",
-  "ts_ls",
   -- "vue_ls",
   -- "vtsls",
   "yamlls",
 }
+
+-- Conditionally add biome
+if should_enable_biome() then
+  table.insert(servers, "biome")
+end
+
+-- Conditionally add eslint
+if should_enable_eslint() then
+  table.insert(servers, "eslint")
+end
+
+-- Mutually exclusive: deno or ts_ls
+if should_enable_deno() then
+  table.insert(servers, "denols")
+else
+  table.insert(servers, "ts_ls")
+end
+
+-- Enable LSP servers
+vim.lsp.enable(servers)
 
 -- Configure diagnostic display with custom signs
 local icons = require "config.icons"

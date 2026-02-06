@@ -16,7 +16,7 @@ M.servers = {
   "bashls",
   "biome",
   "clangd",
-  -- "denols",
+  "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
