@@ -11,6 +11,8 @@ return {
     local function javascript_linter()
       if
         vim.fn.glob "oxlint.json" ~= ""
+        or vim.fn.glob "oxlint.config.js" ~= ""
+        or vim.fn.glob "oxlint.config.ts" ~= ""
         or vim.fn.glob ".oxlint.json" ~= ""
         or vim.fn.glob ".oxlint.jsonc" ~= ""
         or vim.fn.glob "oxc.json" ~= ""
