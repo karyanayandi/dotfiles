@@ -56,13 +56,12 @@ layout {
 prefer-no-csd
 
 spawn-at-startup "waybar"
-spawn-at-startup "elephant"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "swayosd-server"
 spawn-at-startup "swaync"
 
+spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "swayidle -w"
-spawn-sh-at-startup "walker --gapplication-service"
 spawn-sh-at-startup "export SSH_AUTH_SOCK"
 spawn-sh-at-startup "$(gnome-keyring-daemon --start)"
 spawn-sh-at-startup "gnome-keyring-daemon --start"
@@ -101,7 +100,7 @@ window-rule {
 
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
-    match app-id=r#"dev.benz.walker$"#
+    match app-id=r#"vicinae$"#
     match app-id=r#"chrome-nngceckbapebfimnlniiiahkandclblb-Default$"#
     match app-id=r#"org.gnome.FileRoller$"#
     match app-id=r#"mpv$"#
@@ -159,12 +158,11 @@ binds {
 
     Mod+E hotkey-overlay-title="Open File Manager" { spawn "/usr/bin/nemo"; }
 
-    Mod+Space hotkey-overlay-title="Run an Application: walker" { spawn-sh "walker --width 1280"; }
-    Mod+Shift+Space hotkey-overlay-title="Run an Runner" { spawn-sh "walker --width 1280 -m runner"; }
-    Mod+Shift+Q hotkey-overlay-title="Run an Exit Menu" { spawn-sh "walker --width 1280 -m menus:power"; }
-    Mod+Shift+W hotkey-overlay-title="Run an Websearch" { spawn-sh "walker --width 1280 -m websearch"; }
-    Mod+Shift+B hotkey-overlay-title="Open Bluetooth" { spawn-sh "walker --width 1280 -m bluetooth"; }
-    Mod+P hotkey-overlay-title="Open Clipboard" { spawn-sh "walker --width 1280 -m clipboard"; }
+    Mod+Space repeat=false hotkey-overlay-title="Run an Application: Vicinae" { spawn "vicinae" "toggle"; }
+    Mod+Shift+Space repeat=false hotkey-overlay-title="Run an Runner" { spawn "vicinae" "dmenu"; }
+    // Mod+Shift+W hotkey-overlay-title="Run an Websearch" { spawn-sh "walker --width 1280 -m websearch"; }
+    // Mod+Shift+B hotkey-overlay-title="Open Bluetooth" { spawn-sh "walker --width 1280 -m bluetooth"; }
+    Mod+P repeat=false hotkey-overlay-title="Open Clipboard" { spawn "vicinae" "vicinae://extensions/vicinae/clipboard/history"; }
 
     Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 
@@ -323,6 +321,10 @@ binds {
     Ctrl+Alt+Delete { quit; }
 
     Mod+Shift+P { power-off-monitors; }
+}
+
+debug {
+  honor-xdg-activation-with-invalid-serial
 }
 
 // workspace "1"

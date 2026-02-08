@@ -27,7 +27,7 @@ return {
       then
         return { "prettierd" }
       else
-        return { "prettierd" }
+        return { "oxlint" }
       end
     end
 

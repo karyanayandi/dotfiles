@@ -23,21 +23,6 @@ yay -S --needed \
   distrobox \
   dive \
   eglinfo \
-  elephant \
-  elephant-archlinuxpkgs \
-  elephant-bluetooth \
-  elephant-calc \
-  elephant-clipboard \
-  elephant-desktopapplications \
-  elephant-files \
-  elephant-menus \
-  elephant-providerlist \
-  elephant-runner \
-  elephant-symbols \
-  elephant-todo \
-  elephant-unicode \
-  elephant-websearch \
-  elephant-windows \
   eza \
   fd \
   ffmpeg \
@@ -130,9 +115,9 @@ yay -S --needed \
   udisks2 \
   unrar \
   unzip \
+  vicinae \
   visual-studio-code-bin \
   vivid \
-  walker \
   waybar \
   wf-recorder \
   wget \
@@ -147,6 +132,7 @@ yay -S --needed \
   xorg-xhost \
   yaak-bin \
   yazi \
+  yt-dlp \
   youtube-dl \
   zathura \
   zathura-djvu \
