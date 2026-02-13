@@ -32,6 +32,7 @@ local servers = {
   "jsonls",
   "lua_ls",
   "marksman",
+  "oxlint",
   -- "nil_ls",
   "prismals",
   "pyright",
