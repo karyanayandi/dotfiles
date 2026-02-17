@@ -8,12 +8,7 @@ return {
     local conform = require "conform"
 
     local function javascript_formatter()
-      if
-        vim.fn.glob "oxlint.json" ~= ""
-        or vim.fn.glob "oxc.json" ~= ""
-        or vim.fn.glob ".oxfmtrc.json" ~= ""
-        or vim.fn.glob ".oxfmtrc.jsonc" ~= ""
-      then
+      if vim.fn.glob ".oxfmtrc.json" ~= "" or vim.fn.glob ".oxfmtrc.jsonc" ~= "" or vim.fn.glob "oxc.json" ~= "" then
         return { "oxfmt" }
       elseif vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= "" then
         return { "biome" }

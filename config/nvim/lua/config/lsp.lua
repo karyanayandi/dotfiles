@@ -5,6 +5,20 @@ local function should_enable_biome()
   return vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= ""
 end
 
+local function should_enable_oxlint()
+  return vim.fn.glob ".oxlintrc.json" ~= ""
+    or vim.fn.glob ".oxlintrc.jsonc" ~= ""
+    or vim.fn.glob "oxlint.config.js" ~= ""
+    or vim.fn.glob "oxlint.config.ts" ~= ""
+    or vim.fn.glob ".oxlint.json" ~= ""
+    or vim.fn.glob ".oxlint.jsonc" ~= ""
+    or vim.fn.glob "oxc.json" ~= ""
+end
+
+local function should_enable_oxfmt()
+  return vim.fn.glob ".oxfmtrc.json" ~= "" or vim.fn.glob ".oxfmtrc.jsonc" ~= "" or vim.fn.glob "oxc.json" ~= ""
+end
+
 local function should_enable_eslint()
   return vim.fn.glob ".eslintrc" ~= ""
     or vim.fn.glob ".eslintrc.json" ~= ""
@@ -32,7 +46,6 @@ local servers = {
   "jsonls",
   "lua_ls",
   "marksman",
-  "oxlint",
   -- "nil_ls",
   "prismals",
   "pyright",
@@ -47,6 +60,16 @@ local servers = {
   -- "vtsls",
   "yamlls",
 }
+
+-- Conditionally add oxlint
+if should_enable_oxlint() then
+  table.insert(servers, "oxlint")
+end
+
+-- Conditionally add oxfmt
+if should_enable_oxfmt() then
+  table.insert(servers, "oxfmt")
+end
 
 -- Conditionally add biome
 if should_enable_biome() then
