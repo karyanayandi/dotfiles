@@ -37,6 +37,7 @@ local servers = {
   "astro",
   "bashls",
   "clangd",
+  "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
