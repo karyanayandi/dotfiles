@@ -57,7 +57,7 @@ local servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  -- "vue_ls",
+  "vue_ls",
   -- "vtsls",
   "yamlls",
 }

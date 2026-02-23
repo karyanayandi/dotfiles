@@ -166,7 +166,19 @@ return {
 					lualine_a = { branch, diff, filename },
 					lualine_b = {},
 					lualine_c = {},
-					lualine_x = {},
+					lualine_x = {
+						{
+							"lsp_status",
+							icon = "",
+							symbols = {
+								spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
+								done = "✓",
+								separator = " ",
+							},
+							ignore_lsp = { "copilot" },
+							show_name = true,
+						},
+					},
 					lualine_y = { diagnostics },
 					-- lualine_z = { filetype, "location" },
 					lualine_z = { "location" },
