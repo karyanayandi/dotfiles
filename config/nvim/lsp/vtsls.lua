@@ -4,7 +4,7 @@ local globalPlugins = {}
 
 -- Vue plugin
 local vue_path = vim.fn.expand "$MASON/packages/vue-language-server/node_modules/@vue/language-server"
-if vue_path then
+if vim.fn.isdirectory(vue_path) == 1 then
   table.insert(globalPlugins, {
     name = "@vue/typescript-plugin",
     location = vue_path,
@@ -16,7 +16,7 @@ end
 
 -- Astro plugin
 local astro_path = vim.fn.expand "$MASON/packages/astro-language-server/node_modules/@astrojs/language-server"
-if astro_path then
+if vim.fn.isdirectory(astro_path) == 1 then
   table.insert(globalPlugins, {
     name = "@astrojs/ts-plugin",
     location = astro_path,
@@ -28,7 +28,7 @@ end
 
 -- Svelte plugin
 local svelte_path = vim.fn.expand "$MASON/packages/svelte-language-server/node_modules/svelte-language-server"
-if svelte_path then
+if vim.fn.isdirectory(svelte_path) == 1 then
   table.insert(globalPlugins, {
     name = "typescript-svelte-plugin",
     location = svelte_path,
@@ -39,6 +39,17 @@ if svelte_path then
 end
 
 return {
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "javascript.jsx",
+    "typescript",
+    "typescriptreact",
+    "typescript.tsx",
+    "vue",
+    "astro",
+    "svelte",
+  },
   init_options = {
     globalPlugins = globalPlugins,
   },
