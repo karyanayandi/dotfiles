@@ -36,9 +36,9 @@ M.servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  "ts_ls",
+  -- "ts_ls",
   -- "vue_ls",
-  -- "vtsls",
+  "vtsls",
   "yamlls",
 }
 
@@ -55,6 +55,7 @@ M.formatters = {
   "oxfmt",
   "prettierd",
   "pretty-php",
+  "rustfmt",
   "shfmt",
   "stylua",
 }

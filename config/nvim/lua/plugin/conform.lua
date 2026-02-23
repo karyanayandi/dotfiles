@@ -44,6 +44,7 @@ return {
       nix = { "alejandra" },
       php = { "pretty-php" },
       python = { "isort", "black" },
+      rust = { "rustfmt" },
       sh = { "shfmt" },
       svelte = javascript_formatter,
       typescript = javascript_formatter,

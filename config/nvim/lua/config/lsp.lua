@@ -82,11 +82,11 @@ if should_enable_eslint() then
   table.insert(servers, "eslint")
 end
 
--- Mutually exclusive: deno or ts_ls
+-- Mutually exclusive: deno or vtsls
 if should_enable_deno() then
   table.insert(servers, "denols")
 else
-  table.insert(servers, "ts_ls")
+  table.insert(servers, "vtsls")
 end
 
 -- Enable LSP servers

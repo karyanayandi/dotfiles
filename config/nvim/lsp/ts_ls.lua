@@ -1,5 +1,3 @@
--- TODO: dont run ts_ls when there is deno.json or deno.jsonc file
-
 -- luacheck: globals vim
 
 local globalPlugins = {}

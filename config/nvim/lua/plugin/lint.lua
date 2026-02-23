@@ -50,6 +50,7 @@ return {
       nix = { "nix" },
       php = { "php" },
       python = { "python", "flake8" },
+      rust = { "rust" },
       svelte = javascript_linter(),
       typescript = javascript_linter(),
       typescriptreact = javascript_linter(),
