@@ -55,6 +55,13 @@ return {
   },
   settings = {
     typescript = {
+      updateImportsOnFileMove = { enabled = "always" },
+      suggest = {
+        completeFunctionCalls = true,
+      },
+      tsserver = {
+        maxTsServerMemory = 8192,
+      },
       inlayHints = {
         includeInlayParameterNameHints = "all",
         includeInlayParameterNameHintsWhenArgumentMatchesName = true,
