@@ -167,13 +167,13 @@ return {
 					lualine_x = {
 						{
 							"lsp_status",
-							icon = "",
+							icon = "",
 							symbols = {
 								spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
 								done = "✓",
 								separator = " ",
 							},
-							ignore_lsp = { "copilot" },
+							ignore_lsp = { "copilot", "emmet_ls" },
 							show_name = true,
 						},
 					},
