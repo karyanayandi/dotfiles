@@ -308,12 +308,12 @@ return {
             vim.g.opencode_tmux_pane = nil
           end
         end
-        local result = vim.fn.system "tmux split-window -h -p 30 -P -F '#{pane_id}' 'opencode'"
+        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'opencode'"
         vim.g.opencode_tmux_pane = vim.fn.trim(result)
       else
         Snacks.terminal.toggle("opencode", {
           interactive = true,
-          win = { position = "right", width = 0.3 },
+          win = { position = "right", width = 0.4 },
         })
       end
     end
