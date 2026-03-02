@@ -5,18 +5,14 @@
   "height": 30,
   "width": 1280,
   "spacing": 4,
-  "modules-left": [
-    "sway/workspaces",
-    "sway/mode",
-    "sway/window"
-  ],
+  "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
   "modules-center": [
     "tray",
     "pulseaudio",
     "network",
     "disk",
     "memory",
-    "clock"
+    "clock",
   ],
   "modules-right": [
     "network",
@@ -24,7 +20,7 @@
     "memory",
     "bluetooth",
     "pulseaudio",
-    "custom/notification"
+    "custom/notification",
   ],
   "sway/workspaces": {
     "disable-scroll": true,
@@ -32,66 +28,66 @@
     "warp-on-scroll": false,
     "format": "{icon}",
     "format-icons": {
-        "1": "",
-        "2": "",
-        "3": "",
-        "4": "",
-        "5": "",
-        "urgent": "",
-        "focused": "",
-        "default": ""
-    }
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "urgent": "",
+      "focused": "",
+      "default": "",
+    },
   },
   "sway/mode": {
-    "format": "{}"
+    "format": "{}",
   },
   "clock": {
     "format": "{:%H:%M}",
     "tooltip": true,
-    "tooltip-format": "{:%A, %B %d, %Y}"
+    "tooltip-format": "{:%A, %B %d, %Y}",
   },
   "disk": {
     "interfal": 30,
     "format": "",
     "path": "/",
-    "on-click": "foot -e yazi"
+    "on-click": "alacritty -e yazi",
   },
   "bluetooth": {
-   "format": "",
+    "format": "",
     "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
     "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
     "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
     "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
-    "on-click": "foot -e bluetui"
+    "on-click": "alacritty -e bluetui",
   },
   "network": {
     "interfal": 5,
     "format-ethernet": "󰓅",
     "tooltip-format-ethernet": "󰓅 {bandwidthUpBits}",
-    "format-disconnected": "", 
-    "on-click": "foot -e ping 8.8.8.8"
+    "format-disconnected": "",
+    "on-click": "alacritty -e ping 8.8.8.8",
   },
   "tray": {
     "icon-size": 20,
-    "spacing": 4
+    "spacing": 4,
   },
   "pulseaudio": {
     "format": "{icon}",
     "format-muted": "󰸈",
     "format-icons": {
       "headphone": "󰋋",
-      "default": ["", "", "󰕾", "󰕾", ""]
+      "default": ["", "", "󰕾", "󰕾", ""],
     },
     "tooltip": true,
     "tooltip-format": "{icon} {volume}%",
     "scroll-step": 1,
-    "on-click": "foot -e wiremix",
-    "on-click-middle": "swayosd-client --output-volume mute-toggle"
+    "on-click": "alacritty -e wiremix",
+    "on-click-middle": "swayosd-client --output-volume mute-toggle",
   },
   "memory": {
     "format": "󰍛",
-    "on-click": "foot -e btm",
-    "interval": 5
+    "on-click": "alacritty -e btm",
+    "interval": 5,
   },
   "custom/notification": {
     "tooltip": false,
@@ -104,13 +100,13 @@
       "inhibited-notification": "<span foreground='red'><sup></sup></span>",
       "inhibited-none": "",
       "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-      "dnd-inhibited-none": ""
+      "dnd-inhibited-none": "",
     },
     "return-type": "json",
     "exec-if": "which swaync-client",
     "exec": "swaync-client -swb",
     "on-click": "swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
-    "escape": true
-  }
+    "escape": true,
+  },
 }
