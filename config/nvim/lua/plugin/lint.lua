@@ -82,20 +82,25 @@ return {
         local filetype = vim.bo[bufnr].filetype
 
         -- Disable markdownlint for codecompanion, Avante and copilot-*
-        if
-          filetype == "markdown"
-          and (filetype == "Avante" or filetype == "codecompanion" or filename:match "^copilot%-")
-        then
-          lint.linters_by_ft["markdown"] = {}
-        elseif filetype == "markdown" then
-          lint.linters_by_ft["markdown"] = { "markdownlint" }
+        -- ...existing code...
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+
+        -- Disable markdownlint for codecompanion, Avante and copilot-* buffers
+        if filetype == "markdown" then
+          if bufname:match "codecompanion" or bufname:match "Avante" or bufname:match "copilot%-" then
+            lint.linters_by_ft["markdown"] = {}
+          else
+            lint.linters_by_ft["markdown"] = { "markdownlint" }
+          end
         end
 
         -- Disable shellcheck for .env files
-        if filetype == "sh" and filename:match "%.env" then
-          lint.linters_by_ft["sh"] = {}
-        elseif filetype == "sh" then
-          lint.linters_by_ft["sh"] = { "shellcheck" }
+        if filetype == "sh" then
+          if filename:match "%.env$" then
+            lint.linters_by_ft["sh"] = {}
+          else
+            lint.linters_by_ft["sh"] = { "shellcheck" }
+          end
         end
       end,
     })
