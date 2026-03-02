@@ -258,6 +258,13 @@ return {
         style = "terminal",
       },
     },
+    styles = {
+      terminal = {
+        wo = {
+          winhighlight = "NormalFloat:Normal,FloatBorder:Normal",
+        },
+      },
+    },
     toggle = { enabled = false },
     words = { enabled = false },
     zen = { enabled = false },
@@ -278,30 +285,18 @@ return {
     })
 
     -- lazygit
-    local lazygit_term = nil
     function _LAZYGIT_TOGGLE()
-      if not lazygit_term then
-        lazygit_term = Snacks.terminal.get("lazygit", { interactive = true })
-      end
-      lazygit_term:toggle()
+      Snacks.terminal.toggle("lazygit", { interactive = true })
     end
 
     -- lazygit log
-    local lazygitlog_term = nil
     function _LAZYGIT_LOG_TOGGLE()
-      if not lazygitlog_term then
-        lazygitlog_term = Snacks.terminal.get("lazygit log", { interactive = true })
-      end
-      lazygitlog_term:toggle()
+      Snacks.terminal.toggle("lazygit log", { interactive = true })
     end
 
     -- opencode
-    local opencode_term = nil
     function _OPENCODE_TOGGLE()
-      if not opencode_term then
-        opencode_term = Snacks.terminal.get("opencode", { interactive = true })
-      end
-      opencode_term:toggle()
+      Snacks.terminal.toggle("opencode", { interactive = true })
     end
   end,
   keys = {
