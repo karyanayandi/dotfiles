@@ -45,6 +45,24 @@ return {
         end,
       },
     },
+    rules = {
+      default = {
+        description = "Collection of common files for all projects",
+        files = {
+          ".clinerules",
+          ".cursorrules",
+          ".goosehints",
+          ".rules",
+          ".windsurfrules",
+          ".github/copilot-instructions.md",
+          "AGENT.md",
+          "AGENTS.md",
+          { path = "CLAUDE.md", parser = "claude" },
+          { path = "CLAUDE.local.md", parser = "claude" },
+          { path = "~/.claude/CLAUDE.md", parser = "claude" },
+        },
+      },
+    },
     prompt_library = {
       ["Generate a Commit Message"] = {
         interaction = "inline",
@@ -70,6 +88,7 @@ return {
             ),
           },
         },
+        tools = { "read_file", "insert_edit_into_file", "run_command" },
       },
     },
     strategies = {
