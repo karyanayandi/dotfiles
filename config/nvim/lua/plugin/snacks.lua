@@ -296,7 +296,10 @@ return {
 
     -- opencode
     function _OPENCODE_TOGGLE()
-      Snacks.terminal.toggle("opencode", { interactive = true })
+      Snacks.terminal.toggle(
+        "opencode",
+        { interactive = true, position = "right", size = { width = 0.8, height = 0.8 } }
+      )
     end
   end,
   keys = {
