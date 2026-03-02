@@ -256,13 +256,7 @@ return {
       enabled = true,
       win = {
         style = "terminal",
-      },
-    },
-    styles = {
-      terminal = {
-        wo = {
-          winhighlight = "NormalFloat:Normal,FloatBorder:Normal",
-        },
+        position = "bottom",
       },
     },
     toggle = { enabled = false },
@@ -286,20 +280,26 @@ return {
 
     -- lazygit
     function _LAZYGIT_TOGGLE()
-      Snacks.terminal.toggle("lazygit", { interactive = true })
+      Snacks.terminal.toggle("lazygit", {
+        interactive = true,
+        win = { position = "float", border = "none", width = 1, height = 1 },
+      })
     end
 
     -- lazygit log
     function _LAZYGIT_LOG_TOGGLE()
-      Snacks.terminal.toggle("lazygit log", { interactive = true })
+      Snacks.terminal.toggle("lazygit log", {
+        interactive = true,
+        win = { position = "float", border = "none", width = 1, height = 1 },
+      })
     end
 
     -- opencode
     function _OPENCODE_TOGGLE()
-      Snacks.terminal.toggle(
-        "opencode",
-        { interactive = true, position = "right", size = { width = 0.8, height = 0.8 } }
-      )
+      Snacks.terminal.toggle("opencode", {
+        interactive = true,
+        win = { position = "right", width = 0.4 },
+      })
     end
   end,
   keys = {
