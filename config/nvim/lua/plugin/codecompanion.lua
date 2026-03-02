@@ -96,8 +96,8 @@ return {
         adapter = {
           -- name = "openrouter",
           -- model = "qwen/qwen3-coder:free",
-          name = "copilot",
-          model = "claude-sonnet-4.5",
+          name = "opencode",
+          model = "github-copilot/claude-sonnet-4.6",
         },
         opts = {
           completion_provider = "cmp",
