@@ -8,6 +8,7 @@ local env = require("config.functions").load_env_file "~/.env"
 return {
   "olimorris/codecompanion.nvim",
   cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
+
   dependencies = {
     "ravitemer/mcphub.nvim",
     "echasnovski/mini.diff",
@@ -78,7 +79,6 @@ return {
           short_name = "generate_commit",
           alias = "generate_commit",
           auto_submit = true,
-          auto_accept = true, -- Add this line
         },
         prompts = {
           {
@@ -264,7 +264,12 @@ return {
     },
     {
       "<leader>ag",
-      "<cmd>CodeCompanion /generate_commit<CR>",
+      function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local approvals = require("codecompanion.interactions.chat.tools.approvals")
+        approvals:always(bufnr, { tool_name = "inline" })
+        vim.cmd("CodeCompanion /generate_commit")
+      end,
       desc = "Generate commit message",
       mode = { "n", "v" },
     },
