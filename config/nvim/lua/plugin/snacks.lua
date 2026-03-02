@@ -282,7 +282,7 @@ return {
     function _LAZYGIT_TOGGLE()
       Snacks.terminal.toggle("lazygit", {
         interactive = true,
-        win = { position = "float", border = "none", width = 1, height = 1 },
+        win = { position = "float", border = "none" },
       })
     end
 
@@ -290,7 +290,7 @@ return {
     function _LAZYGIT_LOG_TOGGLE()
       Snacks.terminal.toggle("lazygit log", {
         interactive = true,
-        win = { position = "float", border = "none", width = 1, height = 1 },
+        win = { position = "float", border = "none" },
       })
     end
 
