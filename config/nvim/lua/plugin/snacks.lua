@@ -166,7 +166,7 @@ return {
     },
     input = {
       enabled = true,
-      icon = " ",
+      icon = " ",
       icon_hl = "SnacksInputIcon",
       icon_pos = "left",
       prompt_pos = "title",
@@ -252,11 +252,58 @@ return {
       },
       refresh = 50,
     },
-    terminal = { enabled = false },
+    terminal = {
+      enabled = true,
+      win = {
+        style = "terminal",
+      },
+    },
     toggle = { enabled = false },
     words = { enabled = false },
     zen = { enabled = false },
   },
+  config = function(_, opts)
+    require("snacks").setup(opts)
+
+    -- Terminal window navigation (replaces toggleterm set_terminal_keymaps)
+    vim.api.nvim_create_autocmd("TermOpen", {
+      pattern = "term://*",
+      callback = function()
+        local map_opts = { noremap = true, buffer = 0 }
+        vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-W>h]], map_opts)
+        vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-W>j]], map_opts)
+        vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-W>k]], map_opts)
+        vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-W>l]], map_opts)
+      end,
+    })
+
+    -- lazygit
+    local lazygit_term = nil
+    function _LAZYGIT_TOGGLE()
+      if not lazygit_term then
+        lazygit_term = Snacks.terminal.get("lazygit", { interactive = true })
+      end
+      lazygit_term:toggle()
+    end
+
+    -- lazygit log
+    local lazygitlog_term = nil
+    function _LAZYGIT_LOG_TOGGLE()
+      if not lazygitlog_term then
+        lazygitlog_term = Snacks.terminal.get("lazygit log", { interactive = true })
+      end
+      lazygitlog_term:toggle()
+    end
+
+    -- opencode
+    local opencode_term = nil
+    function _OPENCODE_TOGGLE()
+      if not opencode_term then
+        opencode_term = Snacks.terminal.get("opencode", { interactive = true })
+      end
+      opencode_term:toggle()
+    end
+  end,
   keys = {
     {
       "<leader>bc",
@@ -297,9 +344,18 @@ return {
     {
       "<C-t>",
       function()
-        Snacks.terminal()
+        Snacks.terminal.toggle()
       end,
-      desc = "which_key_ignore",
+      mode = { "n", "i", "t" },
+      desc = "Toggle Terminal",
+    },
+    {
+      ";o",
+      function()
+        _OPENCODE_TOGGLE()
+      end,
+      mode = { "n", "i" },
+      desc = "Toggle OpenCode",
     },
   },
 }

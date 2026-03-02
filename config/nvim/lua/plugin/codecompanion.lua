@@ -78,6 +78,7 @@ return {
           short_name = "generate_commit",
           alias = "generate_commit",
           auto_submit = true,
+          auto_accept = true, -- Add this line
         },
         prompts = {
           {
@@ -88,7 +89,6 @@ return {
             ),
           },
         },
-        tools = { "read_file", "insert_edit_into_file", "run_command" },
       },
     },
     strategies = {
