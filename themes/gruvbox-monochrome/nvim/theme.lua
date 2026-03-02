@@ -23,6 +23,9 @@ return {
 				base0E = "#c8bfa5",
 				base0F = "#6f655b",
 			})
+			vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+			vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
 			vim.api.nvim_set_hl(0, "DiagnosticError", { fg = "#fb4934" })
 			vim.api.nvim_set_hl(0, "DiagnosticWarn", { fg = "#fe8019" })
 			vim.api.nvim_set_hl(0, "DiagnosticInfo", { fg = "#83a598" })
