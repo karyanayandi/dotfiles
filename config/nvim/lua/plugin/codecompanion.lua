@@ -266,9 +266,9 @@ return {
       "<leader>ag",
       function()
         local bufnr = vim.api.nvim_get_current_buf()
-        local approvals = require("codecompanion.interactions.chat.tools.approvals")
+        local approvals = require "codecompanion.interactions.chat.tools.approvals"
         approvals:always(bufnr, { tool_name = "inline" })
-        vim.cmd("CodeCompanion /generate_commit")
+        vim.cmd "CodeCompanion /generate_commit"
       end,
       desc = "Generate commit message",
       mode = { "n", "v" },
