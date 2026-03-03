@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, and Neovim Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim
+# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, and Neovim Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, and neovim
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim."
+  echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, and neovim."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -68,6 +68,7 @@ discover_themes() {
     local has_swaync=false
     local has_walker=false
     local has_zathura=false
+    local has_yazi=false
     
     if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
       has_waybar=true
@@ -125,20 +126,24 @@ discover_themes() {
       has_zathura=true
     fi
     
+    if [[ -f "$DOTFILES_DIR/config/yazi/themes/${discovered_theme}.toml" ]]; then
+      has_yazi=true
+    fi
+    
     local has_nvim=false
     if [[ -f "$theme_dir/nvim/theme.lua" ]]; then
       has_nvim=true
     fi
     
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, or nvim/theme.lua" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, or nvim/theme.lua" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -823,6 +828,48 @@ reload_zathura() {
   fi
 }
 
+# Update yazi theme symlink
+update_yazi_theme() {
+  local theme_name="$1"
+  local source_theme="$DOTFILES_DIR/config/yazi/themes/${theme_name}.toml"
+  
+  # Check if theme has yazi support
+  if [[ ! -f "$source_theme" ]]; then
+    echo "Note: Theme '$theme_name' does not have yazi support, skipping."
+    return 0
+  fi
+  
+  local target_dir="$CURRENT_THEME_DIR/yazi"
+  local target_theme="$target_dir/theme.toml"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../../config/yazi/themes/<theme>.toml)
+  local relative_path="../../../config/yazi/themes/${theme_name}.toml"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_theme"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update yazi symlink at $target_theme" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("yazi")
+}
+
+# Reload yazi
+reload_yazi() {
+  if pgrep -x yazi >/dev/null; then
+    echo "  - Yazi is running. Restart it to see theme changes."
+  else
+    echo "  ✓ Yazi theme updated (will apply on next start)"
+  fi
+}
+
 # Update nvim theme symlink
 update_nvim_theme() {
   local theme_name="$1"
@@ -866,6 +913,52 @@ reload_nvim() {
     echo "  - Neovim is running. Restart it to see theme changes."
   else
     echo "  ✓ Neovim theme updated (will apply on next start)"
+  fi
+}
+
+# Update yazi theme symlink
+update_yazi_theme() {
+  local theme_name="$1"
+  local source_theme="$DOTFILES_DIR/config/yazi/themes/${theme_name}.toml"
+  
+  # Check if theme has yazi support
+  if [[ ! -f "$source_theme" ]]; then
+    echo "Note: Theme '$theme_name' does not have yazi support, skipping."
+    return 0
+  fi
+  
+  # Yazi looks for theme.toml directly in its config directory
+  local target_theme="$HOME/.config/yazi/theme.toml"
+
+  # Create yazi config directory if it doesn't exist
+  local yazi_config_dir="$HOME/.config/yazi"
+  if [[ ! -d "$yazi_config_dir" ]]; then
+    mkdir -p "$yazi_config_dir"
+  fi
+
+  # Remove old theme.toml symlink/file
+  if [[ -e "$target_theme" ]]; then
+    rm -f "$target_theme"
+  fi
+
+  # Create symlink to the theme file
+  ln -sf "$source_theme" "$target_theme"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update yazi theme symlink at $target_theme" >&2
+    exit 1
+  fi
+  
+  UPDATED_COMPONENTS+=("yazi")
+}
+
+# Reload yazi
+reload_yazi() {
+  if pgrep -x yazi >/dev/null; then
+    echo "  - Yazi is running. Restart it to see theme changes."
+    echo "    Tip: Press 'q' to quit and reopen yazi"
+  else
+    echo "  ✓ Yazi theme updated (will apply on next start)"
   fi
 }
 
@@ -924,7 +1017,9 @@ main() {
   update_swaync_theme "$theme_name"
   update_walker_theme "$theme_name"
   update_zathura_theme "$theme_name"
+  update_yazi_theme "$theme_name"
   update_nvim_theme "$theme_name"
+  update_yazi_theme "$theme_name"
   
   # Check if any components were updated
   if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -980,8 +1075,14 @@ main() {
       zathura)
         reload_zathura
         ;;
+      yazi)
+        reload_yazi
+        ;;
       nvim)
         reload_nvim
+        ;;
+      yazi)
+        reload_yazi
         ;;
     esac
   done
