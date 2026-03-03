@@ -97,7 +97,7 @@ return {
           -- name = "openrouter",
           -- model = "qwen/qwen3-coder:free",
           name = "opencode",
-          model = "github-copilot/claude-sonnet-4.6",
+          model = "github-copilot/claude-haiku-4.5",
         },
         opts = {
           completion_provider = "cmp",
@@ -165,7 +165,7 @@ return {
           -- name = "openrouter",
           -- model = "qwen/qwen3-coder:free",
           name = "copilot",
-          model = "claude-sonnet-4",
+          model = "claude-haiku-4.5",
         },
         keymaps = {
           accept_change = {
