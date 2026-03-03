@@ -95,6 +95,10 @@ function M.config()
       M.formatters,
       M.linters,
     },
+    auto_update = true,
+    run_on_start = true,
+    start_delay = 3000,
+    debounce_hours = 24,
   }
 end
 
