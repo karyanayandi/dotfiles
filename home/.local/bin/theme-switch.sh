@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, and Neovim Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim
+# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, and Neovim Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
   echo "Usage: theme-switch.sh [THEME_NAME]"
   echo ""
-  echo "Switch themes for waybar, foot, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim."
+  echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, and neovim."
   echo ""
   echo "Options:"
   echo "  -h, --help    Show this help message"
@@ -53,9 +53,10 @@ discover_themes() {
       continue
     fi
 
-    # Check if theme has required files (waybar, foot, bat, bottom, or vivid)
+    # Check if theme has required files (waybar, foot, alacritty, bat, bottom, or vivid)
     local has_waybar=false
     local has_foot=false
+    local has_alacritty=false
     local has_bat=false
     local has_bottom=false
     local has_vivid=false
@@ -75,7 +76,11 @@ discover_themes() {
     if [[ -f "$theme_dir/foot/colors.ini" ]]; then
       has_foot=true
     fi
-    
+
+    if [[ -f "$theme_dir/alacritty/colors.toml" ]]; then
+      has_alacritty=true
+    fi
+
     if [[ -f "$theme_dir/bat/config" ]]; then
       has_bat=true
     fi
@@ -126,14 +131,14 @@ discover_themes() {
     fi
     
     # Theme is valid if it has at least one component
-    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true ]]; then
+    if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true ]]; then
       AVAILABLE_THEMES+=("$discovered_theme")
     fi
   done
 
   if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
     echo "Error: No valid themes found in $THEMES_DIR" >&2
-    echo "Themes must have waybar/waybar.css, foot/colors.ini, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, or nvim/theme.lua" >&2
+    echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, or nvim/theme.lua" >&2
     echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
     echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
     exit 1
@@ -257,6 +262,39 @@ update_foot_theme() {
   fi
   
   UPDATED_COMPONENTS+=("foot")
+}
+
+# Update alacritty theme symlink
+update_alacritty_theme() {
+  local theme_name="$1"
+  local source_toml="$THEMES_DIR/$theme_name/alacritty/colors.toml"
+
+  # Check if theme has alacritty support
+  if [[ ! -f "$source_toml" ]]; then
+    echo "Note: Theme '$theme_name' does not have alacritty support, skipping."
+    return 0
+  fi
+
+  local target_dir="$CURRENT_THEME_DIR/alacritty"
+  local target_toml="$target_dir/colors.toml"
+
+  # Create target directory if it doesn't exist
+  if [[ ! -d "$target_dir" ]]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # Create relative symlink (../../theme/alacritty/colors.toml)
+  local relative_path="../../$theme_name/alacritty/colors.toml"
+
+  # Update symlink atomically
+  ln -sf "$relative_path" "$target_toml"
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to update alacritty symlink at $target_toml" >&2
+    exit 1
+  fi
+
+  UPDATED_COMPONENTS+=("alacritty")
 }
 
 # Update bat theme symlink
@@ -554,6 +592,21 @@ reload_foot() {
     echo "  - Foot theme updated (open new terminal to see changes)"
   else
     echo "  - Foot is not running. Theme will apply on next start."
+  fi
+}
+
+# Reload alacritty terminals
+reload_alacritty() {
+  # Alacritty doesn't support live config reload via signals
+  # Users need to either:
+  # 1. Enable live_config_reload in their alacritty config
+  # 2. Close and reopen terminals
+  if pgrep -x alacritty >/dev/null; then
+    local alacritty_count=$(pgrep -x alacritty | wc -l)
+    echo "  - Found $alacritty_count running alacritty terminal(s)"
+    echo "  - Alacritty theme updated (config will reload if live_config_reload is enabled, otherwise open new terminal to see changes)"
+  else
+    echo "  - Alacritty is not running. Theme will apply on next start."
   fi
 }
 
@@ -859,6 +912,7 @@ main() {
   # Update component themes
   update_waybar_theme "$theme_name"
   update_foot_theme "$theme_name"
+  update_alacritty_theme "$theme_name"
   update_bat_theme "$theme_name"
   update_bottom_theme "$theme_name"
   update_ls_colors "$theme_name"
@@ -889,6 +943,9 @@ main() {
         ;;
       foot)
         reload_foot
+        ;;
+      alacritty)
+        reload_alacritty
         ;;
       bat)
         reload_bat
