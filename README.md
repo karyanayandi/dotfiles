@@ -9,8 +9,8 @@
 - [x] add theme switcher walker support
 - [x] add theme switcher alacritty support
 - [x] add auto mason update lsp, formater, linter
+- [x] realtime terminal theme changes
+- [x] add theme switcher yazi support
 - [ ] add theme switcher tmux support
-- [ ] add theme switcher yazi support
-- [ ] realtime terminal theme changes
 - [ ] add gtk theme switcher support
 - [ ] add qt / kde theme switcher support

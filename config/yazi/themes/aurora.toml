@@ -1,0 +1,75 @@
+# Yazi theme for aurora
+# Auto-generated from vivid theme colors
+
+[manager]
+cwd = { fg = "#81a1c1" }
+hovered = { fg = "#282c34", bg = "#81a1c1" }
+preview_hovered = { fg = "#282c34", bg = "#81a1c1" }
+find_keyword = { fg = "#bf616a", bold = true }
+find_position = { fg = "#d08770" }
+tab_active = { fg = "#282c34", bg = "#81a1c1" }
+tab_inactive = { fg = "#abb2bf", bg = "#353b45" }
+tab_width = 1
+
+[status]
+mode_normal = { fg = "#282c34", bg = "#81a1c1", bold = true }
+mode_select = { fg = "#282c34", bg = "#a3be8c", bold = true }
+mode_unset = { fg = "#282c34", bg = "#bf616a", bold = true }
+permissions_t = { fg = "#81a1c1" }
+permissions_r = { fg = "#a3be8c" }
+permissions_w = { fg = "#bf616a" }
+permissions_x = { fg = "#ebcb8b" }
+permissions_s = { fg = "#b48ead" }
+
+[input]
+border = { fg = "#81a1c1" }
+title = { fg = "#81a1c1" }
+value = { fg = "#abb2bf" }
+selected = { fg = "#282c34", bg = "#81a1c1" }
+
+[confirm]
+border = { fg = "#bf616a" }
+title = { fg = "#bf616a" }
+content = { fg = "#abb2bf" }
+
+[picker]
+border = { fg = "#81a1c1" }
+active = { fg = "#81a1c1", bold = true }
+inactive = { fg = "#abb2bf" }
+
+[tabs]
+active = { fg = "#282c34", bg = "#81a1c1" }
+inactive = { fg = "#abb2bf", bg = "#353b45" }
+
+[task]
+border = { fg = "#81a1c1" }
+title = { fg = "#81a1c1" }
+
+[help]
+border = { fg = "#81a1c1" }
+title = { fg = "#81a1c1" }
+
+[icon]
+prepend_rules = []
+append_rules = []
+
+# File type colors - including folder/directory colors
+[filetype]
+rules = [
+  # Directories - using green color from vivid theme
+  { url = "*/", fg = "#a3be8c", bold = true },
+  # Images
+  { mime = "image/*", fg = "#b48ead" },
+  # Videos
+  { mime = "video/*", fg = "#d08770" },
+  # Audio
+  { mime = "audio/*", fg = "#ebcb8b" },
+  # Archives
+  { mime = "application/{zip,gzip,tar,bzip*,7z*,rar}", fg = "#d4be98" },
+  # Documents
+  { mime = "application/{pdf,msword,ms-excel,ms-powerpoint}", fg = "#ebdbb2" },
+  # Executables
+  { is = "exec", fg = "#8fbcbb", bold = true },
+  # Symlinks
+  { is = "link", fg = "#88c0d0" },
+]

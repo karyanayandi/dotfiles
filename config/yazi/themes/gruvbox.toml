@@ -1,0 +1,75 @@
+# Yazi theme for gruvbox
+# Auto-generated from vivid theme colors
+
+[manager]
+cwd = { fg = "#83a598" }
+hovered = { fg = "#282828", bg = "#83a598" }
+preview_hovered = { fg = "#282828", bg = "#83a598" }
+find_keyword = { fg = "#fb4934", bold = true }
+find_position = { fg = "#fe8019" }
+tab_active = { fg = "#282828", bg = "#83a598" }
+tab_inactive = { fg = "#bdae93", bg = "#3c3836" }
+tab_width = 1
+
+[status]
+mode_normal = { fg = "#282828", bg = "#83a598", bold = true }
+mode_select = { fg = "#282828", bg = "#b8bb26", bold = true }
+mode_unset = { fg = "#282828", bg = "#fb4934", bold = true }
+permissions_t = { fg = "#83a598" }
+permissions_r = { fg = "#b8bb26" }
+permissions_w = { fg = "#fb4934" }
+permissions_x = { fg = "#fabd2f" }
+permissions_s = { fg = "#d3869b" }
+
+[input]
+border = { fg = "#83a598" }
+title = { fg = "#83a598" }
+value = { fg = "#bdae93" }
+selected = { fg = "#282828", bg = "#83a598" }
+
+[confirm]
+border = { fg = "#fb4934" }
+title = { fg = "#fb4934" }
+content = { fg = "#bdae93" }
+
+[picker]
+border = { fg = "#83a598" }
+active = { fg = "#83a598", bold = true }
+inactive = { fg = "#bdae93" }
+
+[tabs]
+active = { fg = "#282828", bg = "#83a598" }
+inactive = { fg = "#bdae93", bg = "#3c3836" }
+
+[task]
+border = { fg = "#83a598" }
+title = { fg = "#83a598" }
+
+[help]
+border = { fg = "#83a598" }
+title = { fg = "#83a598" }
+
+[icon]
+prepend_rules = []
+append_rules = []
+
+# File type colors - including folder/directory colors
+[filetype]
+rules = [
+  # Directories - using green color from vivid theme
+  { url = "*/", fg = "#b8bb26", bold = true },
+  # Images
+  { mime = "image/*", fg = "#d3869b" },
+  # Videos
+  { mime = "video/*", fg = "#fe8019" },
+  # Audio
+  { mime = "audio/*", fg = "#fabd2f" },
+  # Archives
+  { mime = "application/{zip,gzip,tar,bzip*,7z*,rar}", fg = "#ebdbb2" },
+  # Documents
+  { mime = "application/{pdf,msword,ms-excel,ms-powerpoint}", fg = "#d5c4a1" },
+  # Executables
+  { is = "exec", fg = "#8ec07c", bold = true },
+  # Symlinks
+  { is = "link", fg = "#83a598" },
+]
