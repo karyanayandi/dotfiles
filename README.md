@@ -4,11 +4,13 @@
 
 # TODO
 
-- [ ] realtime terminal theme changes
+- [x] add wallpaper changer
 - [x] add theme switcher neovim support
-- [ ] add theme switcher tmux support
 - [x] add theme switcher walker support
+- [ ] add auto mason update lsp, formater, linter
+- [ ] add theme switcher tmux support
+- [ ] add theme switcher alacritty support
 - [ ] add theme switcher yazi support
+- [ ] realtime terminal theme changes
 - [ ] add gtk theme switcher support
 - [ ] add qt / kde theme switcher support
-- [x] add wallpaper changer
