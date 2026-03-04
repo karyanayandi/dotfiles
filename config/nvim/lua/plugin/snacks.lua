@@ -257,6 +257,9 @@ return {
       win = {
         style = "terminal",
         position = "bottom",
+        wo = {
+          winbar = "",
+        },
       },
     },
     toggle = { enabled = false },
