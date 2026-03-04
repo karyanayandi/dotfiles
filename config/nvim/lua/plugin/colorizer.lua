@@ -40,9 +40,9 @@ return {
             aarrggbb = true,
             no_hash = true,
           },
-          rgb = { enable = false },
-          hsl = { enable = false },
-          oklch = { enable = false },
+          rgb = { enable = true },
+          hsl = { enable = true },
+          oklch = { enable = true },
           tailwind = {
             enable = true,
             lsp = true,
@@ -57,6 +57,8 @@ return {
           xcolor = { enable = true },
           hsluv = { enable = false },
           css_var_rgb = { enable = true },
+          css_var_hsl = { enable = true },
+          css_var_oklch = { enable = true },
           custom = {},
         },
         display = {
