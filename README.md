@@ -14,3 +14,5 @@
 - [ ] add theme switcher tmux support
 - [ ] add gtk theme switcher support
 - [ ] add qt / kde theme switcher support
+- [ ] add pywall support for random-wallpaper.sh
+- [ ] fix mason tool installer not auto update
