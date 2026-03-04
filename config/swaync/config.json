@@ -30,6 +30,71 @@
   "hide-on-action": false,
   "text-empty": "No Notifications",
   "script-fail-notify": true,
+  "widgets": [
+    "title",
+    "dnd",
+    "buttons-grid",
+    "mpris",
+    "notifications"
+  ],
+  "widget-config": {
+    "title": {
+      "text": "Notifications",
+      "clear-all-button": true,
+      "button-text": "Clear All"
+    },
+    "dnd": {
+      "text": "Do Not Disturb"
+    },
+    "buttons-grid": {
+      "actions": [
+        {
+          "label": "Next Theme",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh next"
+        },
+        {
+          "label": "gruvbox",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh gruvbox-dark-medium"
+        },
+        {
+          "label": "gruvbox-hard",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh gruvbox-dark-hard"
+        },
+        {
+          "label": "gruvbox-mono",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh gruvbox-dark-medium-monochrome"
+        },
+        {
+          "label": "gruvbox-hard-mono",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh gruvbox-dark-hard-monochrome"
+        },
+        {
+          "label": "aurora",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh aurora"
+        },
+        {
+          "label": "nord",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh nord"
+        },
+        {
+          "label": "lackluster",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh lackluster"
+        },
+        {
+          "label": "rosepine",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh rosepine"
+        },
+        {
+          "label": "onedark",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh onedark"
+        },
+        {
+          "label": "vesper",
+          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh vesper"
+        }
+      ]
+    }
+  },
   "scripts": {
     "example-script": {
       "exec": "echo 'Do something...'",

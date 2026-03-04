@@ -823,48 +823,6 @@ reload_zathura() {
 	fi
 }
 
-# Update yazi theme symlink
-update_yazi_theme() {
-	local theme_name="$1"
-	local source_theme="$DOTFILES_DIR/config/yazi/themes/${theme_name}.toml"
-
-	# Check if theme has yazi support
-	if [[ ! -f "$source_theme" ]]; then
-		echo "Note: Theme '$theme_name' does not have yazi support, skipping."
-		return 0
-	fi
-
-	local target_dir="$CURRENT_THEME_DIR/yazi"
-	local target_theme="$target_dir/theme.toml"
-
-	# Create target directory if it doesn't exist
-	if [[ ! -d "$target_dir" ]]; then
-		mkdir -p "$target_dir"
-	fi
-
-	# Create relative symlink (../../../config/yazi/themes/<theme>.toml)
-	local relative_path="../../../config/yazi/themes/${theme_name}.toml"
-
-	# Update symlink atomically
-	ln -sf "$relative_path" "$target_theme"
-
-	if [[ $? -ne 0 ]]; then
-		echo "Error: Failed to update yazi symlink at $target_theme" >&2
-		exit 1
-	fi
-
-	UPDATED_COMPONENTS+=("yazi")
-}
-
-# Reload yazi
-reload_yazi() {
-	if pgrep -x yazi >/dev/null; then
-		echo "  - Yazi is running. Restart it to see theme changes."
-	else
-		echo "  ✓ Yazi theme updated (will apply on next start)"
-	fi
-}
-
 # Update nvim theme symlink
 update_nvim_theme() {
 	local theme_name="$1"
@@ -967,6 +925,30 @@ main() {
 		-h | --help)
 			show_help
 			exit 0
+			;;
+		list | --list | -l)
+			discover_themes
+			for theme in "${AVAILABLE_THEMES[@]}"; do
+				echo "$theme"
+			done
+			exit 0
+			;;
+		next | --next | -n)
+			discover_themes
+			local current_theme_file="$HOME/.config/ls_colors/current_theme"
+			local current=""
+			[[ -f "$current_theme_file" ]] && current=$(cat "$current_theme_file")
+			local next_theme="${AVAILABLE_THEMES[0]}"
+			local found=0
+			for i in "${!AVAILABLE_THEMES[@]}"; do
+				if [[ "${AVAILABLE_THEMES[$i]}" == "$current" ]]; then
+					local next_idx=$(((i + 1) % ${#AVAILABLE_THEMES[@]}))
+					next_theme="${AVAILABLE_THEMES[$next_idx]}"
+					found=1
+					break
+				fi
+			done
+			theme_name="$next_theme"
 			;;
 		*)
 			theme_name="$1"
@@ -1080,6 +1062,11 @@ main() {
 
 	echo ""
 	echo "Theme switched successfully to $theme_name!"
+
+	# Send desktop notification if notify-send is available
+	if command -v notify-send &>/dev/null; then
+		notify-send -t 3000 "Theme switched" "$theme_name" -i preferences-desktop-theme
+	fi
 }
 
 # Run main function
