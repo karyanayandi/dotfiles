@@ -89,12 +89,21 @@ function M.config()
   }
 
   require("mason").setup(settings)
+
+  -- mason-lspconfig handles LSP servers using lspconfig names (e.g. lua_ls, rust_analyzer)
+  -- and translates them to mason package names internally
+  require("mason-lspconfig").setup {
+    ensure_installed = M.servers,
+    automatic_installation = true,
+  }
+
+  -- mason-tool-installer handles formatters and linters (mason package names only)
+  -- ensure_installed must be a flat list, not nested tables
+  local tools = {}
+  vim.list_extend(tools, M.formatters)
+  vim.list_extend(tools, M.linters)
   require("mason-tool-installer").setup {
-    ensure_installed = {
-      M.servers,
-      M.formatters,
-      M.linters,
-    },
+    ensure_installed = tools,
     auto_update = true,
     run_on_start = true,
     start_delay = 3000,
