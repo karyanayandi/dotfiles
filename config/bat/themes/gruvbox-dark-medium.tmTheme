@@ -5,7 +5,7 @@
     <key>name</key>
     <string>Gruvbox Dark Medium</string>
     <key>semanticClass</key>
-    <string>theme.dark.gruvbox</string>
+    <string>theme.dark.gruvbox-dark-medium</string>
     <key>uuid</key>
     <string>627ce890-fabb-4d39-9819-7be71f4bdca7</string>
     <key>author</key>

@@ -3,9 +3,9 @@
 <plist version="1.0">
   <dict>
     <key>name</key>
-    <string>Gruvbox Monochrome</string>
+    <string>Gruvbox Dark Medium Monochrome</string>
     <key>semanticClass</key>
-    <string>theme.dark.gruvbox-monochrome</string>
+    <string>theme.dark.gruvbox-dark-medium-monochrome</string>
     <key>uuid</key>
     <string>8a30b427-327c-45b0-90a5-820b00e98214</string>
     <key>author</key>
