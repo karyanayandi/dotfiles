@@ -21,6 +21,28 @@ return {
       vim.keymap.set("n", "h", api.node.navigate.parent_close, opts "Close Directory")
     end
 
+    -- Always anchor nvim-tree root to the git toplevel
+    vim.api.nvim_create_autocmd("BufEnter", {
+      callback = function()
+        local buf = vim.api.nvim_get_current_buf()
+        local buftype = vim.bo[buf].buftype
+        local bufname = vim.api.nvim_buf_get_name(buf)
+        -- Only act on real files, not terminals/quickfix/etc
+        if buftype ~= "" or bufname == "" then
+          return
+        end
+        local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(vim.fn.fnamemodify(bufname, ":h")) .. " rev-parse --show-toplevel")[1]
+        if vim.v.shell_error ~= 0 or not git_root then
+          return
+        end
+        local api = require "nvim-tree.api"
+        local tree_root = api.tree.get_nodes().absolute_path
+        if tree_root ~= git_root then
+          api.tree.change_root(git_root)
+        end
+      end,
+    })
+
     local prev = { new_name = "", old_name = "" } -- Prevents duplicate events
     vim.api.nvim_create_autocmd("User", {
       pattern = "NvimTreeSetup",
@@ -45,8 +67,6 @@ return {
       --   exclude = { ".gitignore", ".env", "~partytown", ".contentlayer", "dist", ".github", "neogit" },
       -- },
       sync_root_with_cwd = false,
-      prefer_startup_root = true,
-      root_dirs = { ".git" },
       renderer = {
         add_trailing = false,
         group_empty = false,
