@@ -321,8 +321,16 @@ update_bat_theme() {
 		mkdir -p "$target_dir"
 	fi
 
-	# Symlink the source bat config into the current theme dir
-	ln -sf "$source_config" "$target_config"
+	# Create relative symlink (../../theme/bat/config)
+	local relative_path="../../$theme_name/bat/config"
+
+	# Update symlink atomically
+	ln -sf "$relative_path" "$target_config"
+
+	if [[ $? -ne 0 ]]; then
+		echo "Error: Failed to update bat symlink at $target_config" >&2
+		exit 1
+	fi
 
 	UPDATED_COMPONENTS+=("bat")
 }
@@ -1006,7 +1014,6 @@ main() {
 	update_zathura_theme "$theme_name"
 	update_yazi_theme "$theme_name"
 	update_nvim_theme "$theme_name"
-	update_yazi_theme "$theme_name"
 
 	# Check if any components were updated
 	if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -1067,9 +1074,6 @@ main() {
 			;;
 		nvim)
 			reload_nvim
-			;;
-		yazi)
-			reload_yazi
 			;;
 		esac
 	done

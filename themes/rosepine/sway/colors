@@ -1,0 +1,9 @@
+# Rose Pine theme colors for Sway
+set $accent #908caa
+set $red #eb6f92
+set $text #e0def4
+set $surface #26233a
+set $dark #1f1d2e
+set $base #191724
+set $border #9ccfd8
+set $border_inactive #6e6a86

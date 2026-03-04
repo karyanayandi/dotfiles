@@ -1,0 +1,9 @@
+# One Dark theme colors for Sway
+set $accent #abb2bf
+set $red #e86671
+set $text #abb2bf
+set $surface #3b3f4c
+set $dark #31353f
+set $base #282c34
+set $border #61afef
+set $border_inactive #5c6370

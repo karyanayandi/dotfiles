@@ -1,0 +1,113 @@
+colors:
+  # Vesper
+  color0: "101010"   # background
+  color1: "161616"   # surface
+  color2: "1C1C1C"   # overlay
+  color3: "4A4A4A"   # muted dark
+  color4: "A0A0A0"   # muted (comment)
+  color5: "FFFFFF"   # foreground
+  color6: "99FFE4"   # mint/cyan
+  color7: "99FFE4"   # mint (bright green)
+  color8: "99D1FF"   # blue
+  color9: "D5B8FF"   # purple
+  color10: "99FFE4"  # mint (dark blue/green)
+  color11: "FF8080"  # red
+  color12: "FFC799"  # accent orange
+  color13: "FFD580"  # yellow
+  color14: "99FFE4"  # mint (green)
+  dim-foreground: "A0A0A0"
+
+core:
+  normal_text:
+    foreground: dim-foreground
+  reset_to_normal:
+    background: color0
+    foreground: color4
+    font-style: regular
+  regular_file:
+    foreground: color4
+  directory:
+    foreground: color10
+    font-style: bold
+  multi_hard_link:
+    foreground: color8
+    font-style: underline
+  symlink:
+    foreground: color8
+  broken_symlink:
+    foreground: color11
+  missing_symlink_target:
+    background: color11
+    foreground: color5
+    font-style: bold
+  fifo:
+    foreground: color7
+    font-style: bold
+  character_device:
+    foreground: color13
+  block_device:
+    foreground: color13
+    font-style: underline
+  door:
+    foreground: color13
+    font-style: italic
+  socket:
+    foreground: color13
+    font-style: bold
+  executable_file:
+    foreground: color7
+    font-style: bold
+  file_with_capability:
+    foreground: color4
+    font-style: bold
+  setuid:
+    foreground: color4
+    font-style: bold
+  setgid:
+    foreground: color4
+    font-style: bold
+  sticky:
+    background: color10
+    foreground: color5
+    font-style: underline
+  other_writable:
+    background: color10
+    foreground: color5
+    font-style: bold
+  sticky_other_writable:
+    background: color10
+    foreground: color5
+    font-style: bold
+
+archives:
+  foreground: color5
+  font-style: bold
+
+executable:
+  foreground: color7
+  font-style: bold
+
+markup:
+  foreground: color6
+  web:
+    foreground: color4
+
+media:
+  foreground: color12
+  fonts:
+    foreground: color4
+
+office:
+  foreground: color14
+
+programming:
+  source:
+    foreground: color7
+  tooling:
+    foreground: color4
+
+text:
+  foreground: color4
+
+unimportant:
+  foreground: color3

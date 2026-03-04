@@ -1,0 +1,32 @@
+set completion-bg "#1f1d2e"
+set completion-fg "#f6c177"
+set completion-group-bg "#191724"
+set completion-group-fg "#f6c177"
+set completion-highlight-bg "#f6c177"
+set completion-highlight-fg "#1f1d2e"
+set default-bg "#1f1d2e"
+set default-fg "#f6c177"
+set inputbar-bg "#1f1d2e"
+set inputbar-fg "#9ccfd8"
+set notification-bg "#9ccfd8"
+set notification-fg "#191724"
+set notification-error-bg "#eb6f92"
+set notification-error-fg "#191724"
+set notification-warning-bg "#f6c177"
+set notification-warning-fg "#191724"
+set statusbar-bg "#191724"
+set statusbar-fg "#f6c177"
+set highlight-color "#9ccfd8"
+set highlight-active-color "#f6c177"
+set recolor-lightcolor "#e0def4"
+set recolor-darkcolor "#191724"
+
+set page-padding 10
+set show-directories true
+set show-hidden true
+set show-recent -1
+
+set guioptions vs
+set selection-clipboard clipboard
+
+set font "Jetbrains Mono NF 10"

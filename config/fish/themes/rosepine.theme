@@ -1,0 +1,30 @@
+# name: 'rosepine'
+# url: 'https://rosepinetheme.com'
+# preferred_background: 191724
+
+fish_color_normal e0def4          # text (foreground)
+fish_color_command 9ccfd8         # foam (cyan)
+fish_color_param ebbcba           # rose
+fish_color_keyword eb6f92         # love (red/keyword)
+fish_color_quote 31748f           # pine (green-ish)
+fish_color_redirection 9ccfd8     # foam
+fish_color_end f6c177             # gold (orange)
+fish_color_comment 6e6a86         # muted
+fish_color_error eb6f92
+fish_color_gray 908caa            # subtle
+fish_color_selection --background=26233a  # overlay
+fish_color_search_match --background=26233a
+fish_color_option 31748f
+fish_color_operator 9ccfd8
+fish_color_escape eb6f92
+fish_color_autosuggestion 6e6a86
+fish_color_cancel eb6f92
+fish_color_cwd f6c177             # gold
+fish_color_user 9ccfd8
+fish_color_host 9ccfd8
+fish_color_host_remote 31748f
+fish_color_status eb6f92
+fish_pager_color_progress 908caa
+fish_pager_color_prefix 9ccfd8
+fish_pager_color_completion e0def4
+fish_pager_color_description 908caa

@@ -1,0 +1,113 @@
+colors:
+  # Rose Pine: base=bg, base0x=surface/overlay/palette
+  color0: "191724"   # base (background)
+  color1: "1f1d2e"   # surface
+  color2: "26233a"   # overlay
+  color3: "6e6a86"   # muted
+  color4: "908caa"   # subtle
+  color5: "e0def4"   # text (foreground)
+  color6: "ebbcba"   # rose
+  color7: "9ccfd8"   # foam (bright cyan)
+  color8: "31748f"   # pine (cyan/teal)
+  color9: "9ccfd8"   # foam (blue-ish)
+  color10: "31748f"  # pine (dark blue/green)
+  color11: "eb6f92"  # love (red)
+  color12: "f6c177"  # gold (orange)
+  color13: "f6c177"  # gold (yellow)
+  color14: "9ccfd8"  # foam (green)
+  dim-foreground: "908caa"
+
+core:
+  normal_text:
+    foreground: dim-foreground
+  reset_to_normal:
+    background: color0
+    foreground: color4
+    font-style: regular
+  regular_file:
+    foreground: color4
+  directory:
+    foreground: color10
+    font-style: bold
+  multi_hard_link:
+    foreground: color8
+    font-style: underline
+  symlink:
+    foreground: color8
+  broken_symlink:
+    foreground: color11
+  missing_symlink_target:
+    background: color11
+    foreground: color5
+    font-style: bold
+  fifo:
+    foreground: color7
+    font-style: bold
+  character_device:
+    foreground: color13
+  block_device:
+    foreground: color13
+    font-style: underline
+  door:
+    foreground: color13
+    font-style: italic
+  socket:
+    foreground: color13
+    font-style: bold
+  executable_file:
+    foreground: color7
+    font-style: bold
+  file_with_capability:
+    foreground: color4
+    font-style: bold
+  setuid:
+    foreground: color4
+    font-style: bold
+  setgid:
+    foreground: color4
+    font-style: bold
+  sticky:
+    background: color10
+    foreground: color5
+    font-style: underline
+  other_writable:
+    background: color10
+    foreground: color5
+    font-style: bold
+  sticky_other_writable:
+    background: color10
+    foreground: color5
+    font-style: bold
+
+archives:
+  foreground: color5
+  font-style: bold
+
+executable:
+  foreground: color7
+  font-style: bold
+
+markup:
+  foreground: color6
+  web:
+    foreground: color4
+
+media:
+  foreground: color12
+  fonts:
+    foreground: color4
+
+office:
+  foreground: color14
+
+programming:
+  source:
+    foreground: color7
+  tooling:
+    foreground: color4
+
+text:
+  foreground: color4
+
+unimportant:
+  foreground: color3
