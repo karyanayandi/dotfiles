@@ -72,7 +72,6 @@ return {
           "%.dll",
           "%.docx",
           "%.dylib",
-          "%.env",
           "%.epub",
           "%.exe",
           "%.flac",

@@ -74,7 +74,7 @@ keymap(
 )
 
 -- Find
-keymap("n", ";f", "<cmd>Telescope find_files<cr>", { desc = "Find files", noremap = true, silent = true })
+keymap("n", ";f", "<cmd>Telescope git_files<cr>", { desc = "Find files", noremap = true, silent = true })
 
 -- Find texts
 keymap("n", ";t", "<cmd>Telescope live_grep<cr>", { desc = "Find text", noremap = true, silent = true })
