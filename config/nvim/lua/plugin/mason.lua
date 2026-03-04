@@ -55,7 +55,6 @@ M.formatters = {
   "oxfmt",
   "prettierd",
   "pretty-php",
-  "rustfmt",
   "shfmt",
   "stylua",
 }
@@ -90,25 +89,32 @@ function M.config()
 
   require("mason").setup(settings)
 
-  -- mason-lspconfig handles LSP servers using lspconfig names (e.g. lua_ls, rust_analyzer)
-  -- and translates them to mason package names internally
   require("mason-lspconfig").setup {
-    ensure_installed = M.servers,
     automatic_installation = true,
   }
 
-  -- mason-tool-installer handles formatters and linters (mason package names only)
-  -- ensure_installed must be a flat list, not nested tables
   local tools = {}
+
+  vim.list_extend(tools, M.servers)
   vim.list_extend(tools, M.formatters)
   vim.list_extend(tools, M.linters)
+
   require("mason-tool-installer").setup {
     ensure_installed = tools,
     auto_update = true,
-    run_on_start = true,
-    start_delay = 3000,
-    debounce_hours = 6,
+    run_on_start = false,
   }
+
+  local mr = require "mason-registry"
+  vim.defer_fn(function()
+    mr:on(
+      "update:success",
+      vim.schedule_wrap(function()
+        vim.cmd "MasonToolsUpdate"
+      end)
+    )
+    mr.update()
+  end, 3000)
 end
 
 return M
