@@ -1,0 +1,58 @@
+[manager]
+cwd = { fg = "#83a598" }
+
+hovered         = { fg = "#1d2021", bg = "#83a598" }
+preview_hovered = { fg = "#1d2021", bg = "#83a598" }
+
+find_keyword  = { fg = "#fb4934", bold = true }
+find_position = { fg = "#fe8019" }
+
+tab_active   = { fg = "#1d2021", bg = "#83a598" }
+tab_inactive = { fg = "#bdae93", bg = "#32302f" }
+
+[status]
+mode_normal = { fg = "#1d2021", bg = "#83a598", bold = true }
+mode_select = { fg = "#1d2021", bg = "#b8bb26", bold = true }
+mode_unset  = { fg = "#1d2021", bg = "#fb4934", bold = true }
+
+perms_t = { fg = "#83a598" }
+perms_r = { fg = "#b8bb26" }
+perms_w = { fg = "#fb4934" }
+perms_x = { fg = "#fabd2f" }
+perms_s = { fg = "#d3869b" }
+
+[input]
+border = { fg = "#83a598" }
+title  = { fg = "#83a598" }
+
+[pick]
+border = { fg = "#83a598" }
+title  = { fg = "#83a598" }
+
+[confirm]
+border = { fg = "#fb4934" }
+title  = { fg = "#fb4934" }
+
+[tasks]
+border = { fg = "#83a598" }
+title  = { fg = "#83a598" }
+
+[help]
+border = { fg = "#83a598" }
+title  = { fg = "#83a598" }
+
+[filetype]
+rules = [
+  { mime = "inode/directory",        fg = "#b8bb26", bold = true },
+  { mime = "image/*",                fg = "#d3869b" },
+  { mime = "video/*",                fg = "#fe8019" },
+  { mime = "audio/*",                fg = "#fabd2f" },
+  { mime = "application/zip",        fg = "#ebdbb2" },
+  { mime = "application/x-tar",      fg = "#ebdbb2" },
+  { mime = "application/x-bzip2",    fg = "#ebdbb2" },
+  { mime = "application/x-7z-compressed", fg = "#ebdbb2" },
+  { mime = "application/gzip",       fg = "#ebdbb2" },
+  { mime = "application/pdf",        fg = "#d5c4a1" },
+  { mime = "application/x-executable", fg = "#8ec07c", bold = true },
+  { mime = "inode/symlink",          fg = "#83a598" },
+]

@@ -1,0 +1,32 @@
+[styles.tables]
+headers = { color = "#ebdbb2" }
+
+[styles.cpu]
+all_entry = "#ebdbb2"
+avg_entry = "#fb4934"
+core_colors = ["#fb4934", "#fe8019", "#fabd2f", "#b8bb26", "#83a598", "#8ec07c"]
+
+[styles.memory]
+ram = "#b8bb26"
+swap = "#fe8019"
+gpu = ["#8ec07c", "#d3869b", "#fb4934", "#fe8019", "#fabd2f", "#b8bb26"]
+arc = "#83a598"
+
+[styles.network]
+rx = "#b8bb26"
+tx = "#fb4934"
+
+[styles.widgets]
+widget_title = "#ebdbb2"
+border = "#45403d"
+selected_border = "#8ec07c"
+text = "#ebdbb2"
+selected_text = { fg = "#1d2021", bg = "#8ec07c" }
+
+[styles.graphs]
+graph_color = "#a89984"
+
+[styles.battery]
+high = "#b8bb26"
+medium = "#fabd2f"
+low = "#fb4934"

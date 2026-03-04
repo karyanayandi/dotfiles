@@ -1,0 +1,8 @@
+set $accent    #bdae93
+set $red       #fb4934
+set $text      #ebdbb2
+set $surface   #45403d
+set $dark      #32302f
+set $base      #1d2021
+set $border    #83a598
+set $border_inactive #5a524c
