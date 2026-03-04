@@ -87,7 +87,12 @@ return {
 
         -- Disable markdownlint for codecompanion, Avante and copilot-* buffers
         if filetype == "markdown" then
-          if bufname:match "codecompanion" or bufname:match "Avante" or bufname:match "copilot%-" then
+          if
+            bufname:match "codecompanion"
+            or bufname:match "CodeCompanion"
+            or bufname:match "Avante"
+            or bufname:match "copilot%-"
+          then
             lint.linters_by_ft["markdown"] = {}
           else
             lint.linters_by_ft["markdown"] = { "markdownlint" }
