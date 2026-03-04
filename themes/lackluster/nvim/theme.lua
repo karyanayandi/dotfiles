@@ -8,11 +8,6 @@ return {
 		init = function()
 			vim.cmd.colorscheme("lackluster")
 		end,
-		config = function()
-			vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-			vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-			vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-		end,
 	},
 	{
 		"RRethy/base16-nvim",
