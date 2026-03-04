@@ -36,7 +36,11 @@ return {
           return
         end
         local api = require "nvim-tree.api"
-        local tree_root = api.tree.get_nodes().absolute_path
+        local tree_nodes = api.tree.get_nodes()
+        if not tree_nodes then
+          return
+        end
+        local tree_root = tree_nodes.absolute_path
         if tree_root ~= git_root then
           api.tree.change_root(git_root)
         end
