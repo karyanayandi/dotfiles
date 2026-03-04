@@ -44,11 +44,13 @@ return {
       --   custom = { ".git" },
       --   exclude = { ".gitignore", ".env", "~partytown", ".contentlayer", "dist", ".github", "neogit" },
       -- },
-      update_cwd = true,
+      sync_root_with_cwd = false,
+      prefer_startup_root = true,
+      root_dirs = { ".git" },
       renderer = {
         add_trailing = false,
         group_empty = false,
-        highlight_git = false,
+        highlight_git = true,
         highlight_opened_files = "none",
         root_folder_modifier = ":t",
         indent_markers = {
@@ -106,8 +108,9 @@ return {
       },
       update_focused_file = {
         enable = true,
-        update_cwd = false,
-        ignore_list = {},
+        update_root = {
+          enable = false,
+        },
       },
       git = {
         enable = true,
