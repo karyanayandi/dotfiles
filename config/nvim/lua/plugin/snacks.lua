@@ -269,7 +269,6 @@ return {
   config = function(_, opts)
     require("snacks").setup(opts)
 
-    -- Terminal window navigation (replaces toggleterm set_terminal_keymaps)
     vim.api.nvim_create_autocmd("TermOpen", {
       pattern = "term://*",
       callback = function()
@@ -285,7 +284,16 @@ return {
     function _LAZYGIT_TOGGLE()
       Snacks.terminal.toggle("lazygit", {
         interactive = true,
-        win = { position = "float", border = "rounded" },
+        win = {
+          position = "float",
+          border = "rounded",
+          backdrop = false,
+        },
+        on_open = function(win)
+          local buf = vim.api.nvim_win_get_buf(win)
+          vim.api.nvim_set_option_value("winhl", "Normal:Normal,NormalNC:Normal", { win = win })
+          vim.api.nvim_buf_set_name(buf, "lazygit")
+        end,
       })
     end
 
@@ -293,7 +301,16 @@ return {
     function _LAZYGIT_LOG_TOGGLE()
       Snacks.terminal.toggle("lazygit log", {
         interactive = true,
-        win = { position = "float", border = "rounded" },
+        win = {
+          position = "float",
+          border = "rounded",
+          backdrop = false,
+        },
+        on_open = function(win)
+          local buf = vim.api.nvim_win_get_buf(win)
+          vim.api.nvim_set_option_value("winhl", "Normal:Normal,NormalNC:Normal", { win = win })
+          vim.api.nvim_buf_set_name(buf, "lazygit")
+        end,
       })
     end
 
