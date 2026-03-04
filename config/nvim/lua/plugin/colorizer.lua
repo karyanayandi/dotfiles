@@ -20,37 +20,67 @@ return {
       buftypes = {},
       user_commands = true,
       lazy_load = false,
-      user_default_options = {
-        names = true,
-        names_opts = {
-          lowercase = true,
-          camelcase = true,
-          uppercase = false,
-          strip_digits = false,
+      options = {
+        parsers = {
+          names = {
+            enable = true,
+            lowercase = true,
+            camelcase = true,
+            uppercase = false,
+            strip_digits = false,
+            custom = false,
+          },
+          hex = {
+            default = true,
+            rgb = true,
+            rgba = true,
+            rrggbb = true,
+            rrggbbaa = true,
+            hash_aarrggbb = true,
+            aarrggbb = true,
+            no_hash = true,
+          },
+          rgb = { enable = false },
+          hsl = { enable = false },
+          oklch = { enable = false },
+          tailwind = {
+            enable = true,
+            lsp = true,
+            update_names = true,
+          },
+          sass = {
+            enable = false,
+            parsers = { css = true },
+            variable_pattern = "^%$([%w_-]+)",
+          },
+          xterm = { enable = true },
+          xcolor = { enable = true },
+          hsluv = { enable = false },
+          css_var_rgb = { enable = true },
+          custom = {},
         },
-        names_custom = false,
-        RGB = true, -- #RGB hex codes
-        RGBA = true, -- #RGBA hex codes
-        RRGGBB = true, -- #RRGGBB hex codes
-        RRGGBBAA = false, -- #RRGGBBAA hex codes
-        AARRGGBB = true, -- 0xAARRGGBB hex codes
-        rgb_fn = true, -- CSS rgb() and rgba() functions
-        hsl_fn = true, -- CSS hsl() and hsla() functions
-        css = true, -- Enable all CSS *features*:
-        css_fn = false, -- Enable all CSS *functions*: rgb_fn, hsl_fn
-        tailwind = true,
-        tailwind_opts = {
-          update_names = true,
+        display = {
+          mode = "background",
+          background = {
+            bright_fg = "#000000",
+            dark_fg = "#ffffff",
+          },
+          virtualtext = {
+            char = "■",
+            position = "eol",
+            hl_mode = "foreground",
+          },
+          priority = {
+            default = 150,
+            lsp = 200,
+          },
         },
-        sass = { enable = false, parsers = { "css" } },
-        mode = "background",
-        virtualtext = "■",
-        virtualtext_inline = false,
-        virtualtext_mode = "background",
-        always_update = false,
         hooks = {
           do_lines_parse = false,
+          should_highlight_line = false,
         },
+        always_update = false,
+        debounce_ms = 0,
       },
     }
   end,
