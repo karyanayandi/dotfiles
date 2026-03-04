@@ -28,9 +28,16 @@ return {
           {
             icon = icons.documents.Files,
             key = "f",
-            desc = "Find File",
+            desc = "Find Git Files",
+            action = ":Telescope git_files",
+          },
+          {
+            icon = icons.documents.Files,
+            key = "d",
+            desc = "Find Files",
             action = ":Telescope find_files",
           },
+
           {
             icon = icons.ui.History,
             key = "r",
