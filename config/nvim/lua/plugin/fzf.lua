@@ -59,6 +59,10 @@ return {
   },
   config = function()
     local fzf = require "fzf-lua"
+    local colors = require("base16-colorscheme").colors
+
+    vim.api.nvim_set_hl(0, "FzfLuaPreviewNormal", { bg = colors.base01, fg = colors.base05 })
+    vim.api.nvim_set_hl(0, "FzfLuaPreviewBorder", { bg = colors.base01, fg = colors.base05 })
 
     fzf.setup {
       "telescope",
@@ -69,6 +73,7 @@ return {
         row = 0.35,
         col = 0.55,
         preview = {
+          border = "none",
           wrap = "nowrap",
           hidden = "nohidden",
           vertical = "down:45%",
@@ -80,6 +85,9 @@ return {
           scrolloff = "-2",
           scrollchars = { "█", "" },
           delay = 100,
+          winopts = {
+            winhl = "Normal:FzfLuaPreviewNormal,NormalNC:FzfLuaPreviewNormal,FloatBorder:FzfLuaPreviewBorder",
+          },
         },
       },
       fzf_opts = {
