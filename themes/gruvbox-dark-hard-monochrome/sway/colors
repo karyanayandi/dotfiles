@@ -1,8 +1,8 @@
 set $accent    #bdae93
 set $red       #bdae93
-set $text      #d4be98
+set $text      #d5c4a1
 set $surface   #45403d
 set $dark      #32302f
 set $base      #1d2021
-set $border    #9c9484
+set $border    #928374
 set $border_inactive #5a524c

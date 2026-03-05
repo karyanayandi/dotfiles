@@ -1,31 +1,30 @@
-# Yazi theme for gruvbox-monochrome
-# Auto-generated from vivid theme colors
+# Yazi theme for gruvbox-dark-medium-monochrome
 
 [manager]
-cwd = { fg = "#9c9484" }
-hovered = { fg = "#282828", bg = "#9c9484" }
-preview_hovered = { fg = "#282828", bg = "#9c9484" }
+cwd = { fg = "#928374" }
+hovered = { fg = "#282828", bg = "#928374" }
+preview_hovered = { fg = "#282828", bg = "#928374" }
 find_keyword = { fg = "#bdae93", bold = true }
 find_position = { fg = "#a89984" }
-tab_active = { fg = "#282828", bg = "#9c9484" }
+tab_active = { fg = "#282828", bg = "#928374" }
 tab_inactive = { fg = "#bdae93", bg = "#3c3836" }
 tab_width = 1
 
 [status]
-mode_normal = { fg = "#282828", bg = "#9c9484", bold = true }
-mode_select = { fg = "#282828", bg = "#8f8a7a", bold = true }
+mode_normal = { fg = "#282828", bg = "#928374", bold = true }
+mode_select = { fg = "#282828", bg = "#a89984", bold = true }
 mode_unset = { fg = "#282828", bg = "#bdae93", bold = true }
-permissions_t = { fg = "#9c9484" }
-permissions_r = { fg = "#8f8a7a" }
+permissions_t = { fg = "#928374" }
+permissions_r = { fg = "#928374" }
 permissions_w = { fg = "#bdae93" }
-permissions_x = { fg = "#c0b090" }
-permissions_s = { fg = "#9c9484" }
+permissions_x = { fg = "#bdae93" }
+permissions_s = { fg = "#928374" }
 
 [input]
-border = { fg = "#9c9484" }
-title = { fg = "#9c9484" }
+border = { fg = "#928374" }
+title = { fg = "#928374" }
 value = { fg = "#bdae93" }
-selected = { fg = "#282828", bg = "#9c9484" }
+selected = { fg = "#282828", bg = "#928374" }
 
 [confirm]
 border = { fg = "#bdae93" }
@@ -33,43 +32,34 @@ title = { fg = "#bdae93" }
 content = { fg = "#bdae93" }
 
 [picker]
-border = { fg = "#9c9484" }
-active = { fg = "#9c9484", bold = true }
+border = { fg = "#928374" }
+active = { fg = "#928374", bold = true }
 inactive = { fg = "#bdae93" }
 
 [tabs]
-active = { fg = "#282828", bg = "#9c9484" }
+active = { fg = "#282828", bg = "#928374" }
 inactive = { fg = "#bdae93", bg = "#3c3836" }
 
 [task]
-border = { fg = "#9c9484" }
-title = { fg = "#9c9484" }
+border = { fg = "#928374" }
+title = { fg = "#928374" }
 
 [help]
-border = { fg = "#9c9484" }
-title = { fg = "#9c9484" }
+border = { fg = "#928374" }
+title = { fg = "#928374" }
 
 [icon]
 prepend_rules = []
 append_rules = []
 
-# File type colors - including folder/directory colors
 [filetype]
 rules = [
-  # Directories - using green color from vivid theme (monochrome variant)
-  { url = "*/", fg = "#8f8a7a", bold = true },
-  # Images
-  { mime = "image/*", fg = "#b0a890" },
-  # Videos
+  { url = "*/", fg = "#928374", bold = true },
+  { mime = "image/*", fg = "#a89984" },
   { mime = "video/*", fg = "#a89984" },
-  # Audio
-  { mime = "audio/*", fg = "#c0b090" },
-  # Archives
-  { mime = "application/{zip,gzip,tar,bzip*,7z*,rar}", fg = "#d4be98" },
-  # Documents
-  { mime = "application/{pdf,msword,ms-excel,ms-powerpoint}", fg = "#e6d5ae" },
-  # Executables
-  { is = "exec", fg = "#b0a890", bold = true },
-  # Symlinks
-  { is = "link", fg = "#9c9484" },
+  { mime = "audio/*", fg = "#bdae93" },
+  { mime = "application/{zip,gzip,tar,bzip*,7z*,rar}", fg = "#d5c4a1" },
+  { mime = "application/{pdf,msword,ms-excel,ms-powerpoint}", fg = "#ebdbb2" },
+  { is = "exec", fg = "#a89984", bold = true },
+  { is = "link", fg = "#928374" },
 ]
