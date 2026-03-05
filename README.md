@@ -9,3 +9,4 @@
 - [ ] add qt / kde theme switcher support
 - [ ] add pywall support for random-wallpaper.sh
 - [ ] use snacks keymap
+- [ ] add surround nvim support
