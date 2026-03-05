@@ -63,6 +63,7 @@ alias lzd lazydocker
 alias lzg lazygit
 alias npm "corepack npm"
 alias npx "corepack npx"
+alias oc "opencode"
 alias pac "sudo pacman -S"
 alias pkglist "yay -Qe"
 alias pn "corepack pnpm"
