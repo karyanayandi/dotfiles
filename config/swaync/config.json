@@ -7,7 +7,7 @@
   "layer-shell": true,
   "cssPriority": "user",
 
-  "control-center-width": 380,
+  "control-center-width": 420,
   "control-center-height": 860,
   "control-center-margin-top": 2,
   "control-center-margin-bottom": 2,
@@ -30,7 +30,7 @@
   "hide-on-action": false,
   "text-empty": "No Notifications",
   "script-fail-notify": true,
-  "widgets": ["buttons-grid", "title", "dnd", "mpris", "notifications"],
+  "widgets": ["buttons-grid", "title", "dnd", "notifications"],
   "widget-config": {
     "title": {
       "text": "Notifications",

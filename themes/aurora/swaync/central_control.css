@@ -255,22 +255,26 @@ progressbar {
   border-radius: 16px;
   color: @text;
   margin: 20px 6px;
+  padding: 16px;
 }
 
 .widget-mpris-player {
   background-color: @background-sec;
   border-radius: 22px;
-  padding: 6px 14px;
-  margin: 6px;
+  padding: 16px;
+  margin: 8px;
 }
 
 .widget-mpris > box > button {
   color: @text;
   border-radius: 20px;
+  min-width: 40px;
+  min-height: 40px;
 }
 
 .widget-mpris button {
   color: alpha(@text, 0.6);
+  padding: 8px;
 }
 
 .widget-mpris button:hover {
@@ -279,16 +283,19 @@ progressbar {
 
 .widget-mpris-album-art {
   border-radius: 16px;
+  min-width: 120px;
+  min-height: 120px;
 }
 
 .widget-mpris-title {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
 }
 
 .widget-mpris-subtitle {
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 /* Volume */

@@ -27,6 +27,7 @@
 
 * {
   color: @text;
+  opacity: 1;
   all: unset;
   font-size: 14px;
   font-family: "JetBrains Mono Nerd Font", "Nerd Font", monospace;
@@ -69,6 +70,7 @@
   .notification
   .notification-content {
   color: @text;
+  opacity: 1;
   margin: 6px;
   padding: 8px 6px 2px 2px;
 }
@@ -91,6 +93,7 @@
   .notification-action {
   background: alpha(@selected, 0.6);
   color: @text;
+  opacity: 1;
   border-radius: 12px;
   margin: 6px;
 }
@@ -121,6 +124,7 @@
   background: transparent;
   border-radius: 6px;
   color: @text;
+  opacity: 1;
   margin: 0px;
   padding: 4px;
 }
@@ -155,17 +159,20 @@ progressbar {
   font-weight: bold;
   font-size: 1.25rem;
   color: @text;
+  opacity: 1;
   letter-spacing: 2px;
 }
 
 .notification-group-icon {
   color: @text;
+  opacity: 1;
 }
 
 .notification-group-collapse-button,
 .notification-group-close-all-button {
   background: transparent;
   color: @text;
+  opacity: 1;
   margin: 4px;
   border-radius: 6px;
   padding: 4px;
@@ -251,44 +258,56 @@ progressbar {
 
 /* Music player */
 .widget-mpris {
+  min-width: 340px;
   background: @background-alt;
   border-radius: 16px;
   color: @text;
+  opacity: 1;
   margin: 20px 6px;
+  padding: 16px;
 }
 
 .widget-mpris-player {
   background-color: @background-sec;
   border-radius: 22px;
-  padding: 6px 14px;
-  margin: 6px;
+  padding: 16px;
+  margin: 8px;
 }
 
 .widget-mpris > box > button {
   color: @text;
+  opacity: 1;
   border-radius: 20px;
+  min-width: 40px;
+  min-height: 40px;
 }
 
 .widget-mpris button {
-  color: alpha(@text, 0.6);
+  color: @text;
+  opacity: 1;
+  padding: 8px;
 }
 
 .widget-mpris button:hover {
   color: @text;
+  opacity: 1;
 }
 
 .widget-mpris-album-art {
   border-radius: 16px;
+  min-width: 120px;
+  min-height: 120px;
 }
 
 .widget-mpris-title {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
 }
 
 .widget-mpris-subtitle {
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 /* Volume */
