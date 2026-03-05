@@ -114,6 +114,7 @@ return {
       },
       menu = {
         draw = {
+          align_to = "label",
           columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind" } },
           components = {
             kind_icon = {
@@ -154,6 +155,10 @@ return {
                 -- Special highlight for emoji
                 if ctx.source_name == "emoji" then
                   return "BlinkCmpItemKindEmoji"
+                end
+                -- Special highlight for emoji
+                if ctx.source_name == "Nerd Fonts" then
+                  return "BlinkCmpItemKindNerdFonts"
                 end
                 -- Default highlight
                 return "BlinkCmpKind" .. ctx.kind
@@ -287,11 +292,11 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpDoc", { bg = colors.base02, fg = colors.base05 })
     vim.api.nvim_set_hl(0, "BlinkCmpDocBorder", { bg = colors.base02, fg = colors.base05 })
     vim.api.nvim_set_hl(0, "BlinkCmpDocSeparator", { bg = colors.base02, fg = colors.base05 })
-    vim.api.nvim_set_hl(0, "BlinkCmpKindRipgrepRipgrep", { fg = colors.base07 })
-    vim.api.nvim_set_hl(0, "BlinkCmpKindRipgrepGit", { fg = colors.base07 })
+
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindCopilot", { fg = colors.base0E })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindNpm", { fg = colors.base0F })
-    vim.api.nvim_set_hl(0, "BlinkCmpItemKindEmoji", { fg = colors.base0A })
+    vim.api.nvim_set_hl(0, "BlinkCmpKindRipgrep", { fg = colors.base0F })
+    vim.api.nvim_set_hl(0, "BlinkCmpItemKindEmoji", { fg = colors.base0C })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindNerdFonts", { fg = colors.base0A })
 
     require("blink.cmp").setup(opts)
