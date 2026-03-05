@@ -19,7 +19,6 @@ gui:
       - "#ebdbb2"
     searchingActiveBorderColor:
       - "#fabd2f"
+  border: single
   authorColors:
     "*": "#83a598"
-  border: single
-  disableStartupPopups: true
