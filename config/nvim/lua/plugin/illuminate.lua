@@ -6,7 +6,12 @@ return {
   dependencies = { "nvim-treesitter" },
   config = function()
     vim.g.Illuminate_ftblacklist = { "snacks_dashboard", "snacks_terminal", "NvimTree" }
-    vim.api.nvim_set_keymap("n", ";z", '<cmd>lua require"illuminate".next_reference{wrap=true}<cr>', { noremap = true })
+    vim.api.nvim_set_keymap(
+      "n",
+      ";z",
+      '<cmd>lua require"illuminate".next_reference{wrap=true}<cr>',
+      { noremap = true, desc = "Illuminate next references" }
+    )
     vim.api.nvim_set_keymap(
       "n",
       "<a-p>",
