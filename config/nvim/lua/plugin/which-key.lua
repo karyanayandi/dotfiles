@@ -483,11 +483,6 @@ return {
         desc = "Todo Diagnostics",
       },
       {
-        "<leader>lu",
-        "<cmd>LuaSnipUnlinkCurrent<cr>",
-        desc = "Unlink Snippet",
-      },
-      {
         "<leader>/",
         '<ESC><CMD>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<CR>',
         desc = "Comment",

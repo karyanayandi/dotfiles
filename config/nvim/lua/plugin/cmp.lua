@@ -5,26 +5,17 @@ return {
   dependencies = {
     "MahanRahmati/blink-nerdfont.nvim",
     "alexandre-abrioux/blink-cmp-npm.nvim",
-    "moyiz/blink-emoji.nvim",
     "mikavilpas/blink-ripgrep.nvim",
+    "moyiz/blink-emoji.nvim",
     {
       "saghen/blink.compat",
       version = "*",
       lazy = true,
       opts = {},
     },
-
     {
       "fang2hou/blink-copilot",
       dependencies = "zbirenbaum/copilot.lua",
-    },
-    {
-      "L3MON4D3/LuaSnip",
-      version = "v2.*",
-      build = "make install_jsregexp",
-      dependencies = {
-        "rafamadriz/friendly-snippets",
-      },
     },
   },
   event = { "InsertEnter", "CmdlineEnter" },
@@ -172,17 +163,14 @@ return {
         },
       },
     },
-    snippets = {
-      preset = "luasnip",
-    },
     sources = {
       default = {
         "lsp",
         "path",
         "snippets",
-        "npm",
         "buffer",
         "ripgrep",
+        "npm",
         "markdown",
         "copilot",
         "nerdfont",
@@ -222,11 +210,6 @@ return {
             trailing_slash = false,
             label_trailing_slash = true,
           },
-        },
-        snippets = {
-          name = "Snippets",
-          module = "blink.cmp.sources.snippets",
-          score_offset = 50,
         },
         buffer = {
           name = "Buffer",
@@ -268,6 +251,16 @@ return {
             trigger = ":",
           },
         },
+        -- snippets = {
+        --   name = "Snippets",
+        --   module = "blink.cmp.sources.snippets",
+        --   score_offset = 50,
+        -- },
+        snippets = {
+          opts = {
+            friendly_snippets = true,
+          },
+        },
       },
     },
     fuzzy = {
@@ -301,10 +294,6 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindEmoji", { fg = colors.base0A })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindNerdFonts", { fg = colors.base0A })
 
-    -- Load LuaSnip snippets
-    require("luasnip.loaders.from_vscode").lazy_load()
-    require("luasnip").filetype_extend("javascriptreact", { "html" })
-    require("luasnip").filetype_extend("typescriptreact", { "html" })
     require("blink.cmp").setup(opts)
   end,
 }
