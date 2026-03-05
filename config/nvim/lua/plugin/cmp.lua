@@ -136,6 +136,14 @@ return {
                 if ctx.source_name == "copilot" then
                   return icons.git.Octoface
                 end
+                -- Special handling for ripgrep
+                if ctx.source_name == "Ripgrep" then
+                  return icons.ui.Lightbulb
+                end
+                -- Special handling for nerd font
+                if ctx.source_name == "Nerd Fonts" then
+                  return icons.misc.Text
+                end
                 -- Special handling for emoji
                 if ctx.source_name == "emoji" then
                   return icons.misc.Smiley

@@ -148,5 +148,6 @@ return {
     Squirrel = " ",
     Tag = " ",
     Watch = " ",
+    Text = "󰊄 ",
   },
 }
