@@ -124,11 +124,6 @@ return {
         desc = "Open Code",
       },
       {
-        "<leader>P",
-        "<cmd>lua _PROJECTS_PICKER()<cr>",
-        desc = "Projects",
-      },
-      {
         "<leader>p",
         group = "Package",
       },

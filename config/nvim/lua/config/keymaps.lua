@@ -81,31 +81,13 @@ keymap("n", ";d", "<cmd>FzfLua files<cr>", { desc = "Find files", noremap = true
 keymap("n", ";t", "<cmd>FzfLua live_grep<cr>", { desc = "Find text", noremap = true, silent = true })
 
 -- Find buffers
-keymap(
-  "n",
-  ";b",
-  "<cmd>FzfLua buffers<cr>",
-  { desc = "Find buffers", noremap = true, silent = true }
-)
+keymap("n", ";b", "<cmd>FzfLua buffers<cr>", { desc = "Find buffers", noremap = true, silent = true })
 
 -- Find git branches
-keymap(
-  "n",
-  ";g",
-  "<cmd>FzfLua git_branches<cr>",
-  { desc = "Find git branches", noremap = true, silent = true }
-)
+keymap("n", ";g", "<cmd>FzfLua git_branches<cr>", { desc = "Find git branches", noremap = true, silent = true })
 
 -- Find help tags
 keymap("n", ";h", "<cmd>FzfLua help_tags<cr>", { desc = "Find help tags", noremap = true, silent = true })
-
--- Find Projects
-keymap(
-  "n",
-  ";p",
-  "<cmd>lua _PROJECTS_PICKER()<cr>",
-  { desc = "Find projects", noremap = true, silent = true }
-)
 
 -- Tree
 keymap("n", ";e", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle NvimTree", noremap = true, silent = true })
@@ -127,12 +109,7 @@ keymap(
 )
 
 -- Undo history
-keymap(
-  "n",
-  ";u",
-  "<cmd>FzfLua undotree<cr>",
-  { desc = "Undo history", noremap = true, silent = true }
-)
+keymap("n", ";u", "<cmd>FzfLua undotree<cr>", { desc = "Undo history", noremap = true, silent = true })
 
 -- Bufdelete
 keymap("n", "Q", ":lua require('snacks').bufdelete()<cr>", opts)

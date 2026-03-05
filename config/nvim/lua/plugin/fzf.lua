@@ -1,62 +1,9 @@
 -- luacheck: globals vim
 
-local function projects_picker()
-  local ok, project_nvim = pcall(require, "project_nvim")
-  if not ok then
-    vim.notify("project_nvim not available", vim.log.levels.WARN)
-    return
-  end
-  local projects = project_nvim.get_recent_projects()
-  local fzf = require "fzf-lua"
-  fzf.fzf_exec(projects, {
-    prompt = "Projects> ",
-    actions = {
-      ["default"] = function(selected)
-        if selected and selected[1] then
-          vim.fn.chdir(selected[1])
-          vim.notify("Changed to: " .. selected[1], vim.log.levels.INFO)
-        end
-      end,
-    },
-  })
-end
-
--- expose globally for keymaps / which-key
-_G._PROJECTS_PICKER = projects_picker
-
 return {
   "ibhagwan/fzf-lua",
   event = "BufEnter",
   cmd = { "FzfLua" },
-  dependencies = {
-    {
-      "ahmedkhalf/project.nvim",
-      config = function()
-        require("project_nvim").setup {
-          active = true,
-          on_config_done = nil,
-          manual_mode = false,
-          detection_methods = { "pattern" },
-          patterns = {
-            ".git",
-            "_darcs",
-            ".hg",
-            ".bzr",
-            ".svn",
-            "Makefile",
-            "package.json",
-            "Cargo.toml",
-            "deno.json",
-          },
-          show_hidden = false,
-          silent_chdir = true,
-          ignore_lsp = {},
-          exclude_dirs = { "dist", "build", ".next", "node_modules", ".github" },
-          datapath = vim.fn.stdpath "data",
-        }
-      end,
-    },
-  },
   config = function()
     local fzf = require "fzf-lua"
     local colors = require("base16-colorscheme").colors

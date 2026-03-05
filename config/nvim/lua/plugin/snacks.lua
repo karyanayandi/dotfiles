@@ -51,12 +51,6 @@ return {
             action = ":lua require('fzf-lua').live_grep()",
           },
           {
-            icon = icons.git.Repo,
-            key = "p",
-            desc = "Find Project",
-            action = ":lua _PROJECTS_PICKER()",
-          },
-          {
             icon = icons.ui.GearOutline,
             key = "c",
             desc = "Config",
