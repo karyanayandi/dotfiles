@@ -268,6 +268,7 @@ return {
         },
       },
     },
+    signature = { enabled = true },
     fuzzy = {
       implementation = "prefer_rust",
     },
