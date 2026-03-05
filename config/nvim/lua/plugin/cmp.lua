@@ -4,7 +4,6 @@ return {
   "saghen/blink.cmp",
   dependencies = {
     "MahanRahmati/blink-nerdfont.nvim",
-    "alexandre-abrioux/blink-cmp-npm.nvim",
     "mikavilpas/blink-ripgrep.nvim",
     "moyiz/blink-emoji.nvim",
     {
@@ -121,10 +120,6 @@ return {
             kind_icon = {
               text = function(ctx)
                 local icons = require "config.icons"
-                -- Special handling for npm
-                if ctx.source_name == "npm" then
-                  return icons.misc.Package
-                end
                 -- Special handling for Copilot
                 if ctx.source_name == "copilot" then
                   return icons.git.Octoface
@@ -145,10 +140,6 @@ return {
                 return ctx.kind_icon
               end,
               highlight = function(ctx)
-                -- Special highlight for npm
-                if ctx.source_name == "npm" then
-                  return "BlinkCmpItemKindNpm"
-                end
                 -- Special highlight for Copilot
                 if ctx.source_name == "copilot" then
                   return "BlinkCmpItemKindCopilot"
@@ -176,7 +167,6 @@ return {
         "snippets",
         "buffer",
         "ripgrep",
-        "npm",
         "markdown",
         "copilot",
         "nerdfont",
@@ -228,16 +218,6 @@ return {
           score_offset = 100,
           async = true,
           opts = {},
-        },
-        npm = {
-          name = "npm",
-          module = "blink-cmp-npm",
-          async = true,
-          opts = {
-            ignore = {},
-            only_semantic_versions = true,
-            only_latest_version = false,
-          },
         },
         nerdfont = {
           name = "Nerd Fonts",
@@ -297,7 +277,6 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpDocSeparator", { bg = colors.base02, fg = colors.base05 })
 
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindCopilot", { fg = colors.base0E })
-    vim.api.nvim_set_hl(0, "BlinkCmpItemKindNpm", { fg = colors.base0F })
     vim.api.nvim_set_hl(0, "BlinkCmpKindRipgrep", { fg = colors.base0F })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindEmoji", { fg = colors.base0C })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindNerdFonts", { fg = colors.base0A })
