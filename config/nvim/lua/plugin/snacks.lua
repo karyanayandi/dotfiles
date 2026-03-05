@@ -29,32 +29,32 @@ return {
             icon = icons.documents.Files,
             key = "f",
             desc = "Find Git Files",
-            action = ":Telescope git_files",
+            action = ":lua require('fzf-lua').git_files()",
           },
           {
             icon = icons.documents.Files,
             key = "d",
             desc = "Find Files",
-            action = ":Telescope find_files",
+            action = ":lua require('fzf-lua').files()",
           },
 
           {
             icon = icons.ui.History,
             key = "r",
             desc = "Recent Files",
-            action = ":Telescope oldfiles",
+            action = ":lua require('fzf-lua').oldfiles()",
           },
           {
             icon = icons.ui.List,
             key = "t",
             desc = "Find Text",
-            action = ":Telescope live_grep",
+            action = ":lua require('fzf-lua').live_grep()",
           },
           {
             icon = icons.git.Repo,
             key = "p",
             desc = "Find Project",
-            action = ":lua require('telescope').extensions.projects.projects()",
+            action = ":lua _PROJECTS_PICKER()",
           },
           {
             icon = icons.ui.GearOutline,

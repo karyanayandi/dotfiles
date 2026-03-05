@@ -130,6 +130,7 @@ return {
 					disabled_filetypes = {
 						"NvimTree",
 						"TelescopePrompt",
+						"fzf",
 						"copilot-chat",
 						"copilot-diff",
 						"copilot-overlay",
@@ -145,6 +146,7 @@ return {
 					},
 					disable_buftypes = {
 						"NvimTree",
+						"fzf",
 						"TelescopePrompt",
 						"copilot-chat",
 						"copilot-diff",

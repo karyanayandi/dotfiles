@@ -94,7 +94,7 @@ return {
       },
       {
         "<leader>bb",
-        "<cmd>lua require('telescope.builtin').buffers({previewer = false, initial_mode='normal'})<cr>",
+        "<cmd>FzfLua buffers<cr>",
         desc = "Buffer List",
       },
       {
@@ -125,7 +125,7 @@ return {
       },
       {
         "<leader>P",
-        "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
+        "<cmd>lua _PROJECTS_PICKER()<cr>",
         desc = "Projects",
       },
       {
@@ -251,72 +251,67 @@ return {
       },
       {
         "<leader>fb",
-        "<cmd>lua require('telescope.builtin').buffers({previewer = false, initial_mode='normal'})<cr>",
+        "<cmd>FzfLua buffers<cr>",
         desc = "Buffer",
       },
       {
         "<leader>fB",
-        "<cmd>lua require('telescope.builtin').git_branches({previewer = false, initial_mode='normal'})<cr>",
+        "<cmd>FzfLua git_branches<cr>",
         desc = "Checkout Branch",
       },
       {
         "<leader>ff",
-        "<cmd>lua require('telescope.builtin').find_files({previewer = false})<cr>",
+        "<cmd>FzfLua files<cr>",
         desc = "Find Files",
       },
       {
         "<leader>ft",
-        "<cmd>Telescope live_grep<cr>",
+        "<cmd>FzfLua live_grep<cr>",
         desc = "Find Text",
       },
       {
         "<leader>fT",
-        "<cmd>TodoTelescope<cr>",
+        "<cmd>TodoFzfLua<cr>",
         desc = "Find Todo",
       },
       {
         "<leader>fh",
-        "<cmd>Telescope help_tags<cr>",
+        "<cmd>FzfLua help_tags<cr>",
         desc = "Help",
       },
       {
-        "<leader>fi",
-        "<cmd>lua require('telescope').extensions.media_files.media_files()<cr>",
-        desc = "Media",
-      },
-      {
         "<leader>fl",
-        "<cmd>Telescope resume<cr>",
+        "<cmd>FzfLua resume<cr>",
         desc = "Last Search",
       },
       {
         "<leader>fM",
-        "<cmd>Telescope man_pages<cr>",
+        "<cmd>FzfLua man_pages<cr>",
         desc = "Man Pages",
       },
       {
         "<leader>fr",
-        "<cmd>Telescope oldfiles<cr>",
+        "<cmd>FzfLua oldfiles<cr>",
         desc = "Recent File",
       },
       {
         "<leader>fR",
-        "<cmd>Telescope registers<cr>",
+        "<cmd>FzfLua registers<cr>",
         desc = "Registers",
       },
       {
         "<leader>fk",
-        "<cmd>Telescope keymaps<cr>",
+        "<cmd>FzfLua keymaps<cr>",
         desc = "Keymaps",
       },
       {
         "<leader>fC",
-        "<cmd>Telescope commands<cr>",
+        "<cmd>FzfLua commands<cr>",
         desc = "Commands",
       },
       {
         "<leader>fu",
-        "<cmd>lua require('telescope').extensions.undo.undo()<cr>",
+        "<cmd>FzfLua undotree<cr>",
         desc = "Undo History",
       },
       {
@@ -375,17 +370,17 @@ return {
       },
       {
         "<leader>go",
-        "<cmd>Telescope git_status<cr>",
+        "<cmd>FzfLua git_status<cr>",
         desc = "Open Changed File",
       },
       {
         "<leader>gb",
-        "<cmd>Telescope git_branches<cr>",
+        "<cmd>FzfLua git_branches<cr>",
         desc = "Checkout Branch",
       },
       {
         "<leader>gc",
-        "<cmd>Telescope git_commits<cr>",
+        "<cmd>FzfLua git_commits<cr>",
         desc = "Checkout Commit",
       },
       {
@@ -454,12 +449,12 @@ return {
       },
       {
         "<leader>ls",
-        "<cmd>Telescope lsp_document_symbols<cr>",
+        "<cmd>FzfLua lsp_document_symbols<cr>",
         desc = "Document Symbols",
       },
       {
         "<leader>lS",
-        "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
+        "<cmd>FzfLua lsp_live_workspace_symbols<cr>",
         desc = "Workspace Symbols",
       },
       {

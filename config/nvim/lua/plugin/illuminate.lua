@@ -32,6 +32,7 @@ return {
         "Outline",
         "SnacksInputNormal",
         "TelescopePrompt",
+        "fzf",
         "Trouble",
         "dirvish",
         "fugitive",

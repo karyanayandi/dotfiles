@@ -74,17 +74,17 @@ keymap(
 )
 
 -- Find
-keymap("n", ";f", "<cmd>Telescope git_files<cr>", { desc = "Find git files", noremap = true, silent = true })
-keymap("n", ";d", "<cmd>Telescope find_files<cr>", { desc = "Find files", noremap = true, silent = true })
+keymap("n", ";f", "<cmd>FzfLua git_files<cr>", { desc = "Find git files", noremap = true, silent = true })
+keymap("n", ";d", "<cmd>FzfLua files<cr>", { desc = "Find files", noremap = true, silent = true })
 
 -- Find texts
-keymap("n", ";t", "<cmd>Telescope live_grep<cr>", { desc = "Find text", noremap = true, silent = true })
+keymap("n", ";t", "<cmd>FzfLua live_grep<cr>", { desc = "Find text", noremap = true, silent = true })
 
 -- Find buffers
 keymap(
   "n",
   ";b",
-  "<cmd>lua require('telescope.builtin').buffers({previewer = false})<cr>",
+  "<cmd>FzfLua buffers<cr>",
   { desc = "Find buffers", noremap = true, silent = true }
 )
 
@@ -92,18 +92,18 @@ keymap(
 keymap(
   "n",
   ";g",
-  "<cmd>lua require('telescope.builtin').git_branches({previewer = false})<cr>",
+  "<cmd>FzfLua git_branches<cr>",
   { desc = "Find git branches", noremap = true, silent = true }
 )
 
 -- Find help tags
-keymap("n", ";h", "<cmd>Telescope help_tags<cr>", { desc = "Find help tags", noremap = true, silent = true })
+keymap("n", ";h", "<cmd>FzfLua help_tags<cr>", { desc = "Find help tags", noremap = true, silent = true })
 
 -- Find Projects
 keymap(
   "n",
   ";p",
-  "<cmd>lua require('telescope').extensions.projects.projects()<cr>",
+  "<cmd>lua _PROJECTS_PICKER()<cr>",
   { desc = "Find projects", noremap = true, silent = true }
 )
 
@@ -130,7 +130,7 @@ keymap(
 keymap(
   "n",
   ";u",
-  "<cmd>lua require('telescope').extensions.undo.undo()<cr>",
+  "<cmd>FzfLua undotree<cr>",
   { desc = "Undo history", noremap = true, silent = true }
 )
 
@@ -143,11 +143,11 @@ keymap("n", "<m-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
 -- No HL
 keymap("n", ";z", "<cmd>nohlsearch<cr>", { desc = "No highlight", noremap = true, silent = true })
 
--- Resume Telescope
-keymap("n", "<F3>", "<cmd>Telescope resume<cr>", opts)
+-- Resume last picker
+keymap("n", "<F3>", "<cmd>FzfLua resume<cr>", opts)
 
--- Find Telescope commands
-keymap("n", "<F4>", "<cmd>Telescope commands<CR>", opts)
+-- Find commands
+keymap("n", "<F4>", "<cmd>FzfLua commands<CR>", opts)
 
 -- Show references
 keymap("n", "<F7>", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
