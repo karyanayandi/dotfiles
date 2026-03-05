@@ -63,6 +63,19 @@ return {
         },
       },
     },
+    mcp = {
+      servers = {
+        ["shadcn"] = {
+          cmd = { "bun", "x", "shadcn@latest", "mcp" },
+        },
+        ["playwriter"] = {
+          cmd = { "bun", "x", "playwriter@latest" },
+        },
+        ["context7"] = {
+          cmd = { "bun", "x", "@upstash/context7-mcp", "--api-key", env["CONTEXT7_API_KEY"] },
+        },
+      },
+    },
     prompt_library = {
       ["Generate a Commit Message"] = {
         interaction = "inline",
