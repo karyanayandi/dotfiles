@@ -130,16 +130,13 @@ vim.diagnostic.config {
 -- Enable inlay hints
 vim.lsp.inlay_hint.enable(false)
 
--- Create default capabilities without cmp
+-- Create default capabilities with blink.cmp
 local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
 
-vim.lsp.config("*", {
-  capabilities = lsp_capabilities,
-})
+-- Get blink.cmp capabilities
+local blink_capabilities = require("blink.cmp").get_lsp_capabilities()
 
-local cmp_nvim_lsp = require "cmp_nvim_lsp"
-
-local ext_capabilities = vim.tbl_deep_extend("force", {}, lsp_capabilities, cmp_nvim_lsp.default_capabilities())
+local ext_capabilities = vim.tbl_deep_extend("force", {}, lsp_capabilities, blink_capabilities)
 
 vim.lsp.config("*", {
   capabilities = ext_capabilities,
