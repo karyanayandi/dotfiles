@@ -10,7 +10,6 @@ return {
   cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionActions" },
 
   dependencies = {
-    "ravitemer/mcphub.nvim",
     "echasnovski/mini.diff",
     {
       "HakonHarnes/img-clip.nvim",
@@ -35,7 +34,7 @@ return {
             formatted_name = "Open Router",
             env = {
               url = "https://openrouter.ai/api",
-              api_key = env["OPENAI_API_KEY"],
+              api_key = env["OPENROUTER_API_KEY"],
             },
             schema = {
               model = {

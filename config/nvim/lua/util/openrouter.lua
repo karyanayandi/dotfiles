@@ -1,13 +1,22 @@
+-- luacheck: globals vim
+
+local openai = require "codecompanion.adapters.http.openai"
 local log = require "codecompanion.utils.log"
 local utils = require "codecompanion.utils.adapters"
+local Curl = require "plenary.curl"
+local config = require "codecompanion.config"
+local _cache_expires
+local _cache_file = vim.fn.tempname()
+local _cached_models
 
 ---Remove any keys from the message that are not allowed by the API
 ---@param message table The message to filter
 ---@return table The filtered message
-local function filter_out_messages(message)
+local function filter_message(message)
   local allowed = {
     "content",
     "role",
+    "reasoning_details",
     "tool_calls",
     "tool_call_id",
   }
@@ -20,10 +29,91 @@ local function filter_out_messages(message)
   return message
 end
 
----@class OpenRouter.Adapter: CodeCompanion.Adapter
+---Return a list as a set
+---@param tbl table
+---@return table
+local function as_set(tbl)
+  local set = {}
+  for _, val in ipairs(tbl) do
+    set[val] = true
+  end
+  return set
+end
+
+---Return the cached models
+---@return any
+local function models()
+  return _cached_models
+end
+
+---Get a list of available OpenRouter models
+---@param self CodeCompanion.HTTPAdapter
+---@return any
+local function get_models(self)
+  if _cached_models and _cache_expires and _cache_expires > os.time() then
+    return models()
+  end
+
+  _cached_models = {}
+
+  local adapter = require("codecompanion.adapters").resolve(self)
+  if not adapter then
+    log:error "Could not resolve OpenRouter adapter in the `get_models` function"
+    return {}
+  end
+
+  utils.get_env_vars(adapter)
+  local url = adapter.env_replaced.url
+  local models_endpoint = adapter.env_replaced.models_endpoint
+
+  local headers = {
+    ["content-type"] = "application/json",
+  }
+  if adapter.env_replaced.api_key then
+    headers["Authorization"] = "Bearer " .. adapter.env_replaced.api_key
+  end
+
+  local ok, response, json
+
+  ok, response = pcall(function()
+    return Curl.get(url .. models_endpoint, {
+      sync = true,
+      headers = headers,
+      insecure = config.adapters.http.opts.allow_insecure,
+      proxy = config.adapters.http.opts.proxy,
+    })
+  end)
+  if not ok then
+    log:error("Could not get the OpenAI compatible models from " .. url .. models_endpoint .. ".\nError: %s", response)
+    return {}
+  end
+
+  ok, json = pcall(vim.json.decode, response.body)
+  if not ok then
+    log:error("Could not parse the response from " .. url .. models_endpoint)
+    return {}
+  end
+
+  for _, model in ipairs(json.data) do
+    local params = as_set(model.supported_parameters or {})
+    local inputs = as_set((model.architecture or {}).input_modalities or {})
+    if params.tools then
+      _cached_models[model.id] =
+        { opts = { stream = true, has_tools = true, has_vision = inputs.image, can_reason = params.reasoning } }
+    end
+  end
+
+  _cache_expires = utils.refresh_cache(_cache_file, config.adapters.http.opts.cache_models_for)
+
+  return models()
+end
+
+local env = require("config.functions").load_env_file "~/.env"
+
+---@class CodeCompanion.HTTPAdapter.OpenRouter: CodeCompanion.HTTPAdapter
 return {
   name = "openrouter",
-  formatted_name = "Open Router",
+  formatted_name = "OpenRouter",
   roles = {
     llm = "assistant",
     user = "user",
@@ -40,7 +130,7 @@ return {
   },
   url = "${url}${chat_url}",
   env = {
-    api_key = "OPENAI_API_KEY",
+    api_key = env["OPENROUTER_API_KEY"],
     url = "https://openrouter.ai/api",
     chat_url = "/v1/chat/completions",
     models_endpoint = "/v1/models",
@@ -49,56 +139,24 @@ return {
     ["Content-Type"] = "application/json",
     Authorization = "Bearer ${api_key}",
   },
-  temp = {},
   handlers = {
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@return boolean
     setup = function(self)
-      local model = self.schema.model.default
-      if type(model) == "function" then
-        model = model(self)
-      end
-      local model_opts = self.schema.model.choices
-      if type(model_opts) == "function" then
-        model_opts = model_opts(self)
-      end
-
-      self.opts.vision = true
-
-      if model_opts and model_opts[model] and model_opts[model].opts then
-        self.opts = vim.tbl_deep_extend("force", self.opts, model_opts[model].opts)
-
-        if not model_opts[model].opts.has_vision then
-          self.opts.vision = false
-        end
-      end
-
-      if self.opts and self.opts.stream then
-        self.parameters.stream = true
-        self.parameters.stream_options = { include_usage = true }
-      end
-
-      return true
+      return openai.handlers.setup(self)
     end,
 
     ---Set the parameters
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param params table
     ---@param messages table
     ---@return table
     form_parameters = function(self, params, messages)
-      if self.temp.reasoning_effort then
-        params.reasoning = {
-          -- effort = self.temp.reasoning_effort,
-          max_tokens = self.temp.reasoning_max_tokens,
-        }
-      end
-
-      return params
+      return openai.handlers.form_parameters(self, params, messages)
     end,
 
     ---Set the format of the role and content for the messages from the chat buffer
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param messages table Format is: { { role = "user", content = "Your prompt here" } }
     ---@return table
     form_messages = function(self, messages)
@@ -107,9 +165,7 @@ return {
         model = model(self)
       end
 
-      local out = {}
-      for _, m in ipairs(messages) do
-        -- Adjust role for certain models
+      messages = vim.tbl_map(function(m)
         if vim.startswith(model, "o1") and m.role == "system" then
           m.role = self.roles.user
         end
@@ -119,7 +175,11 @@ return {
           m.tool_calls = vim
             .iter(m.tool_calls)
             :map(function(tool_call)
-              return { id = tool_call.id, ["function"] = tool_call["function"], type = tool_call.type }
+              return {
+                id = tool_call.id,
+                ["function"] = tool_call["function"],
+                type = tool_call.type,
+              }
             end)
             :totable()
         end
@@ -130,45 +190,62 @@ return {
             m.content = {
               {
                 type = "image_url",
-                image_url = { url = string.format("data:%s;base64,%s", m.opts.mimetype, m.content) },
+                image_url = {
+                  url = string.format("data:%s;base64,%s", m.opts.mimetype, m.content),
+                },
               },
             }
           else
-            -- Skip images when vision unsupported
-            goto continue
+            -- Remove the message if vision is not supported
+            return nil
           end
         end
 
-        -- 1) Emit reasoning as its own assistant message
-        if m.reasoning and m.reasoning.content then
-          local reasoning_msg = {
-            role = self.roles.user,
-            content = "### please consider the following reasonig when answering:\n" .. m.reasoning.content,
-          }
-          reasoning_msg = filter_out_messages(reasoning_msg)
-          table.insert(out, reasoning_msg)
+        -- Pull reasoning back out to a top-level message key
+        -- https://openrouter.ai/docs/use-cases/reasoning-tokens#example-preserving-reasoning-blocks-with-openrouter-and-claude
+        if m.reasoning and m.reasoning.details then
+          m.reasoning_details = m.reasoning.details
         end
 
-        -- 2) Emit the actual content message
-        m = filter_out_messages(m)
-        table.insert(
-          out,
-          { role = m.role, content = m.content, tool_calls = m.tool_calls, tool_call_id = m.tool_call_id }
-        )
-        ::continue::
-      end
+        m = filter_message(m)
 
-      return { messages = out }
+        return m
+      end, messages)
+
+      return { messages = messages }
     end,
 
-    ------Form the reasoning output that is stored in the chat buffer
-    ------@param self CodeCompanion.Adapter
-    ------@param data table The reasoning output from the LLM
-    ------@return nil|{ content: string, _data: table }
+    ---Form the reasoning output that is stored in the chat buffer
+    ---@param self CodeCompanion.HTTPAdapter
+    ---@param data table The reasoning output from the LLM
+    ---@return nil|{ content: string, details: table }
     form_reasoning = function(self, data)
+      local reasoning_details = {}
       local content = vim
         .iter(data)
         :map(function(item)
+          if item.details and #item.details > 0 then
+            for _, rd in ipairs(item.details) do
+              local details = reasoning_details[rd.index + 1]
+                or {
+                  id = rd.id,
+                  index = rd.index,
+                  format = rd.format,
+                  type = rd.type,
+                }
+              if rd.text and rd.text ~= "" then
+                details.text = (details.text or "") .. rd.text
+              end
+              if rd.summary and rd.summary ~= "" then
+                details.summary = (details.summary or "") .. rd.summary
+              end
+              if rd.data and rd.data ~= "" then
+                details.data = (details.data or "") .. rd.data
+              end
+              reasoning_details[rd.index + 1] = details
+            end
+          end
+
           return item.content
         end)
         :filter(function(content)
@@ -178,58 +255,32 @@ return {
 
       return {
         content = content,
+        details = reasoning_details,
       }
     end,
 
     ---Provides the schemas of the tools that are available to the LLM to call
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param tools table<string, table>
     ---@return table|nil
     form_tools = function(self, tools)
-      if not self.opts.tools or not tools then
-        return
-      end
-      if vim.tbl_count(tools) == 0 then
-        return
-      end
-
-      local transformed = {}
-      for _, tool in pairs(tools) do
-        for _, schema in pairs(tool) do
-          table.insert(transformed, schema)
-        end
-      end
-
-      return { tools = transformed }
+      return openai.handlers.form_tools(self, tools)
     end,
 
     ---Returns the number of tokens generated from the LLM
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param data table The data from the LLM
     ---@return number|nil
     tokens = function(self, data)
-      if data and data ~= "" then
-        local data_mod = utils.clean_streamed_data(data)
-        local ok, json = pcall(vim.json.decode, data_mod, { luanil = { object = true } })
-
-        if ok then
-          if json.usage then
-            local tokens = json.usage.total_tokens
-            log:trace("Tokens: %s", tokens)
-            return tokens
-          end
-        end
-      end
+      return openai.handlers.tokens(self, data)
     end,
 
     ---Output the data from the API ready for insertion into the chat buffer
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param data table The streamed JSON data from the API, also formatted by the format_data handler
     ---@param tools? table The table to write any tool output to
-    ---@return { status: string, output: { role: string, content: string, reasoning: string? } } | nil
+    ---@return table|nil [status: string, output: table]
     chat_output = function(self, data, tools)
-      local output = {}
-
       if not data or data == "" then
         return nil
       end
@@ -306,108 +357,80 @@ return {
         return nil
       end
 
-      local can_reason = false
-      if self.temp.reasoning_effort then
-        can_reason = true
+      local result = { status = "success", output = { role = delta.role } }
+      if delta.content and delta.content ~= "" then
+        result.output.content = delta.content
       end
 
-      if can_reason and delta.reasoning then
-        output.reasoning = output.reasoning or {}
-        output.reasoning.content = (output.reasoning.content or "") .. delta.reasoning
-        output.role = delta.role
-        return { status = "success", output = output }
+      if delta.reasoning and delta.reasoning ~= "" then
+        result.output.reasoning = { content = delta.reasoning }
       end
 
-      if delta.content then
-        output.role = delta.role
-        output.content = delta.content
-        return { status = "success", output = output }
+      if delta.reasoning_details and #delta.reasoning_details > 0 then
+        -- We have to stash these here because Chat:add_message doesn't
+        -- care about a toplevel reasoning_details key but it does carry
+        -- over what's in reasoning. We put this in its rightful place
+        -- in form_messages.
+        result.output.reasoning = (result.output.reasoning or {})
+        result.output.reasoning.details = delta.reasoning_details
       end
 
-      return nil
+      return result
     end,
 
     ---Output the data from the API ready for inlining into the current buffer
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param data string|table The streamed JSON data from the API, also formatted by the format_data handler
     ---@param context? table Useful context about the buffer to inline to
     ---@return {status: string, output: table}|nil
     inline_output = function(self, data, context)
-      if self.opts.stream then
-        return log:error "Inline output is not supported for non-streaming models"
-      end
-
-      if data and data ~= "" then
-        local ok, json = pcall(vim.json.decode, data.body, { luanil = { object = true } })
-
-        if not ok then
-          log:error("Error decoding JSON: %s", data.body)
-          return { status = "error", output = json }
-        end
-
-        local choice = json.choices[1]
-        if choice.message.content then
-          return { status = "success", output = choice.message.content }
-        end
-      end
+      return openai.handlers.inline_output(self, data, context)
     end,
+
     tools = {
       ---Format the LLM's tool calls for inclusion back in the request
-      ---@param self CodeCompanion.Adapter
+      ---@param self CodeCompanion.HTTPAdapter
       ---@param tools table The raw tools collected by chat_output
       ---@return table
       format_tool_calls = function(self, tools)
-        -- Source: https://platform.openai.com/docs/guides/function-calling?api-mode=chat#handling-function-calls
-        return tools
+        return openai.handlers.tools.format_tool_calls(self, tools)
       end,
 
       ---Output the LLM's tool call so we can include it in the messages
-      ---@param self CodeCompanion.Adapter
+      ---@param self CodeCompanion.HTTPAdapter
       ---@param tool_call {id: string, function: table, name: string}
       ---@param output string
       ---@return table
       output_response = function(self, tool_call, output)
-        -- Source: https://platform.openai.com/docs/guides/function-calling?api-mode=chat#handling-function-calls
-        return {
-          role = self.roles.tool or "tool",
-          tool_call_id = tool_call.id,
-          content = output,
-          opts = { visible = false },
-        }
+        return openai.handlers.tools.output_response(self, tool_call, output)
       end,
     },
 
     ---Function to run when the request has completed. Useful to catch errors
-    ---@param self CodeCompanion.Adapter
+    ---@param self CodeCompanion.HTTPAdapter
     ---@param data? table
     ---@return nil
     on_exit = function(self, data)
-      if data and data.status >= 400 then
-        log:error("Error: %s", data.body)
-      end
+      return openai.handlers.on_exit(self, data)
     end,
   },
   schema = {
+    ---@type CodeCompanion.Schema
     model = {
       order = 1,
       mapping = "parameters",
       type = "enum",
       desc = "ID of the model to use. See the model endpoint compatibility table for details on which models work with the Chat API.",
-      default = "openai/o4-mini",
-      choices = {
-        ["openai/o4-mini"] = { opts = { can_reason = true, has_vision = true } },
-        ["deepseek/deepseek-r1-0528"] = { opts = { can_reason = true, has_vision = true } },
-        ["moonshotai/kimi-k2"] = { opts = { can_reason = false, has_vision = true } },
-        ["qwen/qwen3-coder"] = { opts = { can_reason = false, has_vision = true } },
-        ["qwen/qwen3-coder:free"] = { opts = { can_reason = false, has_vision = true } },
-        ["openrouter/horizon-beta"] = { opts = { can_reason = true, has_vision = true } },
-        ["z-ai/glm-4.5:free"] = { opts = { can_reason = true, has_vision = false } },
-        ["z-ai/glm-4.5"] = { opts = { can_reason = true, has_vision = false } },
-      },
+      ---@type string|fun(arg: CodeCompanion.HTTPAdapter): string
+      default = "qwen/qwen3-coder:free",
+      ---@type string|fun(arg: CodeCompanion.HTTPAdapter): table
+      choices = function(self)
+        return get_models(self)
+      end,
     },
     reasoning_effort = {
       order = 2,
-      mapping = "temp",
+      mapping = "parameters",
       type = "string",
       optional = true,
       condition = function(self)
@@ -415,8 +438,12 @@ return {
         if type(model) == "function" then
           model = model()
         end
-        if self.schema.model.choices[model] and self.schema.model.choices[model].opts then
-          return self.schema.model.choices[model].opts.can_reason
+        local choices = self.schema.model.choices
+        if type(choices) == "function" then
+          choices = choices(self)
+        end
+        if choices and choices[model] and choices[model].opts and choices[model].opts.can_reason then
+          return true
         end
         return false
       end,
@@ -428,26 +455,8 @@ return {
         "low",
       },
     },
-    reasoning_max_tokens = {
-      order = 3,
-      mapping = "temp",
-      type = "number",
-      optional = true,
-      condition = function(self)
-        local model = self.schema.model.default
-        if type(model) == "function" then
-          model = model()
-        end
-        if self.schema.model.choices[model] and self.schema.model.choices[model].opts then
-          return self.schema.model.choices[model].opts.can_reason
-        end
-        return false
-      end,
-      default = 600,
-      desc = "Max tokens for reasoning",
-    },
     temperature = {
-      order = 4,
+      order = 3,
       mapping = "parameters",
       type = "number",
       optional = true,
@@ -458,7 +467,7 @@ return {
       end,
     },
     top_p = {
-      order = 5,
+      order = 4,
       mapping = "parameters",
       type = "number",
       optional = true,
@@ -469,7 +478,7 @@ return {
       end,
     },
     stop = {
-      order = 6,
+      order = 5,
       mapping = "parameters",
       type = "list",
       optional = true,
@@ -483,7 +492,7 @@ return {
       end,
     },
     max_tokens = {
-      order = 7,
+      order = 6,
       mapping = "parameters",
       type = "integer",
       optional = true,
@@ -494,7 +503,7 @@ return {
       end,
     },
     presence_penalty = {
-      order = 8,
+      order = 7,
       mapping = "parameters",
       type = "number",
       optional = true,
@@ -505,7 +514,7 @@ return {
       end,
     },
     frequency_penalty = {
-      order = 9,
+      order = 8,
       mapping = "parameters",
       type = "number",
       optional = true,
@@ -516,7 +525,7 @@ return {
       end,
     },
     logit_bias = {
-      order = 10,
+      order = 9,
       mapping = "parameters",
       type = "map",
       optional = true,
@@ -533,7 +542,7 @@ return {
       },
     },
     user = {
-      order = 111,
+      order = 10,
       mapping = "parameters",
       type = "string",
       optional = true,
