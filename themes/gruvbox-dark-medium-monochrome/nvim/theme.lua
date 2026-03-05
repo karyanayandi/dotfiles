@@ -31,6 +31,13 @@ return {
 			vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", { fg = "#fe8019" })
 			vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", { fg = "#458588" })
 			vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", { fg = "#b8bb26" })
+
+			vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = "#b8bb26" })
+			vim.api.nvim_set_hl(0, "GitSignsChange", { fg = "#458588" })
+			vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = "#fb4934" })
+			vim.api.nvim_set_hl(0, "GitSignsStagedAdd", { fg = "#b8bb26" })
+			vim.api.nvim_set_hl(0, "GitSignsStagedChange", { fg = "#458588" })
+			vim.api.nvim_set_hl(0, "GitSignsStagedDelete", { fg = "#fb4934" })
 		end,
 	},
 	{
