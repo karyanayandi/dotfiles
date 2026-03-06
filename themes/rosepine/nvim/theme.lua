@@ -125,17 +125,17 @@ return {
 					lualine_b = {},
 					lualine_c = {},
 					lualine_x = {
-						{
-							"lsp_status",
-							icon = "",
-							symbols = {
-								spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
-								done = "✓",
-								separator = " ",
-							},
-							ignore_lsp = { "emmet_ls", "copilot" },
-							show_name = true,
-						},
+						-- {
+						-- 	"lsp_status",
+						-- 	icon = "",
+						-- 	symbols = {
+						-- 		spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
+						-- 		done = "✓",
+						-- 		separator = " ",
+						-- 	},
+						-- 	ignore_lsp = { "emmet_ls", "copilot" },
+						-- 	show_name = true,
+						-- },
 					},
 					lualine_y = { diagnostics },
 					lualine_z = { "location" },
