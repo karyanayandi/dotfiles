@@ -38,6 +38,7 @@ return {
       ["<C-f>"] = { "scroll_documentation_down", "fallback" },
       ["<C-Space>"] = { "show", "fallback" },
       ["<C-e>"] = { "cancel", "fallback" },
+      ["<Esc>"] = { "cancel", "fallback" },
       ["<CR>"] = { "accept", "fallback" },
       ["<Tab>"] = {
         function(cmp)
@@ -282,5 +283,12 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindNerdFonts", { fg = colors.base0A })
 
     require("blink.cmp").setup(opts)
+
+    -- Hide ghost text when moving to another line
+    vim.api.nvim_create_autocmd("CursorMoved", {
+      callback = function()
+        require("blink.cmp").hide()
+      end,
+    })
   end,
 }
