@@ -64,7 +64,6 @@ M.linters = {
   "eslint_d",
   "flake8",
   "golangci-lint",
-  "jsonlint",
   "luacheck",
   "markdownlint",
   "oxlint",

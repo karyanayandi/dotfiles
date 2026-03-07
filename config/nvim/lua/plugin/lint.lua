@@ -43,7 +43,6 @@ return {
       fish = { "fish" },
       javascript = javascript_linter(),
       javascriptreact = javascript_linter(),
-      json = { "jsonlint" },
       lua = { "luacheck" },
       markdown = { "markdownlint" },
       sh = { "shellcheck" },
