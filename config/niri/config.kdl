@@ -148,7 +148,7 @@ window-rule {
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
     Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
+    Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
     Mod+G hotkey-overlay-title="Start Screen Recording" { spawn-sh "~/.local/bin/screen-record.sh"; }
     Mod+Shift+G hotkey-overlay-title="Stop Screen Recording" { spawn-sh "~/.local/bin/stop-screen-record.sh"; }
