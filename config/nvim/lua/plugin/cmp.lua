@@ -38,7 +38,12 @@ return {
       ["<C-f>"] = { "scroll_documentation_down", "fallback" },
       ["<C-Space>"] = { "show", "fallback" },
       ["<C-e>"] = { "cancel", "fallback" },
-      ["<Esc>"] = { "cancel", "fallback" },
+      ["<Esc>"] = {
+        function(cmp)
+          cmp.cancel()
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+        end,
+      },
       ["<CR>"] = { "accept", "fallback" },
       ["<Tab>"] = {
         function(cmp)
