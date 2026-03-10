@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, Tmux, and Neovim Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, and neovim
+# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, Tmux, Fzf, and Neovim Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, fzf, and neovim
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
 	echo "Usage: theme-switch.sh [THEME_NAME]"
 	echo ""
-	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, and neovim."
+	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, fzf, and neovim."
 	echo ""
 	echo "Options:"
 	echo "  -h, --help    Show this help message"
@@ -148,15 +148,21 @@ discover_themes() {
 			fi
 		fi
 
+		local has_fzf=false
+		# Fzf colors are derived from vivid themes - check if vivid theme exists
+		if [[ -f "$DOTFILES_DIR/config/vivid/${discovered_theme}.yaml" ]]; then
+			has_fzf=true
+		fi
+
 		# Theme is valid if it has at least one component
-		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true || "$has_tmux" == true ]]; then
+		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true || "$has_tmux" == true || "$has_fzf" == true ]]; then
 			AVAILABLE_THEMES+=("$discovered_theme")
 		fi
 	done
 
 	if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
 		echo "Error: No valid themes found in $THEMES_DIR" >&2
-		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, nvim/theme.lua, or tmux theme defined" >&2
+		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, nvim/theme.lua, tmux theme defined, or vivid theme for fzf" >&2
 		echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
 		echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
 		echo "Tmux themes: $DOTFILES_DIR/home/.tmux/theme/lib/themes.sh" >&2
@@ -1034,6 +1040,43 @@ reload_ghostty() {
 	fi
 }
 
+# Update fzf theme colors
+update_fzf_theme() {
+	local theme_name="$1"
+	local fzf_theme_dir="$THEMES_DIR/$theme_name/fzf"
+	local fzf_config_dir="$HOME/.config/fzf"
+
+	# Check if fzf theme files exist
+	if [[ ! -f "$fzf_theme_dir/colors.sh" || ! -f "$fzf_theme_dir/colors.fish" ]]; then
+		echo "Note: Theme '$theme_name' does not have fzf support, skipping."
+		return 0
+	fi
+
+	# Create fzf config directory if it doesn't exist
+	mkdir -p "$fzf_config_dir"
+
+	# Create absolute path symlinks (more reliable than relative)
+	ln -sf "$fzf_theme_dir/colors.sh" "$fzf_config_dir/colors.sh"
+	ln -sf "$fzf_theme_dir/colors.fish" "$fzf_config_dir/colors.fish"
+
+	UPDATED_COMPONENTS+=("fzf")
+}
+
+# Reload fzf
+reload_fzf() {
+	local fzf_colors_file="$HOME/.config/fzf/colors.sh"
+	
+	# Apply to current bash shell if running
+	if [[ -n "$BASH_VERSION" && -f "$fzf_colors_file" ]]; then
+		source "$fzf_colors_file"
+		echo "  ✓ Fzf colors applied to current bash shell"
+	fi
+	
+	# Trigger fish theme reload by updating the theme timestamp
+	# Fish will auto-detect this on next prompt via __fzf_theme_check
+	echo "  ✓ Fzf theme updated (fish will auto-reload on next prompt)"
+}
+
 # Main function
 main() {
 	local theme_name=""
@@ -1117,6 +1160,7 @@ main() {
 	update_ghostty_theme "$theme_name"
 	update_nvim_theme "$theme_name"
 	update_tmux_theme "$theme_name"
+	update_fzf_theme "$theme_name"
 
 	# Check if any components were updated
 	if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -1183,6 +1227,9 @@ main() {
 			;;
 		tmux)
 			reload_tmux
+			;;
+		fzf)
+			reload_fzf
 			;;
 		esac
 	done

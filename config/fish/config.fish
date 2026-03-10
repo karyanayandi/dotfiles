@@ -119,12 +119,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export FZF_DEFAULT_COMMAND="rg -uu \
           --files \
           -H"
-export FZF_DEFAULT_OPTS="\
---color=bg+:#32363e,bg:#282c34,spinner:#eceff4,hl:#bf616a \
---color=fg:#c8ccd4,header:#bf616a,info:#8fbcbb,pointer:#eceff4 \
---color=marker:#b4befe,fg+:#cdd6f4,prompt:#8fbcbb,hl+:#bf616a \
---color=selected-bg:#3e4451 \
---multi"
 
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
