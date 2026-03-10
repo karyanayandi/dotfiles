@@ -22,7 +22,7 @@ return {
         preview = {
           border = "none",
           wrap = "nowrap",
-          hidden = "nohidden",
+          hidden = "hidden",
           vertical = "down:45%",
           horizontal = "right:60%",
           layout = "flex",
