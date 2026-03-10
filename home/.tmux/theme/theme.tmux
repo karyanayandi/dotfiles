@@ -4,6 +4,9 @@ SCRIPTS_PATH="$CURRENT_DIR/lib"
 
 source $SCRIPTS_PATH/themes.sh
 
+# Persist the theme in tmux option
+tmux set -g @themes "$SELECTED_THEME"
+
 tmux set -g status-left-length 80
 tmux set -g status-right-length 150
 

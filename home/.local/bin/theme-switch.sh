@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, and Neovim Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, and neovim
+# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, Tmux, and Neovim Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, and neovim
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
 	echo "Usage: theme-switch.sh [THEME_NAME]"
 	echo ""
-	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, and neovim."
+	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, and neovim."
 	echo ""
 	echo "Options:"
 	echo "  -h, --help    Show this help message"
@@ -140,17 +140,26 @@ discover_themes() {
 			has_nvim=true
 		fi
 
+		local has_tmux=false
+		if [[ -f "$DOTFILES_DIR/home/.tmux/theme/lib/themes.sh" ]]; then
+			# Check if theme exists in tmux themes
+			if grep -q "\"$discovered_theme\")" "$DOTFILES_DIR/home/.tmux/theme/lib/themes.sh" 2>/dev/null; then
+				has_tmux=true
+			fi
+		fi
+
 		# Theme is valid if it has at least one component
-		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true ]]; then
+		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true || "$has_tmux" == true ]]; then
 			AVAILABLE_THEMES+=("$discovered_theme")
 		fi
 	done
 
 	if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
 		echo "Error: No valid themes found in $THEMES_DIR" >&2
-		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, or nvim/theme.lua" >&2
+		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, nvim/theme.lua, or tmux theme defined" >&2
 		echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
 		echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
+		echo "Tmux themes: $DOTFILES_DIR/home/.tmux/theme/lib/themes.sh" >&2
 		exit 1
 	fi
 }
@@ -828,6 +837,31 @@ reload_zathura() {
 	fi
 }
 
+# Update tmux theme
+update_tmux_theme() {
+	local theme_name="$1"
+	local tmux_theme_file="$DOTFILES_DIR/home/.tmux/theme/lib/themes.sh"
+
+	# Check if tmux theme file exists and supports this theme
+	if [[ ! -f "$tmux_theme_file" ]]; then
+		echo "Note: tmux theme file not found, skipping."
+		return 0
+	fi
+
+	# Verify the theme exists in tmux themes
+	if ! grep -q "\"$theme_name\")" "$tmux_theme_file" 2>/dev/null; then
+		echo "Note: Theme '$theme_name' does not have tmux support, skipping."
+		return 0
+	fi
+
+	# Store current theme name for tmux
+	local export_dir="$HOME/.config/ls_colors"
+	mkdir -p "$export_dir"
+	echo "$theme_name" >"$export_dir/tmux_theme"
+
+	UPDATED_COMPONENTS+=("tmux")
+}
+
 # Update nvim theme symlink
 update_nvim_theme() {
 	local theme_name="$1"
@@ -863,6 +897,39 @@ update_nvim_theme() {
 	fi
 
 	UPDATED_COMPONENTS+=("nvim")
+}
+
+# Reload tmux
+reload_tmux() {
+	if command -v tmux &>/dev/null; then
+		# Get the theme name from the stored file
+		local tmux_theme_file="$HOME/.config/ls_colors/tmux_theme"
+		local theme_name=""
+		[[ -f "$tmux_theme_file" ]] && theme_name=$(cat "$tmux_theme_file")
+		
+		if [[ -z "$theme_name" ]]; then
+			echo "  - No tmux theme set, skipping."
+			return 0
+		fi
+
+		# Check if tmux is running
+		if tmux list-sessions &>/dev/null 2>&1; then
+			# For each running session, set the theme option and reload
+			tmux list-sessions -F "#S" 2>/dev/null | while read -r session_name; do
+				# Set the theme option globally (applies to all sessions)
+				tmux set-option -g @themes "$theme_name" 2>/dev/null || true
+				# Source the theme script with the new theme
+				THEME_NAME="$theme_name" tmux run-shell "~/.tmux/theme/theme.tmux" 2>/dev/null || true
+			done
+			# Reload the main config to ensure everything is applied
+			tmux source-file ~/.tmux.conf 2>/dev/null || true
+			echo "  ✓ Tmux theme updated to $theme_name"
+		else
+			echo "  - Tmux is not running. Theme will apply on next start."
+		fi
+	else
+		echo "  - Tmux not installed. Skipping."
+	fi
 }
 
 # Reload nvim
@@ -1049,6 +1116,7 @@ main() {
 	update_yazi_theme "$theme_name"
 	update_ghostty_theme "$theme_name"
 	update_nvim_theme "$theme_name"
+	update_tmux_theme "$theme_name"
 
 	# Check if any components were updated
 	if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -1112,6 +1180,9 @@ main() {
 			;;
 		nvim)
 			reload_nvim
+			;;
+		tmux)
+			reload_tmux
 			;;
 		esac
 	done
