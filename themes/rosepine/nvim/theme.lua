@@ -30,7 +30,7 @@ return {
 					modified = icons.git.Mod,
 					removed = icons.git.Remove,
 				},
-				colored = false,
+				colored = true,
 				use_color_mode = true,
 				diff_color = {
 					added = "LuaLineDiffAdd",
