@@ -14,11 +14,21 @@ RESET="#[fg=${THEME[foreground]},bg=${THEME[highlight]},nobold,noitalics,nounder
 
 tmux set -g mode-style "fg=${THEME[green]},bg=${THEME[active]}"
 tmux set -g message-style "bg=${THEME[blue]},fg=${THEME[background]}"
-tmux set -g message-command-style "fg=${THEME[white]},bg=${THEME[active]}"
+tmux set -g message-command-style "fg=${THEME[foreground]},bg=${THEME[active]}"
 tmux set -g pane-border-style "fg=${THEME[active]}"
 tmux set -g pane-active-border-style "fg=${THEME[blue]}"
 tmux set -g pane-border-status off
 tmux set -g status-style bg="${THEME[background]}"
+
+# Popup/float menu styles (for tmux-fzf and other popups)
+tmux set -g popup-style "fg=${THEME[foreground]},bg=${THEME[background]}"
+tmux set -g popup-border-style "fg=${THEME[active]}"
+tmux set -g popup-border-lines single
+
+# Menu style (for right-click context menus)
+tmux set -g menu-style "fg=${THEME[foreground]},bg=${THEME[background]}"
+tmux set -g menu-border-style "fg=${THEME[active]}"
+tmux set -g menu-selected-style "fg=${THEME[background]},bg=${THEME[blue]}"
 
 zoom_number="#($SCRIPTS_PATH/number.sh #P)"
 
