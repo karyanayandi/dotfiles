@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, and Neovim Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, and neovim
+# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, and Neovim Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, and neovim
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
 	echo "Usage: theme-switch.sh [THEME_NAME]"
 	echo ""
-	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, and neovim."
+	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, and neovim."
 	echo ""
 	echo "Options:"
 	echo "  -h, --help    Show this help message"
@@ -69,6 +69,7 @@ discover_themes() {
 		local has_walker=false
 		local has_zathura=false
 		local has_yazi=false
+		local has_ghostty=false
 
 		if [[ -f "$theme_dir/waybar/waybar.css" ]]; then
 			has_waybar=true
@@ -130,20 +131,24 @@ discover_themes() {
 			has_yazi=true
 		fi
 
+		if [[ -f "$theme_dir/ghostty/config" ]]; then
+			has_ghostty=true
+		fi
+
 		local has_nvim=false
 		if [[ -f "$theme_dir/nvim/theme.lua" ]]; then
 			has_nvim=true
 		fi
 
 		# Theme is valid if it has at least one component
-		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true ]]; then
+		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true ]]; then
 			AVAILABLE_THEMES+=("$discovered_theme")
 		fi
 	done
 
 	if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
 		echo "Error: No valid themes found in $THEMES_DIR" >&2
-		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, or nvim/theme.lua" >&2
+		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, or nvim/theme.lua" >&2
 		echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
 		echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
 		exit 1
@@ -915,6 +920,53 @@ reload_yazi() {
 	fi
 }
 
+# Update ghostty theme symlink
+update_ghostty_theme() {
+	local theme_name="$1"
+	local source_config="$THEMES_DIR/$theme_name/ghostty/config"
+
+	# Check if theme has ghostty support
+	if [[ ! -f "$source_config" ]]; then
+		echo "Note: Theme '$theme_name' does not have ghostty support, skipping."
+		return 0
+	fi
+
+	local target_dir="$CURRENT_THEME_DIR/ghostty"
+	local target_config="$target_dir/config"
+
+	# Create target directory if it doesn't exist
+	if [[ ! -d "$target_dir" ]]; then
+		mkdir -p "$target_dir"
+	fi
+
+	# Create relative symlink (../../theme/ghostty/config)
+	local relative_path="../../$theme_name/ghostty/config"
+
+	# Update symlink atomically
+	ln -sf "$relative_path" "$target_config"
+
+	if [[ $? -ne 0 ]]; then
+		echo "Error: Failed to update ghostty symlink at $target_config" >&2
+		exit 1
+	fi
+
+	UPDATED_COMPONENTS+=("ghostty")
+}
+
+# Reload ghostty
+reload_ghostty() {
+	if pgrep -x ghostty >/dev/null; then
+		pkill -SIGUSR2 ghostty 2>/dev/null
+		if [[ $? -eq 0 ]]; then
+			echo "  ✓ Ghostty reloaded successfully"
+		else
+			echo "  - Ghostty is running. Restart it to see theme changes."
+		fi
+	else
+		echo "  ✓ Ghostty theme updated (will apply on next start)"
+	fi
+}
+
 # Main function
 main() {
 	local theme_name=""
@@ -995,6 +1047,7 @@ main() {
 	update_walker_theme "$theme_name"
 	update_zathura_theme "$theme_name"
 	update_yazi_theme "$theme_name"
+	update_ghostty_theme "$theme_name"
 	update_nvim_theme "$theme_name"
 
 	# Check if any components were updated
@@ -1053,6 +1106,9 @@ main() {
 			;;
 		yazi)
 			reload_yazi
+			;;
+		ghostty)
+			reload_ghostty
 			;;
 		nvim)
 			reload_nvim
