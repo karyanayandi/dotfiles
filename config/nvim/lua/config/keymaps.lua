@@ -31,6 +31,10 @@ keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 keymap("n", "<S-l>", ":bnext<CR>", opts)
 keymap("n", "<S-h>", ":bprevious<CR>", opts)
 
+-- Native buffer cycling with notification (replaces cybu.nvim)
+keymap("n", "L", "<cmd>lua require('config.functions').next_buffer()<CR>", opts)
+keymap("n", "H", "<cmd>lua require('config.functions').prev_buffer()<CR>", opts)
+
 --  Select All
 keymap("n", "<C-a>", "gg<S-v>G", opts)
 

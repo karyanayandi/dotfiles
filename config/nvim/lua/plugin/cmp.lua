@@ -3,9 +3,9 @@
 return {
   "saghen/blink.cmp",
   dependencies = {
+    "moyiz/blink-emoji.nvim",
     "MahanRahmati/blink-nerdfont.nvim",
     "mikavilpas/blink-ripgrep.nvim",
-    "moyiz/blink-emoji.nvim",
     {
       "saghen/blink.compat",
       version = "*",

@@ -208,7 +208,7 @@ return {
       },
       {
         "<leader>os",
-        "<cmd>sort<cr>",
+        "<cmd>Sort<cr>",
         desc = "Sort",
       },
       {
