@@ -1,9 +1,0 @@
-# Vesper theme colors for Sway
-set $accent #A0A0A0
-set $red #FF8080
-set $text #FFFFFF
-set $surface #232323
-set $dark #161616
-set $base #101010
-set $border #99FFE4
-set $border_inactive #4A4A4A

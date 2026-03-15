@@ -1,0 +1,4 @@
+# fish prompt theme: gruvbox-light-hard
+set -g theme_background "#f9f5d7"
+set -g theme_foreground "#3c3836"
+set -g theme_accent "#076678"

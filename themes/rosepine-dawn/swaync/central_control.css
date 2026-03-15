@@ -1,0 +1,336 @@
+@define-color rosepine0 #faf4ed;
+@define-color rosepine1 #fffaf3;
+@define-color rosepine2 #f2e9e1;
+@define-color rosepine3 #9893a5;
+@define-color rosepine4 #797593;
+@define-color rosepine5 #575279;
+@define-color rosepine6 #56949f;
+@define-color rosepine7 #286983;
+@define-color rosepine8 #907aa9;
+@define-color rosepine9 #ea9d34;
+@define-color rosepine10 #d7827e;
+@define-color rosepine11 #b4637a;
+@define-color rosepine12 #d7827e;
+@define-color rosepine13 #907aa9;
+@define-color rosepine14 #56949f;
+@define-color rosepine15 #575279;
+
+@define-color foreground    @rosepine5;
+@define-color background   @rosepine0;
+@define-color background-sec @rosepine1;
+
+@define-color text            @foreground;
+@define-color background-alt  @rosepine1;
+@define-color selected        @rosepine9;
+@define-color hover           alpha(@rosepine3, .8);
+@define-color urgent          @rosepine11;
+
+/* Override default swaync CSS variables for light theme */
+* {
+  --text-color: @rosepine5;
+  --cc-bg: @rosepine0;
+}
+
+* {
+  color: @text;
+  opacity: 1;
+  all: unset;
+  font-size: 14px;
+  font-family: "JetBrains Mono Nerd Font", "Nerd Font", monospace;
+  transition: 200ms;
+}
+
+/* Control Center */
+
+.control-center {
+  background: @background;
+  border-radius: 24px;
+  border: 1px solid @rosepine0;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  margin: 18px;
+  padding: 12px;
+  color: @rosepine5;
+}
+
+.control-center-list-placeholder {
+  color: @rosepine5;
+  opacity: 0.5;
+}
+
+/* Notifications  */
+.control-center .notification-row .notification-background,
+.control-center
+  .notification-row
+  .notification-background
+  .notification.critical {
+  background-color: @background-alt;
+  border-radius: 16px;
+  margin: 4px 0px;
+  padding: 4px;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .notification.critical {
+  color: @urgent;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .notification
+  .notification-content {
+  color: @text;
+  opacity: 1;
+  margin: 6px;
+  padding: 8px 6px 2px 2px;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > * {
+  min-height: 3.4em;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action {
+  background: alpha(@selected, 0.6);
+  color: @text;
+  opacity: 1;
+  border-radius: 12px;
+  margin: 6px;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action:hover {
+  background: @selected;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action:active {
+  background-color: @selected;
+}
+
+/* Buttons */
+
+.control-center .notification-row .notification-background .close-button {
+  background: transparent;
+  border-radius: 6px;
+  color: @text;
+  opacity: 1;
+  margin: 0px;
+  padding: 4px;
+}
+
+.control-center .notification-row .notification-background .close-button:hover {
+  background-color: @selected;
+}
+
+.control-center
+  .notification-row
+  .notification-background
+  .close-button:active {
+  background-color: @selected;
+}
+
+progressbar,
+progress,
+trough {
+  border-radius: 12px;
+}
+
+progressbar {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Notifications expanded-group */
+
+.notification-group {
+  margin: 2px 8px 2px 8px;
+}
+.notification-group-headers {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: @rosepine5;
+  opacity: 1;
+  letter-spacing: 2px;
+}
+
+.notification-group-icon {
+  color: @rosepine5;
+  opacity: 1;
+}
+
+.notification-group-collapse-button,
+.notification-group-close-all-button {
+  background: transparent;
+  color: @rosepine5;
+  opacity: 1;
+  margin: 4px;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.notification-group-collapse-button:hover,
+.notification-group-close-all-button:hover {
+  background: @hover;
+}
+
+/* WIDGETS --------------------------------------------------------------------------- */
+
+/* Notification clear button */
+.widget-title {
+  font-size: 1.2em;
+  margin: 6px;
+  color: @rosepine5;
+}
+
+.widget-title button {
+  background: @background-alt;
+  border-radius: 6px;
+  padding: 4px 16px;
+  color: @rosepine5;
+}
+
+.widget-title button:hover {
+  background-color: @hover;
+}
+
+.widget-title button:active {
+  background-color: @selected;
+}
+
+/* Do not disturb */
+.widget-dnd {
+  margin: 6px;
+  font-size: 1.2rem;
+  color: @rosepine5;
+}
+
+.widget-dnd > switch {
+  background: @background-alt;
+  font-size: initial;
+  border-radius: 8px;
+  box-shadow: none;
+  padding: 2px;
+}
+
+.widget-dnd > switch:hover {
+  background: @hover;
+}
+
+.widget-dnd > switch:checked {
+  background: @rosepine9;
+}
+
+.widget-dnd > switch:checked:hover {
+  background: @rosepine9;
+}
+
+.widget-dnd > switch slider {
+  background: @text;
+  border-radius: 6px;
+}
+
+/* Buttons menu */
+.widget-buttons-grid {
+  font-size: x-large;
+  padding: 6px 2px;
+  margin: 6px;
+  border-radius: 12px;
+  background: @background-alt;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button {
+  margin: 4px 10px;
+  padding: 6px 12px;
+  background: transparent;
+  border-radius: 8px;
+  color: @rosepine5;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button:hover {
+  background: @hover;
+}
+
+/* Music player */
+.widget-mpris {
+  min-width: 340px;
+  background: @background-alt;
+  border-radius: 16px;
+  color: @text;
+  opacity: 1;
+  margin: 20px 6px;
+  padding: 16px;
+}
+
+.widget-mpris-player {
+  background-color: @background-sec;
+  border-radius: 22px;
+  padding: 16px;
+  margin: 8px;
+}
+
+.widget-mpris > box > button {
+  color: @text;
+  opacity: 1;
+  border-radius: 20px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.widget-mpris button {
+  color: @text;
+  opacity: 1;
+  padding: 8px;
+}
+
+.widget-mpris button:hover {
+  color: @text;
+  opacity: 1;
+}
+
+.widget-mpris-album-art {
+  border-radius: 16px;
+  min-width: 120px;
+  min-height: 120px;
+}
+
+.widget-mpris-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.widget-mpris-subtitle {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Volume */
+.widget-volume {
+  background: @background-sec;
+  color: @background;
+  padding: 4px;
+  margin: 6px;
+  border-radius: 6px;
+}

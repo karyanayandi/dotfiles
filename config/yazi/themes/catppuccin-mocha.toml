@@ -1,0 +1,106 @@
+[manager]
+cwd = { fg = "#f9e2af" }
+
+# Hovered
+hovered = { fg = "#1e1e2e", bg = "#89b4fa" }
+preview_hovered = { underline = true }
+
+# Find
+find_keyword = { fg = "#f9e2af", italic = true }
+find_position = { fg = "#f5c2e7", bg = "reset", italic = true }
+
+# Marker
+tab_active = { fg = "#1e1e2e", bg = "#89b4fa" }
+tab_inactive = { fg = "#cdd6f4", bg = "#313244" }
+tab_width = 1
+
+# Count
+count_copied = { fg = "#1e1e2e", bg = "#a6e3a1" }
+cut = { fg = "#1e1e2e", bg = "#f38ba8" }
+selected = { fg = "#f9e2af", bg = "#313244" }
+
+# Border
+border_symbol = "│"
+border_style = { fg = "#6c7086" }
+
+[mode]
+normal_main = { fg = "#1e1e2e", bg = "#89b4fa", bold = true }
+normal_alt = { fg = "#89b4fa", bg = "#313244" }
+select_main = { fg = "#1e1e2e", bg = "#f5c2e7", bold = true }
+select_alt = { fg = "#f5c2e7", bg = "#313244" }
+unset_main = { fg = "#1e1e2e", bg = "#f38ba8", bold = true }
+unset_alt = { fg = "#f38ba8", bg = "#313244" }
+
+[status]
+separator_open = ""
+separator_close = ""
+# Progress
+progress_label = { fg = "#cdd6f4", bold = true }
+progress_normal = { fg = "#89b4fa", bg = "#313244" }
+progress_error = { fg = "#f38ba8", bg = "#313244" }
+# Permissions
+perm_type = { fg = "#89b4fa" }
+perm_read = { fg = "#f9e2af" }
+perm_write = { fg = "#f38ba8" }
+perm_exec = { fg = "#a6e3a1" }
+perm_sep = { fg = "#6c7086" }
+
+[select]
+border = { fg = "#89b4fa" }
+active = { fg = "#f5c2e7", underline = true }
+inactive = {}
+
+[input]
+border = { fg = "#89b4fa" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[completion]
+border = { fg = "#89b4fa" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "#89b4fa" }
+title = {}
+hovered = { underline = true }
+
+[which]
+mask = { bg = "#1e1e2e" }
+cand = { fg = "#89b4fa" }
+desc = { fg = "#7f849c" }
+separator = "  "
+separator_style = { fg = "#6c7086" }
+
+[help]
+on = { fg = "#f5c2e7" }
+run = { fg = "#cdd6f4" }
+hovered = { reversed = true }
+footer = { fg = "#cdd6f4", bg = "#313244" }
+
+[filetype]
+rules = [
+	# Images
+	{ mime = "image/*", fg = "#f5c2e7" },
+	# Media
+	{ mime = "video/*", fg = "#f2cdcd" },
+	{ mime = "audio/*", fg = "#f2cdcd" },
+	# Archives
+	{ mime = "application/zip", fg = "#f5c2e7" },
+	{ mime = "application/gzip", fg = "#f5c2e7" },
+	{ mime = "application/x-tar", fg = "#f5c2e7" },
+	{ mime = "application/x-bzip", fg = "#f5c2e7" },
+	{ mime = "application/x-bzip2", fg = "#f5c2e7" },
+	{ mime = "application/x-7z-compressed", fg = "#f5c2e7" },
+	{ mime = "application/x-rar", fg = "#f5c2e7" },
+	{ mime = "application/xz", fg = "#f5c2e7" },
+	# Documents
+	{ mime = "application/doc", fg = "#89b4fa" },
+	{ mime = "application/pdf", fg = "#89b4fa" },
+	{ mime = "application/rtf", fg = "#89b4fa" },
+	{ mime = "application/vnd.*", fg = "#89b4fa" },
+	# Fallback
+	{ name = "*", fg = "#cdd6f4" },
+	{ name = "*/", fg = "#cba6f7" },
+]

@@ -1,0 +1,4 @@
+set $background #f9f5d7
+set $foreground #3c3836
+set $accent #076678
+set $urgent #9d0006

@@ -1,0 +1,6 @@
+# Zathura colors (Rosé Pine Dawn)
+set default-bg "#faf4ed"
+set default-fg "#575279"
+set recolor-keephue false
+set statusbar-bg "#e7dfd9"
+set statusbar-fg "#575279"

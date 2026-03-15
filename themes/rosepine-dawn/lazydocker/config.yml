@@ -1,0 +1,6 @@
+# lazydocker theme: rosepine-dawn
+theme:
+  primary_foreground: "#575279"
+  primary_background: "#faf4ed"
+  accent: "#56949f"
+  error: "#b4637a"

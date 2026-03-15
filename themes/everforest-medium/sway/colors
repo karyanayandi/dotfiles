@@ -1,0 +1,9 @@
+# Everforest Medium theme colors for Sway
+set $accent #7fbbb3
+set $red #e67e80
+set $text #d3c6aa
+set $surface #3a4248
+set $dark #2f383e
+set $base #2f383e
+set $border #7fbbb3
+set $border_inactive #4a5258

@@ -1,0 +1,19 @@
+gui:
+  theme:
+    activeBorderColor:
+      - '#7fbbb3'
+      - bold
+    inactiveBorderColor:
+      - '#4a5258'
+    optionsTextColor:
+      - '#7fbbb3'
+    selectedLineBgColor:
+      - '#3a4248'
+    defaultFgColor:
+      - '#d3c6aa'
+    searchingActiveBorderColor:
+      - '#dbbc7f'
+  authorColors:
+    "*": '#7fbbb3'
+  border: single
+disableStartupPopups: true

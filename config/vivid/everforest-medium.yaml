@@ -1,0 +1,114 @@
+colors:
+  color0: "2f383e"   # background
+  color1: "374247"   # bg1
+  color2: "3a4248"   # bg2
+  color3: "4a5258"   # bg3
+  color4: "5a6268"   # bg4
+  color5: "6a7278"   # bg5
+  color6: "7a8288"   # gray
+  color7: "d3c6aa"   # foreground
+  color8: "7fbbb3"   # blue
+  color9: "d699b6"   # purple
+  color10: "a7c080"  # green
+  color11: "dbbc7f"  # yellow
+  color12: "e69875"  # orange
+  color13: "e67e80"  # red
+  color14: "83c092"  # aqua
+  color15: "e5c76b"  # bright yellow
+
+  dim-foreground: "859289"
+
+core:
+  normal_text:
+    foreground: dim-foreground
+  reset_to_normal:
+    background: color0
+    foreground: color4
+    font-style: regular
+  regular_file:
+    foreground: color4
+  directory:
+    foreground: color8
+    font-style: bold
+  multi_hard_link:
+    foreground: color14
+    font-style: underline
+  symlink:
+    foreground: color14
+  broken_symlink:
+    foreground: color13
+  missing_symlink_target:
+    background: color13
+    foreground: color7
+    font-style: bold
+  fifo:
+    foreground: color7
+    font-style: bold
+  character_device:
+    foreground: color11
+  block_device:
+    foreground: color11
+    font-style: underline
+  door:
+    foreground: color11
+    font-style: italic
+  socket:
+    foreground: color11
+    font-style: bold
+  executable_file:
+    foreground: color7
+    font-style: bold
+  file_with_capability:
+    foreground: color4
+    font-style: bold
+  setuid:
+    foreground: color4
+    font-style: bold
+  setgid:
+    foreground: color4
+    font-style: bold
+  sticky:
+    background: color8
+    foreground: color7
+    font-style: underline
+  other_writable:
+    background: color8
+    foreground: color7
+    font-style: bold
+  sticky_other_writable:
+    background: color8
+    foreground: color7
+    font-style: bold
+
+archives:
+  foreground: color7
+  font-style: bold
+
+executable:
+  foreground: color7
+  font-style: bold
+
+markup:
+  foreground: color6
+  web:
+    foreground: color4
+
+media:
+  foreground: color11
+  fonts:
+    foreground: color4
+
+office:
+  foreground: color14
+
+programming:
+  source:
+    foreground: color7
+  tooling:
+    foreground: color4
+
+text:
+  foreground: color4
+
+unimportant:
+  foreground: color3

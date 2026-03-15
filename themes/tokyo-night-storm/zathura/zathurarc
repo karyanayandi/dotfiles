@@ -1,0 +1,5 @@
+set recolor true
+set recolor_lightcolor "#c0caf5"
+set recolor_darkcolor "#24283b"
+set statusbar_fg "#c0caf5"
+set statusbar_bg "#24283b"

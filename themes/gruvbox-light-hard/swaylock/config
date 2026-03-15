@@ -1,0 +1,6 @@
+# swaylock color configuration for gruvbox-light-hard
+background = "#f9f5d7"
+ring = "#3c3836"
+key_hl = "#076678"
+text = "#3c3836"
+failed = "#9d0006"

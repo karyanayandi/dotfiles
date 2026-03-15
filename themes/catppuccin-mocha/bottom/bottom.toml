@@ -1,0 +1,24 @@
+[styles]
+
+[styles.tables]
+headers = { color = "LightBlue" }
+
+[styles.cpu]
+all_entry_color = "LightBlue"
+avg_entry_color = "LightPink"
+cpu_core_colors = ["LightPink", "LightYellow", "LightGreen", "LightCyan", "LightBlue", "LightMagenta"]
+
+[styles.memory]
+ram_color = "LightGreen"
+swap_color = "LightYellow"
+
+[styles.network]
+rx_color = "LightGreen"
+tx_color = "LightPink"
+
+[styles.widgets]
+widget_title = { color = "LightBlue" }
+border_color = "Grey35"
+selected_border_color = "LightBlue"
+text = { color = "LightBlue" }
+selected_text = { color = "Black", bg_color = "LightBlue" }

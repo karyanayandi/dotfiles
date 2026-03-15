@@ -1,0 +1,9 @@
+# bottom configuration using Rosé Pine Dawn colors
+[general]
+theme = "custom"
+
+[colors]
+background = "#faf4ed"
+primary = "#575279"
+accent = "#56949f"
+urgent = "#b4637a"

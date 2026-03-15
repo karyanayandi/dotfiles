@@ -1,0 +1,34 @@
+[styles]
+
+[styles.tables]
+headers = { color = "LightCyan" }
+
+[styles.cpu]
+all_entry_color = "LightCyan"
+avg_entry_color = "LightPink"
+cpu_core_colors = ["LightPink", "LightYellow", "DarkSeaGreen", "LightSkyBlue", "Plum", "LightCyan"]
+
+[styles.memory]
+ram_color = "DarkSeaGreen"
+swap_color = "LightYellow"
+gpu_colors = ["LightSkyBlue", "Plum", "LightPink", "LightYellow", "DarkSeaGreen", "LightCyan"]
+arc_color = "LightSkyBlue"
+
+[styles.network]
+rx_color = "DarkSeaGreen"
+tx_color = "LightPink"
+
+[styles.widgets]
+widget_title = { color = "LightCyan" }
+border_color = "Grey35"
+selected_border_color = "LightSkyBlue"
+text = { color = "LightCyan" }
+selected_text = { color = "Black", bg_color = "LightSkyBlue" }
+
+[styles.graphs]
+graph_color = "Grey69"
+
+[styles.battery]
+high_battery_color = "DarkSeaGreen"
+medium_battery_color = "LightYellow"
+low_battery_color = "LightPink"

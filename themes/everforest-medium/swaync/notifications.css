@@ -1,0 +1,167 @@
+@define-color everforest0 #2f383e;
+@define-color everforest1 #374247;
+@define-color everforest2 #3a4248;
+@define-color everforest3 #4a5258;
+@define-color everforest4 #5a6268;
+@define-color everforest5 #d3c6aa;
+@define-color everforest6 #7fbbb3;
+@define-color everforest7 #83c092;
+@define-color everforest8 #a7c080;
+@define-color everforest9 #dbbc7f;
+@define-color everforest10 #e69875;
+@define-color everforest11 #e67e80;
+@define-color everforest12 #d699b6;
+@define-color everforest13 #a7c080;
+@define-color everforest14 #7fbbb3;
+@define-color everforest15 #d3c6aa;
+
+@define-color foreground    @everforest5;
+@define-color background   @everforest0;
+@define-color background-sec @everforest1;
+
+@define-color text            @foreground;
+@define-color background-alt  @everforest1;
+@define-color selected        @everforest9;
+@define-color hover           alpha(@everforest3, .8);
+@define-color urgent          @everforest11;
+@define-color critical        @everforest11;
+
+* {
+  color: @text;
+  all: unset;
+  font-size: 14px;
+  font-family: "JetBrains Mono Nerd Font", "Nerd Font", monospace;
+  transition: 200ms;
+}
+
+.notification-row {
+  outline: none;
+  margin: 0;
+  padding: 0px;
+}
+
+.floating-notifications.background .notification-row .notification-background {
+  background: alpha(@background, 0.85);
+  box-shadow: 0 0 5px 0 @everforest0;
+  border-radius: 24px;
+  margin: 16px;
+  padding: 0;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification {
+  background: alpha(@background, 0.85);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.6);
+  border: 1px solid @everforest0;
+  border-radius: 24px;
+  padding: 6px;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification.critical {
+  border: 2px solid @critical;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  .notification-content {
+  margin: 14px;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > * {
+  min-height: 3.4em;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action {
+  border-radius: 8px;
+  background-color: @background-alt;
+  margin: 6px;
+  border: 1px solid transparent;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action:hover {
+  background-color: @hover;
+  border: 1px solid @selected;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action:active {
+  background-color: @selected;
+  color: @background;
+}
+
+.image {
+  margin: 10px 20px 10px 0px;
+}
+
+.summary {
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.body {
+  font-size: 0.8rem;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .close-button {
+  margin: 6px;
+  padding: 2px;
+  border-radius: 6px;
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .close-button:hover {
+  background-color: @everforest2;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .close-button:active {
+  background-color: @selected;
+  color: @background;
+}
+
+.notification.critical progress {
+  background-color: @selected;
+}
+
+.notification.low progress,
+.notification.normal progress {
+  background-color: @selected;
+}

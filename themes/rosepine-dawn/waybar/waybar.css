@@ -1,0 +1,21 @@
+@define-color foreground #575279;
+@define-color background #faf4ed;
+@define-color accent #56949f;
+@define-color urgent #b4637a;
+
+* {
+  color: @foreground;
+  background: @background;
+}
+
+.module {
+  background: transparent;
+}
+
+.urgent {
+  color: @urgent;
+}
+
+.accent {
+  color: @accent;
+}

@@ -1,0 +1,4 @@
+set $bg #24283b
+set $fg #c0caf5
+set $accent #7aa2f7
+set $urgent #f7768e

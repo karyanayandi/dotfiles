@@ -1,0 +1,8 @@
+[general]
+update_interval = 1000
+
+[theme]
+background = "#24283b"
+foreground = "#c0caf5"
+accent = "#7aa2f7"
+urgent = "#f7768e"

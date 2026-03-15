@@ -1,0 +1,190 @@
+@define-color rosepine0 #faf4ed;
+@define-color rosepine1 #fffaf3;
+@define-color rosepine2 #f2e9e1;
+@define-color rosepine3 #9893a5;
+@define-color rosepine4 #797593;
+@define-color rosepine5 #575279;
+@define-color rosepine6 #56949f;
+@define-color rosepine7 #286983;
+@define-color rosepine8 #907aa9;
+@define-color rosepine9 #ea9d34;
+@define-color rosepine10 #d7827e;
+@define-color rosepine11 #b4637a;
+@define-color rosepine12 #d7827e;
+@define-color rosepine13 #907aa9;
+@define-color rosepine14 #56949f;
+@define-color rosepine15 #575279;
+
+@define-color foreground    @rosepine5;
+@define-color background   @rosepine0;
+@define-color background-sec @rosepine1;
+
+@define-color text            @foreground;
+@define-color background-alt  @rosepine1;
+@define-color selected        @rosepine9;
+@define-color hover           alpha(@rosepine3, .8);
+@define-color urgent          @rosepine11;
+@define-color critical        @rosepine11;
+
+/* Override default swaync CSS variables for light theme */
+* {
+  --text-color: @rosepine5;
+}
+
+* {
+  color: @text;
+  all: unset;
+  font-size: 14px;
+  font-family: "JetBrains Mono Nerd Font", "Nerd Font", monospace;
+  transition: 200ms;
+}
+
+.notification-row {
+  outline: none;
+  margin: 0;
+  padding: 0px;
+}
+
+.floating-notifications.background .notification-row .notification-background {
+  background: @background;
+  box-shadow: 0 0 5px 0 @rosepine0;
+  border-radius: 24px;
+  margin: 16px;
+  padding: 0;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification {
+  background: @background;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+  border: 1px solid @rosepine0;
+  border-radius: 24px;
+  padding: 6px;
+  color: @rosepine5;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  .notification-default-action {
+  color: @rosepine5;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification.critical {
+  border: 2px solid @critical;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  .notification-content {
+  margin: 14px;
+  color: @rosepine5;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > * {
+  min-height: 3.4em;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action {
+  border-radius: 8px;
+  background-color: @background-alt;
+  margin: 6px;
+  border: 1px solid transparent;
+  color: @rosepine5;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action:hover {
+  background-color: @hover;
+  border: 1px solid @selected;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification
+  > *:last-child
+  > *
+  .notification-action:active {
+  background-color: @selected;
+  color: @background;
+}
+
+.image {
+  margin: 10px 20px 10px 0px;
+}
+
+.summary {
+  font-weight: 800;
+  font-size: 1rem;
+  color: @rosepine5;
+}
+
+.body {
+  font-size: 0.8rem;
+  color: @rosepine5;
+}
+
+.time {
+  color: @rosepine5;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .close-button {
+  margin: 6px;
+  padding: 2px;
+  border-radius: 6px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: @rosepine5;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .close-button:hover {
+  background-color: @rosepine2;
+}
+
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .close-button:active {
+  background-color: @selected;
+  color: @background;
+}
+
+.notification.critical progress {
+  background-color: @selected;
+}
+
+.notification.low progress,
+.notification.normal progress {
+  background-color: @selected;
+}

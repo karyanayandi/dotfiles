@@ -1,0 +1,6 @@
+[theme]
+name = "gruvbox-light-hard"
+background = "#f9f5d7"
+foreground = "#3c3836"
+accent = "#076678"
+urgent = "#9d0006"

@@ -1,0 +1,13 @@
+# Set colors
+set $bg #1e1e2e
+set $fg #cdd6f4
+set $accent #89b4fa
+set $red #f38ba8
+set $green #a6e3a1
+set $yellow #f9e2af
+
+# Window colors
+client.focused          $accent $accent $bg $accent $accent
+client.focused_inactive $bg $bg $fg $bg $bg
+client.unfocused        $bg $bg $fg $bg $bg
+client.urgent           $red $red $bg $red $red

@@ -1,0 +1,5 @@
+# ghostty configuration snippet for rosepine-dawn
+[colors]
+background = "#faf4ed"
+foreground = "#575279"
+accent = "#56949f"

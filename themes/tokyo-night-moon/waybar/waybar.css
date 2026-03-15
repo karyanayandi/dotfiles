@@ -1,0 +1,25 @@
+@define-color foreground #c8d3f5;
+@define-color background #222436;
+@define-color accent #82aaff;
+@define-color urgent #ff757f;
+
+* {
+  color: @foreground;
+  background: @background;
+}
+
+window, #main, .bar {
+  background: @background;
+}
+
+.module {
+  color: @foreground;
+}
+
+.module .accent {
+  color: @accent;
+}
+
+.module.urgent {
+  color: @urgent;
+}

@@ -1,0 +1,4 @@
+# Zathura color scheme: gruvbox-light-hard
+set recolor true
+set recolor-foreground "#3c3836"
+set recolor-background "#f9f5d7"

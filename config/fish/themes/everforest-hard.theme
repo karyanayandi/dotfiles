@@ -1,0 +1,18 @@
+# everforest-hard
+
+fish_color_normal d3c6aa
+fish_color_command 7fbbb3
+fish_color_param d699b6
+fish_color_redirection dbbc7f
+fish_color_comment 4a5258
+fish_color_error e67e80
+fish_color_escape 83c092
+fish_color_operator d699b6
+fish_color_end 5a6268
+fish_color_quote a7c080
+fish_color_autosuggestion 4a5258
+fish_color_user 7fbbb3
+fish_color_host 83c092
+fish_color_valid_path --underline
+fish_color_cwd dbbc7f
+fish_color_cwd_root e67e80

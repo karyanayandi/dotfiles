@@ -1,0 +1,8 @@
+[appearance]
+background_color = "#f9f5d7"
+foreground_color = "#3c3836"
+accent_color = "#076678"
+urgent_color = "#9d0006"
+
+[widgets]
+border_color = "#3c3836"

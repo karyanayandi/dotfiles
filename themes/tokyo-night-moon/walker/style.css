@@ -1,0 +1,12 @@
+:root {
+  --bg: #222436;
+  --fg: #c8d3f5;
+  --accent: #82aaff;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.title { color: var(--accent); }

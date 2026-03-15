@@ -1,0 +1,5 @@
+theme:
+  fg: "#c0caf5"
+  bg: "#24283b"
+  accent: "#7aa2f7"
+  error: "#f7768e"

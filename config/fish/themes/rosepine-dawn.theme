@@ -1,0 +1,4 @@
+# fish prompt theme: rosepine-dawn
+set -g theme_bg "#faf4ed"
+set -g theme_fg "#575279"
+set -g theme_accent "#56949f"

@@ -94,6 +94,48 @@ case $SELECTED_THEME in
   )
   ;;
 
+"catppuccin-mocha")
+  declare -A THEME=(
+    ["background"]="#1e1e2e"
+    ["foreground"]="#cdd6f4"
+    ["highlight"]="#313244"
+    ["active"]="#45475a"
+    ["blue"]="#89b4fa"
+    ["cyan"]="#94e2d5"
+    ["green"]="#a6e3a1"
+    ["red"]="#f38ba8"
+    ["yellow"]="#f9e2af"
+  )
+  ;;
+
+"everforest-hard")
+  declare -A THEME=(
+    ["background"]="#2b3339"
+    ["foreground"]="#d3c6aa"
+    ["highlight"]="#3a4248"
+    ["active"]="#4a5258"
+    ["blue"]="#7fbbb3"
+    ["cyan"]="#83c092"
+    ["green"]="#a7c080"
+    ["red"]="#e67e80"
+    ["yellow"]="#dbbc7f"
+  )
+  ;;
+
+"everforest-medium")
+  declare -A THEME=(
+    ["background"]="#2f383e"
+    ["foreground"]="#d3c6aa"
+    ["highlight"]="#3a4248"
+    ["active"]="#4a5258"
+    ["blue"]="#7fbbb3"
+    ["cyan"]="#83c092"
+    ["green"]="#a7c080"
+    ["red"]="#e67e80"
+    ["yellow"]="#dbbc7f"
+  )
+  ;;
+
 "nord")
   declare -A THEME=(
     ["background"]="#2e3440"
@@ -105,20 +147,6 @@ case $SELECTED_THEME in
     ["green"]="#a3be8c"
     ["red"]="#bf616a"
     ["yellow"]="#ebcb8b"
-  )
-  ;;
-
-"lackluster")
-  declare -A THEME=(
-    ["background"]="#0A0A0A"
-    ["foreground"]="#DEEEED"
-    ["highlight"]="#444444"
-    ["active"]="#7A7A7A"
-    ["blue"]="#7788AA"
-    ["cyan"]="#708090"
-    ["green"]="#789978"
-    ["red"]="#D70000"
-    ["yellow"]="#FFAA88"
   )
   ;;
 
@@ -136,17 +164,59 @@ case $SELECTED_THEME in
   )
   ;;
 
-"vesper")
+"gruvbox-light-hard")
   declare -A THEME=(
-    ["background"]="#101010"
-    ["foreground"]="#FFFFFF"
-    ["highlight"]="#1C1C1C"
-    ["active"]="#161616"
-    ["blue"]="#99D1FF"
-    ["cyan"]="#99FFE4"
-    ["green"]="#99FFE4"
-    ["red"]="#FF8080"
-    ["yellow"]="#FFD580"
+    ["background"]="#f9f5d7"
+    ["foreground"]="#3c3836"
+    ["highlight"]="#ebdbb2"
+    ["active"]="#d5c4a1"
+    ["blue"]="#076678"
+    ["cyan"]="#427b58"
+    ["green"]="#79740e"
+    ["red"]="#9d0006"
+    ["yellow"]="#b57614"
+  )
+  ;;
+
+"rosepine-dawn")
+  declare -A THEME=(
+    ["background"]="#faf4ed"
+    ["foreground"]="#575279"
+    ["highlight"]="#f2e9e1"
+    ["active"]="#fffaf3"
+    ["blue"]="#56949f"
+    ["cyan"]="#9ccfd8"
+    ["green"]="#286983"
+    ["red"]="#b4637a"
+    ["yellow"]="#ea9d34"
+  )
+  ;;
+
+"tokyo-night-moon")
+  declare -A THEME=(
+    ["background"]="#222436"
+    ["foreground"]="#c8d3f5"
+    ["highlight"]="#2f334d"
+    ["active"]="#1e2030"
+    ["blue"]="#82aaff"
+    ["cyan"]="#86e1fc"
+    ["green"]="#c3e88d"
+    ["red"]="#ff757f"
+    ["yellow"]="#ffc777"
+  )
+  ;;
+
+"tokyo-night-storm")
+  declare -A THEME=(
+    ["background"]="#24283b"
+    ["foreground"]="#c0caf5"
+    ["highlight"]="#2e3c64"
+    ["active"]="#1f2335"
+    ["blue"]="#7aa2f7"
+    ["cyan"]="#7dcfff"
+    ["green"]="#9ece6a"
+    ["red"]="#f7768e"
+    ["yellow"]="#e0af68"
   )
   ;;
 

@@ -1,0 +1,8 @@
+# swaylock config using Rose Pine Dawn colors
+--screenshots
+--font "Monospace 12"
+--indicator-radius 80
+--ring-color 87 78 121
+--line-color 250 244 237
+--inside-color 86 148 159
+--key-hl-color 180 99 122

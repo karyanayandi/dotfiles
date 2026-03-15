@@ -1,0 +1,30 @@
+# catppuccin-mocha
+# https://github.com/catppuccin/catppuccin
+# preferred_background: 1e1e2e
+
+fish_color_normal cdd6f4
+fish_color_command 89b4fa
+fish_color_param f5c2e7
+fish_color_redirection f9e2af
+fish_color_comment 7f849c
+fish_color_error f38ba8
+fish_color_escape 94e2d5
+fish_color_operator f5c2e7
+fish_color_end 9399b2
+fish_color_quote a6e3a1
+fish_color_autosuggestion 6c7086
+fish_color_user 89b4fa
+fish_color_host 94e2d5
+fish_color_valid_path --underline
+fish_color_cwd f9e2af
+fish_color_cwd_root f38ba8
+fish_color_match --background=313244
+fish_color_search_match --background=313244
+fish_color_selection --background=35374b
+fish_pager_color_completion cdd6f4
+fish_pager_color_description 7f849c
+fish_pager_color_prefix 89b4fa
+fish_pager_color_progress 89b4fa
+fish_color_status f38ba8
+fish_color_cancel f38ba8
+fish_color_option f9e2af
