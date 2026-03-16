@@ -1,0 +1,150 @@
+colors:
+  noir0: "0c0b0a" # background
+  noir1: "0d0b0a" # black
+  noir2: "171513" # selection
+  noir3: "282a2d" # brightblack
+  noir4: "a0a4a8" # foreground
+  noir5: "9aa0a6" # white
+  noir6: "80868b" # brightwhite
+  noir7: "80a8a2" # brightcyan
+  noir8: "80a8a2" # cyan
+  noir9: "7691a3" # blue
+  noir10: "5a6b75" # darkblue
+  noir11: "916666" # red
+  noir12: "8a8080" # orange
+  noir13: "8a8080" # yellow
+  noir14: "949669" # green (approx)
+  noir15: "9486a3" # magenta
+
+  dim-foreground: "3c4043"
+
+  normal_text:
+    foreground: dim-foreground
+
+  reset_to_normal:
+    background: noir0
+    foreground: noir4
+    font-style: regular
+
+  # File Types
+
+  regular_file:
+    foreground: noir4
+
+  directory:
+    foreground: noir10 # noir9
+    font-style: bold
+
+  multi_hard_link:
+    foreground: noir8
+    font-style: underline
+
+  symlink:
+    foreground: noir8
+
+  broken_symlink:
+    foreground: noir11
+
+  missing_symlink_target:
+    # NOTE: Also used for readline completion shell builtin and function suffix
+    background: noir11
+    foreground: noir5 # noir4
+    font-style: bold
+
+  fifo:
+    foreground: noir7
+    font-style:
+      - bold
+      - underline
+
+  character_device:
+    foreground: noir13
+
+  block_device:
+    foreground: noir13
+    font-style: underline
+
+  door:
+    foreground: noir13
+    font-style: italic
+
+  socket:
+    # NOTE: Swapped with block device as used for readline completion prefix
+    foreground: noir13
+    font-style: bold
+
+  # File Permissions
+
+  executable_file:
+    foreground: noir7
+    font-style: bold
+
+  file_with_capability:
+    foreground: noir4
+    font-style:
+      - bold
+      - underline
+
+  setuid:
+    foreground: noir4
+    font-style:
+      - bold
+      - underline
+
+  setgid:
+    foreground: noir4
+    font-style:
+      - bold
+      - underline
+
+  sticky:
+    background: noir10 # noir9
+    foreground: noir5 # noir4
+    font-style: underline
+
+  other_writable:
+    background: noir10 # noir9
+    foreground: noir5 # noir4
+    font-style: bold
+
+  sticky_other_writable:
+    background: noir10 # noir9
+    foreground: noir5 # noir4
+    font-style:
+      - bold
+      - underline
+
+# Document Types
+
+archives:
+  foreground: noir5
+  font-style: bold
+
+executable:
+  foreground: noir7
+  font-style: bold
+
+markup:
+  foreground: noir6
+  web:
+    foreground: noir4
+
+media:
+  foreground: noir15
+  fonts:
+    foreground: noir4
+
+office:
+  foreground: noir14
+
+programming:
+  source:
+    foreground: noir7
+  tooling:
+    foreground: noir4
+
+text:
+  foreground: noir4
+
+unimportant:
+  foreground: noir3
