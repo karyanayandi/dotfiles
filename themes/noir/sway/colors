@@ -1,0 +1,9 @@
+# Noir theme colors for Sway
+set $accent #80a8a2
+set $red #916666 
+set $text #a0a4a8
+set $surface #171513
+set $dark #0d0b0a
+set $base #0c0b0a
+set $border #a0a4a8
+set $border_inactive #282a2d

@@ -18,6 +18,7 @@ colors:
 
   dim-foreground: "3c4043"
 
+core:
   normal_text:
     foreground: dim-foreground
 
@@ -32,7 +33,7 @@ colors:
     foreground: noir4
 
   directory:
-    foreground: noir10 # noir9
+    foreground: noir10
     font-style: bold
 
   multi_hard_link:
@@ -46,9 +47,8 @@ colors:
     foreground: noir11
 
   missing_symlink_target:
-    # NOTE: Also used for readline completion shell builtin and function suffix
     background: noir11
-    foreground: noir5 # noir4
+    foreground: noir5
     font-style: bold
 
   fifo:
@@ -69,7 +69,6 @@ colors:
     font-style: italic
 
   socket:
-    # NOTE: Swapped with block device as used for readline completion prefix
     foreground: noir13
     font-style: bold
 
@@ -98,18 +97,18 @@ colors:
       - underline
 
   sticky:
-    background: noir10 # noir9
-    foreground: noir5 # noir4
+    background: noir10
+    foreground: noir5
     font-style: underline
 
   other_writable:
-    background: noir10 # noir9
-    foreground: noir5 # noir4
+    background: noir10
+    foreground: noir5
     font-style: bold
 
   sticky_other_writable:
-    background: noir10 # noir9
-    foreground: noir5 # noir4
+    background: noir10
+    foreground: noir5
     font-style:
       - bold
       - underline

@@ -220,6 +220,20 @@ case $SELECTED_THEME in
   )
   ;;
 
+"noir")
+  declare -A THEME=(
+    ["background"]="#0c0b0a"
+    ["foreground"]="#a0a4a8"
+    ["highlight"]="#171513"
+    ["active"]="#282a2d"
+    ["blue"]="#7691a3"
+    ["cyan"]="#80a8a2"
+    ["green"]="#949669"
+    ["red"]="#916666"
+    ["yellow"]="#8a8080"
+  )
+  ;;
+
 *)
   declare -A THEME=(
     ["background"]="#2e3440"

@@ -1,0 +1,29 @@
+# name: 'noir'
+# preferred_background: 0c0b0a
+
+fish_color_normal a0a4a8
+fish_color_command 7691a3
+fish_color_param a0a4a8
+fish_color_keyword 916666
+fish_color_quote 949669
+fish_color_redirection 80a8a2
+fish_color_end 8a8080
+fish_color_comment 282a2d
+fish_color_error 916666
+fish_color_gray 282a2d
+fish_color_selection --background=171513
+fish_color_search_match --background=171513
+fish_color_option 949669
+fish_color_operator 80a8a2
+fish_color_escape 916666
+fish_color_autosuggestion 282a2d
+fish_color_cancel 916666
+fish_color_cwd 8a8080
+fish_color_user 7691a3
+fish_color_host 7691a3
+fish_color_host_remote 949669
+fish_color_status 916666
+fish_pager_color_progress 282a2d
+fish_pager_color_prefix 80a8a2
+fish_pager_color_completion a0a4a8
+fish_pager_color_description 282a2d
