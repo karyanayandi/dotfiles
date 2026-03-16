@@ -1,16 +1,17 @@
 gui:
+  nerdFontsVersion: "3"
   theme:
     activeBorderColor:
-      - '#89b4fa'
+      - "#89b4fa"
       - bold
     inactiveBorderColor:
-      - '#6c7086'
+      - "#6c7086"
     optionsTextColor:
-      - '#89b4fa'
+      - "#89b4fa"
     selectedLineBgColor:
-      - '#313244'
+      - "#313244"
     defaultFgColor:
-      - '#cdd6f4'
+      - "#cdd6f4"
     searchingActiveBorderColor:
-      - '#f9e2af'
+      - "#f9e2af"
   border: single

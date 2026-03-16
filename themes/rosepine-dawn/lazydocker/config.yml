@@ -1,4 +1,5 @@
 # lazydocker theme: rosepine-dawn
+nerdFontsVersion: "3"
 theme:
   primary_foreground: "#575279"
   primary_background: "#faf4ed"

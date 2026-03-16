@@ -1,6 +1,8 @@
 theme: gruvbox-light-hard
-colors:
-  primary:
-    background: "#f9f5d7"
-    foreground: "#3c3836"
-  accent: "#076678"
+gui:
+  nerdFontsVersion: "3"
+  colors:
+    primary:
+      background: "#f9f5d7"
+      foreground: "#3c3836"
+    accent: "#076678"

@@ -1,25 +1,26 @@
 gui:
+  nerdFontsVersion: "3"
   theme:
     activeBorderColor:
-      - '#61afef'
+      - "#61afef"
       - bold
     inactiveBorderColor:
-      - '#5c6370'
+      - "#5c6370"
     optionsTextColor:
-      - '#61afef'
+      - "#61afef"
     selectedLineBgColor:
-      - '#3b3f4c'
+      - "#3b3f4c"
     cherryPickedCommitBgColor:
-      - '#31353f'
+      - "#31353f"
     cherryPickedCommitFgColor:
-      - '#61afef'
+      - "#61afef"
     unstagedChangesColor:
-      - '#e86671'
+      - "#e86671"
     defaultFgColor:
-      - '#abb2bf'
+      - "#abb2bf"
     searchingActiveBorderColor:
-      - '#e5c07b'
+      - "#e5c07b"
   authorColors:
-    "*": '#61afef'
+    "*": "#61afef"
   border: single
 disableStartupPopups: true
