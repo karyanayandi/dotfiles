@@ -10,17 +10,6 @@
   },
   "model": "github-copilot/claude-sonnet-4.6",
   "small_model": "github-copilot/gpt-5-mini",
-  "agent": {
-    "general": {
-      "model": "github-copilot/gpt-5-mini"
-    },
-    "explore": {
-      "model": "github-copilot/gpt-5-mini"
-    },
-    "compaction": {
-      "model": "github-copilot/gpt-5-mini"
-    }
-  },
   "lsp": {
     "eslint": {
       "disabled": true
