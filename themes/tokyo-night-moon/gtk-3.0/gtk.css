@@ -1,0 +1,158 @@
+/* tokyo-night-moon Theme - GTK3 CSS */
+
+@define-color theme_fg_color #7a88cf;
+@define-color theme_bg_color #222436;
+@define-color theme_base_color #222436;
+@define-color theme_selected_bg_color #636da6;
+@define-color theme_selected_fg_color #c8d3f5;
+@define-color insensitive_bg_color #222436;
+@define-color insensitive_fg_color #c8d3f5;
+@define-color borders #636da6;
+@define-color error_color #c3e88d;
+
+/* Base styles */
+* {
+    color: @theme_fg_color;
+
+}
+
+/* Window backgrounds */
+window,
+window.background,
+dialog,
+message-dialog {
+    background-color: @theme_bg_color;
+}
+
+/* Buttons */
+button,
+.button,
+GtkButton {
+    background-color: @theme_selected_bg_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+button:hover,
+.button:hover {
+    background-color: @theme_selected_bg_color;
+    opacity: 0.8;
+}
+
+button:active,
+.button:active {
+    background-color: @theme_bg_color;
+}
+
+/* Entries (text inputs) */
+entry,
+.entry,
+GtkEntry {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Tree views and lists */
+treeview,
+.tree-view,
+GtkTreeView {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* Main view and container backgrounds */
+.view,
+.content-view,
+GtkViewport {
+    background-color: @theme_base_color;
+}
+
+/* Icon views (file managers) */
+iconview,
+GtkIconView {
+    background-color: @theme_base_color;
+}
+
+/* Paned containers */
+paned,
+GtkPaned {
+    background-color: @theme_bg_color;
+}
+
+/* Lists */
+list,
+GtkListBox {
+    background-color: @theme_base_color;
+}
+
+/* Flowbox */
+flowbox,
+GtkFlowBox {
+    background-color: @theme_base_color;
+}
+
+treeview:selected,
+.tree-view:selected {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+/* Menus */
+menu,
+.menu,
+GtkMenu {
+    background-color: @theme_bg_color;
+}
+
+menuitem,
+.menuitem,
+GtkMenuItem {
+    color: @theme_fg_color;
+}
+
+menuitem:hover,
+.menuitem:hover {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+/* Toolbars */
+toolbar,
+.toolbar,
+GtkToolbar {
+    background-color: @theme_bg_color;
+}
+
+/* Sidebar */
+sidebar,
+.sidebar,
+GtkSidebar {
+    background-color: @theme_bg_color;
+}
+
+/* Header bars */
+headerbar,
+.header-bar,
+GtkHeaderBar {
+    background-color: @theme_bg_color;
+    border-color: @borders;
+}
+
+/* Notebooks/Tabs */
+notebook,
+.notebook,
+GtkNotebook {
+    background-color: @theme_bg_color;
+}
+
+notebook tab,
+.notebook tab {
+    background-color: @theme_selected_bg_color;
+    color: @theme_fg_color;
+}
+
+notebook tab:checked,
+.notebook tab:checked {
+    background-color: @theme_bg_color;
+}

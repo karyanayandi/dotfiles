@@ -2,8 +2,8 @@
 
 set -e
 
-# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, Tmux, Fzf, and Neovim Theme Switcher
-# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, fzf, and neovim
+# Waybar, Foot, Alacritty, Bat, Bottom, Vivid, Fish, Lazygit, Lazydocker, Sway, Swaylock, Swaync, Walker, Zathura, Yazi, Ghostty, Tmux, Fzf, Neovim, and GTK Theme Switcher
+# Automatically discover and switch between themes for waybar, foot, alacritty, bat, bottom, vivid, fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, fzf, neovim, and gtk
 # Usage: theme-switch.sh [theme-name]
 
 # Dotfiles directory
@@ -18,7 +18,7 @@ UPDATED_COMPONENTS=()
 show_help() {
 	echo "Usage: theme-switch.sh [THEME_NAME]"
 	echo ""
-	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, fzf, and neovim."
+	echo "Switch themes for waybar, foot, alacritty, bat, bottom, vivid (LS_COLORS), fish, lazygit, lazydocker, sway, swaylock, swaync, walker, zathura, yazi, ghostty, tmux, fzf, neovim, and gtk."
 	echo ""
 	echo "Options:"
 	echo "  -h, --help    Show this help message"
@@ -154,15 +154,21 @@ discover_themes() {
 			has_fzf=true
 		fi
 
+		local has_gtk=false
+		# GTK CSS files in theme directory
+		if [[ -f "$theme_dir/gtk-3.0/gtk.css" || -f "$theme_dir/gtk-4.0/gtk.css" ]]; then
+			has_gtk=true
+		fi
+
 		# Theme is valid if it has at least one component
-		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true || "$has_tmux" == true || "$has_fzf" == true ]]; then
+		if [[ "$has_waybar" == true || "$has_foot" == true || "$has_alacritty" == true || "$has_bat" == true || "$has_bottom" == true || "$has_vivid" == true || "$has_fish" == true || "$has_lazygit" == true || "$has_lazydocker" == true || "$has_sway" == true || "$has_swaylock" == true || "$has_swaync" == true || "$has_walker" == true || "$has_zathura" == true || "$has_nvim" == true || "$has_yazi" == true || "$has_ghostty" == true || "$has_tmux" == true || "$has_fzf" == true || "$has_gtk" == true ]]; then
 			AVAILABLE_THEMES+=("$discovered_theme")
 		fi
 	done
 
 	if [[ ${#AVAILABLE_THEMES[@]} -eq 0 ]]; then
 		echo "Error: No valid themes found in $THEMES_DIR" >&2
-		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, nvim/theme.lua, tmux theme defined, or vivid theme for fzf" >&2
+		echo "Themes must have waybar/waybar.css, foot/colors.ini, alacritty/colors.toml, bat/config, bottom/bottom.toml, lazygit/config.yml, lazydocker/config.yml, sway/colors, swaylock/config, swaync/{notifications.css,central_control.css}, walker/style.css, zathura/zathurarc, yazi theme, ghostty/config, nvim/theme.lua, tmux theme defined, vivid theme for fzf, or gtk-{3,4}.0/gtk.css for GTK" >&2
 		echo "Vivid themes: $DOTFILES_DIR/config/vivid/<theme-name>.yaml" >&2
 		echo "Fish themes: $DOTFILES_DIR/config/fish/themes/<theme-name>.theme" >&2
 		echo "Tmux themes: $DOTFILES_DIR/home/.tmux/theme/lib/themes.sh" >&2
@@ -1026,6 +1032,79 @@ update_ghostty_theme() {
 	UPDATED_COMPONENTS+=("ghostty")
 }
 
+# Update GTK theme symlinks
+update_gtk_theme() {
+	local theme_name="$1"
+	local has_gtk_css=false
+	
+	# Check if theme has GTK support
+	local gtk3_css="$THEMES_DIR/$theme_name/gtk-3.0/gtk.css"
+	local gtk4_css="$THEMES_DIR/$theme_name/gtk-4.0/gtk.css"
+	
+	if [[ -f "$gtk3_css" || -f "$gtk4_css" ]]; then
+		has_gtk_css=true
+	fi
+	
+	if [[ "$has_gtk_css" == false ]]; then
+		echo "Note: Theme '$theme_name' does not have GTK support, skipping."
+		return 0
+	fi
+	
+	# Update GTK3 CSS symlink
+	if [[ -f "$gtk3_css" ]]; then
+		local target_dir="$CURRENT_THEME_DIR/gtk-3.0"
+		if [[ ! -d "$target_dir" ]]; then
+			mkdir -p "$target_dir"
+		fi
+		local relative_path="../../$theme_name/gtk-3.0/gtk.css"
+		ln -sf "$relative_path" "$target_dir/gtk.css"
+		if [[ $? -ne 0 ]]; then
+			echo "Error: Failed to update GTK3 symlink" >&2
+			exit 1
+		fi
+	fi
+	
+	# Update GTK4 CSS symlink
+	if [[ -f "$gtk4_css" ]]; then
+		local target_dir="$CURRENT_THEME_DIR/gtk-4.0"
+		if [[ ! -d "$target_dir" ]]; then
+			mkdir -p "$target_dir"
+		fi
+		local relative_path="../../$theme_name/gtk-4.0/gtk.css"
+		ln -sf "$relative_path" "$target_dir/gtk.css"
+		if [[ $? -ne 0 ]]; then
+			echo "Error: Failed to update GTK4 symlink" >&2
+			exit 1
+		fi
+	fi
+	
+	# Symlink to user config directory
+	local user_gtk3_dir="$HOME/.config/gtk-3.0"
+	local user_gtk4_dir="$HOME/.config/gtk-4.0"
+	
+	mkdir -p "$user_gtk3_dir" "$user_gtk4_dir"
+	
+	# Link to current theme
+	ln -sf "$CURRENT_THEME_DIR/gtk-3.0/gtk.css" "$user_gtk3_dir/gtk.css"
+	ln -sf "$CURRENT_THEME_DIR/gtk-4.0/gtk.css" "$user_gtk4_dir/gtk.css"
+	
+	# Update settings.ini to remove theme-name (use CSS only)
+	local user_gtk3_settings="$HOME/.config/gtk-3.0/settings.ini"
+	local user_gtk4_settings="$HOME/.config/gtk-4.0/settings.ini"
+	
+	if [[ -f "$user_gtk3_settings" ]]; then
+		# Comment out gtk-theme-name to let CSS take over
+		sed -i 's/^gtk-theme-name=/#gtk-theme-name=/' "$user_gtk3_settings" 2>/dev/null || true
+	fi
+	
+	if [[ -f "$user_gtk4_settings" ]]; then
+		# Comment out gtk-theme-name to let CSS take over
+		sed -i 's/^gtk-theme-name=/#gtk-theme-name=/' "$user_gtk4_settings" 2>/dev/null || true
+	fi
+	
+	UPDATED_COMPONENTS+=("gtk")
+}
+
 # Reload ghostty
 reload_ghostty() {
 	if pgrep -x ghostty >/dev/null; then
@@ -1075,6 +1154,33 @@ reload_fzf() {
 	# Trigger fish theme reload by updating the theme timestamp
 	# Fish will auto-detect this on next prompt via __fzf_theme_check
 	echo "  ✓ Fzf theme updated (fish will auto-reload on next prompt)"
+}
+
+# Reload GTK apps
+reload_gtk() {
+	# GTK applications don't support hot-reloading CSS files
+	# They need to be restarted to pick up theme changes
+	
+	# Check for common running GTK apps
+	local gtk_apps=()
+	local common_gtk_apps="firefox thunderbird gimp inkscape libreoffice nautilus pcmanfm thunar"
+	
+	for app in $common_gtk_apps; do
+		if pgrep -x "$app" >/dev/null 2>&1 || pgrep -f "$app" >/dev/null 2>&1; then
+			gtk_apps+=("$app")
+		fi
+	done
+	
+	if [[ ${#gtk_apps[@]} -gt 0 ]]; then
+		echo "  ✓ GTK theme updated"
+		echo "  - Running GTK apps detected: ${gtk_apps[*]}"
+		echo "    Note: GTK applications must be restarted to see theme changes"
+		echo "    CSS-based theming requires app restart (unlike full GTK themes)"
+	else
+		echo "  ✓ GTK theme updated"
+		echo "    Note: GTK apps will use new theme on next start"
+		echo "    (GTK CSS theming requires app restart)"
+	fi
 }
 
 # Main function
@@ -1161,6 +1267,7 @@ main() {
 	update_nvim_theme "$theme_name"
 	update_tmux_theme "$theme_name"
 	update_fzf_theme "$theme_name"
+	update_gtk_theme "$theme_name"
 
 	# Check if any components were updated
 	if [[ ${#UPDATED_COMPONENTS[@]} -eq 0 ]]; then
@@ -1230,6 +1337,9 @@ main() {
 			;;
 		fzf)
 			reload_fzf
+			;;
+		gtk)
+			reload_gtk
 			;;
 		esac
 	done

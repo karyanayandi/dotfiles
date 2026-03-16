@@ -1,0 +1,88 @@
+/* gruvbox-light-hard Theme - GTK4 CSS */
+
+@define-color theme_fg_color #928374;
+@define-color theme_bg_color #f9f5d7;
+@define-color theme_base_color #f9f5d7;
+@define-color theme_selected_bg_color #a89984;
+@define-color theme_selected_fg_color #3c3836;
+@define-color insensitive_bg_color #f9f5d7;
+@define-color insensitive_fg_color #3c3836;
+@define-color borders #a89984;
+@define-color error_color #8f3f71;
+
+/* Base styles */
+* {
+    color: @theme_fg_color;
+
+}
+
+/* Window backgrounds */
+window {
+    background-color: @theme_bg_color;
+}
+
+/* Buttons */
+button {
+    background-color: @theme_selected_bg_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+button:active {
+    background-color: @theme_bg_color;
+}
+
+/* Entries (text inputs) */
+entry {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Popovers */
+popover {
+    background-color: @theme_bg_color;
+}
+
+/* Menu buttons */
+.menu-button {
+    color: @theme_fg_color;
+}
+
+.menu-button:hover {
+    background-color: @theme_selected_bg_color;
+}
+
+/* Lists */
+list {
+    background-color: @theme_base_color;
+}
+
+list row:selected {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+/* Header bars */
+headerbar {
+    background-color: @theme_bg_color;
+    border-color: @borders;
+}
+
+/* Notebooks/Tabs */
+notebook {
+    background-color: @theme_bg_color;
+}
+
+notebook tab {
+    background-color: @theme_selected_bg_color;
+    color: @theme_fg_color;
+}
+
+notebook tab:checked {
+    background-color: @theme_bg_color;
+}
