@@ -11,10 +11,6 @@
 @define-color error_color #83a598;
 
 /* Base styles */
-* {
-    color: @theme_fg_color;
-
-}
 
 /* Window backgrounds */
 window,
@@ -24,24 +20,22 @@ message-dialog {
     background-color: @theme_bg_color;
 }
 
-/* Buttons */
+/* Buttons - keep default background, only set text color */
 button,
 .button,
 GtkButton {
-    background-color: @theme_selected_bg_color;
     color: @theme_fg_color;
     border-color: @borders;
 }
 
 button:hover,
 .button:hover {
-    background-color: @theme_selected_bg_color;
     opacity: 0.8;
 }
 
 button:active,
 .button:active {
-    background-color: @theme_bg_color;
+    opacity: 0.6;
 }
 
 /* Entries (text inputs) */

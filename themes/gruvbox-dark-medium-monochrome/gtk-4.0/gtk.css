@@ -4,28 +4,35 @@
 @define-color theme_bg_color #282828;
 @define-color theme_base_color #282828;
 @define-color theme_selected_bg_color #bdae93;
-@define-color theme_selected_fg_color #a89984;
+@define-color theme_selected_fg_color #282828;
 @define-color insensitive_bg_color #282828;
 @define-color insensitive_fg_color #a89984;
 @define-color borders #bdae93;
 @define-color error_color #928374;
 
 /* Base styles */
-* {
-    color: @theme_fg_color;
-
-}
 
 /* Window backgrounds */
 window {
     background-color: @theme_bg_color;
 }
 
-/* Buttons */
-button {
-    background-color: @theme_selected_bg_color;
+/* Buttons - keep default background, only set text color */
+button,
+.button,
+GtkButton {
     color: @theme_fg_color;
     border-color: @borders;
+}
+
+button:hover,
+.button:hover {
+    opacity: 0.8;
+}
+
+button:active,
+.button:active {
+    opacity: 0.6;
 }
 
 button:hover {

@@ -1,20 +1,16 @@
 /* aurora Theme - GTK3 CSS */
 
 @define-color theme_fg_color #eceff4;
-@define-color theme_bg_color #1e1e2e;
-@define-color theme_base_color #1e1e2e;
-@define-color theme_selected_bg_color #6c7086;
-@define-color theme_selected_fg_color #cdd6f4;
+@define-color theme_bg_color #282c34;
+@define-color theme_base_color #282c34;
+@define-color theme_selected_bg_color #abb2bf;
+@define-color theme_selected_fg_color #282c34;
 @define-color insensitive_bg_color #1e1e2e;
 @define-color insensitive_fg_color #cdd6f4;
-@define-color borders #6c7086;
+@define-color borders #abb2bf;
 @define-color error_color #f38ba8;
 
 /* Base styles */
-* {
-    color: @theme_fg_color;
-
-}
 
 /* Window backgrounds */
 window,
@@ -24,13 +20,22 @@ message-dialog {
     background-color: @theme_bg_color;
 }
 
-/* Buttons */
+/* Buttons - keep default background, only set text color */
 button,
 .button,
 GtkButton {
-    background-color: @theme_selected_bg_color;
     color: @theme_fg_color;
     border-color: @borders;
+}
+
+button:hover,
+.button:hover {
+    opacity: 0.8;
+}
+
+button:active,
+.button:active {
+    opacity: 0.6;
 }
 
 button:hover,
