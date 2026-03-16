@@ -89,6 +89,7 @@ alias x exit
 alias yarn "corepack yarn"
 alias yarnpkg "corepack yarnpkg"
 alias yz yazi
+alias countline "find . -type f -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/.next/*' -not -path '*/dist/*' | xargs wc -l | sort -n"
 
 ## Keybinding
 set fish_key_bindings fish_default_key_bindings

@@ -86,6 +86,7 @@ alias vis="sudo nvim"
 alias x="exit"
 alias yarn="corepack yarn"
 alias yarnpkg="corepack yarnpkg"
+alias countline="find . -type f -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/.next/*' -not -path '*/dist/*' | xargs wc -l | sort -n"
 
 # Keybinding (defaults should work, but if you need custom key bindings, add them here)
 bindkey -v
