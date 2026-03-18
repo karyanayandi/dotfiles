@@ -44,7 +44,7 @@ return {
       javascript = javascript_linter(),
       javascriptreact = javascript_linter(),
       lua = { "luacheck" },
-      markdown = { "markdownlint" },
+      markdown = { "vale" },
       sh = { "shellcheck" },
       nix = { "nix" },
       php = { "php" },
@@ -80,11 +80,11 @@ return {
         local filename = vim.fn.bufname(bufnr)
         local filetype = vim.bo[bufnr].filetype
 
-        -- Disable markdownlint for codecompanion, Avante and copilot-*
+        -- Disable vale for codecompanion, Avante and copilot-*
         -- ...existing code...
         local bufname = vim.api.nvim_buf_get_name(bufnr)
 
-        -- Disable markdownlint for codecompanion, Avante and copilot-* buffers
+        -- Disable vale for codecompanion, Avante and copilot-* buffers
         if filetype == "markdown" then
           if
             bufname:match "codecompanion"
@@ -94,7 +94,7 @@ return {
           then
             lint.linters_by_ft["markdown"] = {}
           else
-            lint.linters_by_ft["markdown"] = { "markdownlint" }
+            lint.linters_by_ft["markdown"] = { "vale" }
           end
         end
 

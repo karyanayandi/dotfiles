@@ -65,7 +65,7 @@ M.linters = {
   "flake8",
   "golangci-lint",
   "luacheck",
-  "markdownlint",
+  "vale",
   "oxlint",
   -- "phpcs",
 }
