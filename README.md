@@ -10,3 +10,4 @@
 - [ ] add surround nvim support
 - [ ] fix gruvbox monochrome lazygit color contrast
 - [ ] add vicinae theme support
+- [ ] use quickshell
