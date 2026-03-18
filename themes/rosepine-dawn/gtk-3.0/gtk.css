@@ -1,14 +1,16 @@
 /* rosepine-dawn Theme - GTK3 CSS */
 
-@define-color theme_fg_color #797593;
+@define-color theme_fg_color #575279;
 @define-color theme_bg_color #faf4ed;
-@define-color theme_base_color #faf4ed;
+@define-color theme_base_color #fffaf3;
 @define-color theme_selected_bg_color #9893a5;
 @define-color theme_selected_fg_color #faf4ed;
 @define-color insensitive_bg_color #faf4ed;
-@define-color insensitive_fg_color #575279;
+@define-color insensitive_fg_color #6e6a86;
 @define-color borders #9893a5;
-@define-color error_color #286983;
+@define-color error_color #b4637a;
+@define-color success_color #8aa88f;
+@define-color warning_color #d8a657;
 
 /* Base styles */
 
@@ -160,4 +162,120 @@ notebook tab,
 notebook tab:checked,
 .notebook tab:checked {
     background-color: @theme_bg_color;
+}
+
+/* Chrome/Chromium specific fixes */
+.chromium-window,
+.chromium-window .entry,
+.chromium-window GtkEntry,
+.chromium-window textview,
+.chromium-window textview text {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+.chromium-window headerbar,
+.chromium-window .header-bar {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Force light background for text entries */
+.chromium-window entry,
+.chromium-window .entry {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Additional widget theming for better app support */
+textview,
+textview text {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+scrolledwindow viewport {
+    background-color: @theme_base_color;
+}
+
+/* Tooltips */
+tooltip,
+.tooltip,
+GtkTooltip {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Progress bars */
+progressbar,
+.progressbar,
+GtkProgressBar {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+progressbar trough,
+.progressbar trough {
+    background-color: @theme_bg_color;
+    border-color: @borders;
+}
+
+progressbar progress,
+.progressbar progress {
+    background-color: @theme_selected_bg_color;
+}
+
+/* Scales/Sliders */
+scale,
+.scale,
+GtkScale {
+    background-color: @theme_bg_color;
+}
+
+scale trough,
+.scale trough {
+    background-color: @theme_base_color;
+    border-color: @borders;
+}
+
+scale highlight,
+.scale highlight {
+    background-color: @theme_selected_bg_color;
+}
+
+/* Links */
+a:link,
+a:visited,
+.link,
+.link:visited {
+    color: #56949f;
+}
+
+/* Infobars */
+infobar,
+.infobar,
+GtkInfoBar {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+infobar.info,
+.infobar.info {
+    background-color: #e7dfd9;
+    color: #575279;
+}
+
+infobar.warning,
+.infobar.warning {
+    background-color: #d8a657;
+    color: #575279;
+}
+
+infobar.error,
+.infobar.error {
+    background-color: #b4637a;
+    color: #faf4ed;
 }

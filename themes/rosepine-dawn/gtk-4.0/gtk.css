@@ -1,14 +1,16 @@
 /* rosepine-dawn Theme - GTK4 CSS */
 
-@define-color theme_fg_color #797593;
+@define-color theme_fg_color #575279;
 @define-color theme_bg_color #faf4ed;
-@define-color theme_base_color #faf4ed;
+@define-color theme_base_color #fffaf3;
 @define-color theme_selected_bg_color #9893a5;
 @define-color theme_selected_fg_color #faf4ed;
 @define-color insensitive_bg_color #faf4ed;
-@define-color insensitive_fg_color #575279;
+@define-color insensitive_fg_color #6e6a86;
 @define-color borders #9893a5;
-@define-color error_color #286983;
+@define-color error_color #b4637a;
+@define-color success_color #8aa88f;
+@define-color warning_color #d8a657;
 
 /* Base styles */
 
@@ -92,4 +94,106 @@ notebook tab {
 
 notebook tab:checked {
     background-color: @theme_bg_color;
+}
+
+/* Chrome/Chromium specific fixes */
+.chromium-window entry {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+.chromium-window headerbar {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Text views */
+textview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* Scrolled windows */
+scrolledwindow {
+    background-color: @theme_base_color;
+}
+
+/* Tooltips */
+tooltip {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Progress bars */
+progressbar {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+progressbar trough {
+    background-color: @theme_bg_color;
+    border-color: @borders;
+}
+
+progressbar progress {
+    background-color: @theme_selected_bg_color;
+}
+
+/* Scales */
+scale {
+    background-color: @theme_bg_color;
+}
+
+scale trough {
+    background-color: @theme_base_color;
+    border-color: @borders;
+}
+
+scale highlight {
+    background-color: @theme_selected_bg_color;
+}
+
+/* Links */
+a:link,
+a:visited {
+    color: #56949f;
+}
+
+/* Dialogs */
+dialog {
+    background-color: @theme_bg_color;
+}
+
+/* Sidebars */
+sidebar {
+    background-color: @theme_bg_color;
+}
+
+/* Paned containers */
+paned {
+    background-color: @theme_bg_color;
+}
+
+/* Info bars */
+infobar {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+infobar.info {
+    background-color: #e7dfd9;
+    color: #575279;
+}
+
+infobar.warning {
+    background-color: #d8a657;
+    color: #575279;
+}
+
+infobar.error {
+    background-color: #b4637a;
+    color: #faf4ed;
 }
