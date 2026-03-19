@@ -1095,11 +1095,29 @@ update_gtk_theme() {
 	if [[ -f "$user_gtk3_settings" ]]; then
 		# Comment out gtk-theme-name to let CSS take over
 		sed -i 's/^gtk-theme-name=/#gtk-theme-name=/' "$user_gtk3_settings" 2>/dev/null || true
+		
+		# Set dark theme preference based on theme name
+		if [[ "$theme_name" == *"light"* ]] || [[ "$theme_name" == *"dawn"* ]]; then
+			# Light theme - disable dark preference
+			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=0/' "$user_gtk3_settings" 2>/dev/null || true
+		else
+			# Dark theme - enable dark preference
+			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=1/' "$user_gtk3_settings" 2>/dev/null || true
+		fi
 	fi
 	
 	if [[ -f "$user_gtk4_settings" ]]; then
 		# Comment out gtk-theme-name to let CSS take over
 		sed -i 's/^gtk-theme-name=/#gtk-theme-name=/' "$user_gtk4_settings" 2>/dev/null || true
+		
+		# Set dark theme preference based on theme name
+		if [[ "$theme_name" == *"light"* ]] || [[ "$theme_name" == *"dawn"* ]]; then
+			# Light theme - disable dark preference
+			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=0/' "$user_gtk4_settings" 2>/dev/null || true
+		else
+			# Dark theme - enable dark preference
+			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=1/' "$user_gtk4_settings" 2>/dev/null || true
+		fi
 	fi
 	
 	UPDATED_COMPONENTS+=("gtk")
