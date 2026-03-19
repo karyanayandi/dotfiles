@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sh ./setup/yay.sh
+sh ./setup/viteplus.sh
 sh ./install.sh
 sh ./setup/24-bit-color.sh
 sh ./setup/bun.sh
