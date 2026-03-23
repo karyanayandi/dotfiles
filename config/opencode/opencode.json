@@ -3,7 +3,8 @@
   "autoupdate": false,
   "plugin": [
     "@mohak34/opencode-notifier@latest",
-    "@tarquinen/opencode-dcp@latest"
+    "@tarquinen/opencode-dcp@latest",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "compaction": {
     "auto": true
