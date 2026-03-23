@@ -8,41 +8,66 @@ return {
   config = function()
     local lint = require "lint"
 
-    local function javascript_linter()
-      if
-        vim.fn.glob "oxlint.json" ~= ""
-        or vim.fn.glob ".oxlintrc.json" ~= ""
-        or vim.fn.glob "oxlint.config.js" ~= ""
-        or vim.fn.glob "oxlint.config.ts" ~= ""
-        or vim.fn.glob ".oxlint.json" ~= ""
-        or vim.fn.glob ".oxlint.jsonc" ~= ""
-        or vim.fn.glob "oxc.json" ~= ""
-      then
-        return { "oxlint" }
-      elseif vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= "" then
-        return { "biomejs" }
-      elseif vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= "" then
-        return { "deno" }
-      elseif
-        vim.fn.glob ".eslintrc" ~= ""
-        or vim.fn.glob ".eslintrc.json" ~= ""
-        or vim.fn.glob ".eslintrc.js" ~= ""
-        or vim.fn.glob "eslint.config.cjs" ~= ""
-        or vim.fn.glob "eslint.config.js" ~= ""
-        or vim.fn.glob "eslint.config.mjs" ~= ""
-      then
-        return { "eslint_d" }
-      else
-        return { "oxlint" }
+    local linter_cache = {}
+
+    local function get_js_linter()
+      local cwd = vim.fn.getcwd()
+      if linter_cache[cwd] then
+        return linter_cache[cwd]
       end
+
+      local linter = { "oxlint" }
+
+      local function file_exists(path)
+        return vim.fn.filereadable(path) == 1
+      end
+
+      if
+        file_exists "oxlint.json"
+        or file_exists ".oxlintrc.json"
+        or file_exists "oxlint.config.js"
+        or file_exists "oxlint.config.ts"
+        or file_exists ".oxlint.json"
+        or file_exists ".oxlint.jsonc"
+        or file_exists "oxc.json"
+      then
+        linter = { "oxlint" }
+      elseif file_exists "biome.json" or file_exists "biome.jsonc" then
+        linter = { "biomejs" }
+      elseif file_exists "deno.json" or file_exists "deno.jsonc" then
+        linter = { "deno" }
+      elseif
+        file_exists ".eslintrc"
+        or file_exists ".eslintrc.json"
+        or file_exists ".eslintrc.js"
+        or file_exists "eslint.config.cjs"
+        or file_exists "eslint.config.js"
+        or file_exists "eslint.config.mjs"
+      then
+        linter = { "eslint_d" }
+      else
+        local package_json = vim.fn.glob "package.json"
+        if package_json ~= "" then
+          local ok, content = pcall(vim.fn.readfile, package_json, "", 100)
+          if ok and content then
+            local json = table.concat(content, "\n")
+            if json:match '"vite%-plus"' then
+              linter = { "oxlint" }
+            end
+          end
+        end
+      end
+
+      linter_cache[cwd] = linter
+      return linter
     end
 
     lint.linters_by_ft = {
-      astro = javascript_linter(),
+      astro = get_js_linter(),
       css = { "eslint_d" },
       fish = { "fish" },
-      javascript = javascript_linter(),
-      javascriptreact = javascript_linter(),
+      javascript = get_js_linter(),
+      javascriptreact = get_js_linter(),
       lua = { "luacheck" },
       markdown = { "vale" },
       sh = { "shellcheck" },
@@ -50,15 +75,14 @@ return {
       php = { "php" },
       python = { "python", "flake8" },
       rust = { "clippy" },
-      svelte = javascript_linter(),
-      typescript = javascript_linter(),
-      typescriptreact = javascript_linter(),
-      vue = javascript_linter(),
+      svelte = get_js_linter(),
+      typescript = get_js_linter(),
+      typescriptreact = get_js_linter(),
+      vue = get_js_linter(),
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 
-    -- Handle disabling linters
     vim.api.nvim_create_autocmd({
       "BufEnter",
       "BufWinEnter",
@@ -79,12 +103,8 @@ return {
         local bufnr = vim.api.nvim_get_current_buf()
         local filename = vim.fn.bufname(bufnr)
         local filetype = vim.bo[bufnr].filetype
-
-        -- Disable vale for codecompanion, Avante and copilot-*
-        -- ...existing code...
         local bufname = vim.api.nvim_buf_get_name(bufnr)
 
-        -- Disable vale for codecompanion, Avante and copilot-* buffers
         if filetype == "markdown" then
           if
             bufname:match "codecompanion"
@@ -98,7 +118,6 @@ return {
           end
         end
 
-        -- Disable shellcheck for .env files
         if filetype == "sh" then
           if filename:match "%.env$" then
             lint.linters_by_ft["sh"] = {}
