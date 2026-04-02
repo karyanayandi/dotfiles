@@ -6,25 +6,49 @@ return {
   event = { "BufReadPre", "BufNewFile" },
   config = function()
     local conform = require "conform"
+    local util = require "conform.util"
+
+    local biome_root_files = { "biome.json", "biome.jsonc" }
+    local deno_root_files = { "deno.json", "deno.jsonc" }
+    local oxfmt_root_files = { ".oxfmtrc.json", ".oxfmtrc.jsonc" }
+    local prettier_root_files = {
+      ".prettierrc",
+      ".prettierrc.json",
+      ".prettierrc.json5",
+      ".prettierrc.yml",
+      ".prettierrc.yaml",
+      ".prettierrc.js",
+      ".prettierrc.cjs",
+      "prettier.config.js",
+      "prettier.config.cjs",
+    }
+
+    local function has_any_file(files)
+      for _, file in ipairs(files) do
+        if vim.fn.glob(file) ~= "" then
+          return true
+        end
+      end
+      return false
+    end
 
     local function javascript_formatter()
-      if vim.fn.glob ".oxfmtrc.json" ~= "" or vim.fn.glob ".oxfmtrc.jsonc" ~= "" or vim.fn.glob "oxc.json" ~= "" then
+      if has_any_file(oxfmt_root_files) or vim.fn.glob "oxc.json" ~= "" then
         return { "oxfmt" }
-      elseif vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= "" then
+      elseif has_any_file(biome_root_files) then
         return { "biome" }
-      elseif vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= "" then
+      elseif has_any_file(deno_root_files) then
         return { "deno_fmt" }
-      elseif
-        vim.fn.glob ".prettierrc" ~= ""
-        or vim.fn.glob ".prettierrc.json" ~= ""
-        or vim.fn.glob ".prettierrc.js" ~= ""
-        or vim.fn.glob "prettier.config.js" ~= ""
-      then
+      elseif has_any_file(prettier_root_files) then
         return { "prettierd" }
       else
         return { "oxfmt" }
       end
     end
+
+    local biome_root = util.root_file(biome_root_files)
+    local oxfmt_root = util.root_file(oxfmt_root_files)
+    local prettier_root = util.root_file(prettier_root_files)
 
     local formatters_by_ft = {
       astro = javascript_formatter,
@@ -62,6 +86,36 @@ return {
 
     conform.setup {
       formatters_by_ft = formatters_by_ft,
+      formatters = {
+        oxfmt = {
+          command = "vp",
+          args = { "fmt", "--write", "$FILENAME" },
+          stdin = false,
+          cwd = oxfmt_root,
+          require_cwd = true,
+        },
+        biome = {
+          command = "node_modules/.bin/biome",
+          args = { "format", "--stdin-file-path", "$FILENAME" },
+          stdin = true,
+          cwd = biome_root,
+          require_cwd = true,
+        },
+        biome_fix = {
+          command = "node_modules/.bin/biome",
+          args = { "check", "--write", "--stdin-file-path", "$FILENAME" },
+          stdin = true,
+          cwd = biome_root,
+          require_cwd = true,
+        },
+        prettier = {
+          command = "node_modules/.bin/prettier",
+          args = { "--stdin-filepath", "$FILENAME" },
+          stdin = true,
+          cwd = prettier_root,
+          require_cwd = true,
+        },
+      },
       format_on_save = format_on_save,
     }
   end,
