@@ -15,7 +15,8 @@ return {
       "oxlint.config.ts",
       ".oxlint.json",
       ".oxlint.jsonc",
-      "package.json",
+      "oxc.json",
+      "vite.config.ts",
     }
     local biome_root_files = { "biome.json", "biome.jsonc" }
     local deno_root_files = { "deno.json", "deno.jsonc" }
