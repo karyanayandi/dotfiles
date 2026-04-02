@@ -17,9 +17,7 @@ sh ./setup/tmux.sh
 cd ~/.config/dotfiles/home && stow .
 cd ~/.config/dotfiles/config && stow .
 
-sh ./home/.local/bin/theme-switch.sh aurora
+sh ./home/.local/bin/theme-switch.sh gruvbox-dark-hard-monochrome
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv
-
-fish_config theme save "Aurora"
