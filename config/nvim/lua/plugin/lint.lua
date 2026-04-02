@@ -8,29 +8,43 @@ return {
   config = function()
     local lint = require "lint"
 
+    local oxlint_root_files = {
+      "oxlint.json",
+      ".oxlintrc.json",
+      "oxlint.config.js",
+      "oxlint.config.ts",
+      ".oxlint.json",
+      ".oxlint.jsonc",
+      "package.json",
+    }
+    local biome_root_files = { "biome.json", "biome.jsonc" }
+    local deno_root_files = { "deno.json", "deno.jsonc" }
+    local eslint_root_files = {
+      ".eslintrc",
+      ".eslintrc.json",
+      ".eslintrc.js",
+      "eslint.config.cjs",
+      "eslint.config.js",
+      "eslint.config.mjs",
+    }
+
+    local function has_any_file(files)
+      for _, file in ipairs(files) do
+        if vim.fn.glob(file) ~= "" then
+          return true
+        end
+      end
+      return false
+    end
+
     local function javascript_linter()
-      if
-        vim.fn.glob "oxlint.json" ~= ""
-        or vim.fn.glob ".oxlintrc.json" ~= ""
-        or vim.fn.glob "oxlint.config.js" ~= ""
-        or vim.fn.glob "oxlint.config.ts" ~= ""
-        or vim.fn.glob ".oxlint.json" ~= ""
-        or vim.fn.glob ".oxlint.jsonc" ~= ""
-        or vim.fn.glob "oxc.json" ~= ""
-      then
+      if has_any_file(oxlint_root_files) or vim.fn.glob "oxc.json" ~= "" then
         return { "oxlint" }
-      elseif vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= "" then
+      elseif has_any_file(biome_root_files) then
         return { "biomejs" }
-      elseif vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= "" then
+      elseif has_any_file(deno_root_files) then
         return { "deno" }
-      elseif
-        vim.fn.glob ".eslintrc" ~= ""
-        or vim.fn.glob ".eslintrc.json" ~= ""
-        or vim.fn.glob ".eslintrc.js" ~= ""
-        or vim.fn.glob "eslint.config.cjs" ~= ""
-        or vim.fn.glob "eslint.config.js" ~= ""
-        or vim.fn.glob "eslint.config.mjs" ~= ""
-      then
+      elseif has_any_file(eslint_root_files) then
         return { "eslint_d" }
       else
         return { "oxlint" }

@@ -10,7 +10,7 @@ return {
 
     local biome_root_files = { "biome.json", "biome.jsonc" }
     local deno_root_files = { "deno.json", "deno.jsonc" }
-    local oxfmt_root_files = { ".oxfmtrc.json", ".oxfmtrc.jsonc" }
+    local oxfmt_root_files = { ".oxfmtrc.json", ".oxfmtrc.jsonc", "package.json" }
     local prettier_root_files = {
       ".prettierrc",
       ".prettierrc.json",
