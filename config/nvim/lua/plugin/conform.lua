@@ -92,7 +92,7 @@ return {
           args = { "fmt", "--write", "$FILENAME" },
           stdin = false,
           cwd = oxfmt_root,
-          require_cwd = true,
+          -- require_cwd = true,
         },
         biome = {
           command = "node_modules/.bin/biome",
