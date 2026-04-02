@@ -1,5 +1,7 @@
 #!/bin/bash
 
-bun udpate -g
+bun upgrade
+
+bun update -g
 
 yay -Syu --noconfirm --needed
