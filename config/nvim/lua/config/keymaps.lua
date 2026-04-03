@@ -117,7 +117,7 @@ keymap("n", ";u", "<cmd>FzfLua undotree<cr>", { desc = "Undo history", noremap =
 
 -- Bufdelete
 keymap("n", "Q", ":lua require('snacks').bufdelete()<cr>", opts)
-keymap("n", ";c", ":%bd<cr>", { desc = "Close all buffers", noremap = true, silent = true })
+keymap("n", ";q", ":%bd<cr>", { desc = "Close all buffers", noremap = true, silent = true })
 
 -- Show document symbol
 keymap("n", "<m-t>", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts)
