@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "tools": [
+        "*"
+      ],
+      "type": "local",
+      "command": "bun",
+      "args": [
+        "x",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "source": "user",
+      "sourcePath": "/home/karyana/.copilot/mcp-config.json"
+    },
+    "playwriter": {
+      "tools": [
+        "*"
+      ],
+      "type": "local",
+      "command": "bun",
+      "args": [
+        "x",
+        "playwriter@latest"
+      ],
+      "source": "user",
+      "sourcePath": "/home/karyana/.copilot/mcp-config.json"
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {},
+      "tools": [
+        "*"
+      ]
+    }
+  }
+}

@@ -315,6 +315,30 @@ return {
       })
     end
 
+    -- copilot
+    function _COPILOT_TOGGLE()
+      if vim.env.TMUX ~= nil and vim.env.TMUX ~= "" then
+        local pane_id = vim.g.copilot_tmux_pane
+        if pane_id then
+          vim.fn.system("tmux display-message -t " .. pane_id .. " -p '#{pane_id}' 2>/dev/null")
+          if vim.v.shell_error == 0 then
+            vim.fn.system("tmux kill-pane -t " .. pane_id)
+            vim.g.copilot_tmux_pane = nil
+            return
+          else
+            vim.g.copilot_tmux_pane = nil
+          end
+        end
+        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'copilot'"
+        vim.g.copilot_tmux_pane = vim.fn.trim(result)
+      else
+        Snacks.terminal.toggle("copilot", {
+          interactive = true,
+          win = { position = "right", width = 0.4 },
+        })
+      end
+    end
+
     -- opencode
     function _OPENCODE_TOGGLE()
       if vim.env.TMUX ~= nil and vim.env.TMUX ~= "" then
@@ -383,6 +407,14 @@ return {
       end,
       mode = { "n", "i", "t" },
       desc = "Toggle Terminal",
+    },
+    {
+      ";c",
+      function()
+        _COPILOT_TOGGLE()
+      end,
+      mode = { "n", "i" },
+      desc = "Toggle Copilot",
     },
     {
       ";o",
