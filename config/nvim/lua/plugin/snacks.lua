@@ -288,6 +288,7 @@ return {
         interactive = true,
         win = {
           position = "float",
+          height = 0.9,
           border = "rounded",
           backdrop = false,
         },
@@ -305,6 +306,7 @@ return {
         interactive = true,
         win = {
           position = "float",
+          height = 0.9,
           border = "rounded",
           backdrop = false,
         },
