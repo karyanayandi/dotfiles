@@ -9,7 +9,6 @@ input {
     }
     mouse {}
     trackpoint {}
-    focus-follows-mouse
 }
 
 /-output "eDP-1" {
@@ -88,6 +87,24 @@ cursor {
   xcursor-theme "Bibata-Modern-Ice"
   xcursor-size 24
   hide-when-typing
+}
+
+gestures {
+    dnd-edge-view-scroll {
+        trigger-width 30
+        delay-ms 100
+        max-speed 1500
+    }
+
+    dnd-edge-workspace-switch {
+        trigger-height 50
+        delay-ms 100
+        max-speed 1500
+    }
+
+    hot-corners {
+        off
+    }
 }
 
 window-rule {
