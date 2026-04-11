@@ -258,6 +258,7 @@ return {
       win = {
         style = "terminal",
         position = "bottom",
+        height = 0.25,
         wo = {
           winbar = "",
         },
