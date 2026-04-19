@@ -14,4 +14,5 @@ bun add -g \
   @z_ai/coding-helper@latest \
   agent-browser@latest \
   playwright@latest \
-  playwriter@latest
+  playwriter@latest \
+  wrangler@latest
