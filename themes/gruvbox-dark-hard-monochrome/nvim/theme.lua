@@ -41,6 +41,18 @@ return {
 			vim.api.nvim_set_hl(0, "GitSignsStagedAdd", { fg = "#b8bb26" })
 			vim.api.nvim_set_hl(0, "GitSignsStagedChange", { fg = "#458588" })
 			vim.api.nvim_set_hl(0, "GitSignsStagedDelete", { fg = "#fb4934" })
+
+			local constant = "#B16286"
+			vim.api.nvim_set_hl(0, "Constant", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "Number", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "Boolean", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "Float", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "@constant", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "@constant.builtin", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "@constant.macro", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "@boolean", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "@number", { fg = constant, bold = true })
+			vim.api.nvim_set_hl(0, "@number.float", { fg = constant, bold = true })
 		end,
 	},
 	{
