@@ -1,16 +1,19 @@
 // -*- mode: jsonc -*-
 {
-  "position": "top",
+  "position": "bottom",
   "height": 30,
+  "width": 500,
+  "margin-bottom": 10,
   "spacing": 4,
-  "modules-left": ["niri/workspaces", "niri/mode"],
-  "modules-center": ["clock"],
-  "modules-right": [
+  "modules-center": [
+    "niri/workspaces", 
+    "niri/mode",
     "disk",
     "memory",
     "bluetooth",
     "pulseaudio",
     "custom/notification",
+    "clock",
   ],
   "sway/workspaces": {
     "disable-scroll": true,
