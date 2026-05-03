@@ -3,7 +3,10 @@ lazy-lock.json
 yazi.toml-*
 fish_variables
 tmux_resurrect_*
+opencode-notifier-state.json
+config/opencode/package-lock.json
 
 .opencode
 openspec
 AGENTS.md
+.swarm/

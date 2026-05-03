@@ -1,0 +1,89 @@
+{
+  "agents": {
+    "coder": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "reviewer": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "test_engineer": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "explorer": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "sme": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "critic": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "docs": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "designer": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "critic_sounding_board": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "critic_drift_verifier": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "critic_hallucination_verifier": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "critic_oversight": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "curator_init": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    },
+    "curator_phase": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        "opencode/big-pickle"
+      ]
+    }
+  },
+  "max_iterations": 5
+}
