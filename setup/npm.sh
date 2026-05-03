@@ -1,6 +1,7 @@
 #!/bin/bash
 
 bun add -g \
+  autocannon@latest \
   corepack@latest \
   firebase-tools@latest \
   neovim@latest \
