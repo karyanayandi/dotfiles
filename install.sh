@@ -115,7 +115,7 @@ yay -S --needed \
   udisks2 \
   unrar \
   unzip \
-  vicinae \
+  vicinae-bin \
   visual-studio-code-bin \
   vivid \
   waybar \
