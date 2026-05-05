@@ -80,16 +80,229 @@ headerbar {
     border-color: @borders;
 }
 
-/* Notebooks/Tabs */
-notebook {
-    background-color: @theme_bg_color;
-}
-
-notebook tab {
-    background-color: @theme_selected_bg_color;
+/* Labels */
+label {
     color: @theme_fg_color;
 }
 
-notebook tab:checked {
+/* Dialogs */
+dialog,
+message-dialog {
     background-color: @theme_bg_color;
+}
+
+/* File chooser fixes */
+filechooser {
+    background-color: @theme_bg_color;
+}
+
+filechooser .view,
+filechooser treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+filechooser placessidebar,
+filechooser sidebar {
+    background-color: @theme_bg_color;
+}
+
+filechooser row {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* List rows */
+list row {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* Viewport */
+viewport {
+    background-color: @theme_base_color;
+}
+
+/* Tree views */
+treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* Main views */
+.view,
+.content-view {
+    background-color: @theme_base_color;
+}
+
+/* Icon views */
+iconview {
+    background-color: @theme_base_color;
+}
+
+/* Paned containers */
+paned {
+    background-color: @theme_bg_color;
+}
+
+/* Flowbox */
+flowbox {
+    background-color: @theme_base_color;
+}
+
+/* Menus */
+menu {
+    background-color: @theme_bg_color;
+}
+
+menuitem {
+    color: @theme_fg_color;
+}
+
+menuitem:hover {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+/* Toolbars */
+toolbar {
+    background-color: @theme_bg_color;
+}
+
+/* Sidebar */
+sidebar {
+    background-color: @theme_bg_color;
+}
+
+/* Combo boxes / Dropdowns (File Roller filter) */
+dropdown {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+dropdown button {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+dropdown button:hover {
+    background-color: @theme_selected_bg_color;
+}
+
+dropdown arrow {
+    color: @theme_fg_color;
+}
+
+dropdown popup {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Action bars */
+actionbar {
+    background-color: @theme_bg_color;
+    border-color: @borders;
+}
+
+actionbar button {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Popover menus */
+popover modelbutton {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+popover modelbutton:hover {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+/* Aggressive file chooser / libadwaita bottom bar fix */
+.bottom-bar,
+toolbarview > .top-bar,
+toolbarview > .bottom-bar,
+navigation-view .transition-box,
+overlay .bottom-bar,
+window > overlay > box:last-child,
+window > box > box:last-child,
+window > box > overlay > box:last-child {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Any box inside filechooser that might be white */
+filechooser box,
+filechooser overlay box,
+filechooser actionbar revealer box,
+filechooser revealer box {
+    background-color: @theme_bg_color;
+}
+
+/* Force ALL dropdowns in file chooser */
+filechooser dropdown,
+filechooser dropdown button,
+filechooser dropdown togglebutton,
+filechooser .dropdown,
+filechooser .dropdown button,
+filechooser .dropdown togglebutton,
+filechooser popover button {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Force dropdown list background */
+filechooser popover,
+filechooser popover contents,
+filechooser popover listview,
+filechooser popover listview row,
+filechooser dropdown popup {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Sidebar / Places sidebar rows - libadwaita fix */
+sidebar list row,
+placessidebar row,
+.navigation-sidebar row,
+.sidebar row,
+list.navigation-sidebar row {
+    background-color: transparent;
+    color: @theme_fg_color;
+    border-radius: 6px;
+    margin: 2px 6px;
+}
+
+sidebar list row:hover,
+placessidebar row:hover,
+.navigation-sidebar row:hover,
+.sidebar row:hover {
+    background-color: alpha(@theme_selected_bg_color, 0.15);
+    color: @theme_fg_color;
+}
+
+sidebar list row:selected,
+placessidebar row:selected,
+.navigation-sidebar row:selected,
+.sidebar row:selected {
+    background-color: #3f474d;
+    color: @theme_fg_color;
+}
+
+/* File chooser sidebar specifically */
+filechooser placessidebar row,
+filechooser sidebar list row {
+    background-color: transparent;
+    color: @theme_fg_color;
+}
+
+filechooser placessidebar row:selected,
+filechooser sidebar list row:selected {
+    background-color: #3f474d;
+    color: @theme_fg_color;
 }

@@ -144,20 +144,158 @@ GtkHeaderBar {
     border-color: @borders;
 }
 
-/* Notebooks/Tabs */
-notebook,
-.notebook,
-GtkNotebook {
-    background-color: @theme_bg_color;
-}
-
-notebook tab,
-.notebook tab {
-    background-color: @theme_selected_bg_color;
+/* Labels */
+label {
     color: @theme_fg_color;
 }
 
-notebook tab:checked,
-.notebook tab:checked {
+/* File chooser fixes */
+filechooser,
+GtkFileChooserDialog,
+GtkFileChooserWidget {
     background-color: @theme_bg_color;
+}
+
+filechooser .view,
+filechooser treeview,
+GtkFileChooserWidget .view,
+GtkFileChooserWidget treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+filechooser placessidebar,
+filechooser sidebar,
+GtkFileChooserWidget placessidebar,
+GtkFileChooserWidget sidebar {
+    background-color: @theme_bg_color;
+}
+
+filechooser row,
+GtkFileChooserWidget row {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* List rows */
+list row,
+GtkListBoxRow {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+/* Viewport */
+viewport,
+GtkViewport {
+    background-color: @theme_base_color;
+}
+
+/* Combo boxes / Dropdowns (File Roller filter) */
+combobox,
+GtkComboBox,
+GtkComboBoxText {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+combobox button,
+GtkComboBox button,
+GtkComboBoxText button {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+combobox button:hover,
+GtkComboBox button:hover {
+    background-color: @theme_selected_bg_color;
+}
+
+combobox arrow,
+GtkComboBox arrow {
+    color: @theme_fg_color;
+}
+
+combobox popup menu,
+GtkComboBox popup menu {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Action bars */
+actionbar,
+GtkActionBar {
+    background-color: @theme_bg_color;
+    border-color: @borders;
+}
+
+actionbar button,
+GtkActionBar button {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Aggressive file chooser bottom bar fix */
+GtkFileChooserDialog .dialog-action-area,
+GtkFileChooserWidget .dialog-action-area,
+GtkFileChooserDialog .dialog-vbox > box:last-child,
+GtkFileChooserWidget .dialog-vbox > box:last-child,
+GtkFileChooserDialog actionbar,
+GtkFileChooserWidget actionbar,
+GtkFileChooserDialog actionbar > box,
+GtkFileChooserWidget actionbar > box {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Force ALL dropdowns in file chooser */
+GtkFileChooserDialog combobox button,
+GtkFileChooserWidget combobox button,
+GtkFileChooserDialog GtkComboBox button,
+GtkFileChooserWidget GtkComboBox button {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border-color: @borders;
+}
+
+/* Force dropdown list background */
+GtkFileChooserDialog popover menu,
+GtkFileChooserWidget popover menu,
+GtkFileChooserDialog menu,
+GtkFileChooserWidget menu {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Sidebar / Places sidebar rows */
+.sidebar row,
+GtkSidebar row,
+placessidebar row,
+GtkPlacesSidebar row {
+    background-color: transparent;
+    color: @theme_fg_color;
+}
+
+.sidebar row:selected,
+GtkSidebar row:selected,
+placessidebar row:selected,
+GtkPlacesSidebar row:selected {
+    background-color: #434c52;
+    color: @theme_fg_color;
+}
+
+/* File chooser sidebar */
+GtkFileChooserWidget placessidebar row,
+GtkFileChooserWidget sidebar row,
+GtkFileChooserDialog placessidebar row,
+GtkFileChooserDialog sidebar row {
+    background-color: transparent;
+    color: @theme_fg_color;
+}
+
+GtkFileChooserWidget placessidebar row:selected,
+GtkFileChooserWidget sidebar row:selected {
+    background-color: #434c52;
+    color: @theme_fg_color;
 }

@@ -1032,6 +1032,49 @@ update_ghostty_theme() {
 	UPDATED_COMPONENTS+=("ghostty")
 }
 
+
+# Update browser theme color from chromium.theme
+update_browser_theme() {
+	local theme_name="$1"
+	local chromium_theme_file="$THEMES_DIR/$theme_name/chromium.theme"
+	
+	if [[ ! -f "$chromium_theme_file" ]]; then
+		return 0
+	fi
+	
+	local theme_rgb=$(<"$chromium_theme_file")
+	local theme_hex=$(printf '#%02x%02x%02x' ${theme_rgb//,/ })
+	
+	# Apply to Chromium/Chrome
+	local chromium_policy_dir="$HOME/.config/chromium/policies/managed"
+	if [[ -d "$chromium_policy_dir" ]] || mkdir -p "$chromium_policy_dir" 2>/dev/null; then
+		echo "{\"BrowserThemeColor\": \"$theme_hex\", \"BrowserColorScheme\": \"device\"}" > "$chromium_policy_dir/color.json"
+	fi
+	
+	# Apply to Brave
+	local brave_policy_dir="$HOME/.config/BraveSoftware/Brave-Browser/policies/managed"
+	if [[ -d "$brave_policy_dir" ]] || mkdir -p "$brave_policy_dir" 2>/dev/null; then
+		echo "{\"BrowserThemeColor\": \"$theme_hex\", \"BrowserColorScheme\": \"device\"}" > "$brave_policy_dir/color.json"
+	fi
+	
+	# Apply to Helium
+	local helium_policy_dir="$HOME/.config/helium/policies/managed"
+	if [[ -d "$helium_policy_dir" ]] || mkdir -p "$helium_policy_dir" 2>/dev/null; then
+		echo "{\"BrowserThemeColor\": \"$theme_hex\", \"BrowserColorScheme\": \"device\"}" > "$helium_policy_dir/color.json"
+	fi
+	
+	# Refresh policies if browsers are running
+	if pgrep -x chromium >/dev/null; then
+		chromium --refresh-platform-policy --no-startup-window &>/dev/null || true
+	fi
+	if pgrep -x brave >/dev/null; then
+		brave --refresh-platform-policy --no-startup-window &>/dev/null || true
+	fi
+	if pgrep -x helium >/dev/null; then
+		helium --refresh-platform-policy --no-startup-window &>/dev/null || true
+	fi
+}
+
 # Update GTK theme symlinks
 update_gtk_theme() {
 	local theme_name="$1"
@@ -1088,36 +1131,28 @@ update_gtk_theme() {
 	ln -sf "$CURRENT_THEME_DIR/gtk-3.0/gtk.css" "$user_gtk3_dir/gtk.css"
 	ln -sf "$CURRENT_THEME_DIR/gtk-4.0/gtk.css" "$user_gtk4_dir/gtk.css"
 	
-	# Update settings.ini to remove theme-name (use CSS only)
+	# Update settings.ini to keep base theme and apply CSS overrides on top
 	local user_gtk3_settings="$HOME/.config/gtk-3.0/settings.ini"
 	local user_gtk4_settings="$HOME/.config/gtk-4.0/settings.ini"
 	
+	# Determine base theme and dark preference based on theme name
+	local base_theme="adw-gtk3-dark"
+	local dark_preference="1"
+	if [[ "$theme_name" == *"light"* ]] || [[ "$theme_name" == *"dawn"* ]]; then
+		base_theme="adw-gtk3"
+		dark_preference="0"
+	fi
+	
 	if [[ -f "$user_gtk3_settings" ]]; then
-		# Comment out gtk-theme-name to let CSS take over
-		sed -i 's/^gtk-theme-name=/#gtk-theme-name=/' "$user_gtk3_settings" 2>/dev/null || true
-		
-		# Set dark theme preference based on theme name
-		if [[ "$theme_name" == *"light"* ]] || [[ "$theme_name" == *"dawn"* ]]; then
-			# Light theme - disable dark preference
-			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=0/' "$user_gtk3_settings" 2>/dev/null || true
-		else
-			# Dark theme - enable dark preference
-			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=1/' "$user_gtk3_settings" 2>/dev/null || true
-		fi
+		# Set base theme for proper Chromium/GTK3 app theming
+		sed -i "s/^#\?gtk-theme-name=.*/gtk-theme-name=$base_theme/" "$user_gtk3_settings" 2>/dev/null || true
+		sed -i "s/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=$dark_preference/" "$user_gtk3_settings" 2>/dev/null || true
 	fi
 	
 	if [[ -f "$user_gtk4_settings" ]]; then
-		# Comment out gtk-theme-name to let CSS take over
-		sed -i 's/^gtk-theme-name=/#gtk-theme-name=/' "$user_gtk4_settings" 2>/dev/null || true
-		
-		# Set dark theme preference based on theme name
-		if [[ "$theme_name" == *"light"* ]] || [[ "$theme_name" == *"dawn"* ]]; then
-			# Light theme - disable dark preference
-			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=0/' "$user_gtk4_settings" 2>/dev/null || true
-		else
-			# Dark theme - enable dark preference
-			sed -i 's/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=1/' "$user_gtk4_settings" 2>/dev/null || true
-		fi
+		# Set base theme for proper GTK4 app theming
+		sed -i "s/^#\?gtk-theme-name=.*/gtk-theme-name=$base_theme/" "$user_gtk4_settings" 2>/dev/null || true
+		sed -i "s/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=$dark_preference/" "$user_gtk4_settings" 2>/dev/null || true
 	fi
 	
 	UPDATED_COMPONENTS+=("gtk")
@@ -1285,6 +1320,7 @@ main() {
 	update_nvim_theme "$theme_name"
 	update_tmux_theme "$theme_name"
 	update_fzf_theme "$theme_name"
+	update_browser_theme "$theme_name"
 	update_gtk_theme "$theme_name"
 
 	# Check if any components were updated
