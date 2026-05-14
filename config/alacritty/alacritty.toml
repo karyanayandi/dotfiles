@@ -1,6 +1,0 @@
-[general]
-import = ["~/.config/dotfiles/themes/current/alacritty/colors.toml"]
-
-[font]
-normal = { family = "JetBrains Mono Nerd Font", style = "Regular" }
-size = 13.0

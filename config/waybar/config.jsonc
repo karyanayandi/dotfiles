@@ -2,38 +2,38 @@
 {
   "position": "bottom",
   "height": 30,
-  "width": 500,
+  "width": 400,
   "margin-bottom": 10,
   "spacing": 4,
   "modules-center": [
-    "niri/workspaces", 
-    "niri/mode",
+    "hyprland/workspaces",
+    "hyprland/mode",
     "disk",
     "memory",
     "bluetooth",
     "pulseaudio",
     "custom/notification",
-    "clock",
+    "clock"
   ],
-  "sway/workspaces": {
+  "hyprland/workspaces": {
     "disable-scroll": true,
     "all-outputs": true,
     "warp-on-scroll": false,
-    "format": "{name}",
+    "format": "{name}"
   },
-  "sway/mode": {
-    "format": "{}",
+  "hyprland/mode": {
+    "format": "{}"
   },
   "clock": {
     "format": "{:%H:%M}",
     "tooltip": true,
-    "tooltip-format": "{:%A, %B %d, %Y}",
+    "tooltip-format": "{:%A, %B %d, %Y}"
   },
   "disk": {
     "interfal": 30,
     "format": "",
     "path": "/",
-    "on-click": "alacritty -e yazi",
+    "on-click": "ghostty -e yazi"
   },
   "bluetooth": {
     "format": "",
@@ -41,25 +41,31 @@
     "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
     "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
     "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
-    "on-click": "alacritty -e bluetui",
+    "on-click": "ghostty -e bluetui"
   },
   "pulseaudio": {
     "format": "{icon}",
     "format-muted": "󰸈",
     "format-icons": {
       "headphone": "󰋋",
-      "default": ["", "", "󰕾", "󰕾", ""],
+      "default": [
+        "",
+        "",
+        "󰕾",
+        "󰕾",
+        ""
+      ]
     },
     "tooltip": true,
     "tooltip-format": "{icon} {volume}%",
     "scroll-step": 1,
-    "on-click": "alacritty -e wiremix",
-    "on-click-middle": "swayosd-client --output-volume mute-toggle",
+    "on-click": "ghostty -e wiremix",
+    "on-click-middle": "swayosd-client --output-volume mute-toggle"
   },
   "memory": {
     "format": "󰍛",
-    "on-click": "alacritty -e btm",
-    "interval": 5,
+    "on-click": "ghostty -e btm",
+    "interval": 5
   },
   "custom/notification": {
     "tooltip": false,
@@ -72,13 +78,13 @@
       "inhibited-notification": "<span foreground='red'><sup></sup></span>",
       "inhibited-none": "",
       "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-      "dnd-inhibited-none": "",
+      "dnd-inhibited-none": ""
     },
     "return-type": "json",
     "exec-if": "which swaync-client",
     "exec": "swaync-client -swb",
     "on-click": "swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
-    "escape": true,
-  },
+    "escape": true
+  }
 }

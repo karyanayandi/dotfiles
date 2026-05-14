@@ -1,7 +1,5 @@
 #!/bin/bash
 
-bun upgrade
-
 bun update -g
 
 vp upgrade

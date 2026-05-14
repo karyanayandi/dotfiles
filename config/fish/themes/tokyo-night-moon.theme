@@ -1,3 +1,0 @@
-set -g theme_background "#222436"
-set -g theme_foreground "#c8d3f5"
-set -g theme_accent "#82aaff"

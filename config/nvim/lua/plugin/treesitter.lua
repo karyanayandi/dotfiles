@@ -106,95 +106,102 @@ return {
     --   group = vim.api.nvim_create_augroup("AstroTreesitter", { clear = true }),
     -- })
 
-    require("nvim-treesitter.configs").setup {
-      ensure_installed = {
-        "astro",
-        "bash",
-        "c",
-        "css",
-        "diff",
-        "gitcommit",
-        "go",
-        "html",
-        "javascript",
-        "jsdoc",
-        "json",
-        "jsonc",
-        "lua",
-        "luadoc",
-        "luap",
-        "markdown",
-        "markdown_inline",
-        "nix",
-        "php",
-        "printf",
-        "python",
-        "query",
-        "regex",
-        "rust",
-        "svelte",
-        "toml",
-        "tsx",
-        "typescript",
-        "vim",
-        "vimdoc",
-        "vue",
-        "xml",
-        "yaml",
-      },
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- additional_vim_regex_highlighting = false,
-      },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
-      matchup = {
-        enable = true,
-        disable_virtual_text = true,
-        disable = { "html", "smali", "jsonc", "lua" },
-      },
-      autopairs = {
-        enable = true,
-      },
-      indent = { enable = true, disable = { "python" } },
-      textobjects = {
-        select = {
-          enable = true,
-          lookahead = true,
-          keymaps = {
-            ["af"] = "@function.outer",
-            ["if"] = "@function.inner",
-            ["at"] = "@class.outer",
-            ["it"] = "@class.inner",
-            ["ac"] = "@call.outer",
-            ["ic"] = "@call.inner",
-            ["aa"] = "@parameter.outer",
-            ["ia"] = "@parameter.inner",
-            ["al"] = "@loop.outer",
-            ["il"] = "@loop.inner",
-            ["ai"] = "@conditional.outer",
-            ["ii"] = "@conditional.inner",
-            ["a/"] = "@comment.outer",
-            ["i/"] = "@comment.inner",
-            ["ab"] = "@block.outer",
-            ["ib"] = "@block.inner",
-            ["as"] = "@statement.outer",
-            ["is"] = "@scopename.inner",
-            ["aA"] = "@attribute.outer",
-            ["iA"] = "@attribute.inner",
-            ["aF"] = "@frame.outer",
-            ["iF"] = "@frame.inner",
-          },
-        },
+    require("nvim-treesitter").setup {}
+
+    -- Highlight is built into Neovim 0.10+ via treesitter, no config needed.
+
+    -- Install parsers (non-blocking, avoids slowing down startup)
+    local ensure_installed = {
+      "astro",
+      "bash",
+      "c",
+      "css",
+      "diff",
+      "gitcommit",
+      "go",
+      "html",
+      "javascript",
+      "jsdoc",
+      "json",
+      "jsonc",
+      "lua",
+      "luadoc",
+      "luap",
+      "markdown",
+      "markdown_inline",
+      "nix",
+      "php",
+      "printf",
+      "python",
+      "query",
+      "regex",
+      "rust",
+      "svelte",
+      "toml",
+      "tsx",
+      "typescript",
+      "vim",
+      "vimdoc",
+      "vue",
+      "xml",
+      "yaml",
+    }
+    vim.defer_fn(function()
+      pcall(require("nvim-treesitter").install, ensure_installed)
+    end, 0)
+
+    -- Treesitter-based indentation
+    vim.opt.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "python",
+      callback = function()
+        vim.bo.indentexpr = ""
+      end,
+    })
+
+    -- Textobjects: configure plugin and set keymaps
+    require("nvim-treesitter-textobjects").setup {
+      select = {
+        lookahead = true,
       },
     }
+    local select = require("nvim-treesitter-textobjects.select")
+    local textobjects = {
+      af = "@function.outer",
+      ["if"] = "@function.inner",
+      at = "@class.outer",
+      it = "@class.inner",
+      ac = "@call.outer",
+      ic = "@call.inner",
+      aa = "@parameter.outer",
+      ia = "@parameter.inner",
+      al = "@loop.outer",
+      il = "@loop.inner",
+      ai = "@conditional.outer",
+      ii = "@conditional.inner",
+      ["a/"] = "@comment.outer",
+      ["i/"] = "@comment.inner",
+      ab = "@block.outer",
+      ib = "@block.inner",
+      as = "@statement.outer",
+      is = "@scopename.inner",
+      aA = "@attribute.outer",
+      iA = "@attribute.inner",
+      aF = "@frame.outer",
+      iF = "@frame.inner",
+    }
+    for key, query in pairs(textobjects) do
+      vim.keymap.set({ "o", "x" }, key, function()
+        select.select_textobject(query)
+      end, { desc = query })
+    end
+
+    -- Incremental selection (Neovim built-in since 0.9)
+    vim.keymap.set("n", "<C-space>", function()
+      vim.treesitter.incremental_selection()
+    end, { desc = "Incremental selection" })
+    vim.keymap.set("n", "<bs>", function()
+      vim.treesitter.incremental_selection("decrement")
+    end, { desc = "Decrement selection" })
   end,
 }

@@ -65,9 +65,10 @@ M.linters = {
   "flake8",
   "golangci-lint",
   "luacheck",
-  "vale",
   "oxlint",
-  -- "phpcs",
+  "phpcs",
+  "shellcheck",
+  "vale",
 }
 
 function M.config()

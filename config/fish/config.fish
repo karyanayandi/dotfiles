@@ -5,8 +5,10 @@ export STARSHIP_CONFIG=/home/karyana/.config/starship/starship.toml
 
 # Environment
 export TERM=screen-256color
+export TERMINAL=ghostty
 export EDITOR=nvim
 export SHELL=/usr/bin/fish
+export QT_QPA_PLATFORMTHEME=qt6ct
 export LANG=en_US.utf8
 export LC_COLLATE=C
 export LC_ADDRESS=en_US.utf8
@@ -21,11 +23,7 @@ export LC_PAPER=en_US.utf8
 export LC_TELEPHONE=en_US.utf8
 export LC_TIME=en_US.utf8
 
-# LS_COLORS theme support
-if test -f ~/.config/ls_colors/ls_colors.fish
-  source ~/.config/ls_colors/ls_colors.fish
-end
-
+vivid generate ~/.config/dotfiles/config/vivid/colors.yaml
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 
 
@@ -44,10 +42,10 @@ alias cat bat
 alias cdc "cd ~/.config/dotfiles"
 alias cdp "cd ~/Codes"
 alias cl clear
-alias clean "yay -Yc"
+# alias clean "paru -Yc"
 alias clean-code "find . -type d -name 'node_modules' -o -name '.next' -o -name '.turbo' -exec rm -rf {} + -o -type f -name '*.astro' -exec rm -f {} +;"
 alias dbox distrobox
-alias delete "yay -Rns"
+alias delete "paru -Rns"
 alias docker podman
 alias e nvim
 alias eb "nvim ~/.bashrc"
@@ -59,8 +57,8 @@ alias ez "nvim ~/.zshrc"
 alias font-list "fc-list : family"
 alias font-refresh "fc-cache -fv"
 alias g git
-alias i "yay -S"
-alias install "yay -S"
+alias i "paru -S"
+alias install "paru -S"
 alias ll "eza -al -g --icons"
 alias ls "eza --group-directories-first --icons"
 alias lsl "eza --group-directories-first -lh --icons"
@@ -71,27 +69,29 @@ alias npx "corepack npx"
 alias oc "opencode"
 alias os "openspec"
 alias pac "sudo pacman -S"
-alias pkglist "yay -Qe"
+alias pkglist "paru -Qe"
 alias pn "corepack pnpm"
 alias pnpm "corepack pnpm"
 alias pnpx "corepack pnpx"
 alias px "corepack pnpx"
-alias r "yay -Rns"
+alias r "paru -Rns"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
+alias reload-waybar "pkill waybar; waybar & disown"
 alias rm trash-put
 alias rmr rm
-alias s "yay -s"
-alias search "yay -s"
+alias s "paru -s"
+alias search "paru -s"
 alias sug "gh copilot suggest"
 alias t tmux
 alias tree "exa --tree --group-directories-first --icons --ignore-glob '*node_modules*'"
-alias u "yay -Syyu"
-alias update "yay -Syyu"
+alias u "paru -Syyu"
+alias update "paru -Syyu"
 alias update-time "sudo ntpd -qg"
 alias vim nvim
 alias vis "sudo nvim"
 alias x exit
 alias yarn "corepack yarn"
+alias yay "paru"
 alias yarnpkg "corepack yarnpkg"
 alias yz yazi
 alias countline "rg --files | xargs wc -l | sort -n"

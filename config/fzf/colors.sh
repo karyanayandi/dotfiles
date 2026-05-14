@@ -1,1 +1,0 @@
-/home/karyana/.config/dotfiles/themes/gruvbox-dark-hard-monochrome/fzf/colors.sh

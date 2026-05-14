@@ -39,14 +39,6 @@
     },
     "dnd": {
       "text": "Do Not Disturb"
-    },
-    "buttons-grid": {
-      "actions": [
-        {
-          "label": "🌓 Change Theme",
-          "command": "/home/karyana/.config/dotfiles/home/.local/bin/theme-switch.sh next"
-        }
-      ]
     }
   },
   "scripts": {

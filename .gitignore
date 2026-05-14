@@ -7,6 +7,7 @@ opencode-notifier-state.json
 config/opencode/package-lock.json
 
 .opencode
+dcp.jsonc
 openspec
 AGENTS.md
 .swarm/

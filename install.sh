@@ -11,23 +11,21 @@ yay -S --needed \
   bluez \
   bluez-utils \
   bottom \
-  brave-bin \
+  brave-origin-beta-bin \
+  bun \
   chafa \
   cmake \
+  corepack \
   cowsay \
-  cursor-bin \
-  datagrip \
-  datagrip-jre \
-  dbus \
   deno \
   distrobox \
-  dive \
   eglinfo \
   eza \
+  fastfetch \
   fd \
   ffmpeg \
   ffmpegthumbnailer \
-  fnm \
+  firefox \
   fzf \
   gcc \
   gimp \
@@ -35,109 +33,85 @@ yay -S --needed \
   glxinfo \
   gnome-keyring \
   go \
-  google-chrome \
-  gparted \
   grim \
   gvfs \
   gzip \
+  hyprcursor \
+  hypridle \
+  hyprlock \
+  hyprpaper \
   hyprpicker \
-  imv \
-  inter-font \
   inxi \
   iw \
-  jfsutils \
   jq \
-  killport \
-  krita \
+  kvantum \
+  kvantum-qt5 \
   lazydocker \
   lazygit \
   less \
-  lib32-vulkan-intel \
-  libqalculate \
+  libnotify \
   libxcrypt-compat \
   local-by-flywheel-bin \
   lshw \
   lua \
   luarocks \
-  lynx \
-  mkcert \
   mpv \
   nemo \
   nemo-fileroller \
   neovim \
-  neovim \
-  networkmanager \
-  nilfs-utils \
-  notesnook \
   noto-fonts \
   noto-fonts-cjk \
   noto-fonts-emoji \
   noto-fonts-extra \
   ntfs-3g \
   ntfsprogs \
-  obsidian \
   opencode-bin \
+  opencode-desktop-bin \
   openssh \
   p7zip \
-  papipurs-icon-theme \
   pavucontrol \
   pfetch \
   podman-compose \
   polkit-gnome \
-  postman \
   python-pip \
   python-pipx \
-  qwen-code \
+  qt5ct \
+  qt6ct \
   reflector \
   reiserfsprogs \
   ripgrep \
   rustup \
-  satty \
   sed \
   slurp \
   sof-firmware \
   starship \
   stow \
-  swaybg \
-  swayfx \
-  swayidle \
-  swaylock-effects-git \
+  swappy \
   swaync \
-  swayosd-git \
+  swayosd \
   tela-icon-theme \
-  termius \
   tmux \
   trash-cli \
   tree \
+  tree-sitter-cli \
   ttf-cascadia-code-nerd \
   ttf-firacode-nerd \
-  udevil \
-  udisks2 \
+  ttf-jetbrains-mono-nerd \
   unrar \
   unzip \
   vicinae-bin \
-  visual-studio-code-bin \
+  viewnior \
   vivid \
   waybar \
   wf-recorder \
   wget \
-  wiremix \
-  wireplumber \
   wl-clipboard \
   xdg-desktop-portal \
-  xdg-desktop-portal-gtk \
-  xdg-desktop-portal-wlr \
+  xdg-desktop-portal-hyprland \
   xdg-user-dirs \
   xfsprogs \
   xorg-xhost \
   yaak-bin \
   yazi \
   yt-dlp \
-  youtube-dl \
-  zathura \
-  zathura-djvu \
-  zathura-pdf-mupdf \
-  zen-browser-bin \
   zip
-
-sudo systemctl enable --now swayosd-libinput-backend.service

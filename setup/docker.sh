@@ -1,4 +1,6 @@
 #!/bin/bash
+paru -S podman podman-compose
+
 set -e # Exit on any error
 
 # Install podman
@@ -12,6 +14,7 @@ sudo systemctl start podman.service
 sudo systemctl enable podman.service
 
 # Add user to docker group
+sudo groupadd docker
 sudo usermod -aG docker "$USER"
 newgrp docker
 systemctl --user enable --now podman.socket
