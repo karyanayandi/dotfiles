@@ -11,3 +11,6 @@ dcp.jsonc
 openspec
 AGENTS.md
 .swarm/
+home/.tmux/plugins/
+config/opencode/commands/
+config/opencode/plugins/
