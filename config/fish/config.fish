@@ -23,7 +23,7 @@ export LC_PAPER=en_US.utf8
 export LC_TELEPHONE=en_US.utf8
 export LC_TIME=en_US.utf8
 
-vivid generate ~/.config/dotfiles/config/vivid/colors.yaml
+set -gx LS_COLORS (vivid generate ~/.config/dotfiles/config/vivid/colors.yaml)
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
 
 
