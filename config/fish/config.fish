@@ -3,6 +3,9 @@ set fish_greeting ''
 starship init fish | source
 export STARSHIP_CONFIG=/home/karyana/.config/starship/starship.toml
 
+# mise
+mise activate fish | source
+
 # Environment
 export TERM=screen-256color
 export TERMINAL=ghostty
