@@ -33,7 +33,7 @@ alias ... "cd ../.."
 alias .... "cd ../../.."
 alias ..... "cd ../../../.."
 alias ...... "cd ../../../../.."
-alias autoclean "sudo pacman -R $(pacman -Qdtq)"
+alias autoclean "pacman -Qtdq | sudo pacman -Rns -"
 alias bn bun
 alias br "bun run"
 alias bx bunx
