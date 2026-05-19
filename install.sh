@@ -55,6 +55,7 @@ yay -S --needed \
   lshw \
   lua \
   luarocks \
+  mise \
   mpv \
   nemo \
   nemo-fileroller \
@@ -99,6 +100,7 @@ yay -S --needed \
   ttf-jetbrains-mono-nerd \
   unrar \
   unzip \
+  usage \
   vicinae-bin \
   viewnior \
   vivid \
