@@ -42,7 +42,7 @@ alias cat bat
 alias cdc "cd ~/.config/dotfiles"
 alias cdp "cd ~/Codes"
 alias cl clear
-# alias clean "paru -Yc"
+alias clean "pacman -Qtdq | sudo pacman -Rns -"
 alias clean-code "find . -type d -name 'node_modules' -o -name '.next' -o -name '.turbo' -exec rm -rf {} + -o -type f -name '*.astro' -exec rm -f {} +;"
 alias dbox distrobox
 alias delete "paru -Rns"
