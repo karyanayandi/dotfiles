@@ -25,7 +25,7 @@ yay -S --needed \
   fd \
   ffmpeg \
   ffmpegthumbnailer \
-  firefox \
+  firefox-nightly-bin \
   fzf \
   gcc \
   gimp \
@@ -33,9 +33,11 @@ yay -S --needed \
   glxinfo \
   gnome-keyring \
   go \
+  google-chrome-dev \
   grim \
   gvfs \
   gzip \
+  helium-bin \
   hyprcursor \
   hypridle \
   hyprlock \
@@ -50,6 +52,7 @@ yay -S --needed \
   lazygit \
   less \
   libnotify \
+  librewolf-bin \
   libxcrypt-compat \
   local-by-flywheel-bin \
   lshw \
