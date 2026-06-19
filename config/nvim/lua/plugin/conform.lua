@@ -32,7 +32,25 @@ return {
       return false
     end
 
+    local function has_vite_plus()
+      if vim.fn.glob "vite.config.ts" ~= "" then
+        if vim.fn.glob "package.json" ~= "" then
+          local pkg = vim.fn.readfile "package.json"
+          if #pkg > 0 then
+            local content = table.concat(pkg, "\n")
+            if content:find "vite%-plus" then
+              return true
+            end
+          end
+        end
+      end
+      return false
+    end
+
     local function javascript_formatter()
+      if has_vite_plus() then
+        return { "oxfmt" }
+      end
       if has_any_file(oxfmt_root_files) or vim.fn.glob "oxc.json" ~= "" then
         return { "oxfmt" }
       elseif has_any_file(biome_root_files) then
@@ -49,6 +67,7 @@ return {
     local biome_root = util.root_file(biome_root_files)
     local oxfmt_root = util.root_file(oxfmt_root_files)
     local prettier_root = util.root_file(prettier_root_files)
+    local vite_root = util.root_file { "vite.config.ts" }
 
     local formatters_by_ft = {
       astro = javascript_formatter,
@@ -91,7 +110,7 @@ return {
           command = "vp",
           args = { "fmt", "--write", "$FILENAME" },
           stdin = false,
-          cwd = oxfmt_root,
+          cwd = oxfmt_root or vite_root,
           -- require_cwd = true,
         },
         biome = {
