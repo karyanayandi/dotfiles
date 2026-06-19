@@ -13,9 +13,7 @@ return {
         local local_binary = vim.fn.fnamemodify("./node_modules/.bin/vp", ":p")
         return vim.loop.fs_stat(local_binary) and local_binary or "vp"
       end,
-      args = function()
-        return { "lint", "--format", "github", vim.api.nvim_buf_get_name(0) }
-      end,
+    args = { "lint", "--format", "github" },
       stdin = false,
       stream = "stdout",
       ignore_exitcode = true,
