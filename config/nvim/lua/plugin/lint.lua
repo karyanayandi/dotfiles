@@ -8,6 +8,24 @@ return {
   config = function()
     local lint = require "lint"
 
+    require("lint").linters.vp_lint = {
+      cmd = function()
+        local local_binary = vim.fn.fnamemodify("./node_modules/.bin/vp", ":p")
+        return vim.loop.fs_stat(local_binary) and local_binary or "vp"
+      end,
+      args = { "lint", "--format", "github" },
+      stdin = false,
+      stream = "stdout",
+      ignore_exitcode = true,
+      parser = (require "lint.parser").from_pattern(
+        "::([^ ]+) file=(.*),line=(%d+),endLine=(%d+),col=(%d+),endColumn=(%d+),title=(.*)::(.*)",
+        { "severity", "file", "lnum", "end_lnum", "col", "end_col", "code", "message" },
+        { error = vim.diagnostic.severity.ERROR, warning = vim.diagnostic.severity.WARN },
+        { source = "vp-lint" },
+        {}
+      ),
+    }
+
     local oxlint_root_files = {
       "oxlint.json",
       ".oxlintrc.json",
@@ -37,8 +55,25 @@ return {
       return false
     end
 
+    local function has_vite_plus()
+      if vim.fn.glob "vite.config.ts" ~= "" then
+        if vim.fn.glob "package.json" ~= "" then
+          local pkg = vim.fn.readfile "package.json"
+          if pkg and #pkg > 0 then
+            local content = table.concat(pkg, "\n")
+            if content:find "vite%-plus" then
+              return true
+            end
+          end
+        end
+      end
+      return false
+    end
+
     local function javascript_linter()
-      if has_any_file(oxlint_root_files) or vim.fn.glob "oxc.json" ~= "" then
+      if has_vite_plus() then
+        return { "vp_lint" }
+      elseif has_any_file(oxlint_root_files) or vim.fn.glob "oxc.json" ~= "" then
         return { "oxlint" }
       elseif has_any_file(biome_root_files) then
         return { "biomejs" }
