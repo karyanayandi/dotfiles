@@ -86,12 +86,14 @@ return {
       end
     end
 
+    local js_linter = javascript_linter()
+
     lint.linters_by_ft = {
-      astro = javascript_linter(),
-      css = javascript_linter(),
+      astro = js_linter,
+      css = js_linter,
       fish = { "fish" },
-      javascript = javascript_linter(),
-      javascriptreact = javascript_linter(),
+      javascript = js_linter,
+      javascriptreact = js_linter,
       lua = { "luacheck" },
       markdown = { "vale" },
       sh = { "shellcheck" },
@@ -99,10 +101,10 @@ return {
       php = { "php" },
       python = { "python", "flake8" },
       rust = { "clippy" },
-      svelte = javascript_linter(),
-      typescript = javascript_linter(),
-      typescriptreact = javascript_linter(),
-      vue = javascript_linter(),
+      svelte = js_linter,
+      typescript = js_linter,
+      typescriptreact = js_linter,
+      vue = js_linter,
     }
 
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
