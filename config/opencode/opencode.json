@@ -65,6 +65,130 @@
       "options": {
         "baseURL": "http://127.0.0.1:11434/v1"
       }
+    },
+    "omniroute": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OmniRoute",
+      "options": {
+        "baseURL": "http://localhost:20127/v1",
+        "apiKey": "sk-35a6bf73eb4f0c00-be8bb2-afd34a7a"
+      },
+      "models": {
+        "agy/claude-opus-4-6-thinking": {
+          "name": "agy/claude-opus-4-6-thinking"
+        },
+        "agy/claude-sonnet-4-6": {
+          "name": "agy/claude-sonnet-4-6"
+        },
+        "agy/gemini-3.1-pro-high": {
+          "name": "agy/gemini-3.1-pro-high"
+        },
+        "agy/gemini-pro-agent": {
+          "name": "agy/gemini-pro-agent"
+        },
+        "agy/gemini-3.1-pro-low": {
+          "name": "agy/gemini-3.1-pro-low"
+        },
+        "agy/gemini-3.5-flash-low": {
+          "name": "agy/gemini-3.5-flash-low"
+        },
+        "agy/gemini-3.5-flash-medium": {
+          "name": "agy/gemini-3.5-flash-medium"
+        },
+        "agy/gemini-3.5-flash-high": {
+          "name": "agy/gemini-3.5-flash-high"
+        },
+        "agy/gemini-3.1-flash-lite": {
+          "name": "agy/gemini-3.1-flash-lite"
+        },
+        "cx/gpt-5.5": {
+          "name": "cx/gpt-5.5"
+        },
+        "cx/gpt-5.5-high": {
+          "name": "cx/gpt-5.5-high"
+        },
+        "cx/gpt-5.5-medium": {
+          "name": "cx/gpt-5.5-medium"
+        },
+        "cx/gpt-5.5-xhigh": {
+          "name": "cx/gpt-5.5-xhigh"
+        },
+        "cx/gpt-5.3-codex": {
+          "name": "cx/gpt-5.3-codex"
+        },
+        "gh/gpt-5.3-codex": {
+          "name": "gh/gpt-5.3-codex"
+        },
+        "gh/gemini-3.1-pro-preview": {
+          "name": "gh/gemini-3.1-pro-preview"
+        },
+        "gh/oswe-vscode-prime": {
+          "name": "gh/oswe-vscode-prime"
+        },
+        "kc/openrouter/free": {
+          "name": "kc/openrouter/free"
+        },
+        "opencode-zen/big-pickle": {
+          "name": "opencode-zen/big-pickle"
+        },
+        "opencode-zen/deepseek-v4-flash-free": {
+          "name": "opencode-zen/deepseek-v4-flash-free"
+        },
+        "opencode-go/glm-5.1": {
+          "name": "opencode-go/glm-5.1"
+        },
+        "opencode-go/kimi-k2.5": {
+          "name": "opencode-go/kimi-k2.5"
+        },
+        "opencode-go/glm-5": {
+          "name": "opencode-go/glm-5"
+        },
+        "opencode-go/mimo-v2.5-pro": {
+          "name": "opencode-go/mimo-v2.5-pro"
+        },
+        "opencode-go/kimi-k2.6": {
+          "name": "opencode-go/kimi-k2.6"
+        },
+        "opencode-go/kimi-k2.7-code": {
+          "name": "opencode-go/kimi-k2.7-code"
+        },
+        "opencode-go/mimo-v2-pro": {
+          "name": "opencode-go/mimo-v2-pro"
+        },
+        "opencode-go/mimo-v2.5": {
+          "name": "opencode-go/mimo-v2.5"
+        },
+        "opencode-go/mimo-v2-omni": {
+          "name": "opencode-go/mimo-v2-omni"
+        },
+        "opencode-go/minimax-m3": {
+          "name": "opencode-go/minimax-m3"
+        },
+        "opencode-go/minimax-m2.5": {
+          "name": "opencode-go/minimax-m2.5"
+        },
+        "opencode-go/minimax-m2.7": {
+          "name": "opencode-go/minimax-m2.7"
+        },
+        "opencode-go/qwen3.7-max": {
+          "name": "opencode-go/qwen3.7-max"
+        },
+        "opencode-go/qwen3.6-plus": {
+          "name": "opencode-go/qwen3.6-plus"
+        },
+        "opencode-go/qwen3.5-plus": {
+          "name": "opencode-go/qwen3.5-plus"
+        },
+        "opencode-go/hy3-preview": {
+          "name": "opencode-go/hy3-preview"
+        },
+        "opencode-go/deepseek-v4-flash": {
+          "name": "opencode-go/deepseek-v4-flash"
+        },
+        "opencode-go/deepseek-v4-pro": {
+          "name": "opencode-go/deepseek-v4-pro"
+        }
+      }
     }
   },
   "agent": {
