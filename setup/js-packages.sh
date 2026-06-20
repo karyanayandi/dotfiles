@@ -1,14 +1,15 @@
 #!/bin/bash
 
 bun add -g \
+  @fission-ai/openspec@latest \
+  @playwright/mcp@latest \
+  agent-browser@latest \
   autocannon@latest \
   firebase-tools@latest \
   neovim@latest \
   node-gyp@latest \
-  tree-sitter@latest \
-  @fission-ai/openspec@latest \
-  @playwright/mcp@latest \
-  agent-browser@latest \
+  omniroute@latest \
   playwright@latest \
   playwriter@latest \
+  tree-sitter@latest \
   wrangler@latest
