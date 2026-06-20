@@ -1,6 +1,7 @@
 #!/bin/bash
 
 bun add -g \
+  @anthropic-ai/claude-code \
   @fission-ai/openspec@latest \
   @playwright/mcp@latest \
   agent-browser@latest \
