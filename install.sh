@@ -69,6 +69,7 @@ yay -S --needed \
   noto-fonts-extra \
   ntfs-3g \
   ntfsprogs \
+  ollama \
   opencode-bin \
   opencode-desktop-bin \
   openssh \

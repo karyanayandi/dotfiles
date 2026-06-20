@@ -48,16 +48,31 @@
     "ollama": {
       "models": {
         "kimi-k2.5:cloud": {
-          "_launch": true,
-          "limit": {
-            "context": 262144,
-            "output": 262144
-          },
           "name": "kimi-k2.5:cloud"
         },
+        "kimi-k2.6:cloud": {
+          "name": "kimi-k2.6:cloud"
+        },
+        "kimi-k2.7-code:cloud": {
+          "name": "kimi-k2.7-code:cloud"
+        },
+        "glm-5:cloud": {
+          "name": "glm-5:cloud"
+        },
+        "glm-5.1:cloud": {
+          "name": "glm-5.1:cloud"
+        },
+        "glm-5.2:cloud": {
+          "name": "glm-5.2:cloud"
+        },
         "minimax-m2.5:cloud": {
-          "_launch": true,
           "name": "minimax-m2.5:cloud"
+        },
+        "minimax-m3:cloud": {
+          "name": "minimax-m3:cloud"
+        },
+        "qwen3-coder-next:cloud": {
+          "name": "qwen3-coder-next:cloud"
         }
       },
       "name": "Ollama",
@@ -83,11 +98,11 @@
         "agy/gemini-3.1-pro-high": {
           "name": "agy/gemini-3.1-pro-high"
         },
-        "agy/gemini-pro-agent": {
-          "name": "agy/gemini-pro-agent"
-        },
         "agy/gemini-3.1-pro-low": {
           "name": "agy/gemini-3.1-pro-low"
+        },
+        "agy/gemini-pro-agent": {
+          "name": "agy/gemini-pro-agent"
         },
         "agy/gemini-3.5-flash-low": {
           "name": "agy/gemini-3.5-flash-low"
@@ -101,26 +116,104 @@
         "agy/gemini-3.1-flash-lite": {
           "name": "agy/gemini-3.1-flash-lite"
         },
+        "agy/gemini-3.1-flash-image": {
+          "name": "agy/gemini-3.1-flash-image"
+        },
+        "agy/gemini-2.5-pro": {
+          "name": "agy/gemini-2.5-pro"
+        },
+        "agy/gemini-2.5-flash": {
+          "name": "agy/gemini-2.5-flash"
+        },
+        "agy/gemini-2.5-flash-thinking": {
+          "name": "agy/gemini-2.5-flash-thinking"
+        },
+        "agy/gemini-2.5-flash-lite": {
+          "name": "agy/gemini-2.5-flash-lite"
+        },
+        "agy/gpt-oss-120b-medium": {
+          "name": "agy/gpt-oss-120b-medium"
+        },
         "cx/gpt-5.5": {
           "name": "cx/gpt-5.5"
-        },
-        "cx/gpt-5.5-high": {
-          "name": "cx/gpt-5.5-high"
-        },
-        "cx/gpt-5.5-medium": {
-          "name": "cx/gpt-5.5-medium"
         },
         "cx/gpt-5.5-xhigh": {
           "name": "cx/gpt-5.5-xhigh"
         },
+        "cx/gpt-5.5-medium": {
+          "name": "cx/gpt-5.5-medium"
+        },
+        "cx/gpt-5.5-high": {
+          "name": "cx/gpt-5.5-high"
+        },
+        "cx/gpt-5.5-low": {
+          "name": "cx/gpt-5.5-low"
+        },
+        "cx/gpt-5.4": {
+          "name": "cx/gpt-5.4"
+        },
+        "cx/gpt-5.4-high": {
+          "name": "cx/gpt-5.4-high"
+        },
+        "cx/gpt-5.4-xhigh": {
+          "name": "cx/gpt-5.4-xhigh"
+        },
+        "cx/gpt-5.4-medium": {
+          "name": "cx/gpt-5.4-medium"
+        },
+        "cx/gpt-5.4-low": {
+          "name": "cx/gpt-5.4-low"
+        },
+        "cx/gpt-5.3-codex-spark": {
+          "name": "cx/gpt-5.3-codex-spark"
+        },
+        "cx/gpt-5.2": {
+          "name": "cx/gpt-5.2"
+        },
+        "cx/gpt-5.4-mini": {
+          "name": "cx/gpt-5.4-mini"
+        },
         "cx/gpt-5.3-codex": {
           "name": "cx/gpt-5.3-codex"
+        },
+        "gh/gpt-5-mini": {
+          "name": "gh/gpt-5-mini"
         },
         "gh/gpt-5.3-codex": {
           "name": "gh/gpt-5.3-codex"
         },
+        "gh/gpt-5.4": {
+          "name": "gh/gpt-5.4"
+        },
+        "gh/gpt-5.4-mini": {
+          "name": "gh/gpt-5.4-mini"
+        },
+        "gh/gpt-5.5": {
+          "name": "gh/gpt-5.5"
+        },
+        "gh/claude-haiku-4.5": {
+          "name": "gh/claude-haiku-4.5"
+        },
+        "gh/claude-sonnet-4.5": {
+          "name": "gh/claude-sonnet-4.5"
+        },
+        "gh/claude-sonnet-4.6": {
+          "name": "gh/claude-sonnet-4.6"
+        },
+        "gh/claude-opus-4-5-20251101": {
+          "name": "gh/claude-opus-4-5-20251101"
+        },
+        "gh/claude-opus-4.6": {
+          "name": "gh/claude-opus-4.6"
+        },
         "gh/gemini-3.1-pro-preview": {
           "name": "gh/gemini-3.1-pro-preview"
+        },
+        "gh/claude-opus-4.7": {
+          "name": "gh/claude-opus-4.7"
+        },
+        "gh/gemini-3-flash-preview": {
+          "name": "gh/gemini-3-flash-preview"
         },
         "gh/oswe-vscode-prime": {
           "name": "gh/oswe-vscode-prime"
@@ -128,53 +221,98 @@
         "kc/openrouter/free": {
           "name": "kc/openrouter/free"
         },
+        "ollamacloud/deepseek-v4-pro": {
+          "name": "ollamacloud/deepseek-v4-pro"
+        },
+        "ollamacloud/deepseek-v4-flash": {
+          "name": "ollamacloud/deepseek-v4-flash"
+        },
+        "ollamacloud/kimi-k2.6": {
+          "name": "ollamacloud/kimi-k2.6"
+        },
+        "ollamacloud/kimi-k2.7-code": {
+          "name": "ollamacloud/kimi-k2.7-code"
+        },
+        "ollamacloud/glm-5": {
+          "name": "ollamacloud/glm-5"
+        },
+        "ollamacloud/glm-5.1": {
+          "name": "ollamacloud/glm-5.1"
+        },
+        "ollamacloud/glm-5.2": {
+          "name": "ollamacloud/glm-5.2"
+        },
+        "ollamacloud/minimax-m2.7": {
+          "name": "ollamacloud/minimax-m2.7"
+        },
+        "ollamacloud/minimax-m3": {
+          "name": "ollamacloud/minimax-m3"
+        },
+        "ollamacloud/gemma4:31b": {
+          "name": "ollamacloud/gemma4:31b"
+        },
+        "ollamacloud/nemotron-3-super": {
+          "name": "ollamacloud/nemotron-3-super"
+        },
+        "ollamacloud/qwen3.5:397b": {
+          "name": "ollamacloud/qwen3.5:397b"
+        },
+        "ollamacloud/qwen3-coder-next": {
+          "name": "ollamacloud/qwen3-coder-next"
+        },
         "opencode-zen/big-pickle": {
           "name": "opencode-zen/big-pickle"
         },
         "opencode-zen/deepseek-v4-flash-free": {
           "name": "opencode-zen/deepseek-v4-flash-free"
         },
+        "opencode-zen/minimax-m2.5-free": {
+          "name": "opencode-zen/minimax-m2.5-free"
+        },
+        "opencode-zen/nemotron-3-super-free": {
+          "name": "opencode-zen/nemotron-3-super-free"
+        },
+        "opencode-zen/qwen3.6-plus-free": {
+          "name": "opencode-zen/qwen3.6-plus-free"
+        },
         "opencode-go/glm-5.1": {
           "name": "opencode-go/glm-5.1"
-        },
-        "opencode-go/kimi-k2.5": {
-          "name": "opencode-go/kimi-k2.5"
         },
         "opencode-go/glm-5": {
           "name": "opencode-go/glm-5"
         },
-        "opencode-go/mimo-v2.5-pro": {
-          "name": "opencode-go/mimo-v2.5-pro"
-        },
         "opencode-go/kimi-k2.6": {
           "name": "opencode-go/kimi-k2.6"
         },
-        "opencode-go/kimi-k2.7-code": {
-          "name": "opencode-go/kimi-k2.7-code"
+        "opencode-go/mimo-v2.5-pro": {
+          "name": "opencode-go/mimo-v2.5-pro"
         },
-        "opencode-go/mimo-v2-pro": {
-          "name": "opencode-go/mimo-v2-pro"
+        "opencode-go/kimi-k2.5": {
+          "name": "opencode-go/kimi-k2.5"
         },
         "opencode-go/mimo-v2.5": {
           "name": "opencode-go/mimo-v2.5"
         },
-        "opencode-go/mimo-v2-omni": {
-          "name": "opencode-go/mimo-v2-omni"
+        "opencode-go/mimo-v2-pro": {
+          "name": "opencode-go/mimo-v2-pro"
         },
         "opencode-go/minimax-m3": {
           "name": "opencode-go/minimax-m3"
         },
-        "opencode-go/minimax-m2.5": {
-          "name": "opencode-go/minimax-m2.5"
+        "opencode-go/mimo-v2-omni": {
+          "name": "opencode-go/mimo-v2-omni"
         },
         "opencode-go/minimax-m2.7": {
           "name": "opencode-go/minimax-m2.7"
         },
-        "opencode-go/qwen3.7-max": {
-          "name": "opencode-go/qwen3.7-max"
+        "opencode-go/minimax-m2.5": {
+          "name": "opencode-go/minimax-m2.5"
         },
         "opencode-go/qwen3.6-plus": {
           "name": "opencode-go/qwen3.6-plus"
+        },
+        "opencode-go/qwen3.7-max": {
+          "name": "opencode-go/qwen3.7-max"
         },
         "opencode-go/qwen3.5-plus": {
           "name": "opencode-go/qwen3.5-plus"
@@ -182,11 +320,11 @@
         "opencode-go/hy3-preview": {
           "name": "opencode-go/hy3-preview"
         },
-        "opencode-go/deepseek-v4-flash": {
-          "name": "opencode-go/deepseek-v4-flash"
-        },
         "opencode-go/deepseek-v4-pro": {
           "name": "opencode-go/deepseek-v4-pro"
+        },
+        "opencode-go/deepseek-v4-flash": {
+          "name": "opencode-go/deepseek-v4-flash"
         }
       }
     }
