@@ -1,13 +1,13 @@
 {
   "env": {
     "ANTHROPIC_BASE_URL": "http://localhost:20127",
-    "ANTHROPIC_MODEL": "pinter",
-    "ANTHROPIC_SMALL_FAST_MODEL": "opencode-go/deepseek-v4-flash",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "agy/claude-opus-4-6-thinking",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "agy/claude-sonnet-4-6",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gh/claude-haiku-4.5",
+    "ANTHROPIC_MODEL": "ollamacloud/kimi-k2.7-code",
+    "ANTHROPIC_SMALL_FAST_MODEL": "ollamacloud/deepseek-v4-flash",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "ollamacloud/glm-5.2",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "ollamacloud/kimi-k2.7-code",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "ollamacloud/deepseek-v4-pro",
     "ANTHROPIC_AUTH_TOKEN": "sk-35a6bf73eb4f0c00-be8bb2-afd34a7a"
   },
-  "model": "pinter",
+  "model": "ollamacloud/kimi-k2.7-code",
   "theme": "auto"
 }
