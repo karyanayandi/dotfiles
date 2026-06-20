@@ -9,6 +9,7 @@
       "disabled": true
     }
   },
+  "model": "ollama-cloud/deepseek-v4-pro",
   "mcp": {
     "context7": {
       "enabled": true,
@@ -47,6 +48,12 @@
   "provider": {
     "ollama": {
       "models": {
+        "deepseek-v4-flash:cloud": {
+          "name": "deepseek-v4-flash:cloud"
+        },
+        "deepseek-v4-pro:cloud": {
+          "name": "deepseek-v4-fpro:cloud"
+        },
         "kimi-k2.5:cloud": {
           "name": "kimi-k2.5:cloud"
         },
