@@ -337,7 +337,16 @@
         },
         "pinter": {
           "name": "pinter"
-        }
+        },
+        "flagship": {
+          "name": "flagship"
+        },
+        "kimi": {
+          "name": "kimi"
+        },
+        "deepseek": {
+          "name": "deepseek"
+        },
       }
     }
   },
