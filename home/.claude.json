@@ -1,5 +1,5 @@
 {
-  "numStartups": 13,
+  "numStartups": 14,
   "hasSeenTasksHint": true,
   "tipsHistory": {
     "new-user-warmup": 1,
@@ -7,11 +7,11 @@
     "memory-command": 1,
     "theme-command": 1,
     "status-line": 3,
-    "prompt-queue": 3,
+    "prompt-queue": 14,
     "enter-to-steer-in-relatime": 3,
     "todo-list": 3,
     "color-when-multi-clauding": 7,
-    "ide-upsell-external-terminal": 8,
+    "ide-upsell-external-terminal": 14,
     "drag-and-drop-images": 8,
     "frontend-design-plugin": 8,
     "default-permission-mode-config": 8,
@@ -20,9 +20,15 @@
     "shift-tab": 9,
     "image-paste": 10,
     "permissions": 11,
-    "rename-conversation": 13
+    "rename-conversation": 13,
+    "custom-agents": 14,
+    "subagent-fanout-nudge": 14,
+    "loop-command-nudge": 14
   },
-  "promptQueueUseCount": 2,
+  "promptQueueUseCount": 4,
+  "unpinOpus47LaunchEffort": true,
+  "unpinOpus48LaunchEffort": true,
+  "unpinFable5LaunchEffort": true,
   "firstStartTime": "2026-06-20T03:23:56.617Z",
   "machineID": "7c3a8421deb9012d9a77d13bae9d746816d6d4142829915531e87f3e3fe3a9ff",
   "opusProMigrationComplete": true,
@@ -91,7 +97,7 @@
       "projectOnboardingSeenCount": 0,
       "hasClaudeMdExternalIncludesApproved": false,
       "hasClaudeMdExternalIncludesWarningShown": false,
-      "lastGracefulShutdown": true,
+      "lastGracefulShutdown": false,
       "lastVersionBase": "2.1.183",
       "exampleFiles": [
         "main-layout.astro",
@@ -146,11 +152,11 @@
     "memory-command": 1,
     "theme-command": 1,
     "status-line": 1,
-    "prompt-queue": 1,
+    "prompt-queue": 2,
     "enter-to-steer-in-relatime": 1,
     "todo-list": 1,
     "color-when-multi-clauding": 1,
-    "ide-upsell-external-terminal": 1,
+    "ide-upsell-external-terminal": 2,
     "drag-and-drop-images": 1,
     "frontend-design-plugin": 1,
     "default-permission-mode-config": 1,
@@ -159,7 +165,10 @@
     "shift-tab": 1,
     "image-paste": 1,
     "permissions": 1,
-    "rename-conversation": 1
+    "rename-conversation": 1,
+    "custom-agents": 1,
+    "subagent-fanout-nudge": 1,
+    "loop-command-nudge": 1
   },
   "hasOpenedAgentsView": true,
   "agentLastUsed": {
@@ -196,10 +205,10 @@
   },
   "skillUsage": {
     "coss-particles": {
-      "usageCount": 1,
-      "lastUsedAt": 1781928398123
+      "usageCount": 2,
+      "lastUsedAt": 1781930371267
     }
   },
   "hasSeenAutoModeEntryWarning": true,
-  "lastPlanModeUse": 1781928745059
+  "lastPlanModeUse": 1781930316246
 }
