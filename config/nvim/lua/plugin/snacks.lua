@@ -318,24 +318,24 @@ return {
       })
     end
 
-    -- copilot
-    function _COPILOT_TOGGLE()
+    -- claude
+    function _CLAUDE_TOGGLE()
       if vim.env.TMUX ~= nil and vim.env.TMUX ~= "" then
-        local pane_id = vim.g.copilot_tmux_pane
+        local pane_id = vim.g.claude_tmux_pane
         if pane_id then
           vim.fn.system("tmux display-message -t " .. pane_id .. " -p '#{pane_id}' 2>/dev/null")
           if vim.v.shell_error == 0 then
             vim.fn.system("tmux kill-pane -t " .. pane_id)
-            vim.g.copilot_tmux_pane = nil
+            vim.g.claude_tmux_pane = nil
             return
           else
-            vim.g.copilot_tmux_pane = nil
+            vim.g.claude_tmux_pane = nil
           end
         end
-        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'copilot'"
-        vim.g.copilot_tmux_pane = vim.fn.trim(result)
+        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'claude'"
+        vim.g.claude_tmux_pane = vim.fn.trim(result)
       else
-        Snacks.terminal.toggle("copilot", {
+        Snacks.terminal.toggle("claude", {
           interactive = true,
           win = { position = "right", width = 0.4 },
         })
@@ -414,10 +414,10 @@ return {
     {
       ";c",
       function()
-        _COPILOT_TOGGLE()
+        _CLAUDE_TOGGLE()
       end,
       mode = { "n", "i" },
-      desc = "Toggle Copilot",
+      desc = "Toggle Claude",
     },
     {
       ";o",

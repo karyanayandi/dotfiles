@@ -121,8 +121,14 @@ return {
       {
         "<leader>ao",
         "<cmd>lua _OPENCODE_TOGGLE()<CR>",
-        desc = "Open Code",
+        desc = "Open Opencode",
       },
+      {
+        "<leader>ac",
+        "<cmd>lua _CLAUDE_TOGGLE()<CR>",
+        desc = "Open Claude",
+      },
+
       {
         "<leader>p",
         group = "Package",
