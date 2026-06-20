@@ -106,15 +106,8 @@ return {
     conform.setup {
       formatters_by_ft = formatters_by_ft,
       formatters = {
-        vp_fmt = {
-          command = "vp",
-          args = { "fmt", "--write", "$FILENAME" },
-          stdin = false,
-          cwd = vite_root,
-          require_cwd = true,
-        },
         oxfmt = {
-          command = "node_modules/.bin/oxfmt",
+          command = "vp",
           args = { "fmt", "--write", "$FILENAME" },
           stdin = false,
           cwd = oxfmt_root or vite_root,
