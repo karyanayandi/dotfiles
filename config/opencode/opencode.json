@@ -680,6 +680,9 @@
     },
     "general": {
       "disable": true
+    },
+    "coder": {
+      "model": "ollama-cloud/deepseek-v4-flash"
     }
   }
 }
