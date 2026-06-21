@@ -10,7 +10,7 @@
     }
   },
   "model": "ollama-cloud/deepseek-v4-pro",
-  "small_model": "ollama-cloud/deepseek-v4-pro",
+  "small_model": "ollama-cloud/deepseek-v4-flash",
   "mcp": {
     "context7": {
       "enabled": true,
