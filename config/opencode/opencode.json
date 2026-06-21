@@ -21,21 +21,12 @@
       "url": "https://mcp.context7.com/mcp"
     },
     "playwriter": {
-      "command": [
-        "bun",
-        "x",
-        "playwriter@latest"
-      ],
+      "command": ["bun", "x", "playwriter@latest"],
       "enabled": true,
       "type": "local"
     },
     "shadcn": {
-      "command": [
-        "bun",
-        "x",
-        "shadcn@latest",
-        "mcp"
-      ],
+      "command": ["bun", "x", "shadcn@latest", "mcp"],
       "enabled": true,
       "type": "local"
     }
@@ -53,34 +44,70 @@
           "name": "deepseek-v4-flash:cloud"
         },
         "deepseek-v4-pro:cloud": {
-          "name": "deepseek-v4-fpro:cloud"
+          "name": "deepseek-v4-fpro:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "kimi-k2.5:cloud": {
-          "name": "kimi-k2.5:cloud"
+          "name": "kimi-k2.5:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "kimi-k2.6:cloud": {
-          "name": "kimi-k2.6:cloud"
+          "name": "kimi-k2.6:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "kimi-k2.7-code:cloud": {
-          "name": "kimi-k2.7-code:cloud"
+          "name": "kimi-k2.7-code:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "glm-5:cloud": {
-          "name": "glm-5:cloud"
+          "name": "glm-5:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "glm-5.1:cloud": {
-          "name": "glm-5.1:cloud"
+          "name": "glm-5.1:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "glm-5.2:cloud": {
-          "name": "glm-5.2:cloud"
+          "name": "glm-5.1:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "minimax-m2.5:cloud": {
           "name": "minimax-m2.5:cloud"
         },
         "minimax-m3:cloud": {
-          "name": "minimax-m3:cloud"
+          "name": "minimax-m3:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "qwen3-coder-next:cloud": {
-          "name": "qwen3-coder-next:cloud"
+          "name": "qwen3-coder-next:cloud",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         }
       },
       "name": "Ollama",
@@ -98,178 +125,361 @@
       },
       "models": {
         "agy/claude-opus-4-6-thinking": {
-          "name": "agy/claude-opus-4-6-thinking"
+          "name": "agy/claude-opus-4-6-thinking",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/claude-sonnet-4-6": {
-          "name": "agy/claude-sonnet-4-6"
+          "name": "agy/claude-sonnet-4-6",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gemini-3.1-pro-high": {
-          "name": "agy/gemini-3.1-pro-high"
+          "name": "agy/gemini-3.1-pro-high",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gemini-3.1-pro-low": {
-          "name": "agy/gemini-3.1-pro-low"
+          "name": "agy/gemini-3.1-pro-low",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gemini-pro-agent": {
-          "name": "agy/gemini-pro-agent"
+          "name": "agy/gemini-pro-agent",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gemini-3.5-flash-low": {
-          "name": "agy/gemini-3.5-flash-low"
+          "name": "agy/gemini-3.5-flash-low",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gemini-3.5-flash-medium": {
-          "name": "agy/gemini-3.5-flash-medium"
+          "name": "agy/gemini-3.5-flash-medium",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gemini-3.5-flash-high": {
-          "name": "agy/gemini-3.5-flash-high"
-        },
-        "agy/gemini-3.1-flash-lite": {
-          "name": "agy/gemini-3.1-flash-lite"
-        },
-        "agy/gemini-3.1-flash-image": {
-          "name": "agy/gemini-3.1-flash-image"
-        },
-        "agy/gemini-2.5-pro": {
-          "name": "agy/gemini-2.5-pro"
-        },
-        "agy/gemini-2.5-flash": {
-          "name": "agy/gemini-2.5-flash"
-        },
-        "agy/gemini-2.5-flash-thinking": {
-          "name": "agy/gemini-2.5-flash-thinking"
-        },
-        "agy/gemini-2.5-flash-lite": {
-          "name": "agy/gemini-2.5-flash-lite"
+          "name": "agy/gemini-3.5-flash-high",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "agy/gpt-oss-120b-medium": {
-          "name": "agy/gpt-oss-120b-medium"
+          "name": "agy/gpt-oss-120b-medium",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.5": {
-          "name": "cx/gpt-5.5"
+          "name": "cx/gpt-5.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.5-xhigh": {
-          "name": "cx/gpt-5.5-xhigh"
+          "name": "cx/gpt-5.5-xhigh",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.5-medium": {
-          "name": "cx/gpt-5.5-medium"
+          "name": "cx/gpt-5.5-medium",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.5-high": {
-          "name": "cx/gpt-5.5-high"
+          "name": "cx/gpt-5.5-high",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.5-low": {
-          "name": "cx/gpt-5.5-low"
+          "name": "cx/gpt-5.5-low",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.4": {
-          "name": "cx/gpt-5.4"
+          "name": "cx/gpt-5.4",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.4-high": {
-          "name": "cx/gpt-5.4-high"
+          "name": "cx/gpt-5.4-high",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.4-xhigh": {
-          "name": "cx/gpt-5.4-xhigh"
+          "name": "cx/gpt-5.4-xhigh",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.4-medium": {
-          "name": "cx/gpt-5.4-medium"
+          "name": "cx/gpt-5.4-medium",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.4-low": {
-          "name": "cx/gpt-5.4-low"
+          "name": "cx/gpt-5.4-low",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.3-codex-spark": {
-          "name": "cx/gpt-5.3-codex-spark"
-        },
-        "cx/gpt-5.2": {
-          "name": "cx/gpt-5.2"
+          "name": "cx/gpt-5.3-codex-spark",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.4-mini": {
-          "name": "cx/gpt-5.4-mini"
+          "name": "cx/gpt-5.4-mini",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "cx/gpt-5.3-codex": {
-          "name": "cx/gpt-5.3-codex"
+          "name": "cx/gpt-5.3-codex",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gpt-5-mini": {
-          "name": "gh/gpt-5-mini"
+          "name": "gh/gpt-5-mini",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gpt-5.3-codex": {
-          "name": "gh/gpt-5.3-codex"
+          "name": "gh/gpt-5.3-codex",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gpt-5.4": {
-          "name": "gh/gpt-5.4"
+          "name": "gh/gpt-5.4",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gpt-5.4-mini": {
-          "name": "gh/gpt-5.4-mini"
+          "name": "gh/gpt-5.4-mini",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gpt-5.5": {
-          "name": "gh/gpt-5.5"
+          "name": "gh/gpt-5.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/claude-haiku-4.5": {
-          "name": "gh/claude-haiku-4.5"
+          "name": "gh/claude-haiku-4.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/claude-sonnet-4.5": {
-          "name": "gh/claude-sonnet-4.5"
+          "name": "gh/claude-sonnet-4.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/claude-sonnet-4.6": {
-          "name": "gh/claude-sonnet-4.6"
+          "name": "gh/claude-sonnet-4.6",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/claude-opus-4-5-20251101": {
-          "name": "gh/claude-opus-4-5-20251101"
+          "name": "gh/claude-opus-4-5-20251101",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/claude-opus-4.6": {
-          "name": "gh/claude-opus-4.6"
+          "name": "gh/claude-opus-4.6",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gemini-3.1-pro-preview": {
-          "name": "gh/gemini-3.1-pro-preview"
+          "name": "gh/gemini-3.1-pro-preview",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/claude-opus-4.7": {
-          "name": "gh/claude-opus-4.7"
+          "name": "gh/claude-opus-4.7",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/gemini-3-flash-preview": {
-          "name": "gh/gemini-3-flash-preview"
+          "name": "gh/gemini-3-flash-preview",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "gh/oswe-vscode-prime": {
-          "name": "gh/oswe-vscode-prime"
+          "name": "gh/oswe-vscode-prime",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "kc/openrouter/free": {
-          "name": "kc/openrouter/free"
+          "name": "kc/openrouter/free",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/deepseek-v4-pro": {
-          "name": "ollamacloud/deepseek-v4-pro"
+          "name": "ollamacloud/deepseek-v4-pro",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/deepseek-v4-flash": {
-          "name": "ollamacloud/deepseek-v4-flash"
+          "name": "ollamacloud/deepseek-v4-flash",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/kimi-k2.6": {
-          "name": "ollamacloud/kimi-k2.6"
+          "name": "ollamacloud/kimi-k2.6",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/kimi-k2.7-code": {
-          "name": "ollamacloud/kimi-k2.7-code"
+          "name": "ollamacloud/kimi-k2.7-code",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/glm-5": {
-          "name": "ollamacloud/glm-5"
+          "name": "ollamacloud/glm-5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/glm-5.1": {
-          "name": "ollamacloud/glm-5.1"
+          "name": "ollamacloud/glm-5.1",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/glm-5.2": {
-          "name": "ollamacloud/glm-5.2"
+          "name": "ollamacloud/glm-5.2",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/minimax-m2.7": {
-          "name": "ollamacloud/minimax-m2.7"
+          "name": "ollamacloud/minimax-m2.7",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/minimax-m3": {
-          "name": "ollamacloud/minimax-m3"
+          "name": "ollamacloud/minimax-m3",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/gemma4:31b": {
-          "name": "ollamacloud/gemma4:31b"
+          "name": "ollamacloud/gemma4:31b",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/nemotron-3-super": {
-          "name": "ollamacloud/nemotron-3-super"
+          "name": "ollamacloud/nemotron-3-super",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/qwen3.5:397b": {
-          "name": "ollamacloud/qwen3.5:397b"
+          "name": "ollamacloud/qwen3.5:397b",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollamacloud/qwen3-coder-next": {
-          "name": "ollamacloud/qwen3-coder-next"
+          "name": "ollamacloud/qwen3-coder-next",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-zen/big-pickle": {
-          "name": "opencode-zen/big-pickle"
+          "name": "opencode-zen/big-pickle",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-zen/deepseek-v4-flash-free": {
           "name": "opencode-zen/deepseek-v4-flash-free"
@@ -278,43 +488,95 @@
           "name": "opencode-zen/minimax-m2.5-free"
         },
         "opencode-zen/nemotron-3-super-free": {
-          "name": "opencode-zen/nemotron-3-super-free"
+          "name": "opencode-zen/nemotron-3-super-free",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-zen/qwen3.6-plus-free": {
-          "name": "opencode-zen/qwen3.6-plus-free"
+          "name": "opencode-zen/qwen3.6-plus-free",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/glm-5.1": {
-          "name": "opencode-go/glm-5.1"
+          "name": "opencode-go/glm-5.1",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/glm-5.2": {
-          "name": "opencode-go/glm-5.2"
+          "name": "opencode-go/glm-5.2",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/glm-5": {
-          "name": "opencode-go/glm-5"
+          "name": "opencode-go/glm-5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/kimi-k2.5": {
-          "name": "opencode-go/kimi-k2.5"
+          "name": "opencode-go/kimi-k2.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/kimi-k2.6": {
-          "name": "opencode-go/kimi-k2.6"
+          "name": "opencode-go/kimi-k2.6",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/kimi-k2.7-code": {
-          "name": "opencode-go/kimi-k2.7-code"
+          "name": "opencode-go/kimi-k2.7-code",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/mimo-v2.5-pro": {
-          "name": "opencode-go/mimo-v2.5-pro"
+          "name": "opencode-go/mimo-v2.5-pro",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/mimo-v2.5": {
-          "name": "opencode-go/mimo-v2.5"
+          "name": "opencode-go/mimo-v2.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/mimo-v2-pro": {
-          "name": "opencode-go/mimo-v2-pro"
+          "name": "opencode-go/mimo-v2-pro",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/minimax-m3": {
-          "name": "opencode-go/minimax-m3"
+          "name": "opencode-go/minimax-m3",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/mimo-v2-omni": {
-          "name": "opencode-go/mimo-v2-omni"
+          "name": "opencode-go/mimo-v2-omni",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/minimax-m2.7": {
           "name": "opencode-go/minimax-m2.7"
@@ -323,44 +585,92 @@
           "name": "opencode-go/minimax-m2.5"
         },
         "opencode-go/qwen3.6-plus": {
-          "name": "opencode-go/qwen3.6-plus"
+          "name": "opencode-go/qwen3.6-plus",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/qwen3.7-max": {
-          "name": "opencode-go/qwen3.7-max"
+          "name": "opencode-go/qwen3.7-max",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/qwen3.5-plus": {
-          "name": "opencode-go/qwen3.5-plus"
+          "name": "opencode-go/qwen3.5-plus",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/hy3-preview": {
-          "name": "opencode-go/hy3-preview"
+          "name": "opencode-go/hy3-preview",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/deepseek-v4-pro": {
-          "name": "opencode-go/deepseek-v4-pro"
+          "name": "opencode-go/deepseek-v4-pro",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "opencode-go/deepseek-v4-flash": {
           "name": "opencode-go/deepseek-v4-flash"
         },
         "cu/composer-2.5": {
-          "name": "cu/composer-2.5"
+          "name": "cu/composer-2.5",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "auto/best-coding": {
-          "name": "auto/best-coding"
+          "name": "auto/best-coding",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "pinter": {
-          "name": "pinter"
+          "name": "pinter",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "flagship": {
-          "name": "flagship"
+          "name": "flagship",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "kimi": {
-          "name": "kimi"
+          "name": "kimi",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "deepseek": {
-          "name": "deepseek"
+          "name": "deepseek",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         },
         "ollavity": {
-          "name": "ollavity"
-        },
+          "name": "ollavity",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
       }
     }
   },
