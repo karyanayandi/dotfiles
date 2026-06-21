@@ -339,6 +339,9 @@
         "opencode-go/deepseek-v4-flash": {
           "name": "opencode-go/deepseek-v4-flash"
         },
+"cu/composer-2.5": {
+          "name": "cu/composer-2.5"
+        },
         "auto/best-coding": {
           "name": "auto/best-coding"
         },
