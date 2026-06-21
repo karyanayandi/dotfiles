@@ -354,6 +354,9 @@
         "deepseek": {
           "name": "deepseek"
         },
+        "ollavity": {
+          "name": "ollavity"
+        },
       }
     }
   },
