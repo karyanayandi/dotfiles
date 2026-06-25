@@ -1,11 +1,11 @@
 {
-  "numStartups": 20,
+  "numStartups": 21,
   "hasSeenTasksHint": true,
   "tipsHistory": {
     "new-user-warmup": 1,
     "plan-mode-for-complex-tasks": 1,
     "memory-command": 17,
-    "theme-command": 1,
+    "theme-command": 21,
     "status-line": 3,
     "prompt-queue": 14,
     "enter-to-steer-in-relatime": 3,
@@ -23,7 +23,8 @@
     "rename-conversation": 13,
     "custom-agents": 14,
     "subagent-fanout-nudge": 14,
-    "loop-command-nudge": 14
+    "loop-command-nudge": 14,
+    "dynamic-workflows": 21
   },
   "promptQueueUseCount": 10,
   "unpinOpus47LaunchEffort": true,
@@ -36,7 +37,7 @@
   "seenNotifications": {},
   "migrationVersion": 13,
   "userID": "badf26138bc466a48045db65e544705b368a92d92dccad87cbe2a4f9a384ac54",
-  "changelogLastFetched": 1782115290909,
+  "changelogLastFetched": 1782369462241,
   "hasCompletedOnboarding": true,
   "lastOnboardingVersion": "2.1.183",
   "projects": {
@@ -47,11 +48,11 @@
       "enabledMcpjsonServers": [],
       "disabledMcpjsonServers": [],
       "hasTrustDialogAccepted": true,
-      "projectOnboardingSeenCount": 1,
+      "projectOnboardingSeenCount": 2,
       "hasClaudeMdExternalIncludesApproved": false,
       "hasClaudeMdExternalIncludesWarningShown": false,
-      "lastGracefulShutdown": false,
-      "lastVersionBase": "2.1.183",
+      "lastGracefulShutdown": true,
+      "lastVersionBase": "2.1.191",
       "exampleFiles": [
         "install.sh",
         "config",
@@ -64,7 +65,7 @@
       "lastAPIDuration": 0,
       "lastAPIDurationWithoutRetries": 0,
       "lastToolDuration": 0,
-      "lastDuration": 63872,
+      "lastDuration": 49193,
       "lastLinesAdded": 0,
       "lastLinesRemoved": 0,
       "lastTotalInputTokens": 0,
@@ -72,18 +73,18 @@
       "lastTotalCacheCreationInputTokens": 0,
       "lastTotalCacheReadInputTokens": 0,
       "lastTotalWebSearchRequests": 0,
-      "lastFpsAverage": 2.9,
-      "lastFpsLow1Pct": 61.75,
+      "lastFpsAverage": 4.5,
+      "lastFpsLow1Pct": 68.69,
       "lastModelUsage": {},
-      "lastSessionId": "c5d42caa-180d-48dc-875d-08f8e1ce7511",
+      "lastSessionId": "6f1b267e-820b-4238-8b66-1514b9c2ec3d",
       "lastSessionMetrics": {
-        "frame_duration_ms_count": 182,
-        "frame_duration_ms_min": 0.12507699999696342,
-        "frame_duration_ms_max": 22.853136000000006,
-        "frame_duration_ms_avg": 3.2232130934067245,
-        "frame_duration_ms_p50": 2.051935499999672,
-        "frame_duration_ms_p95": 9.630196450000303,
-        "frame_duration_ms_p99": 14.448149000001608
+        "frame_duration_ms_count": 216,
+        "frame_duration_ms_min": 0.11536499999965599,
+        "frame_duration_ms_max": 19.295450000000073,
+        "frame_duration_ms_avg": 1.988241907407533,
+        "frame_duration_ms_p50": 1.166952499999752,
+        "frame_duration_ms_p95": 6.53341724999882,
+        "frame_duration_ms_p99": 13.813811999999984
       },
       "hasUnseenTeamArtifacts": false
     },
@@ -159,7 +160,7 @@
       "lastFpsLow1Pct": 137.58
     }
   },
-  "lastReleaseNotesSeen": "2.1.185",
+  "lastReleaseNotesSeen": "2.1.191",
   "githubRepoPaths": {
     "karyanayandi/dotfiles": [
       "/home/karyana/.config/dotfiles"
@@ -174,7 +175,7 @@
     "new-user-warmup": 1,
     "plan-mode-for-complex-tasks": 1,
     "memory-command": 2,
-    "theme-command": 1,
+    "theme-command": 2,
     "status-line": 1,
     "prompt-queue": 2,
     "enter-to-steer-in-relatime": 1,
@@ -192,7 +193,8 @@
     "rename-conversation": 1,
     "custom-agents": 1,
     "subagent-fanout-nudge": 1,
-    "loop-command-nudge": 1
+    "loop-command-nudge": 1,
+    "dynamic-workflows": 1
   },
   "hasOpenedAgentsView": true,
   "agentLastUsed": {

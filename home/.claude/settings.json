@@ -31,6 +31,17 @@
       }
     ]
   },
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    }
+  },
   "effortLevel": "high",
-  "theme": "auto"
+  "theme": "auto",
+  "enabledPlugins": {
+    "ponytail@ponytail": true
+  }
 }
