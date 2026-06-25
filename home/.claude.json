@@ -1,5 +1,5 @@
 {
-  "numStartups": 19,
+  "numStartups": 20,
   "hasSeenTasksHint": true,
   "tipsHistory": {
     "new-user-warmup": 1,
@@ -15,7 +15,7 @@
     "drag-and-drop-images": 19,
     "frontend-design-plugin": 14,
     "default-permission-mode-config": 19,
-    "double-esc-code-restore": 8,
+    "double-esc-code-restore": 20,
     "continue": 9,
     "shift-tab": 9,
     "image-paste": 10,
@@ -36,7 +36,7 @@
   "seenNotifications": {},
   "migrationVersion": 13,
   "userID": "badf26138bc466a48045db65e544705b368a92d92dccad87cbe2a4f9a384ac54",
-  "changelogLastFetched": 1781925836852,
+  "changelogLastFetched": 1782115290909,
   "hasCompletedOnboarding": true,
   "lastOnboardingVersion": "2.1.183",
   "projects": {
@@ -98,7 +98,7 @@
       "hasClaudeMdExternalIncludesApproved": false,
       "hasClaudeMdExternalIncludesWarningShown": false,
       "lastGracefulShutdown": true,
-      "lastVersionBase": "2.1.183",
+      "lastVersionBase": "2.1.185",
       "exampleFiles": [
         "main-layout.astro",
         "astro.config.mjs",
@@ -107,58 +107,59 @@
         "index.astro"
       ],
       "exampleFilesGeneratedAt": 1781926466302,
-      "lastCost": 55.300195,
-      "lastAPIDuration": 820286,
-      "lastAPIDurationWithoutRetries": 487587,
-      "lastToolDuration": 156661,
-      "lastDuration": 4407568,
-      "lastLinesAdded": 160,
-      "lastLinesRemoved": 133,
-      "lastTotalInputTokens": 10968654,
-      "lastTotalOutputTokens": 18277,
+      "lastCost": 0.47714500000000004,
+      "lastAPIDuration": 107901,
+      "lastAPIDurationWithoutRetries": 107880,
+      "lastToolDuration": 0,
+      "lastDuration": 96480,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 59104,
+      "lastTotalOutputTokens": 7265,
       "lastTotalCacheCreationInputTokens": 0,
       "lastTotalCacheReadInputTokens": 0,
       "lastTotalWebSearchRequests": 0,
       "lastModelUsage": {
-        "ollamacloud/kimi-k2.7-code": {
-          "inputTokens": 10968654,
-          "outputTokens": 18277,
+        "ollamacloud/deepseek-v4-flash": {
+          "inputTokens": 17368,
+          "outputTokens": 3614,
           "cacheReadInputTokens": 0,
           "cacheCreationInputTokens": 0,
           "webSearchRequests": 0,
-          "costUSD": 55.300195
+          "costUSD": 0.17719000000000001
+        },
+        "ollamacloud/kimi-k2.7-code": {
+          "inputTokens": 41736,
+          "outputTokens": 3651,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.299955
         }
       },
-      "lastSessionId": "d4e5aa76-22e4-463e-9b72-e142a02c279c",
+      "lastSessionId": "277e644e-5ecd-423d-904a-445bf31349ff",
       "lastSessionMetrics": {
-        "frame_duration_ms_count": 27481,
-        "frame_duration_ms_min": 0.08107800036668777,
-        "frame_duration_ms_max": 146.62646400000085,
-        "frame_duration_ms_avg": 5.617612491358464,
-        "frame_duration_ms_p50": 5.679863999830559,
-        "frame_duration_ms_p95": 10.105681399721648,
-        "frame_duration_ms_p99": 14.264047910021612,
-        "pre_tool_hook_duration_ms_count": 73,
-        "pre_tool_hook_duration_ms_min": 0,
-        "pre_tool_hook_duration_ms_max": 1,
-        "pre_tool_hook_duration_ms_avg": 0.0410958904109589,
-        "pre_tool_hook_duration_ms_p50": 0,
-        "pre_tool_hook_duration_ms_p95": 0,
-        "pre_tool_hook_duration_ms_p99": 1,
-        "hook_duration_ms_count": 31,
-        "hook_duration_ms_min": 0,
-        "hook_duration_ms_max": 70,
-        "hook_duration_ms_avg": 4.32258064516129,
-        "hook_duration_ms_p50": 0,
-        "hook_duration_ms_p95": 29,
-        "hook_duration_ms_p99": 64.6
+        "frame_duration_ms_count": 999,
+        "frame_duration_ms_min": 0.18111600000065664,
+        "frame_duration_ms_max": 60.252692000000025,
+        "frame_duration_ms_avg": 0.9913188688688991,
+        "frame_duration_ms_p50": 0.6142519999993965,
+        "frame_duration_ms_p95": 2.502951200002279,
+        "frame_duration_ms_p99": 7.140001979993246,
+        "hook_duration_ms_count": 1,
+        "hook_duration_ms_min": 85,
+        "hook_duration_ms_max": 85,
+        "hook_duration_ms_avg": 85,
+        "hook_duration_ms_p50": 85,
+        "hook_duration_ms_p95": 85,
+        "hook_duration_ms_p99": 85
       },
       "hasCompletedProjectOnboarding": true,
-      "lastFpsAverage": 6.24,
-      "lastFpsLow1Pct": 46.77
+      "lastFpsAverage": 10.53,
+      "lastFpsLow1Pct": 137.58
     }
   },
-  "lastReleaseNotesSeen": "2.1.183",
+  "lastReleaseNotesSeen": "2.1.185",
   "githubRepoPaths": {
     "karyanayandi/dotfiles": [
       "/home/karyana/.config/dotfiles"
@@ -183,7 +184,7 @@
     "drag-and-drop-images": 2,
     "frontend-design-plugin": 2,
     "default-permission-mode-config": 2,
-    "double-esc-code-restore": 1,
+    "double-esc-code-restore": 2,
     "continue": 1,
     "shift-tab": 1,
     "image-paste": 1,
