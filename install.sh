@@ -86,6 +86,7 @@ yay -S --needed \
   reiserfsprogs \
   ripgrep \
   rustup \
+  rustup \
   sed \
   slurp \
   sof-firmware \
@@ -121,3 +122,5 @@ yay -S --needed \
   yazi \
   yt-dlp \
   zip
+
+rustup toolchain install stable

@@ -120,6 +120,7 @@ return {
       "gitcommit",
       "go",
       "html",
+      "htmx",
       "javascript",
       "jsdoc",
       "json",
@@ -137,6 +138,7 @@ return {
       "regex",
       "rust",
       "svelte",
+      "templ",
       "toml",
       "tsx",
       "typescript",
@@ -165,7 +167,7 @@ return {
         lookahead = true,
       },
     }
-    local select = require("nvim-treesitter-textobjects.select")
+    local select = require "nvim-treesitter-textobjects.select"
     local textobjects = {
       af = "@function.outer",
       ["if"] = "@function.inner",
@@ -201,7 +203,7 @@ return {
       vim.treesitter.incremental_selection()
     end, { desc = "Incremental selection" })
     vim.keymap.set("n", "<bs>", function()
-      vim.treesitter.incremental_selection("decrement")
+      vim.treesitter.incremental_selection "decrement"
     end, { desc = "Decrement selection" })
   end,
 }

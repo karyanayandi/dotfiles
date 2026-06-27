@@ -1,5 +1,5 @@
 {
-  "numStartups": 21,
+  "numStartups": 22,
   "hasSeenTasksHint": true,
   "tipsHistory": {
     "new-user-warmup": 1,
@@ -37,7 +37,7 @@
   "seenNotifications": {},
   "migrationVersion": 13,
   "userID": "badf26138bc466a48045db65e544705b368a92d92dccad87cbe2a4f9a384ac54",
-  "changelogLastFetched": 1782369462241,
+  "changelogLastFetched": 1782540452304,
   "hasCompletedOnboarding": true,
   "lastOnboardingVersion": "2.1.183",
   "projects": {
@@ -48,11 +48,11 @@
       "enabledMcpjsonServers": [],
       "disabledMcpjsonServers": [],
       "hasTrustDialogAccepted": true,
-      "projectOnboardingSeenCount": 2,
+      "projectOnboardingSeenCount": 3,
       "hasClaudeMdExternalIncludesApproved": false,
       "hasClaudeMdExternalIncludesWarningShown": false,
       "lastGracefulShutdown": true,
-      "lastVersionBase": "2.1.191",
+      "lastVersionBase": "2.1.195",
       "exampleFiles": [
         "install.sh",
         "config",
@@ -60,12 +60,12 @@
         "lint.lua",
         "codecompanion.lua"
       ],
-      "exampleFilesGeneratedAt": 1781925907528,
+      "exampleFilesGeneratedAt": 1782540452230,
       "lastCost": 0,
       "lastAPIDuration": 0,
       "lastAPIDurationWithoutRetries": 0,
       "lastToolDuration": 0,
-      "lastDuration": 49193,
+      "lastDuration": 6974,
       "lastLinesAdded": 0,
       "lastLinesRemoved": 0,
       "lastTotalInputTokens": 0,
@@ -73,18 +73,25 @@
       "lastTotalCacheCreationInputTokens": 0,
       "lastTotalCacheReadInputTokens": 0,
       "lastTotalWebSearchRequests": 0,
-      "lastFpsAverage": 4.5,
-      "lastFpsLow1Pct": 68.69,
+      "lastFpsAverage": 1.5,
+      "lastFpsLow1Pct": 52.72,
       "lastModelUsage": {},
-      "lastSessionId": "6f1b267e-820b-4238-8b66-1514b9c2ec3d",
+      "lastSessionId": "b6c7ac74-74c0-49a3-8de8-069d1fc06bba",
       "lastSessionMetrics": {
-        "frame_duration_ms_count": 216,
-        "frame_duration_ms_min": 0.11536499999965599,
-        "frame_duration_ms_max": 19.295450000000073,
-        "frame_duration_ms_avg": 1.988241907407533,
-        "frame_duration_ms_p50": 1.166952499999752,
-        "frame_duration_ms_p95": 6.53341724999882,
-        "frame_duration_ms_p99": 13.813811999999984
+        "frame_duration_ms_count": 8,
+        "frame_duration_ms_min": 0.14231000000017957,
+        "frame_duration_ms_max": 18.9674729999997,
+        "frame_duration_ms_avg": 4.349423124999959,
+        "frame_duration_ms_p50": 0.352337499999976,
+        "frame_duration_ms_p95": 17.278543099999816,
+        "frame_duration_ms_p99": 18.62968701999972,
+        "hook_duration_ms_count": 1,
+        "hook_duration_ms_min": 188,
+        "hook_duration_ms_max": 188,
+        "hook_duration_ms_avg": 188,
+        "hook_duration_ms_p50": 188,
+        "hook_duration_ms_p95": 188,
+        "hook_duration_ms_p99": 188
       },
       "hasUnseenTeamArtifacts": false
     },
@@ -160,7 +167,7 @@
       "lastFpsLow1Pct": 137.58
     }
   },
-  "lastReleaseNotesSeen": "2.1.191",
+  "lastReleaseNotesSeen": "2.1.195",
   "githubRepoPaths": {
     "karyanayandi/dotfiles": [
       "/home/karyana/.config/dotfiles"
@@ -236,5 +243,12 @@
     }
   },
   "hasSeenAutoModeEntryWarning": true,
-  "lastPlanModeUse": 1781930937366
+  "lastPlanModeUse": 1781930937366,
+  "pluginUsage": {
+    "ponytail@ponytail": {
+      "usageCount": 1,
+      "lastUsedAt": 1782540451975,
+      "lastUsedNumStartups": 22
+    }
+  }
 }

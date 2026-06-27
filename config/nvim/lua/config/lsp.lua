@@ -43,11 +43,11 @@ local servers = {
   "emmet_ls",
   "gopls",
   "html",
+  "htmx",
   "intelephense",
   "jsonls",
   "lua_ls",
   "marksman",
-  -- "nil_ls",
   "prismals",
   "pyright",
   "rust_analyzer",
@@ -57,10 +57,14 @@ local servers = {
   "tailwindcss",
   "taplo",
   "templ",
+  "templ",
   "vue_ls",
-  -- "vtsls",
   "yamlls",
+  -- "nil_ls",
+  -- "vtsls",
 }
+
+vim.filetype.add { extension = { templ = "templ" } }
 
 -- Conditionally add oxlint
 if should_enable_oxlint() then
