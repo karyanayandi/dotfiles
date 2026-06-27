@@ -670,6 +670,13 @@
             "input": ["text", "image"],
             "output": ["text"]
           }
+        },
+        "v4-flash": {
+          "name": "v4-flash",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         }
       }
     }
