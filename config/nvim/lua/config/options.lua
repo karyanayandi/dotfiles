@@ -58,6 +58,7 @@ vim.opt.shortmess:append "c"
 vim.filetype.add {
   extension = {
     env = "dotenv",
+    templ = "templ",
   },
   filename = {
     [".env"] = "dotenv",
