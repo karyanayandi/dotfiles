@@ -2,6 +2,7 @@
 
 bun add -g \
   @anthropic-ai/claude-code \
+  @earendil-works/pi-coding-agent \
   @fission-ai/openspec@latest \
   @playwright/mcp@latest \
   agent-browser@latest \
