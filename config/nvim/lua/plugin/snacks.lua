@@ -356,7 +356,7 @@ return {
             vim.g.pi_tmux_pane = nil
           end
         end
-        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'ollama launch pi'"
+        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'pi'"
         vim.g.pi_tmux_pane = vim.fn.trim(result)
       else
         Snacks.terminal.toggle("pi", {
