@@ -109,8 +109,8 @@ return {
       formatters = {
         oxfmt = {
           command = "vp",
-          args = { "fmt", "--write", "$FILENAME" },
-          stdin = false,
+          args = { "fmt", "--stdin-filepath", "$FILENAME" },
+          stdin = true,
           cwd = oxfmt_root or vite_root,
           -- require_cwd = true,
         },
