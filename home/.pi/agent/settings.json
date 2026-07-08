@@ -23,5 +23,6 @@
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "collapseChangelog": true,
-  "quietStartup": true
+  "quietStartup": true,
+  "defaultThinkingLevel": "high"
 }
