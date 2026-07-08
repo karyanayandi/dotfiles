@@ -23,45 +23,46 @@ return {
       "prettier.config.cjs",
     }
 
-    local function has_any_file(files)
-      for _, file in ipairs(files) do
-        if vim.fn.glob(file) ~= "" then
-          return true
-        end
-      end
-      return false
+    local function has_root_file(dir, files)
+      return vim.fs.find(files, { upward = true, path = dir, limit = 1 })[1] ~= nil
     end
 
-    local function has_vite_plus()
-      if vim.fn.glob "vite.config.ts" ~= "" then
-        if vim.fn.glob "package.json" ~= "" then
-          local pkg = vim.fn.readfile "package.json"
-          if #pkg > 0 then
-            local content = table.concat(pkg, "\n")
-            if content:find "vite%-plus" then
-              return true
-            end
-          end
-        end
+    local function has_vite_plus(dir)
+      if not has_root_file(dir, "vite.config.ts") then
+        return false
       end
-      return false
+      local pkg = vim.fs.find("package.json", { upward = true, path = dir, limit = 1 })[1]
+      if not pkg then
+        return false
+      end
+      local content = table.concat(vim.fn.readfile(pkg), "\n")
+      return content:find "vite%-plus" ~= nil
     end
 
-    local function javascript_formatter()
-      if has_vite_plus() then
-        return { "oxfmt" }
+    local function javascript_formatter(bufnr)
+      local cached = vim.b[bufnr].js_formatter
+      if cached then
+        return cached
       end
-      if has_any_file(oxfmt_root_files) or vim.fn.glob "oxc.json" ~= "" then
-        return { "oxfmt" }
-      elseif has_any_file(biome_root_files) then
-        return { "biome" }
-      elseif has_any_file(deno_root_files) then
-        return { "deno_fmt" }
-      elseif has_any_file(prettier_root_files) then
-        return { "prettierd" }
+
+      local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+      local formatters
+      if has_vite_plus(dir) then
+        formatters = { "oxfmt" }
+      elseif has_root_file(dir, oxfmt_root_files) then
+        formatters = { "oxfmt" }
+      elseif has_root_file(dir, biome_root_files) then
+        formatters = { "biome" }
+      elseif has_root_file(dir, deno_root_files) then
+        formatters = { "deno_fmt" }
+      elseif has_root_file(dir, prettier_root_files) then
+        formatters = { "prettierd" }
       else
-        return { "oxfmt" }
+        formatters = { "oxfmt" }
       end
+
+      vim.b[bufnr].js_formatter = formatters
+      return formatters
     end
 
     local biome_root = util.root_file(biome_root_files)
