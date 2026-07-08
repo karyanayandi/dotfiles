@@ -1,6 +1,6 @@
 {
-  "defaultModel": "opencode/hy3-free",
-  "defaultProvider": "opencode-cli",
+  "defaultModel": "kimi-k2.7-code:cloud",
+  "defaultProvider": "ollama",
   "editorPaddingX": 1,
   "hideThinkingBlock": false,
   "images": {
@@ -21,7 +21,7 @@
     "npm:pi-notify-agent",
     "npm:pi-nvim",
     "npm:pi-zentui",
-    "npm:opencode-pi"
+    "npm:pi-opencode-bridge"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
