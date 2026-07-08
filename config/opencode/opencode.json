@@ -484,18 +484,18 @@
         "opencode-zen/deepseek-v4-flash-free": {
           "name": "opencode-zen/deepseek-v4-flash-free"
         },
-        "opencode-zen/minimax-m2.5-free": {
-          "name": "opencode-zen/minimax-m2.5-free"
+        "opencode-zen/mimo-v2.5-free": {
+          "name": "opencode-zen/mimo-v2.5-free"
         },
-        "opencode-zen/nemotron-3-super-free": {
-          "name": "opencode-zen/nemotron-3-super-free",
+        "opencode-zen/nemotron-3-ultra-free": {
+          "name": "opencode-zen/nemotron-3-ultra-free",
           "modalities": {
             "input": ["text", "image"],
             "output": ["text"]
           }
         },
-        "opencode-zen/qwen3.6-plus-free": {
-          "name": "opencode-zen/qwen3.6-plus-free",
+        "opencode-zen/north-mini-code-free": {
+          "name": "opencode-zen/north-mini-code-free",
           "modalities": {
             "input": ["text", "image"],
             "output": ["text"]
