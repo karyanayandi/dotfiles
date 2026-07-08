@@ -140,7 +140,10 @@ local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
 -- Get blink.cmp capabilities
 local blink_capabilities = require("blink.cmp").get_lsp_capabilities()
 
-local ext_capabilities = vim.tbl_deep_extend("force", {}, lsp_capabilities, blink_capabilities)
+-- Advertise LSP workspace file operations (will/did rename/create/delete)
+local fileop_capabilities = require("lsp-file-operations").default_capabilities()
+
+local ext_capabilities = vim.tbl_deep_extend("force", {}, lsp_capabilities, blink_capabilities, fileop_capabilities)
 
 vim.lsp.config("*", {
   capabilities = ext_capabilities,
