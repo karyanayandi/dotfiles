@@ -18,9 +18,10 @@
     "npm:@narumitw/pi-goal",
     "git:https://github.com/hasit/pi-community-themes",
     "npm:pi-caveman",
-    "npm:pi-notify-agent",
-    "npm:@jordyvd/pi-image-attachments"
+    "npm:pi-notify-agent"
   ],
   "theme": "gruvbox-dark-hard",
-  "treeFilterMode": "all"
+  "treeFilterMode": "all",
+  "collapseChangelog": true,
+  "quietStartup": true
 }
