@@ -73,8 +73,8 @@ keymap("n", ";s", "<cmd>split<cr>", opts)
 keymap(
   "n",
   ";a",
-  "<cmd>CodeCompanionChat Toggle<cr>",
-  { desc = "Open Code Companion Chat", noremap = true, silent = true }
+  "<cmd>PiAsk<cr>",
+  { desc = "Ask pi", noremap = true, silent = true }
 )
 
 -- Find
