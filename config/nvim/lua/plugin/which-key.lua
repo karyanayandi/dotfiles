@@ -128,6 +128,11 @@ return {
         "<cmd>lua _CLAUDE_TOGGLE()<CR>",
         desc = "Open Claude",
       },
+      {
+        "<leader>ap",
+        "<cmd>lua _PI_TOGGLE()<CR>",
+        desc = "Open Pi Coding Agent",
+      },
 
       {
         "<leader>p",
