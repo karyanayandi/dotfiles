@@ -17,10 +17,31 @@ return {
       ".prettierrc.json5",
       ".prettierrc.yml",
       ".prettierrc.yaml",
+      ".prettierrc.toml",
       ".prettierrc.js",
       ".prettierrc.cjs",
+      ".prettierrc.mjs",
+      ".prettierrc.ts",
+      ".prettierrc.cts",
+      ".prettierrc.mts",
       "prettier.config.js",
       "prettier.config.cjs",
+      "prettier.config.mjs",
+      "prettier.config.ts",
+      "prettier.config.cts",
+      "prettier.config.mts",
+    }
+    local prettier_root_set = {}
+    for _, name in ipairs(prettier_root_files) do
+      prettier_root_set[name] = true
+    end
+
+    local vite_root_files = {
+      "vite.config.ts",
+      "vite.config.js",
+      "vite.config.mjs",
+      "vite.config.cjs",
+      "vite.config.mts",
     }
 
     local function has_root_file(dir, files)
@@ -28,7 +49,7 @@ return {
     end
 
     local function has_vite_plus(dir)
-      if not has_root_file(dir, "vite.config.ts") then
+      if not has_root_file(dir, vite_root_files) then
         return false
       end
       local pkg = vim.fs.find("package.json", { upward = true, path = dir, limit = 1 })[1]
@@ -37,6 +58,20 @@ return {
       end
       local content = table.concat(vim.fn.readfile(pkg), "\n")
       return content:find "vite%-plus" ~= nil
+    end
+
+    local function prettier_root(_, ctx)
+      return vim.fs.root(ctx.dirname, function(name, path)
+        if prettier_root_set[name] then
+          return true
+        end
+        if name == "package.json" then
+          local ok, data =
+            pcall(vim.json.decode, table.concat(vim.fn.readfile(vim.fs.joinpath(path, name)), "\n"))
+          return ok and data.prettier ~= nil
+        end
+        return false
+      end)
     end
 
     local function javascript_formatter(bufnr)
@@ -55,7 +90,7 @@ return {
         formatters = { "biome" }
       elseif has_root_file(dir, deno_root_files) then
         formatters = { "deno_fmt" }
-      elseif has_root_file(dir, prettier_root_files) then
+      elseif prettier_root(nil, { dirname = dir }) then
         formatters = { "prettierd" }
       else
         formatters = { "oxfmt" }
@@ -67,8 +102,7 @@ return {
 
     local biome_root = util.root_file(biome_root_files)
     local oxfmt_root = util.root_file(oxfmt_root_files)
-    local prettier_root = util.root_file(prettier_root_files)
-    local vite_root = util.root_file { "vite.config.ts" }
+    local vite_root = util.root_file(vite_root_files)
 
     local formatters_by_ft = {
       astro = javascript_formatter,
@@ -101,7 +135,15 @@ return {
       if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
         return
       end
-      return { timeout_ms = 3000, lsp_fallback = true, async = false }
+      local formatters = conform.list_formatters_for_buffer(bufnr)
+      local timeout_ms = 3000
+      for _, name in ipairs(formatters) do
+        if name == "vp_fmt" then
+          timeout_ms = 10000
+          break
+        end
+      end
+      return { timeout_ms = timeout_ms, lsp_fallback = true, async = false }
     end
 
     conform.setup {
@@ -111,13 +153,18 @@ return {
           command = "vp",
           args = { "fmt", "--stdin-filepath", "$FILENAME" },
           stdin = true,
-          cwd = oxfmt_root or vite_root,
+          cwd = vite_root,
           require_cwd = true,
         },
         oxfmt = {
           command = "oxfmt",
-          args = { "fmt", "--stdin-filepath", "$FILENAME" },
+          args = { "--stdin-filepath", "$FILENAME" },
           stdin = true,
+          cwd = oxfmt_root,
+        },
+        deno_fmt = {
+          cwd = deno_root,
+          require_cwd = true,
         },
         biome = {
           command = "node_modules/.bin/biome",
