@@ -47,8 +47,7 @@ return {
       end,
     })
 
-    -- File rename LSP import updates are handled by nvim-lsp-file-operations,
-    -- which listens to nvim-tree's NodeRenamed event.
+    -- File rename LSP import updates are handled by Snacks.rename.
 
     require("nvim-tree").setup {
       on_attach = on_attach,
@@ -137,5 +136,42 @@ return {
         relativenumber = false,
       },
     }
+
+    -- Wire LSP file rename updates and save buffers that receive import edits
+    do
+      local nvim_tree_api = require "nvim-tree.api"
+      local prev_rename = { old_name = "", new_name = "" }
+      nvim_tree_api.events.subscribe(nvim_tree_api.events.Event.NodeRenamed, function(data)
+        if data.old_name == prev_rename.old_name and data.new_name == prev_rename.new_name then
+          return
+        end
+        prev_rename = { old_name = data.old_name, new_name = data.new_name }
+
+        local old_uri = vim.uri_from_fname(data.old_name)
+        local new_uri = vim.uri_from_fname(data.new_name)
+        local changes = { files = { { oldUri = old_uri, newUri = new_uri } } }
+
+        local clients = vim.lsp.get_clients()
+        for _, client in ipairs(clients) do
+          if client:supports_method "workspace/willRenameFiles" then
+            local resp = client:request_sync("workspace/willRenameFiles", changes, 1000, 0)
+            if resp and resp.result ~= nil then
+              local ei = vim.o.eventignore
+              vim.o.eventignore = "BufReadPost"
+              vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
+              vim.o.eventignore = ei
+            end
+          end
+        end
+
+        for _, client in ipairs(clients) do
+          if client:supports_method "workspace/didRenameFiles" then
+            client:notify("workspace/didRenameFiles", changes)
+          end
+        end
+
+        vim.schedule(require("config.functions").save_modified_buffers)
+      end)
+    end
   end,
 }

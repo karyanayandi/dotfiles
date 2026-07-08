@@ -11,6 +11,17 @@ function M.remove_augroup(name)
   end
 end
 
+--- Save all loaded buffers that have unsaved changes
+function M.save_modified_buffers()
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].modified then
+      vim.api.nvim_buf_call(bufnr, function()
+        vim.cmd "silent! update"
+      end)
+    end
+  end
+end
+
 --- Toggles a Neovim option and displays a notification with the new state
 --- This provides a convenient way to switch boolean settings on/off with feedback
 --- @param option string The Neovim option name to toggle

@@ -141,7 +141,18 @@ local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
 local blink_capabilities = require("blink.cmp").get_lsp_capabilities()
 
 -- Advertise LSP workspace file operations (will/did rename/create/delete)
-local fileop_capabilities = require("lsp-file-operations").default_capabilities()
+local fileop_capabilities = {
+  workspace = {
+    fileOperations = {
+      willRename = true,
+      didRename = true,
+      willCreate = true,
+      didCreate = true,
+      willDelete = true,
+      didDelete = true,
+    },
+  },
+}
 
 local ext_capabilities = vim.tbl_deep_extend("force", {}, lsp_capabilities, blink_capabilities, fileop_capabilities)
 
@@ -153,6 +164,35 @@ local keymap = vim.keymap
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspConfig", {}),
   callback = function(ev)
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client then
+      client.handlers["textDocument/rename"] = function(err, result, ctx, config)
+        -- Suppress BufReadPost while LSP loads buffers for workspace edits;
+        -- some plugins return non-command values from their autocmds and cause E5101.
+        local ei = vim.o.eventignore
+        vim.o.eventignore = "BufReadPost"
+        vim.lsp.handlers["textDocument/rename"](err, result, ctx, config)
+        vim.o.eventignore = ei
+
+        if err or not result then
+          return
+        end
+
+        -- Restore filetype detection for buffers that LSP loaded without BufReadPost.
+        local changes = result.changes or {}
+        for uri, _ in pairs(changes) do
+          local bufnr = vim.uri_to_bufnr(uri)
+          if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].filetype == "" then
+            vim.api.nvim_buf_call(bufnr, function()
+              vim.cmd "filetype detect"
+            end)
+          end
+        end
+
+        vim.schedule(require("config.functions").save_modified_buffers)
+      end
+    end
+
     local opts = { buffer = ev.buf, silent = true }
 
     opts.desc = "Go to definition"
