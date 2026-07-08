@@ -48,7 +48,7 @@ return {
       local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
       local formatters
       if has_vite_plus(dir) then
-        formatters = { "oxfmt" }
+        formatters = { "vp_fmt" }
       elseif has_root_file(dir, oxfmt_root_files) then
         formatters = { "oxfmt" }
       elseif has_root_file(dir, biome_root_files) then
@@ -107,12 +107,17 @@ return {
     conform.setup {
       formatters_by_ft = formatters_by_ft,
       formatters = {
-        oxfmt = {
+        vp_fmt = {
           command = "vp",
           args = { "fmt", "--stdin-filepath", "$FILENAME" },
           stdin = true,
           cwd = oxfmt_root or vite_root,
-          -- require_cwd = true,
+          require_cwd = true,
+        },
+        oxfmt = {
+          command = "oxfmt",
+          args = { "fmt", "--stdin-filepath", "$FILENAME" },
+          stdin = true,
         },
         biome = {
           command = "node_modules/.bin/biome",
