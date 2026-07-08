@@ -163,6 +163,24 @@ return {
           cwd = oxfmt_root,
         },
         deno_fmt = {
+          args = function(self, ctx)
+            local extension = vim.bo[ctx.buf].filetype == "typescript" and "ts"
+              or vim.bo[ctx.buf].filetype == "typescriptreact" and "tsx"
+              or vim.bo[ctx.buf].filetype == "javascript" and "js"
+              or vim.bo[ctx.buf].filetype == "javascriptreact" and "jsx"
+              or "ts"
+            local config_file = vim.fs.find({ "deno.json", "deno.jsonc" }, {
+              upward = true,
+              path = ctx.dirname,
+              limit = 1,
+            })[1]
+            local args = { "fmt", "-", "--ext", extension }
+            if config_file then
+              table.insert(args, "--config")
+              table.insert(args, config_file)
+            end
+            return args
+          end,
           cwd = deno_root,
           require_cwd = true,
         },
