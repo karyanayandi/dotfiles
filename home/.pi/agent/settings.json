@@ -1,0 +1,26 @@
+{
+  "defaultModel": "kimi-k2.7-code:cloud",
+  "defaultProvider": "ollama",
+  "editorPaddingX": 1,
+  "hideThinkingBlock": false,
+  "images": {
+    "blockImages": false
+  },
+  "lastChangelogVersion": "0.80.3",
+  "packages": [
+    "npm:@ollama/pi-web-search",
+    "npm:pi-observational-memory",
+    "npm:pi-subagents",
+    "npm:@hypabolic/pi-hypa",
+    "npm:context-mode",
+    "npm:bigpowers",
+    "npm:@dietrichgebert/ponytail",
+    "npm:@narumitw/pi-goal",
+    "git:https://github.com/hasit/pi-community-themes",
+    "npm:pi-caveman",
+    "npm:pi-notify-agent",
+    "npm:@jordyvd/pi-image-attachments"
+  ],
+  "theme": "gruvbox-dark-hard",
+  "treeFilterMode": "all"
+}

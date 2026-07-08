@@ -1,0 +1,37 @@
+{
+  "imports": [
+    "claude-code"
+  ],
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "{env:CONTEXT7_API_KEY}"
+      ],
+      "env": {},
+      "directTools": true
+    },
+    "playwriter": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": [
+        "-y",
+        "playwriter@latest"
+      ],
+      "directTools": true
+    },
+    "shadcn": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ],
+      "directTools": true
+    }
+  }
+}
