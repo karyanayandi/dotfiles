@@ -19,7 +19,8 @@
     "git:https://github.com/hasit/pi-community-themes",
     "npm:pi-caveman",
     "npm:pi-notify-agent",
-    "npm:pi-nvim"
+    "npm:pi-nvim",
+    "npm:pi-zentui"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
