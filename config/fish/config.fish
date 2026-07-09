@@ -67,16 +67,12 @@ alias ls "eza --group-directories-first --icons"
 alias lsl "eza --group-directories-first -lh --icons"
 alias lzd lazydocker
 alias lzg lazygit
-alias npm "corepack npm"
-alias npx "corepack npx"
 alias oc "opencode"
 alias os "openspec"
 alias pac "sudo pacman -S"
 alias pkglist "paru -Qe"
-alias pn "corepack pnpm"
-alias pnpm "corepack pnpm"
-alias pnpx "corepack pnpx"
-alias px "corepack pnpx"
+alias pn "pnpm"
+alias px "pnpx"
 alias r "paru -Rns"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
 alias reload-waybar "pkill waybar; waybar & disown"
@@ -93,9 +89,7 @@ alias update-time "sudo ntpd -qg"
 alias vim nvim
 alias vis "sudo nvim"
 alias x exit
-alias yarn "corepack yarn"
 alias yay "paru"
-alias yarnpkg "corepack yarnpkg"
 alias yz yazi
 alias countline "rg --files | xargs wc -l | sort -n"
 
