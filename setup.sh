@@ -6,7 +6,6 @@ sh ./setup/polkitagent.sh
 
 sh ./setup/24-bit-color.sh
 sh ./setup/chaotic-aur.sh
-sh ./setup/corepack.sh
 sh ./setup/docker.sh
 sh ./setup/git.sh
 sh ./setup/go.sh

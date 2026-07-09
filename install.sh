@@ -15,7 +15,6 @@ yay -S --needed \
   bun \
   chafa \
   cmake \
-  corepack \
   cowsay \
   deno \
   distrobox \
