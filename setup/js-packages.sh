@@ -15,3 +15,7 @@ bun add -g \
   playwriter@latest \
   tree-sitter@latest \
   wrangler@latest
+
+npm i -g \
+  pnpm \
+  yarn
