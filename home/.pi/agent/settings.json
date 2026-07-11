@@ -1,12 +1,12 @@
 {
-  "defaultModel": "kimi-k2.7-code:cloud",
+  "defaultModel": "deepseek-v4-pro:cloud",
   "defaultProvider": "ollama",
   "editorPaddingX": 1,
   "hideThinkingBlock": false,
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.80.3",
+  "lastChangelogVersion": "0.80.5",
   "packages": [
     "npm:@ollama/pi-web-search",
     "npm:pi-observational-memory",
@@ -21,7 +21,9 @@
     "npm:pi-notify-agent",
     "npm:pi-nvim",
     "npm:pi-zentui",
-    "npm:pi-opencode-bridge"
+    "npm:pi-opencode-bridge",
+    "npm:glm-vision",
+    "npm:pi-mcp-adapter"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",

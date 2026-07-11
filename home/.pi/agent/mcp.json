@@ -1,37 +1,50 @@
 {
-  "imports": [
-    "claude-code"
-  ],
   "mcpServers": {
     "context7": {
       "type": "stdio",
       "command": "bunx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp",
-        "--api-key",
-        "{env:CONTEXT7_API_KEY}"
-      ],
-      "env": {},
-      "directTools": true
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "{env:CONTEXT7_API_KEY}"],
+      "env": {}
     },
     "playwriter": {
       "type": "stdio",
       "command": "bunx",
-      "args": [
-        "-y",
-        "playwriter@latest"
-      ],
-      "directTools": true
+      "args": ["-y", "playwriter@latest"]
     },
     "shadcn": {
       "type": "stdio",
       "command": "bunx",
-      "args": [
-        "shadcn@latest",
-        "mcp"
-      ],
-      "directTools": true
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "zai-mcp-server": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["zai-mcp-server@latest"],
+      "env": {
+        "Z_AI_MODE": "ZAI",
+        "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
+      }
+    },
+    "web-search-prime": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:Z_AI_API_KEY}"
+      }
+    },
+    "web-reader": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:Z_AI_API_KEY}"
+      }
+    },
+    "zread": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/zread/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:Z_AI_API_KEY}"
+      }
     }
   }
 }
