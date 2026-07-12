@@ -73,6 +73,7 @@ yay -S --needed \
   opencode-desktop-bin \
   openssh \
   p7zip \
+  pacman-contrib \
   pavucontrol \
   pfetch \
   podman-compose \
