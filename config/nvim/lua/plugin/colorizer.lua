@@ -3,6 +3,8 @@ return {
   lazy = false,
   event = "BufReadPre",
   config = function()
+    local icons = require "config.icons"
+
     require("colorizer").setup {
       filetypes = {
         "*",
@@ -68,7 +70,7 @@ return {
             dark_fg = "#ffffff",
           },
           virtualtext = {
-            char = "■",
+            char = icons.ui.Square,
             position = "eol",
             hl_mode = "foreground",
           },

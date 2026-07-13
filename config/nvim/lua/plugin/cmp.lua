@@ -1,5 +1,7 @@
 -- luacheck: globals vim
 
+local icons = require "config.icons"
+
 return {
   "saghen/blink.cmp",
   dependencies = {
@@ -71,35 +73,7 @@ return {
     appearance = {
       use_nvim_cmp_as_default = false,
       nerd_font_variant = "mono",
-      kind_icons = {
-        Class = " ",
-        Color = " ",
-        Constant = " ",
-        Constructor = " ",
-        Copilot = " ",
-        Enum = " ",
-        EnumMember = " ",
-        Event = " ",
-        Field = " ",
-        File = " ",
-        Folder = " ",
-        Function = "󰊕",
-        Interface = " ",
-        Keyword = " ",
-        Method = " ",
-        Misc = " ",
-        Module = " ",
-        Operator = " ",
-        Property = " ",
-        Reference = " ",
-        Snippet = " ",
-        Struct = " ",
-        Text = " ",
-        TypeParameter = " ",
-        Unit = " ",
-        Value = " ",
-        Variable = " ",
-      },
+      kind_icons = icons.kind,
     },
     completion = {
       ghost_text = { enabled = true },
@@ -125,7 +99,6 @@ return {
           components = {
             kind_icon = {
               text = function(ctx)
-                local icons = require "config.icons"
                 -- Special handling for Copilot
                 if ctx.source_name == "copilot" then
                   return icons.git.Octoface

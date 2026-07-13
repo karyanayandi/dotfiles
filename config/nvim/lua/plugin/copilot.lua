@@ -1,5 +1,7 @@
 -- luacheck: globals vim
 
+local icons = require "config.icons"
+
 local function find_auth_db()
   local candidates = {
     vim.fn.expand "$XDG_CONFIG_HOME/github-copilot/auth.db",
@@ -67,7 +69,7 @@ local function insert_commit_text(text, r)
 end
 
 local function generate_commit()
-  vim.notify("⏳ Generating commit message…", vim.log.levels.INFO, { title = "Copilot" })
+  vim.notify(icons.misc.Hourglass .. " Generating commit message...", vim.log.levels.INFO, { title = "Copilot" })
 
   -- capture visual selection while still in visual mode; use '.' and 'v' marks because '< and '> are only set after leaving visual mode.
   local visual_range = capture_visual_range()
@@ -215,7 +217,7 @@ Output only the commit message, no explanation.
             end
 
             content = clean_commit_message(content)
-            vim.notify("✓ Commit message generated", vim.log.levels.INFO, { title = "Copilot" })
+            vim.notify(icons.ui.Installed .. " Commit message generated", vim.log.levels.INFO, { title = "Copilot" })
             exit_visual()
             insert_commit_text(content, visual_range)
           end)

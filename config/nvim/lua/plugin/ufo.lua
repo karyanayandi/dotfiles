@@ -1,5 +1,7 @@
 -- luacheck: globals vim
 
+local icons = require "config.icons"
+
 return {
   "kevinhwang91/nvim-ufo",
   dependencies = "kevinhwang91/promise-async",
@@ -35,7 +37,7 @@ return {
       },
       preview = {
         win_config = {
-          border = { "", "─", "", "", "", "─", "", "" },
+          border = { "", icons.ui.HorizontalLine, "", "", "", icons.ui.HorizontalLine, "", "" },
           winhighlight = "Normal:Folded",
           winblend = 0,
         },

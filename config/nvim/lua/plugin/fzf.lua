@@ -1,5 +1,7 @@
 -- luacheck: globals vim
 
+local icons = require "config.icons"
+
 return {
   "ibhagwan/fzf-lua",
   event = "BufEnter",
@@ -30,7 +32,7 @@ return {
           title = true,
           scrollbar = "float",
           scrolloff = "-2",
-          scrollchars = { "█", "" },
+          scrollchars = { icons.ui.Scrollbar, "" },
           delay = 100,
           winopts = {
             winhl = "Normal:FzfLuaPreviewNormal,NormalNC:FzfLuaPreviewNormal,FloatBorder:FzfLuaPreviewBorder",
@@ -143,34 +145,7 @@ return {
       },
       lsp = {
         symbols = {
-          symbol_icons = {
-            File = "󰈙",
-            Module = "",
-            Namespace = "󰦮",
-            Package = "",
-            Class = "󰌗",
-            Method = "󰆧",
-            Property = "",
-            Field = "",
-            Constructor = "",
-            Enum = "󰒻",
-            Interface = "",
-            Function = "󰊕",
-            Variable = "󰫧",
-            Constant = "󰏿",
-            String = "󰉿",
-            Number = "󰎠",
-            Boolean = "󱓂",
-            Array = "󰅪",
-            Object = "󰅩",
-            Key = "󰌋",
-            Null = "󰌚",
-            EnumMember = "",
-            Struct = "󰌗",
-            Event = "",
-            Operator = "󰆕",
-            TypeParameter = "󰊄",
-          },
+          symbol_icons = icons.fzf.symbols,
         },
       },
     }

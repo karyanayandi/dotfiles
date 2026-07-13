@@ -144,11 +144,11 @@ return {
         priority = 200,
         hl = "SnacksIndentChunk",
         char = {
-          corner_top = "┌",
-          corner_bottom = "└",
-          horizontal = "─",
+          corner_top = icons.ui.CornerTop,
+          corner_bottom = icons.ui.CornerBottom,
+          horizontal = icons.ui.HorizontalLine,
           vertical = icons.ui.Pipe,
-          arrow = ">",
+          arrow = icons.ui.ArrowRight,
         },
       },
       blank = {
@@ -229,7 +229,7 @@ return {
       style = "compact",
       top_down = true,
       date_format = "%R",
-      more_format = " ↓ %d lines ",
+      more_format = " " .. icons.ui.ArrowDown .. " %d lines ",
       refresh = 50,
     },
     picker = {
