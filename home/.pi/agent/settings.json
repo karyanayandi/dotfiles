@@ -27,7 +27,8 @@
     "npm:pi-subagents",
     "npm:pi-tool-display",
     "npm:pi-web-access",
-    "npm:pi-zentui"
+    "npm:pi-zentui",
+    "npm:@narumitw/pi-plan-mode"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",

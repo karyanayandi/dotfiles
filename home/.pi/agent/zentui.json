@@ -14,15 +14,15 @@
     "mode": "nerd"
   },
   "footerSegments": {
-    "cwd": true,
-    "gitBranch": true,
-    "gitStatus": true,
+    "cwd": false,
+    "gitBranch": false,
+    "gitStatus": false,
     "gitCounts": false,
     "sessionDuration": false,
     "username": false,
     "time": false,
     "os": false,
-    "runtime": true,
+    "runtime": false,
     "context": true,
     "cost": false,
     "tokens": false
