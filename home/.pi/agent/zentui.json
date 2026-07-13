@@ -1,0 +1,36 @@
+{
+  "colorSources": {
+    "starship": "terminal",
+    "editor": "terminal",
+    "userMessages": "terminal"
+  },
+  "features": {
+    "statusLine": true,
+    "copyFriendly": true,
+    "editor": true
+  },
+  "contextStyle": "text",
+  "icons": {
+    "mode": "nerd"
+  },
+  "footerSegments": {
+    "cwd": true,
+    "gitBranch": true,
+    "gitStatus": true,
+    "gitCounts": false,
+    "sessionDuration": false,
+    "username": false,
+    "time": false,
+    "os": false,
+    "runtime": true,
+    "context": true,
+    "cost": false,
+    "tokens": false
+  },
+  "extensionStatuses": {
+    "placements": {
+      "mcp": "off",
+      "caveman": "off"
+    }
+  }
+}
