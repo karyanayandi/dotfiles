@@ -23,7 +23,8 @@
     "npm:pi-zentui",
     "npm:pi-opencode-bridge",
     "npm:glm-vision",
-    "npm:pi-mcp-adapter"
+    "npm:pi-mcp-adapter",
+    "npm:pi-tool-display"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
