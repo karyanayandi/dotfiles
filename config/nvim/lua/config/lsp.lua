@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 -- Conditionally enable LSP servers based on config files
 local function should_enable_biome()

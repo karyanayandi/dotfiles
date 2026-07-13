@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 return {
   "numToStr/Comment.nvim",

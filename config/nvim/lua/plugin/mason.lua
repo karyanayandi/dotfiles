@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 local M = {
   "mason-org/mason.nvim",

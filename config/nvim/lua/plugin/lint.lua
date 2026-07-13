@@ -1,5 +1,4 @@
 -- TODO: add linting for github action, deno
--- luacheck: globals vim
 
 return {
   "mfussenegger/nvim-lint",

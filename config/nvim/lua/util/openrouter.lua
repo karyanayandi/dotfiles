@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 local openai = require "codecompanion.adapters.http.openai"
 local log = require "codecompanion.utils.log"

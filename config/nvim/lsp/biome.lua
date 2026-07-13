@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 return {
   root_dir = function(fname)

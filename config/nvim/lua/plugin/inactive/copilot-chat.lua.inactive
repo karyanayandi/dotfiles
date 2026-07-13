@@ -1,4 +1,3 @@
--- luacheck: globals vim
 -- luacheck: ignore 631
 
 return {

@@ -1,4 +1,3 @@
--- luacheck: globals vim
 -- luacheck: ignore 631
 
 --- Creates a named autocommand group with automatic clearing

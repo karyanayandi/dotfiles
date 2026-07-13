@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 vim.g.use_nerd_icons = true
 

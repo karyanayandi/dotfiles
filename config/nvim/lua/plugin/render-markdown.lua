@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 local icons = require "config.icons"
 

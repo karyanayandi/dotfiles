@@ -1,7 +1,3 @@
--- luacheck: globals Snacks
--- luacheck: globals vim
--- luacheck: globals M
-
 local icons = require "config.icons"
 
 return {

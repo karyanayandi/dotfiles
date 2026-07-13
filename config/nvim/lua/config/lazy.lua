@@ -1,4 +1,3 @@
--- luacheck: globals vim
 
 if vim.g.lazy_did_setup then
   return {}
