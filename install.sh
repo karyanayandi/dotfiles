@@ -42,6 +42,7 @@ yay -S --needed \
   hyprlock \
   hyprpaper \
   hyprpicker \
+  imv \
   inxi \
   iw \
   jq \
@@ -107,7 +108,6 @@ yay -S --needed \
   unzip \
   usage \
   vicinae-bin \
-  viewnior \
   vivid \
   waybar \
   wf-recorder \
