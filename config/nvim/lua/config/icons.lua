@@ -152,7 +152,7 @@ return {
     Warning = " ",
   },
   misc = {
-    Hourglass = "⏳",
+    Hourglass = "",
     Package = " ",
     Robot = " ",
     Smiley = " ",
