@@ -13,6 +13,7 @@
     "npm:@ff-labs/pi-fff",
     "npm:@hypabolic/pi-hypa",
     "npm:@narumitw/pi-goal",
+    "npm:@narumitw/pi-plan-mode",
     "npm:@tintinweb/pi-tasks",
     "npm:bigpowers",
     "npm:context-mode",
@@ -26,9 +27,9 @@
     "npm:pi-opencode-bridge",
     "npm:pi-subagents",
     "npm:pi-tool-display",
+    "npm:pi-vim",
     "npm:pi-web-access",
-    "npm:pi-zentui",
-    "npm:@narumitw/pi-plan-mode"
+    "npm:pi-zentui"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",

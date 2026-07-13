@@ -18,19 +18,20 @@
     "gitBranch": false,
     "gitStatus": false,
     "gitCounts": false,
-    "sessionDuration": true,
+    "sessionDuration": false,
     "username": false,
     "time": false,
     "os": false,
     "runtime": false,
-    "context": true,
+    "context": false,
     "cost": false,
     "tokens": false
   },
   "extensionStatuses": {
     "placements": {
       "mcp": "off",
-      "caveman": "off"
+      "caveman": "off",
+      "pi-vimmode": "off"
     }
   }
 }
