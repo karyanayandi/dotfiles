@@ -25,7 +25,9 @@
     "npm:pi-tool-display",
     "npm:@tintinweb/pi-tasks",
     "git:github.com/DietrichGebert/ponytail",
-    "npm:pi-web-access"
+    "npm:pi-web-access",
+    "npm:@ff-labs/pi-fff",
+    "npm:pi-btw"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
