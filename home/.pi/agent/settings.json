@@ -14,7 +14,6 @@
     "npm:@hypabolic/pi-hypa",
     "npm:context-mode",
     "npm:bigpowers",
-    "npm:@dietrichgebert/ponytail",
     "npm:@narumitw/pi-goal",
     "git:https://github.com/hasit/pi-community-themes",
     "npm:pi-caveman",
@@ -24,11 +23,15 @@
     "npm:pi-opencode-bridge",
     "npm:glm-vision",
     "npm:pi-mcp-adapter",
-    "npm:pi-tool-display"
+    "npm:pi-tool-display",
+    "npm:@tintinweb/pi-tasks",
+    "git:github.com/DietrichGebert/ponytail"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "collapseChangelog": true,
   "quietStartup": true,
-  "defaultThinkingLevel": "high"
+  "defaultThinkingLevel": "high",
+  "enableInstallTelemetry": true,
+  "enableSkillCommands": true
 }
