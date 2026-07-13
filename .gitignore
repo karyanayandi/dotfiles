@@ -14,4 +14,5 @@ AGENTS.md
 .swarm/
 home/.tmux/plugins/
 config/opencode/commands/
+config/opencode/context-mode/
 config/opencode/plugins/
