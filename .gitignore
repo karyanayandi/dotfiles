@@ -7,6 +7,7 @@ opencode-notifier-state.json
 config/opencode/package-lock.json
 
 .opencode
+.ponytail-active
 dcp.jsonc
 openspec
 AGENTS.md
@@ -14,3 +15,4 @@ AGENTS.md
 home/.tmux/plugins/
 config/opencode/commands/
 config/opencode/plugins/
+
