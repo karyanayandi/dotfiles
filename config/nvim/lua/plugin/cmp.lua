@@ -1,4 +1,3 @@
-
 local icons = require "config.icons"
 
 return {
@@ -254,7 +253,7 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpDocBorder", { bg = colors.base02, fg = colors.base05 })
     vim.api.nvim_set_hl(0, "BlinkCmpDocSeparator", { bg = colors.base02, fg = colors.base05 })
 
-    vim.api.nvim_set_hl(0, "BlinkCmpItemKindCopilot", { fg = colors.base0E })
+    vim.api.nvim_set_hl(0, "BlinkCmpItemKindCopilot", { fg = colors.base0C })
     vim.api.nvim_set_hl(0, "BlinkCmpKindRipgrep", { fg = colors.base0F })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindEmoji", { fg = colors.base0C })
     vim.api.nvim_set_hl(0, "BlinkCmpItemKindNerdFonts", { fg = colors.base0A })
