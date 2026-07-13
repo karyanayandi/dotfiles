@@ -48,16 +48,83 @@ return {
       return vim.fs.find(files, { upward = true, path = dir, limit = 1 })[1] ~= nil
     end
 
+    -- Project/workspace boundary: stop here so we never read an unrelated project's config.
+    local project_root_markers = {
+      "pnpm-workspace.yaml",
+      "lerna.json",
+      "turbo.json",
+      "nx.json",
+      "rush.json",
+      "bun.lockb", -- bun workspaces hoist the lockfile to the repo root
+      "yarn.lock", -- yarn workspaces hoist the lockfile to the repo root
+    }
+    local function package_has_workspaces(pkg)
+      local ok, data = pcall(vim.json.decode, table.concat(vim.fn.readfile(pkg), "\n"))
+      return ok and data and data.workspaces ~= nil
+    end
+    local function find_project_root(dir)
+      local git = vim.fs.find(".git", { upward = true, path = dir, limit = 1 })[1]
+      if git then
+        return vim.fs.dirname(git)
+      end
+      local marker = vim.fs.find(project_root_markers, { upward = true, path = dir, limit = 1 })[1]
+      if marker then
+        return vim.fs.dirname(marker)
+      end
+      -- npm/yarn/bun workspaces declared via "workspaces" in a (root) package.json
+      local pkgs = vim.fs.find("package.json", { upward = true, path = dir, limit = math.huge })
+      for _, pkg in ipairs(pkgs) do
+        if package_has_workspaces(pkg) then
+          return vim.fs.dirname(pkg)
+        end
+      end
+      return nil
+    end
+
+    -- Topmost directory INSIDE the project containing one of `files`.
+    -- Monorepo -> root vite.config.ts; single project -> the only one. Bounded so it
+    -- can't escape to another project's config above the workspace root.
+    local function find_root_dir(dir, files)
+      local boundary = find_project_root(dir)
+      if not boundary then
+        -- not a git repo / no workspace manifest: use the nearest config to stay safe
+        local nearest = vim.fs.find(files, { upward = true, path = dir, limit = 1 })[1]
+        return nearest and vim.fs.dirname(nearest) or nil
+      end
+      local top
+      local current = dir
+      while current and current ~= vim.fs.dirname(current) do
+        for _, f in ipairs(files) do
+          if vim.fn.filereadable(current .. "/" .. f) == 1 then
+            top = current
+            break
+          end
+        end
+        if current == boundary then
+          break
+        end
+        current = vim.fs.dirname(current)
+      end
+      return top
+    end
+
     local function has_vite_plus(dir)
-      if not has_root_file(dir, vite_root_files) then
+      if not find_root_dir(dir, vite_root_files) then
         return false
       end
-      local pkg = vim.fs.find("package.json", { upward = true, path = dir, limit = 1 })[1]
-      if not pkg then
-        return false
+      -- scan package.json upward, but only inside the project (never above the boundary)
+      local boundary = find_project_root(dir)
+      local pkgs = vim.fs.find("package.json", { upward = true, path = dir, limit = math.huge })
+      for _, pkg in ipairs(pkgs) do
+        if boundary and vim.fs.relpath(boundary, pkg) == nil then
+          break -- crossed above the project boundary
+        end
+        local content = table.concat(vim.fn.readfile(pkg), "\n")
+        if content:find "vite%-plus" then
+          return true
+        end
       end
-      local content = table.concat(vim.fn.readfile(pkg), "\n")
-      return content:find "vite%-plus" ~= nil
+      return false
     end
 
     local function prettier_root(_, ctx)
@@ -66,8 +133,7 @@ return {
           return true
         end
         if name == "package.json" then
-          local ok, data =
-            pcall(vim.json.decode, table.concat(vim.fn.readfile(vim.fs.joinpath(path, name)), "\n"))
+          local ok, data = pcall(vim.json.decode, table.concat(vim.fn.readfile(vim.fs.joinpath(path, name)), "\n"))
           return ok and data.prettier ~= nil
         end
         return false
@@ -102,7 +168,9 @@ return {
 
     local biome_root = util.root_file(biome_root_files)
     local oxfmt_root = util.root_file(oxfmt_root_files)
-    local vite_root = util.root_file(vite_root_files)
+    local vite_root = function(self, ctx)
+      return find_root_dir(ctx.dirname, vite_root_files)
+    end
 
     local formatters_by_ft = {
       astro = javascript_formatter,
@@ -181,7 +249,7 @@ return {
             end
             return args
           end,
-          cwd = deno_root,
+          cwd = deno_root_files,
           require_cwd = true,
         },
         biome = {
