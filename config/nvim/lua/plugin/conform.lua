@@ -108,6 +108,19 @@ return {
       return top
     end
 
+    local function package_has_dep(pkg, name)
+      local ok, data = pcall(vim.json.decode, table.concat(vim.fn.readfile(pkg), "\n"))
+      if not ok or type(data) ~= "table" then
+        return false
+      end
+      for _, section in ipairs { "dependencies", "devDependencies", "peerDependencies" } do
+        if type(data[section]) == "table" and data[section][name] then
+          return true
+        end
+      end
+      return false
+    end
+
     local function has_vite_plus(dir)
       if not find_root_dir(dir, vite_root_files) then
         return false
@@ -119,8 +132,7 @@ return {
         if boundary and vim.fs.relpath(boundary, pkg) == nil then
           break -- crossed above the project boundary
         end
-        local content = table.concat(vim.fn.readfile(pkg), "\n")
-        if content:find "vite%-plus" then
+        if package_has_dep(pkg, "vite-plus") then
           return true
         end
       end
@@ -167,6 +179,7 @@ return {
     end
 
     local biome_root = util.root_file(biome_root_files)
+    local deno_root = util.root_file(deno_root_files)
     local oxfmt_root = util.root_file(oxfmt_root_files)
     local vite_root = function(self, ctx)
       return find_root_dir(ctx.dirname, vite_root_files)
@@ -249,7 +262,7 @@ return {
             end
             return args
           end,
-          cwd = deno_root_files,
+          cwd = deno_root,
           require_cwd = true,
         },
         biome = {
