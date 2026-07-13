@@ -130,7 +130,7 @@ window-rule {
     match app-id=r#"org.gnome.FileRoller$"#
     match app-id=r#"mpv$"#
     match app-id=r#"pavucontrol$"#
-    match app-id=r#"viewnior$"#
+    match app-id=r#"imv$"#
     match app-id=r#"yad$"#
     match app-id=r#"feh$"#
     match app-id=r#"xdg-open$"#
