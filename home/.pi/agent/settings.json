@@ -2,7 +2,7 @@
   "defaultModel": "kimi-k2.7-code:cloud",
   "defaultProvider": "ollama",
   "editorPaddingX": 1,
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "images": {
     "blockImages": false
   },
@@ -10,11 +10,11 @@
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "git:https://github.com/hasit/pi-community-themes",
+    "npm:@diegopetrucci/pi-todo",
     "npm:@ff-labs/pi-fff",
     "npm:@hypabolic/pi-hypa",
     "npm:@narumitw/pi-goal",
     "npm:@narumitw/pi-plan-mode",
-    "npm:@tintinweb/pi-tasks",
     "npm:bigpowers",
     "npm:context-mode",
     "npm:glm-vision",
