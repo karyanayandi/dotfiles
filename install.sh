@@ -38,7 +38,6 @@ yay -S --needed \
   gzip \
   helium-bin \
   hyprcursor \
-  hypridle \
   hyprlock \
   hyprpaper \
   hyprpicker \

@@ -1,8 +1,8 @@
 {
-  "defaultModel": "kimi-k2.7-code:cloud",
-  "defaultProvider": "ollama",
+  "defaultModel": "glm-5.2",
+  "defaultProvider": "zai",
   "editorPaddingX": 1,
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "images": {
     "blockImages": false
   },
