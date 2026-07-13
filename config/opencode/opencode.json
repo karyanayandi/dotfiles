@@ -72,10 +72,11 @@
     }
   },
   "plugin": [
+    "@dietrichgebert/ponytail",
     "@mohak34/opencode-notifier@latest",
     "@tarquinen/opencode-dcp@latest",
-    "superpowers@git+https://github.com/obra/superpowers.git",
-    "@dietrichgebert/ponytail"
+    "context-mode",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "provider": {
     "groupy": {
