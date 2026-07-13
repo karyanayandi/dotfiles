@@ -8,7 +8,6 @@
   },
   "lastChangelogVersion": "0.80.6",
   "packages": [
-    "npm:@ollama/pi-web-search",
     "npm:pi-observational-memory",
     "npm:pi-subagents",
     "npm:@hypabolic/pi-hypa",
@@ -25,7 +24,8 @@
     "npm:pi-mcp-adapter",
     "npm:pi-tool-display",
     "npm:@tintinweb/pi-tasks",
-    "git:github.com/DietrichGebert/ponytail"
+    "git:github.com/DietrichGebert/ponytail",
+    "npm:pi-web-access"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
