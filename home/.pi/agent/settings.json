@@ -1,12 +1,12 @@
 {
-  "defaultModel": "deepseek-v4-pro:cloud",
+  "defaultModel": "kimi-k2.7-code:cloud",
   "defaultProvider": "ollama",
   "editorPaddingX": 1,
   "hideThinkingBlock": false,
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.80.5",
+  "lastChangelogVersion": "0.80.6",
   "packages": [
     "npm:@ollama/pi-web-search",
     "npm:pi-observational-memory",
