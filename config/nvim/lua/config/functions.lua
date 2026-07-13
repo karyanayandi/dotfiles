@@ -369,4 +369,21 @@ function M.sort(opts)
   end
 end
 
+function M.sort_paragraph()
+  local mode = vim.fn.mode()
+  if mode:match "[vV]" then
+    M.sort {}
+    return
+  end
+  vim.cmd "normal! vap"
+  M.sort {}
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+end
+
+vim.api.nvim_create_user_command("Sort", function()
+  M.sort_paragraph()
+end, {
+  desc = "Sort current paragraph or selection",
+})
+
 return M

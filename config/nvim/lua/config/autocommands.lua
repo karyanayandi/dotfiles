@@ -171,6 +171,112 @@ end, {
   bang = true,
 })
 
+-- ponytail: manual vim-cool replacement: stop hlsearch when cursor leaves a match
+local function cool_should_stop()
+  if not vim.v.hlsearch or vim.fn.mode() ~= "n" then
+    return false
+  end
+  local pattern = vim.fn.getreg "/"
+  if pattern == "" then
+    return false
+  end
+  local flags = "cn"
+  local ok, pos = pcall(vim.fn.searchpos, pattern, flags, 0, 0)
+  if not ok or pos[1] == 0 then
+    return true
+  end
+  local cur = vim.api.nvim_win_get_cursor(0)
+  return pos[1] ~= cur[1] or pos[2] ~= cur[2]
+end
+
+local function cool_stop_hl()
+  vim.schedule(function()
+    vim.cmd "nohlsearch"
+  end)
+end
+
+vim.api.nvim_create_autocmd("CursorMoved", {
+  callback = function()
+    if cool_should_stop() then
+      cool_stop_hl()
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd("InsertEnter", {
+  callback = function()
+    if vim.v.hlsearch then
+      cool_stop_hl()
+    end
+  end,
+})
+
+-- ponytail: manual numb.nvim replacement: preview line number while typing in cmdline
+local function numb_save()
+  local win = vim.api.nvim_get_current_win()
+  local cursor = vim.api.nvim_win_get_cursor(win)
+  vim.w[win].numb_state = {
+    line = cursor[1],
+    col = cursor[2],
+    cursorline = vim.wo[win].cursorline,
+    number = vim.wo[win].number,
+    relativenumber = vim.wo[win].relativenumber,
+  }
+end
+
+local function numb_preview()
+  local win = vim.api.nvim_get_current_win()
+  local state = vim.w[win].numb_state
+  if not state then
+    return
+  end
+  local cmd = vim.fn.getcmdline()
+  if cmd:match "^%d+$" then
+    local count = vim.api.nvim_buf_line_count(0)
+    local target = tonumber(cmd)
+    if target and target >= 1 and target <= count then
+      vim.api.nvim_win_set_cursor(win, { target, 0 })
+      vim.wo[win].cursorline = true
+      vim.wo[win].number = true
+      return
+    end
+  end
+  vim.api.nvim_win_set_cursor(win, { state.line, state.col })
+  vim.wo[win].cursorline = state.cursorline
+  vim.wo[win].number = state.number
+  vim.wo[win].relativenumber = state.relativenumber
+end
+
+local function numb_restore()
+  local win = vim.api.nvim_get_current_win()
+  local state = vim.w[win].numb_state
+  if not state then
+    return
+  end
+  if vim.v.event.abort == 1 then
+    vim.api.nvim_win_set_cursor(win, { state.line, state.col })
+  end
+  vim.wo[win].cursorline = state.cursorline
+  vim.wo[win].number = state.number
+  vim.wo[win].relativenumber = state.relativenumber
+  vim.w[win].numb_state = nil
+end
+
+vim.api.nvim_create_autocmd("CmdlineEnter", {
+  pattern = ":",
+  callback = numb_save,
+})
+
+vim.api.nvim_create_autocmd("CmdlineChanged", {
+  pattern = ":",
+  callback = numb_preview,
+})
+
+vim.api.nvim_create_autocmd("CmdlineLeave", {
+  pattern = ":",
+  callback = numb_restore,
+})
+
 local codecompanion_augroup = vim.api.nvim_create_augroup("CodeCompanionFiletype", { clear = true })
 
 vim.api.nvim_create_autocmd({
