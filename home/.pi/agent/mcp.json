@@ -4,17 +4,20 @@
       "type": "stdio",
       "command": "bunx",
       "args": ["-y", "@upstash/context7-mcp", "--api-key", "{env:CONTEXT7_API_KEY}"],
-      "env": {}
+      "env": {},
+      "directTools": true
     },
     "playwriter": {
       "type": "stdio",
       "command": "bunx",
-      "args": ["-y", "playwriter@latest"]
+      "args": ["-y", "playwriter@latest"],
+      "directTools": true
     },
     "shadcn": {
       "type": "stdio",
       "command": "bunx",
-      "args": ["shadcn@latest", "mcp"]
+      "args": ["shadcn@latest", "mcp"],
+      "directTools": true
     },
     "zai-mcp-server": {
       "type": "stdio",
@@ -23,7 +26,8 @@
       "env": {
         "Z_AI_MODE": "ZAI",
         "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
-      }
+      },
+      "directTools": true
     },
     "web-search-prime": {
       "type": "remote",
