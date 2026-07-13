@@ -86,8 +86,10 @@ alias tree "exa --tree --group-directories-first --icons --ignore-glob '*node_mo
 alias u "paru -Syyu"
 alias update "paru -Syyu"
 alias update-time "sudo ntpd -qg"
+alias v vp
 alias vim nvim
 alias vis "sudo nvim"
+alias vr "vp run"
 alias x exit
 alias yay "paru"
 alias yz yazi
