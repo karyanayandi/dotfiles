@@ -1,4 +1,3 @@
-
 vim.g.use_nerd_icons = true
 
 return {
@@ -77,7 +76,7 @@ return {
     SignUntracked = "┋",
     Staged = "S",
     Unstaged = "",
-    Untracked = "★",
+    Untracked = "",
   },
   ui = {
     ArrowClosed = " ",
