@@ -31,6 +31,9 @@
     "npm:pi-web-access",
     "npm:pi-zentui"
   ],
+  "piVim": {
+    "clipboardMirror": "all"
+  },
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "collapseChangelog": true,
