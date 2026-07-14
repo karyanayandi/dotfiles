@@ -1,0 +1,96 @@
+{
+  "models": [
+    {
+      "base_instructions": "",
+      "context_window": 262144,
+      "default_verbosity": "low",
+      "display_name": "kimi-k2.7-code:cloud",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text"
+      ],
+      "priority": 0,
+      "shell_type": "default",
+      "slug": "kimi-k2.7-code:cloud",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "tokens"
+      },
+      "visibility": "list"
+    },
+    {
+      "base_instructions": "",
+      "context_window": 524288,
+      "default_verbosity": "low",
+      "display_name": "deepseek-v4-pro:cloud",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text"
+      ],
+      "priority": 1,
+      "shell_type": "default",
+      "slug": "deepseek-v4-pro:cloud",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "tokens"
+      },
+      "visibility": "list"
+    },
+    {
+      "base_instructions": "",
+      "context_window": 1048576,
+      "default_verbosity": "low",
+      "display_name": "deepseek-v4-flash:cloud",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text"
+      ],
+      "priority": 2,
+      "shell_type": "default",
+      "slug": "deepseek-v4-flash:cloud",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "tokens"
+      },
+      "visibility": "list"
+    },
+    {
+      "base_instructions": "",
+      "context_window": 1000000,
+      "default_verbosity": "low",
+      "display_name": "glm-5.2:cloud",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text"
+      ],
+      "priority": 3,
+      "shell_type": "default",
+      "slug": "glm-5.2:cloud",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "tokens"
+      },
+      "visibility": "list"
+    }
+  ]
+}
