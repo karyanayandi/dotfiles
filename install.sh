@@ -55,6 +55,7 @@ yay -S --needed \
   libxcrypt-compat \
   local-by-flywheel-bin \
   lshw \
+  lsof \
   lua \
   luarocks \
   mise \
