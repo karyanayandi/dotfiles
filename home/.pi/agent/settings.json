@@ -6,7 +6,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.80.6",
+  "lastChangelogVersion": "0.80.7",
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "git:https://github.com/hasit/pi-community-themes",
@@ -38,7 +38,7 @@
   "treeFilterMode": "all",
   "collapseChangelog": true,
   "quietStartup": true,
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "max",
   "enableInstallTelemetry": true,
   "enableSkillCommands": true
 }

@@ -6,9 +6,7 @@
       "default_verbosity": "low",
       "display_name": "kimi-k2.7-code:cloud",
       "experimental_supported_tools": [],
-      "input_modalities": [
-        "text"
-      ],
+      "input_modalities": ["text"],
       "priority": 0,
       "shell_type": "default",
       "slug": "kimi-k2.7-code:cloud",
@@ -29,9 +27,7 @@
       "default_verbosity": "low",
       "display_name": "deepseek-v4-pro:cloud",
       "experimental_supported_tools": [],
-      "input_modalities": [
-        "text"
-      ],
+      "input_modalities": ["text"],
       "priority": 1,
       "shell_type": "default",
       "slug": "deepseek-v4-pro:cloud",
@@ -52,9 +48,7 @@
       "default_verbosity": "low",
       "display_name": "deepseek-v4-flash:cloud",
       "experimental_supported_tools": [],
-      "input_modalities": [
-        "text"
-      ],
+      "input_modalities": ["text"],
       "priority": 2,
       "shell_type": "default",
       "slug": "deepseek-v4-flash:cloud",
@@ -75,9 +69,7 @@
       "default_verbosity": "low",
       "display_name": "glm-5.2:cloud",
       "experimental_supported_tools": [],
-      "input_modalities": [
-        "text"
-      ],
+      "input_modalities": ["text"],
       "priority": 3,
       "shell_type": "default",
       "slug": "glm-5.2:cloud",

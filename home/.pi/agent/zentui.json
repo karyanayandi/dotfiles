@@ -14,7 +14,7 @@
     "mode": "nerd"
   },
   "footerSegments": {
-    "cwd": false,
+    "cwd": true,
     "gitBranch": false,
     "gitStatus": false,
     "gitCounts": false,
@@ -25,7 +25,7 @@
     "runtime": false,
     "context": false,
     "cost": false,
-    "tokens": false
+    "tokens": true
   },
   "extensionStatuses": {
     "placements": {

@@ -1,6 +1,19 @@
-model = "kimi-k2.7-code:cloud"
+model = "glm-5.2:cloud"
 model_provider = "ollama-launch"
 model_catalog_json = "/home/karyana/.codex/model.json"
+model_reasoning_effort = "none"
+
+[model_reasoning_effort_overrides]
+"glm-5.2:cloud" = "max"
+"glm-5.2:cloud-mini" = "max"
+"deepseek-v4-flash:cloud" = "max"
+"deepseek-v4-pro:cloud" = "max"
+"kimi-k2.7-code:cloud" = "max"
+"kimi-k2.7:cloud" = "max"
+"minimax-m3:cloud" = "max"
+"nemotron-3-super:cloud" = "max"
+gemma4 = "max"
+"qwen3.6" = "max"
 
 [marketplaces.openai-bundled]
 last_updated = "2026-07-14T16:50:05Z"
@@ -63,10 +76,31 @@ NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunct
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
 BROWSER_USE_CODEX_APP_VERSION = "26.707.31428"
 
-[mcp_servers.node_repl.tools]
-
 [mcp_servers.node_repl.tools.js]
 approval_mode = "approve"
+
+[mcp_servers.context7]
+command = "bunx"
+args = [
+    "-y",
+    "@upstash/context7-mcp",
+    "--api-key",
+    "{env:CONTEXT7_API_KEY}",
+]
+
+[mcp_servers.playwriter]
+command = "bunx"
+args = [
+    "-y",
+    "playwriter@latest",
+]
+
+[mcp_servers.shadcn]
+command = "bunx"
+args = [
+    "shadcn@latest",
+    "mcp",
+]
 
 [desktop]
 conversationDetailMode = "STEPS_COMMANDS"
@@ -87,3 +121,21 @@ trust_level = "trusted"
 
 [projects."/home/karyana/Pictures/Logo/wakuwaku"]
 trust_level = "trusted"
+
+[projects."/home/karyana/Codes/projects/yui"]
+trust_level = "trusted"
+
+[projects."/home/karyana/.config/dotfiles"]
+trust_level = "trusted"
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+ANTHROPIC_BASE_URL = "http://localhost:20127"
+ANTHROPIC_MODEL = "ollamacloud/kimi-k2.7-code"
+ANTHROPIC_SMALL_FAST_MODEL = "ollamacloud/deepseek-v4-flash"
+ANTHROPIC_DEFAULT_OPUS_MODEL = "ollamacloud/glm-5.2"
+ANTHROPIC_DEFAULT_SONNET_MODEL = "ollamacloud/kimi-k2.7-code"
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "ollamacloud/deepseek-v4-pro"
+ANTHROPIC_AUTH_TOKEN = "sk-35a6bf73eb4f0c00-be8bb2-afd34a7a"
