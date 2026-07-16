@@ -48,27 +48,6 @@
         "Z_AI_MODE": "ZAI",
         "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
       }
-    },
-    "web-search-prime": {
-      "type": "remote",
-      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:Z_AI_API_KEY}"
-      }
-    },
-    "web-reader": {
-      "type": "remote",
-      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:Z_AI_API_KEY}"
-      }
-    },
-    "zread": {
-      "type": "remote",
-      "url": "https://api.z.ai/api/mcp/zread/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:Z_AI_API_KEY}"
-      }
     }
   },
   "plugin": [
@@ -79,34 +58,6 @@
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "provider": {
-    "groupy": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Groupy Phantom",
-      "options": {
-        "baseURL": "https://api.tokito.xyz/v1",
-        "apiKey": "sk-proxy-61eq3Y_SddabI0cmtydoNNAuKBxP4QU5"
-      },
-      "models": {
-        "claude/combogroupy": {
-          "name": "claude/combogroupy"
-        },
-        "claude/ollama/gpt-oss:120b": {
-          "name": "claude/ollama/gpt-oss:120b"
-        },
-        "claude/ollama/kimi-k2.5": {
-          "name": "claude/ollama/kimi-k2.5"
-        },
-        "claude/ollama/glm-5": {
-          "name": "claude/ollama/glm-5"
-        },
-        "claude/ollama/minimax-m2.5": {
-          "name": "claude/ollama/minimax-m2.5"
-        },
-        "claude/ollama/glm-4.7-flash": {
-          "name": "claude/ollama/glm-4.7-flash"
-        }
-      }
-    },
     "ollama": {
       "models": {
         "deepseek-v4-flash:cloud": {
