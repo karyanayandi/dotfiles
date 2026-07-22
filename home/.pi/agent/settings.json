@@ -6,7 +6,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.80.7",
+  "lastChangelogVersion": "0.81.1",
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "git:https://github.com/hasit/pi-community-themes",
@@ -15,25 +15,21 @@
     "npm:@hypabolic/pi-hypa",
     "npm:@narumitw/pi-goal",
     "npm:@narumitw/pi-plan-mode",
+    "npm:@ollama/pi-web-search",
     "npm:bigpowers",
     "npm:context-mode",
     "npm:glm-vision",
     "npm:pi-btw",
     "npm:pi-caveman",
+    "npm:pi-cursor-sdk",
     "npm:pi-mcp-adapter",
     "npm:pi-notify-agent",
-    "npm:pi-nvim",
     "npm:pi-observational-memory",
     "npm:pi-opencode-bridge",
     "npm:pi-subagents",
     "npm:pi-tool-display",
-    "npm:pi-vim",
-    "npm:pi-web-access",
     "npm:pi-zentui"
   ],
-  "piVim": {
-    "clipboardMirror": "all"
-  },
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "collapseChangelog": true,
