@@ -23,15 +23,28 @@
     "time": false,
     "os": false,
     "runtime": false,
-    "context": false,
+    "context": true,
     "cost": false,
-    "tokens": true
+    "tokens": true,
+    "packageVersion": false,
+    "gitCommit": false,
+    "gitMetrics": false
   },
   "extensionStatuses": {
     "placements": {
       "mcp": "off",
       "caveman": "off",
       "pi-vimmode": "off"
+    },
+    "colorModes": {
+      "mcp": "zentui",
+      "caveman": "zentui"
     }
+  },
+  "pathDisplay": {
+    "mode": "full"
+  },
+  "gitBranch": {
+    "maxLength": "full"
   }
 }

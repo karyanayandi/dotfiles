@@ -32,7 +32,7 @@
   "treeFilterMode": "all",
   "collapseChangelog": true,
   "quietStartup": true,
-  "defaultThinkingLevel": "max",
+  "defaultThinkingLevel": "high",
   "enableInstallTelemetry": true,
   "enableSkillCommands": true
 }

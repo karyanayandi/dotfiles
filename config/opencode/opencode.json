@@ -55,6 +55,7 @@
     "@mohak34/opencode-notifier@latest",
     "@tarquinen/opencode-dcp@latest",
     "context-mode",
+    "opencode-goal-plugin",
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "provider": {

@@ -11,7 +11,7 @@ bun add -g \
   firebase-tools@latest \
   neovim@latest \
   node-gyp@latest \
-  omniroute@latest \
+  opencode-goal-plugin \
   playwright@latest \
   playwriter@latest \
   tree-sitter@latest \
