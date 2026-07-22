@@ -107,6 +107,7 @@ yay -S --needed \
   unrar \
   unzip \
   usage \
+  uv \
   vicinae-bin \
   vivid \
   waybar \
