@@ -5,10 +5,10 @@ return {
       workspaceDictPath = "",
       fileDictPath = "",
       linters = {
-        SpellCheck = true,
+        SpellCheck = false,
         SpelledNumbers = false,
         AnA = true,
-        SentenceCapitalization = true,
+        SentenceCapitalization = false,
         UnclosedQuotes = true,
         WrongApostrophe = false,
         LongSentences = true,
