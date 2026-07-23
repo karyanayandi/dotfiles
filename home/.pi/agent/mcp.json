@@ -3,7 +3,10 @@
     "context7": {
       "type": "stdio",
       "command": "bash",
-      "args": ["-c", "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"],
+      "args": [
+        "-c",
+        "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"
+      ],
       "env": {},
       "directTools": true
     },
@@ -18,6 +21,11 @@
       "command": "bunx",
       "args": ["shadcn@latest", "mcp"],
       "directTools": true
+    },
+    "codebase-memory-mcp": {
+      "type": "stdio",
+      "command": "/usr/sbin/codebase-memory-mcp",
+      "args": []
     },
     "zai-mcp-server": {
       "type": "stdio",

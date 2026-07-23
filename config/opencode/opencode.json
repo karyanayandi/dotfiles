@@ -26,7 +26,11 @@
     "context7": {
       "enabled": true,
       "type": "local",
-      "command": ["bash", "-c", "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"]
+      "command": [
+        "bash",
+        "-c",
+        "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"
+      ]
     },
     "playwriter": {
       "command": ["bun", "x", "playwriter@latest"],
@@ -37,6 +41,10 @@
       "command": ["bun", "x", "shadcn@latest", "mcp"],
       "enabled": true,
       "type": "local"
+    },
+    "codebase-memory-mcp": {
+      "type": "local",
+      "command": ["/usr/sbin/codebase-memory-mcp"]
     },
     "zai-mcp-server": {
       "type": "local",
