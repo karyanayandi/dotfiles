@@ -15,6 +15,7 @@ yay -S --needed \
   bun \
   chafa \
   cmake \
+  codebase-memory-mcp-bin \
   cowsay \
   deno \
   distrobox \
