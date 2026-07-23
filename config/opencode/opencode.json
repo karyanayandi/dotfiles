@@ -25,11 +25,8 @@
   "mcp": {
     "context7": {
       "enabled": true,
-      "headers": {
-        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
-      },
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp"
+      "type": "local",
+      "command": ["bash", "-c", "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"]
     },
     "playwriter": {
       "command": ["bun", "x", "playwriter@latest"],

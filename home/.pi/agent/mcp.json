@@ -2,8 +2,8 @@
   "mcpServers": {
     "context7": {
       "type": "stdio",
-      "command": "bunx",
-      "args": ["-y", "@upstash/context7-mcp", "--api-key", "{env:CONTEXT7_API_KEY}"],
+      "command": "bash",
+      "args": ["-c", "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"],
       "env": {},
       "directTools": true
     },
@@ -25,7 +25,7 @@
       "args": ["zai-mcp-server@latest"],
       "env": {
         "Z_AI_MODE": "ZAI",
-        "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
+        "Z_AI_API_KEY": "${Z_AI_API_KEY}"
       },
       "directTools": true
     }
