@@ -1,4 +1,3 @@
-
 -- Conditionally enable LSP servers based on config files
 local function should_enable_biome()
   return vim.fn.glob "biome.json" ~= "" or vim.fn.glob "biome.jsonc" ~= ""
@@ -41,6 +40,7 @@ local servers = {
   "dockerls",
   "emmet_ls",
   "gopls",
+  "harper-ls",
   "html",
   "htmx",
   "intelephense",
