@@ -7,7 +7,7 @@
   "features": {
     "statusLine": true,
     "copyFriendly": true,
-    "editor": true
+    "editor": false
   },
   "contextStyle": "text",
   "icons": {
