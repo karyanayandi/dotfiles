@@ -26,7 +26,8 @@
     "npm:pi-opencode-bridge",
     "npm:pi-subagents",
     "npm:pi-tool-display",
-    "npm:pi-zentui"
+    "npm:pi-zentui",
+    "npm:@zeldrisho/pi-vite-plus"
   ],
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
