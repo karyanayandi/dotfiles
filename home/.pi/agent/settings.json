@@ -35,5 +35,7 @@
   "quietStartup": true,
   "defaultThinkingLevel": "max",
   "enableInstallTelemetry": true,
-  "enableSkillCommands": true
+  "enableSkillCommands": true,
+  "showHardwareCursor": false,
+  "defaultProjectTrust": "ask"
 }
