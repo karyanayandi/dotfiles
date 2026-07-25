@@ -7,7 +7,7 @@
   "features": {
     "statusLine": true,
     "copyFriendly": true,
-    "editor": false
+    "editor": true
   },
   "contextStyle": "text",
   "icons": {
@@ -28,7 +28,8 @@
     "tokens": true,
     "packageVersion": false,
     "gitCommit": false,
-    "gitMetrics": false
+    "gitMetrics": false,
+    "sessionName": false
   },
   "extensionStatuses": {
     "placements": {
@@ -42,12 +43,14 @@
     }
   },
   "pathDisplay": {
-    "mode": "full"
+    "mode": "full",
+    "depth": 0
   },
   "gitBranch": {
     "maxLength": "full"
   },
   "fixedEditor": {
     "enabled": true
-  }
+  },
+  "separator": "pipe"
 }
