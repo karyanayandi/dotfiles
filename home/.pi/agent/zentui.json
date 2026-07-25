@@ -11,7 +11,7 @@
   },
   "contextStyle": "text",
   "icons": {
-    "mode": "nerd"
+    "mode": "auto"
   },
   "footerSegments": {
     "cwd": true,
