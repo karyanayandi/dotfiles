@@ -30,7 +30,7 @@
   all: unset;
   background-alt: @gruvbox1;
   color: @text;
-  font-family: "CaskaydiaCove NFM", "Nerd Font", monospace;
+  font-family: "JetBrainsMono NFM", "Nerd Font", monospace;
   font-size: 14px;
   hover: @gruvbox4;
   opacity: 1;

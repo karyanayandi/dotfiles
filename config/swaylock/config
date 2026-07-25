@@ -33,7 +33,7 @@ text-caps-lock-color=d5c4a1
 text-ver-color=d5c4a1
 text-wrong-color=d5c4a1
 
-font=CaskaydiaCove NFM
+font=JetBrainsMono NFM
 font-size=35
 indicator-idle-visible
 indicator-radius=100
