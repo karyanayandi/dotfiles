@@ -4,7 +4,6 @@ bun add -g \
   @anthropic-ai/claude-code \
   @earendil-works/pi-coding-agent \
   @fission-ai/openspec@latest \
-  @hypabolic/hypa \
   @playwright/mcp@latest \
   agent-browser@latest \
   autocannon@latest \
