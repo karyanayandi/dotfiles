@@ -46,5 +46,8 @@
   },
   "gitBranch": {
     "maxLength": "full"
+  },
+  "fixedEditor": {
+    "enabled": true
   }
 }

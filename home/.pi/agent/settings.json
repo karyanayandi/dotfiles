@@ -6,7 +6,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.82.0",
+  "lastChangelogVersion": "0.82.1",
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "git:https://github.com/hasit/pi-community-themes",
