@@ -13,8 +13,8 @@ tmux set -g status-right-length 150
 RESET="#[fg=${THEME[foreground]},bg=${THEME[highlight]},nobold,noitalics,nounderscore,nodim]"
 
 tmux set -g mode-style "fg=${THEME[green]},bg=${THEME[active]}"
-tmux set -g message-style "bg=${THEME[blue]},fg=${THEME[background]}"
-tmux set -g message-command-style "fg=${THEME[foreground]},bg=${THEME[active]}"
+tmux set -g message-style "bg=${THEME[blue]},fg=${THEME[background]},fill=${THEME[blue]}"
+tmux set -g message-command-style "fg=${THEME[foreground]},bg=${THEME[active]},fill=${THEME[active]}"
 tmux set -g pane-border-style "fg=${THEME[active]}"
 tmux set -g pane-active-border-style "fg=${THEME[blue]}"
 tmux set -g pane-border-status off
