@@ -36,5 +36,6 @@
   "enableInstallTelemetry": true,
   "enableSkillCommands": true,
   "showHardwareCursor": false,
-  "defaultProjectTrust": "ask"
+  "defaultProjectTrust": "always",
+  "outputPad": 1
 }
