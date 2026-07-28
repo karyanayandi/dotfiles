@@ -26,6 +26,7 @@ yay -S --needed \
   ffmpeg \
   ffmpegthumbnailer \
   firefox-nightly-bin \
+  foot \
   fzf \
   gcc \
   gimp \
@@ -33,7 +34,7 @@ yay -S --needed \
   glxinfo \
   gnome-keyring \
   go \
-  google-chrome-dev \
+  google-chrome \
   grim \
   gvfs \
   gzip \
@@ -114,6 +115,7 @@ yay -S --needed \
   waybar \
   wf-recorder \
   wget \
+  wiremix \
   wl-clipboard \
   xdg-desktop-portal \
   xdg-desktop-portal-hyprland \
@@ -123,6 +125,7 @@ yay -S --needed \
   yaak-bin \
   yazi \
   yt-dlp \
+  zen-browser-bin \
   zip
 
 rustup toolchain install stable
