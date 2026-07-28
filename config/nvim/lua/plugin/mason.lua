@@ -37,7 +37,7 @@ M.servers = {
   "templ",
   -- "ts_ls",
   "vue_ls",
-  "vtsls",
+  "tsgo",
   "yamlls",
 }
 
