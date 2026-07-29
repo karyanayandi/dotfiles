@@ -15,7 +15,7 @@
   },
   "footerSegments": {
     "cwd": true,
-    "gitBranch": false,
+    "gitBranch": true,
     "gitStatus": false,
     "gitCounts": false,
     "sessionDuration": false,
@@ -43,7 +43,7 @@
     }
   },
   "pathDisplay": {
-    "mode": "full",
+    "mode": "basename",
     "depth": 0
   },
   "gitBranch": {
