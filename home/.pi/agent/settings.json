@@ -1,12 +1,18 @@
 {
+  "collapseChangelog": true,
   "defaultModel": "kimi-k2.7-code:cloud",
+  "defaultProjectTrust": "always",
   "defaultProvider": "ollama",
+  "defaultThinkingLevel": "max",
   "editorPaddingX": 1,
+  "enableInstallTelemetry": true,
+  "enableSkillCommands": true,
   "hideThinkingBlock": false,
   "images": {
     "blockImages": false
   },
   "lastChangelogVersion": "0.82.1",
+  "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "git:github.com/hasit/pi-community-themes",
@@ -28,14 +34,8 @@
     "npm:pi-tool-display",
     "npm:pi-zentui"
   ],
-  "theme": "gruvbox-dark-hard",
-  "treeFilterMode": "all",
-  "collapseChangelog": true,
   "quietStartup": true,
-  "defaultThinkingLevel": "max",
-  "enableInstallTelemetry": true,
-  "enableSkillCommands": true,
   "showHardwareCursor": false,
-  "defaultProjectTrust": "always",
-  "outputPad": 1
+  "theme": "gruvbox-dark-hard",
+  "treeFilterMode": "all"
 }
