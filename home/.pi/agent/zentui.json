@@ -28,7 +28,7 @@
     "tokens": true,
     "packageVersion": false,
     "gitCommit": false,
-    "gitMetrics": false,
+    "gitMetrics": true,
     "sessionName": false
   },
   "extensionStatuses": {
@@ -52,5 +52,7 @@
   "fixedEditor": {
     "enabled": true
   },
-  "separator": "pipe"
+  "separator": "pipe",
+  "responsiveFooter": true,
+  "compactFooterMaxLines": 2
 }
