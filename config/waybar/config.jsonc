@@ -6,8 +6,8 @@
   "margin-bottom": 10,
   "spacing": 4,
   "modules-center": [
-    "hyprland/workspaces",
-    "hyprland/mode",
+    "ext/workspaces",
+    "hyprland/submap",
     "disk",
     "memory",
     "bluetooth",
@@ -15,13 +15,14 @@
     "custom/notification",
     "clock"
   ],
-  "hyprland/workspaces": {
-    "disable-scroll": true,
+  "ext/workspaces": {
     "all-outputs": true,
-    "warp-on-scroll": false,
-    "format": "{name}"
+    "format": "{name}",
+    "on-click": "activate",
+    "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'",
+    "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'"
   },
-  "hyprland/mode": {
+  "hyprland/submap": {
     "format": "{}"
   },
   "clock": {

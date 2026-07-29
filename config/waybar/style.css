@@ -43,7 +43,7 @@ window#waybar {
   background-color: @urgent;
 }
 
-#mode {
+#submap {
   font-style: italic;
 }
 
