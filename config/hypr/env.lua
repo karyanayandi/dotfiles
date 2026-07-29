@@ -1,6 +1,6 @@
 hl.env("GTK_THEME", "adw-gtk3-dark")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
-hl.env("XCURSOR_THEME", "Bibata-Modern-Classic")
+hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("XCURSOR_SIZE", "24")
-hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Classic")
+hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("HYPRCURSOR_SIZE", "24")
