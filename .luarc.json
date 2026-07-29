@@ -1,5 +1,5 @@
 {
-  "diagnostics.globals": ["vim", "notify", "Snacks", "M"],
+  "diagnostics.globals": ["hl", "vim", "notify", "Snacks", "M"],
   "diagnostics.disable": [
     "missing-return",
     "duplicate-set-field",
