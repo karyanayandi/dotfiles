@@ -20,7 +20,6 @@ M.servers = {
   "emmet_ls",
   -- "eslint",
   "gopls",
-  "harper-ls",
   "html",
   "intelephense",
   "jsonls",

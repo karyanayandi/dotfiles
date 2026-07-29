@@ -40,7 +40,6 @@ local servers = {
   "dockerls",
   "emmet_ls",
   "gopls",
-  "harper-ls",
   "html",
   "htmx",
   "intelephense",
