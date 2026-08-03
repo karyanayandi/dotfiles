@@ -1,0 +1,13 @@
+--- .bun/install/global/node_modules/@earendil-works/pi-ai/dist/auth/oauth/github-copilot.js
++++ .bun/install/global/node_modules/@earendil-works/pi-ai/dist/auth/oauth/github-copilot.js
+@@ -64,7 +64,9 @@
+     const policy = asRecord(item.policy);
+     const capabilities = asRecord(item.capabilities);
+     const supports = asRecord(capabilities?.supports);
+-    return item.model_picker_enabled === true && policy?.state !== "disabled" && supports?.tool_calls !== false;
++    // pi 0.83.0 bug: GitHub returns model_picker_enabled:false for every model.
++    // Ignore the picker flag; only policy state + tool_calls gate availability.
++    return policy?.state !== "disabled" && supports?.tool_calls !== false;
+ }
+ function parseAvailableCopilotModelIds(raw) {
+     const data = asRecord(raw)?.data;

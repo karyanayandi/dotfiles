@@ -29,9 +29,9 @@ export interface SummaryConfig {
 }
 
 export const DEFAULT_SUMMARY_CONFIG: SummaryConfig = {
-  provider: "opencode",
-  model: "deepseek-v4-flash-free",
-  reasoning: "high",
+  provider: "github-copilot",
+  model: "gpt-4.1",
+  reasoning: "off",
 }
 
 const extensionDirectory = dirname(dirname(fileURLToPath(import.meta.url)))
