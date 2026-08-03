@@ -41,6 +41,7 @@ alias bn bun
 alias br "bun run"
 alias bx bunx
 alias c clear
+alias cat bat
 alias cdc "cd ~/.config/dotfiles"
 alias cdp "cd ~/Codes"
 alias cl clear
