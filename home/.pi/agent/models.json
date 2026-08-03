@@ -53,6 +53,20 @@
           "input": [
             "text"
           ]
+        },
+        {
+          "_launch": true,
+          "id": "deepseek-v4-flash:cloud",
+          "input": [
+            "text"
+          ]
+        },
+        {
+          "_launch": true,
+          "id": "deepseek-v4-flash:0731-cloud",
+          "input": [
+            "text"
+          ]
         }
       ]
     }

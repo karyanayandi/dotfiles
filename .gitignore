@@ -17,3 +17,4 @@ config/opencode/commands/
 config/opencode/context-mode/
 config/opencode/plugins/
 .pi/
+.pi-subagents/
