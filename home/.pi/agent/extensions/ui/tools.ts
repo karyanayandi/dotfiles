@@ -179,13 +179,20 @@ export function removeToolSpacing(): () => void {
   ): string[] {
     const rendered = originalRender.call(this, width)
     const { expanded } = this as unknown as { expanded: boolean }
-    let start = 0
-    while (start < rendered.length && rendered[start] === "") start++
-    if (start >= rendered.length) return []
+
+    const visibleAt = (line: string) => {
+      const plain = line.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
+      return plain.trim().length > 0
+    }
+
+    const firstVisible = rendered.findIndex(visibleAt)
+    if (firstVisible === -1) return []
+
+    if (!expanded) return [rendered[firstVisible]!]
+
     let end = rendered.length
-    if (!expanded) return [rendered[start]!]
-    while (end > start && rendered[end - 1] === "") end--
-    return rendered.slice(start, end)
+    while (end > firstVisible && !visibleAt(rendered[end - 1]!)) end--
+    return rendered.slice(firstVisible, end)
   }
   ToolExecutionComponent.prototype.render = compactRender
 
