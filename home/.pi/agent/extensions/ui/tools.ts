@@ -127,8 +127,10 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
   pi: ExtensionAPI,
   factory: ToolFactory<TParams, TDetails, TState>,
   renderer: CompactRenderer<TParams, TDetails>,
+  restores: Array<() => void>,
 ): void {
   const original = factory(process.cwd())
+  restores.push(() => pi.registerTool(original))
   pi.registerTool<TParams, TDetails, CompactToolState>({
     ...original,
     renderShell: "self",
@@ -214,7 +216,8 @@ function countDiff(details: EditToolDetails | undefined): string | undefined {
   return `+${additions} −${removals}`
 }
 
-export function registerCompactTools(pi: ExtensionAPI): void {
+export function registerCompactTools(pi: ExtensionAPI): Array<() => void> {
+  const restores: Array<() => void> = []
   registerCompactTool(pi, createReadToolDefinition, {
     call: (args) => {
       const start = args.offset
@@ -237,7 +240,7 @@ export function registerCompactTools(pi: ExtensionAPI): void {
         ? `${count} lines${result.details?.truncation?.truncated ? ", truncated" : ""}`
         : undefined
     },
-  })
+  }, restores)
 
   registerCompactTool(pi, createBashToolDefinition, {
     call: (args) => ({
@@ -246,7 +249,7 @@ export function registerCompactTools(pi: ExtensionAPI): void {
         ? { meta: `timeout ${args.timeout}s` }
         : {}),
     }),
-  })
+  }, restores)
 
   registerCompactTool(pi, createEditToolDefinition, {
     call: (args) => ({
@@ -262,7 +265,7 @@ export function registerCompactTools(pi: ExtensionAPI): void {
       isError
         ? expandedText(result)
         : (result.details?.diff ?? expandedText(result)),
-  })
+  }, restores)
 
   registerCompactTool(pi, createWriteToolDefinition, {
     call: (args) => {
@@ -281,7 +284,7 @@ export function registerCompactTools(pi: ExtensionAPI): void {
         : typeof args.content === "string"
           ? args.content
           : expandedText(result),
-  })
+  }, restores)
 
   registerCompactTool(pi, createGrepToolDefinition, {
     call: (args) => {
@@ -296,7 +299,7 @@ export function registerCompactTools(pi: ExtensionAPI): void {
       const count = lineCount(textOutput(result))
       return count > 0 ? `${count} lines` : undefined
     },
-  })
+  }, restores)
 
   registerCompactTool(pi, createFindToolDefinition, {
     call: (args) => ({
@@ -307,7 +310,7 @@ export function registerCompactTools(pi: ExtensionAPI): void {
       const count = lineCount(textOutput(result))
       return count > 0 ? `${count} files` : undefined
     },
-  })
+  }, restores)
 
   registerCompactTool(pi, createLsToolDefinition, {
     call: (args) => ({ subject: compactText(args.path, ".") }),
@@ -315,5 +318,6 @@ export function registerCompactTools(pi: ExtensionAPI): void {
       const count = lineCount(textOutput(result))
       return count > 0 ? `${count} entries` : undefined
     },
-  })
+  }, restores)
+  return restores
 }

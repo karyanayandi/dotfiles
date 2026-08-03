@@ -3,6 +3,7 @@ import { dirname, join } from "node:path"
 import {
   CustomEditor,
   type ExtensionAPI,
+  type ExtensionUIContext,
   type KeybindingsManager,
   getAgentDir,
 } from "@earendil-works/pi-coding-agent"
@@ -36,10 +37,10 @@ function isHorizontalBorder(line: string): boolean {
   return /^─+$/.test(plain) || /^─── [↑↓] \d+ more ─*$/.test(plain)
 }
 
-type Layout = "full" | "minimal"
+type Layout = "full" | "minimal" | "off"
 
 function parseLayout(value: unknown): Layout | undefined {
-  if (value === "full" || value === "minimal") return value
+  if (value === "full" || value === "minimal" || value === "off") return value
   return undefined
 }
 
@@ -84,11 +85,32 @@ function writeLayout(
 }
 
 export default function ui(pi: ExtensionAPI) {
-  registerCompactTools(pi)
-  const restoreToolSpacing = removeToolSpacing()
+  let restoreToolSpacing: (() => void) | undefined
+  let restoreTools: Array<() => void> | undefined
+
+  const applyCompactTools = () => {
+    if (restoreTools) return
+    restoreTools = registerCompactTools(pi)
+    restoreToolSpacing = removeToolSpacing()
+  }
+
+  const removeCompactTools = () => {
+    if (!restoreTools) return
+    restoreToolSpacing?.()
+    restoreToolSpacing = undefined
+    for (const restore of restoreTools) restore()
+    restoreTools = undefined
+  }
+
+  if (
+    parseLayout(
+      readSettingsField(join(getAgentDir(), "settings.json"), "layout"),
+    ) !== "off"
+  )
+    applyCompactTools()
 
   pi.registerCommand("/ui", {
-    description: "Toggle UI layout between full and minimal",
+    description: "Toggle UI layout between full, minimal, and off",
     handler: async (args, ctx) => {
       const { layout: current, scope } = readLayout(
         ctx.cwd,
@@ -96,12 +118,13 @@ export default function ui(pi: ExtensionAPI) {
       )
       const arg = args.trim().toLowerCase()
       let next: Layout
-      if (arg === "full" || arg === "minimal") {
+      if (arg === "full" || arg === "minimal" || arg === "off") {
         next = arg
       } else {
         const choice = await ctx.ui.select(`UI layout (current: ${current})`, [
           "full",
           "minimal",
+          "off",
         ])
         if (!choice) return
         next = choice as Layout
@@ -112,6 +135,7 @@ export default function ui(pi: ExtensionAPI) {
       }
       writeLayout(ctx.cwd, scope, next)
       layout = next
+      applySessionUI(ctx)
       ctx.ui.notify(`UI layout: ${current} → ${next}`, "info")
       tui?.requestRender()
     },
@@ -134,6 +158,17 @@ export default function ui(pi: ExtensionAPI) {
   let spinnerTimer: ReturnType<typeof setInterval> | undefined
   const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
   let layout: Layout = "full"
+
+  const applySessionUI = (ctx: { ui: ExtensionUIContext }) => {
+    const isOff = layout === "off"
+    restoreMessages?.()
+    restoreMessages = isOff ? undefined : compactMessages(ctx.ui.theme)
+    ctx.ui.setFooter(isOff ? undefined : () => new EmptyFooter())
+    ctx.ui.setHiddenThinkingLabel(isOff ? undefined : "")
+    ctx.ui.setWorkingVisible(!isOff)
+    if (isOff) removeCompactTools()
+    else applyCompactTools()
+  }
 
   const startSpinner = () => {
     working = true
@@ -212,7 +247,7 @@ export default function ui(pi: ExtensionAPI) {
   }
 
   pi.on("agent_start", (_event, ctx) => {
-    ctx.ui.setWorkingVisible(false)
+    if (layout !== "off") ctx.ui.setWorkingVisible(false)
     succeeded = 0
     failed = 0
     startSpinner()
@@ -231,18 +266,14 @@ export default function ui(pi: ExtensionAPI) {
   })
 
   pi.on("message_start", (_event, ctx) => {
-    ctx.ui.setWorkingVisible(false)
+    if (layout !== "off") ctx.ui.setWorkingVisible(false)
   })
 
   pi.on("session_start", (event, ctx) => {
     stopped = false
     clearTerminalOnEditorMount = event.reason === "startup"
-    restoreMessages?.()
-    restoreMessages = compactMessages(ctx.ui.theme)
-    ctx.ui.setFooter(() => new EmptyFooter())
-    ctx.ui.setHiddenThinkingLabel("")
-    ctx.ui.setWorkingVisible(false)
     layout = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
+    applySessionUI(ctx)
     void refreshGit(ctx.cwd)
 
     class SimpleEditor extends CustomEditor {
@@ -263,6 +294,10 @@ export default function ui(pi: ExtensionAPI) {
       }
 
       override render(width: number): string[] {
+        if (layout === "off") {
+          this.setPaddingX(1)
+          return super.render(width)
+        }
         const isMinimal = layout === "minimal"
         this.borderColor = isMinimal ? () => "" : this.defaultBorderColor
         this.setPaddingX(2)
@@ -358,7 +393,7 @@ export default function ui(pi: ExtensionAPI) {
     stopped = true
     restoreMessages?.()
     restoreMessages = undefined
-    restoreToolSpacing()
+    removeCompactTools()
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()
