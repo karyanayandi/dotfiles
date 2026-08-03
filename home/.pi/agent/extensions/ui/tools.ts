@@ -23,7 +23,7 @@ import type { Static, TSchema } from "typebox"
 
 import { sanitizeTerminalText } from "./layout.js"
 
-interface CompactCall {
+export interface CompactCall {
   subject: string
   meta?: string
 }
@@ -49,7 +49,7 @@ type ToolFactory<TParams extends TSchema, TDetails, TState> = (
   cwd: string,
 ) => ToolDefinition<TParams, TDetails, TState>
 
-class SingleLine implements Component {
+export class SingleLine implements Component {
   constructor(private text: string) {}
 
   setText(text: string): void {
@@ -64,24 +64,26 @@ class SingleLine implements Component {
   invalidate(): void {}
 }
 
-function compactText(value: unknown, fallback = "…"): string {
+export function compactText(value: unknown, fallback = "…"): string {
   if (typeof value !== "string") return fallback
   const compact = value.replace(/\s+/g, " ").trim()
   return sanitizeTerminalText(compact) || fallback
 }
 
-function textOutput(result: AgentToolResult<unknown>): string {
+export function textOutput(result: AgentToolResult<unknown>): string {
   return result.content
     .flatMap((part) => (part.type === "text" ? [part.text] : []))
     .join("\n")
     .trimEnd()
 }
 
-function lineCount(text: string): number {
+export function lineCount(text: string): number {
   return text ? text.split("\n").length : 0
 }
 
-function errorSummary(result: AgentToolResult<unknown>): string | undefined {
+export function errorSummary(
+  result: AgentToolResult<unknown>,
+): string | undefined {
   const lines = textOutput(result)
     .split("\n")
     .map((line) => line.trim())
@@ -89,11 +91,15 @@ function errorSummary(result: AgentToolResult<unknown>): string | undefined {
   return lines.length > 0 ? compactText(lines.at(-1)) : undefined
 }
 
-function expandedText(result: AgentToolResult<unknown>): string {
+export function expandedText(result: AgentToolResult<unknown>): string {
   return textOutput(result)
 }
 
-function styleOutput(text: string, theme: Theme, isError: boolean): string {
+export function styleOutput(
+  text: string,
+  theme: Theme,
+  isError: boolean,
+): string {
   const color = isError ? "error" : "toolOutput"
   return text
     .split("\n")
@@ -218,106 +224,141 @@ function countDiff(details: EditToolDetails | undefined): string | undefined {
 
 export function registerCompactTools(pi: ExtensionAPI): Array<() => void> {
   const restores: Array<() => void> = []
-  registerCompactTool(pi, createReadToolDefinition, {
-    call: (args) => {
-      const start = args.offset
-      const end =
-        start !== undefined && args.limit !== undefined
-          ? start + args.limit - 1
+  registerCompactTool(
+    pi,
+    createReadToolDefinition,
+    {
+      call: (args) => {
+        const start = args.offset
+        const end =
+          start !== undefined && args.limit !== undefined
+            ? start + args.limit - 1
+            : undefined
+        const range =
+          start !== undefined
+            ? `lines ${start}${end !== undefined ? `–${end}` : "+"}`
+            : undefined
+        return {
+          subject: compactText(args.path),
+          ...(range ? { meta: range } : {}),
+        }
+      },
+      summary: (result) => {
+        const count = lineCount(textOutput(result))
+        return count > 0
+          ? `${count} lines${result.details?.truncation?.truncated ? ", truncated" : ""}`
           : undefined
-      const range =
-        start !== undefined
-          ? `lines ${start}${end !== undefined ? `–${end}` : "+"}`
-          : undefined
-      return {
-        subject: compactText(args.path),
-        ...(range ? { meta: range } : {}),
-      }
+      },
     },
-    summary: (result) => {
-      const count = lineCount(textOutput(result))
-      return count > 0
-        ? `${count} lines${result.details?.truncation?.truncated ? ", truncated" : ""}`
-        : undefined
-    },
-  }, restores)
+    restores,
+  )
 
-  registerCompactTool(pi, createBashToolDefinition, {
-    call: (args) => ({
-      subject: compactText(args.command),
-      ...(args.timeout !== undefined
-        ? { meta: `timeout ${args.timeout}s` }
-        : {}),
-    }),
-  }, restores)
-
-  registerCompactTool(pi, createEditToolDefinition, {
-    call: (args) => ({
-      subject: compactText(args.path),
-      ...(Array.isArray(args.edits)
-        ? {
-            meta: `${args.edits.length} block${args.edits.length === 1 ? "" : "s"}`,
-          }
-        : {}),
-    }),
-    summary: (result) => countDiff(result.details),
-    expanded: (result, _args, isError) =>
-      isError
-        ? expandedText(result)
-        : (result.details?.diff ?? expandedText(result)),
-  }, restores)
-
-  registerCompactTool(pi, createWriteToolDefinition, {
-    call: (args) => {
-      const count =
-        typeof args.content === "string" ? lineCount(args.content) : 0
-      return {
-        subject: compactText(args.path),
-        ...(count > 0
-          ? { meta: `${count} line${count === 1 ? "" : "s"}` }
+  registerCompactTool(
+    pi,
+    createBashToolDefinition,
+    {
+      call: (args) => ({
+        subject: compactText(args.command),
+        ...(args.timeout !== undefined
+          ? { meta: `timeout ${args.timeout}s` }
           : {}),
-      }
+      }),
     },
-    expanded: (result, args, isError) =>
-      isError
-        ? expandedText(result)
-        : typeof args.content === "string"
-          ? args.content
-          : expandedText(result),
-  }, restores)
+    restores,
+  )
 
-  registerCompactTool(pi, createGrepToolDefinition, {
-    call: (args) => {
-      const path = compactText(args.path, ".")
-      const glob = args.glob ? ` ${compactText(args.glob, "")}` : ""
-      return {
-        subject: `/${compactText(args.pattern, "")}/`,
-        meta: `in ${path}${glob}`,
-      }
+  registerCompactTool(
+    pi,
+    createEditToolDefinition,
+    {
+      call: (args) => ({
+        subject: compactText(args.path),
+        ...(Array.isArray(args.edits)
+          ? {
+              meta: `${args.edits.length} block${args.edits.length === 1 ? "" : "s"}`,
+            }
+          : {}),
+      }),
+      summary: (result) => countDiff(result.details),
+      expanded: (result, _args, isError) =>
+        isError
+          ? expandedText(result)
+          : (result.details?.diff ?? expandedText(result)),
     },
-    summary: (result) => {
-      const count = lineCount(textOutput(result))
-      return count > 0 ? `${count} lines` : undefined
-    },
-  }, restores)
+    restores,
+  )
 
-  registerCompactTool(pi, createFindToolDefinition, {
-    call: (args) => ({
-      subject: compactText(args.pattern),
-      meta: `in ${compactText(args.path, ".")}`,
-    }),
-    summary: (result) => {
-      const count = lineCount(textOutput(result))
-      return count > 0 ? `${count} files` : undefined
+  registerCompactTool(
+    pi,
+    createWriteToolDefinition,
+    {
+      call: (args) => {
+        const count =
+          typeof args.content === "string" ? lineCount(args.content) : 0
+        return {
+          subject: compactText(args.path),
+          ...(count > 0
+            ? { meta: `${count} line${count === 1 ? "" : "s"}` }
+            : {}),
+        }
+      },
+      expanded: (result, args, isError) =>
+        isError
+          ? expandedText(result)
+          : typeof args.content === "string"
+            ? args.content
+            : expandedText(result),
     },
-  }, restores)
+    restores,
+  )
 
-  registerCompactTool(pi, createLsToolDefinition, {
-    call: (args) => ({ subject: compactText(args.path, ".") }),
-    summary: (result) => {
-      const count = lineCount(textOutput(result))
-      return count > 0 ? `${count} entries` : undefined
+  registerCompactTool(
+    pi,
+    createGrepToolDefinition,
+    {
+      call: (args) => {
+        const path = compactText(args.path, ".")
+        const glob = args.glob ? ` ${compactText(args.glob, "")}` : ""
+        return {
+          subject: `/${compactText(args.pattern, "")}/`,
+          meta: `in ${path}${glob}`,
+        }
+      },
+      summary: (result) => {
+        const count = lineCount(textOutput(result))
+        return count > 0 ? `${count} lines` : undefined
+      },
     },
-  }, restores)
+    restores,
+  )
+
+  registerCompactTool(
+    pi,
+    createFindToolDefinition,
+    {
+      call: (args) => ({
+        subject: compactText(args.pattern),
+        meta: `in ${compactText(args.path, ".")}`,
+      }),
+      summary: (result) => {
+        const count = lineCount(textOutput(result))
+        return count > 0 ? `${count} files` : undefined
+      },
+    },
+    restores,
+  )
+
+  registerCompactTool(
+    pi,
+    createLsToolDefinition,
+    {
+      call: (args) => ({ subject: compactText(args.path, ".") }),
+      summary: (result) => {
+        const count = lineCount(textOutput(result))
+        return count > 0 ? `${count} entries` : undefined
+      },
+    },
+    restores,
+  )
   return restores
 }

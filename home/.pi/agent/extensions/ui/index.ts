@@ -22,6 +22,7 @@ import {
   sanitizeTerminalText,
 } from "./layout.js"
 import { compactMessages } from "./messages.js"
+import { registerOpenCodeTools } from "./opencode.js"
 import { registerCompactTools, removeToolSpacing } from "./tools.js"
 
 class EmptyFooter implements Component {
@@ -39,12 +40,23 @@ function isHorizontalBorder(line: string): boolean {
 
 type Layout = "full" | "minimal" | "off"
 
+type ToolDisplay = "minimal" | "off" | "opencode"
+
 function parseLayout(value: unknown): Layout | undefined {
   if (value === "full" || value === "minimal" || value === "off") return value
   return undefined
 }
 
-function readSettingsField(path: string, field: "layout"): unknown {
+function parseToolDisplay(value: unknown): ToolDisplay | undefined {
+  if (value === "minimal" || value === "off" || value === "opencode")
+    return value
+  return undefined
+}
+
+function readSettingsField(
+  path: string,
+  field: "layout" | "toolDisplay",
+): unknown {
   if (!existsSync(path)) return undefined
   try {
     const settings = JSON.parse(readFileSync(path, "utf8"))
@@ -68,10 +80,31 @@ function readLayout(
   return { layout: "full", scope: "global" }
 }
 
-function writeLayout(
+function readToolDisplay(
+  cwd: string,
+  projectTrusted: boolean,
+): { toolDisplay: ToolDisplay; scope: "global" | "project" } {
+  const globalPath = join(getAgentDir(), "settings.json")
+  const globalToolDisplay = parseToolDisplay(
+    readSettingsField(globalPath, "toolDisplay"),
+  )
+  const projectToolDisplay = projectTrusted
+    ? parseToolDisplay(
+        readSettingsField(join(cwd, ".pi/settings.json"), "toolDisplay"),
+      )
+    : undefined
+  if (projectToolDisplay)
+    return { toolDisplay: projectToolDisplay, scope: "project" }
+  if (globalToolDisplay)
+    return { toolDisplay: globalToolDisplay, scope: "global" }
+  return { toolDisplay: "minimal", scope: "global" }
+}
+
+function writeUiSetting(
   cwd: string,
   scope: "global" | "project",
-  layout: Layout,
+  field: "layout" | "toolDisplay",
+  value: Layout | ToolDisplay,
 ): void {
   const path =
     scope === "global"
@@ -79,7 +112,7 @@ function writeLayout(
       : join(cwd, ".pi/settings.json")
   const dir = dirname(path)
   const current = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {}
-  const next = { ...current, ui: { ...current.ui, layout } }
+  const next = { ...current, ui: { ...current.ui, [field]: value } }
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   writeFileSync(path, JSON.stringify(next, null, 2))
 }
@@ -87,6 +120,8 @@ function writeLayout(
 export default function ui(pi: ExtensionAPI) {
   let restoreToolSpacing: (() => void) | undefined
   let restoreTools: Array<() => void> | undefined
+  let restoreOpenCodeSpacing: (() => void) | undefined
+  let restoreOpenCodeTools: Array<() => void> | undefined
 
   const applyCompactTools = () => {
     if (restoreTools) return
@@ -94,49 +129,115 @@ export default function ui(pi: ExtensionAPI) {
     restoreToolSpacing = removeToolSpacing()
   }
 
-  const removeCompactTools = () => {
-    if (!restoreTools) return
-    restoreToolSpacing?.()
-    restoreToolSpacing = undefined
-    for (const restore of restoreTools) restore()
-    restoreTools = undefined
+  const applyOpenCodeTools = () => {
+    if (restoreOpenCodeTools) return
+    restoreOpenCodeTools = registerOpenCodeTools(pi)
+    restoreOpenCodeSpacing = removeToolSpacing()
   }
 
-  if (
-    parseLayout(
-      readSettingsField(join(getAgentDir(), "settings.json"), "layout"),
-    ) !== "off"
-  )
-    applyCompactTools()
+  const removeToolDisplay = () => {
+    if (restoreTools) {
+      restoreToolSpacing?.()
+      restoreToolSpacing = undefined
+      for (const restore of restoreTools) restore()
+      restoreTools = undefined
+    }
+    if (restoreOpenCodeTools) {
+      restoreOpenCodeSpacing?.()
+      restoreOpenCodeSpacing = undefined
+      for (const restore of restoreOpenCodeTools) restore()
+      restoreOpenCodeTools = undefined
+    }
+  }
 
-  pi.registerCommand("/ui", {
-    description: "Toggle UI layout between full, minimal, and off",
+  const startupLayout = parseLayout(
+    readSettingsField(join(getAgentDir(), "settings.json"), "layout"),
+  )
+  const startupToolDisplay = parseToolDisplay(
+    readSettingsField(join(getAgentDir(), "settings.json"), "toolDisplay"),
+  )
+  if (startupLayout !== "off" && startupToolDisplay !== "off") {
+    if (startupToolDisplay === "opencode") applyOpenCodeTools()
+    else applyCompactTools()
+  }
+
+  pi.registerCommand("ui", {
+    description: "Configure UI layout and tool display",
     handler: async (args, ctx) => {
-      const { layout: current, scope } = readLayout(
-        ctx.cwd,
-        ctx.isProjectTrusted(),
-      )
       const arg = args.trim().toLowerCase()
-      let next: Layout
-      if (arg === "full" || arg === "minimal" || arg === "off") {
-        next = arg
+      const [settingArg, valueArg] = arg.split(/\s+/, 2)
+      const isLayoutArg = (v: string | undefined) =>
+        v === "full" || v === "minimal" || v === "off"
+      const isToolDisplayArg = (v: string | undefined) =>
+        v === "opencode" || v === "off" || v === "minimal"
+
+      let setting: "layout" | "toolDisplay"
+      if (settingArg === "layout" || settingArg === "tools") {
+        setting = settingArg === "layout" ? "layout" : "toolDisplay"
+      } else if (settingArg === "full") {
+        setting = "layout"
+      } else if (settingArg === "opencode") {
+        setting = "toolDisplay"
       } else {
-        const choice = await ctx.ui.select(`UI layout (current: ${current})`, [
-          "full",
-          "minimal",
-          "off",
+        const choice = await ctx.ui.select("UI settings", [
+          "UI layout",
+          "Tool display",
         ])
         if (!choice) return
-        next = choice as Layout
+        setting = choice === "UI layout" ? "layout" : "toolDisplay"
+      }
+
+      const current =
+        setting === "layout"
+          ? readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
+          : readToolDisplay(ctx.cwd, ctx.isProjectTrusted()).toolDisplay
+      const scope =
+        setting === "layout"
+          ? readLayout(ctx.cwd, ctx.isProjectTrusted()).scope
+          : readToolDisplay(ctx.cwd, ctx.isProjectTrusted()).scope
+
+      let next: Layout | ToolDisplay | undefined
+      const value =
+        valueArg ??
+        (settingArg && settingArg !== "layout" && settingArg !== "tools"
+          ? settingArg
+          : undefined)
+      if (setting === "layout") {
+        if (isLayoutArg(value)) next = value as Layout
+        else {
+          const choice = await ctx.ui.select(
+            `UI layout (current: ${current})`,
+            ["full", "minimal", "off"],
+          )
+          if (!choice) return
+          next = choice as Layout
+        }
+      } else {
+        if (isToolDisplayArg(value)) next = value as ToolDisplay
+        else {
+          const choice = await ctx.ui.select(
+            `Tool display (current: ${current})`,
+            ["minimal", "opencode", "off"],
+          )
+          if (!choice) return
+          next = choice as ToolDisplay
+        }
       }
       if (next === current) {
-        ctx.ui.notify(`UI layout already ${current}`, "info")
+        ctx.ui.notify(
+          `${setting === "layout" ? "UI layout" : "Tool display"} already ${current}`,
+          "info",
+        )
         return
       }
-      writeLayout(ctx.cwd, scope, next)
-      layout = next
+      writeUiSetting(ctx.cwd, scope, setting, next)
+      if (setting === "layout") layout = next as Layout
+      else toolDisplay = next as ToolDisplay
       applySessionUI(ctx)
-      ctx.ui.notify(`UI layout: ${current} → ${next}`, "info")
+      ctx.ui.notify(
+        `${setting === "layout" ? "UI layout" : "Tool display"}: ${current} → ${next}`,
+        "info",
+      )
       tui?.requestRender()
     },
   })
@@ -158,6 +259,14 @@ export default function ui(pi: ExtensionAPI) {
   let spinnerTimer: ReturnType<typeof setInterval> | undefined
   const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
   let layout: Layout = "full"
+  let toolDisplay: ToolDisplay = "minimal"
+
+  const applyToolDisplay = () => {
+    removeToolDisplay()
+    if (layout === "off") return
+    if (toolDisplay === "opencode") applyOpenCodeTools()
+    else if (toolDisplay === "minimal") applyCompactTools()
+  }
 
   const applySessionUI = (ctx: { ui: ExtensionUIContext }) => {
     const isOff = layout === "off"
@@ -166,8 +275,7 @@ export default function ui(pi: ExtensionAPI) {
     ctx.ui.setFooter(isOff ? undefined : () => new EmptyFooter())
     ctx.ui.setHiddenThinkingLabel(isOff ? undefined : "")
     ctx.ui.setWorkingVisible(!isOff)
-    if (isOff) removeCompactTools()
-    else applyCompactTools()
+    applyToolDisplay()
   }
 
   const startSpinner = () => {
@@ -273,6 +381,7 @@ export default function ui(pi: ExtensionAPI) {
     stopped = false
     clearTerminalOnEditorMount = event.reason === "startup"
     layout = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
+    toolDisplay = readToolDisplay(ctx.cwd, ctx.isProjectTrusted()).toolDisplay
     applySessionUI(ctx)
     void refreshGit(ctx.cwd)
 
@@ -393,7 +502,7 @@ export default function ui(pi: ExtensionAPI) {
     stopped = true
     restoreMessages?.()
     restoreMessages = undefined
-    removeCompactTools()
+    removeToolDisplay()
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()
