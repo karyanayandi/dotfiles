@@ -32,6 +32,10 @@
         "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"
       ]
     },
+    "firecrawl": {
+      "type": "remote",
+      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+    },
     "playwriter": {
       "command": ["bun", "x", "playwriter@latest"],
       "enabled": true,
