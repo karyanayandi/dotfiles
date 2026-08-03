@@ -17,7 +17,6 @@
     "git:github.com/DietrichGebert/ponytail",
     "git:github.com/hasit/pi-community-themes",
     "git:github.com/karyanayandi/pi-tasks",
-    "npm:@ff-labs/pi-fff",
     "npm:@ollama/pi-web-search",
     "npm:context-mode",
     "npm:pi-caveman",
@@ -26,8 +25,11 @@
     "npm:pi-observational-memory",
     "npm:pi-tool-display"
   ],
-  "quietStartup": true,
+  "quietStartup": false,
   "showHardwareCursor": false,
-  "theme": "gruvbox-dark-hard",
-  "treeFilterMode": "all"
+  "theme": "ui-customization",
+  "treeFilterMode": "all",
+  "terminal": {
+    "showTerminalProgress": true
+  }
 }

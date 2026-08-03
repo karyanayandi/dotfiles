@@ -1,4 +1,7 @@
 {
+  "settings": {
+    "mcpFooterStatus": "off"
+  },
   "mcpServers": {
     "context7": {
       "type": "stdio",
