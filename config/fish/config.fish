@@ -41,12 +41,11 @@ alias bn bun
 alias br "bun run"
 alias bx bunx
 alias c clear
-alias cat bat
 alias cdc "cd ~/.config/dotfiles"
 alias cdp "cd ~/Codes"
 alias cl clear
 alias clean "pacman -Qtdq | sudo pacman -Rns -"
-alias clean-code "find . -type d \( -name node_modules -o -name .next -o -name .turbo -o -name .output -o -name dist \) -exec rm -rf {} + -o -type f -name '*.astro' -exec rm -f {} +"
+alias clean-code "find . -type d \( -name node_modules -o -name .next -o -name .turbo -o -name .output -o -name dist \) -exec rm -rf {} +"
 alias dbox distrobox
 alias delete "paru -Rns"
 alias docker podman
@@ -96,12 +95,7 @@ alias yz yazi
 alias countline "rg --files | xargs wc -l | sort -n"
 
 ## Keybinding
-set fish_key_bindings fish_default_key_bindings
 source ~/.config/fish/functions/keybind.fish
-
-function fish_user_key_bindings
-  fish_vi_key_bindings
-end
 
 # go
 set -x GOPATH $HOME/go
@@ -125,6 +119,7 @@ export FZF_DEFAULT_COMMAND="rg -uu \
           --files \
           -H"
 
+set fzf_preview_dir_cmd eza --all --color=always
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 envsource ~/.env

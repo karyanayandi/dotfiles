@@ -29,7 +29,8 @@
     "packageVersion": false,
     "gitCommit": false,
     "gitMetrics": true,
-    "sessionName": false
+    "sessionName": false,
+    "modelInfo": false
   },
   "extensionStatuses": {
     "placements": {
@@ -40,7 +41,8 @@
     "colorModes": {
       "mcp": "zentui",
       "caveman": "zentui"
-    }
+    },
+    "defaultPlacement": "off"
   },
   "pathDisplay": {
     "mode": "basename",
@@ -54,5 +56,11 @@
   },
   "separator": "pipe",
   "responsiveFooter": true,
-  "compactFooterMaxLines": 2
+  "compactFooterMaxLines": 2,
+  "gitCommit": {
+    "onlyDetached": true,
+    "showTag": true
+  },
+  "editorBorderColorMode": "adaptive",
+  "editorModelLabel": "name"
 }

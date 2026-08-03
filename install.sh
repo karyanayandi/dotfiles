@@ -89,7 +89,6 @@ yay -S --needed \
   reiserfsprogs \
   ripgrep \
   rustup \
-  rustup \
   sed \
   slurp \
   sof-firmware \

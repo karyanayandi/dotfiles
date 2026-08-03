@@ -1,15 +1,5 @@
 #!/bin/bash
 
-mkdir -p ~/Pictures/Screenshots ~/.config/swappy
-
-cat > ~/.config/swappy/config << 'SWAPPYCONF'
-[Default]
-save_dir=$HOME/Pictures/Screenshots
-save_filename_format=screenshot-%Y%m%d-%H%M%S.png
-early_exit=true
-auto_save=true
-SWAPPYCONF
-
 TMP=$(mktemp /tmp/screenshot-XXXXXX.png)
 grim -g "$(slurp -d)" "$TMP"
 

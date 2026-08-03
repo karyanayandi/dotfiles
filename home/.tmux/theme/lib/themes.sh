@@ -1,29 +1,15 @@
 #!/usr/bin/env bash
 
-# Get theme from environment variable, tmux option, or default to nord
+# Get theme from environment variable, tmux option, or default to gruvbox-dark-hard
 if [[ -n "$THEME_NAME" ]]; then
   SELECTED_THEME="$THEME_NAME"
 elif tmux show-option -gv @themes &>/dev/null; then
   SELECTED_THEME=$(tmux show-option -gv @themes)
 else
-  SELECTED_THEME="nord"
+  SELECTED_THEME="gruvbox-dark-hard"
 fi
 
 case $SELECTED_THEME in
-"gruvbox-dark-hard")
-  declare -A THEME=(
-    ["background"]="#1d2021"
-    ["foreground"]="#ebdbb2"
-    ["highlight"]="#504945"
-    ["active"]="#3c3836"
-    ["blue"]="#83a598"
-    ["cyan"]="#8ec07c"
-    ["green"]="#b8bb26"
-    ["red"]="#fb4934"
-    ["yellow"]="#fabd2f"
-  )
-  ;;
-
 "gruvbox-dark-hard-monochrome")
   declare -A THEME=(
     ["background"]="#1d2021"

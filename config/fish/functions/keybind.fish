@@ -3,8 +3,7 @@ function search_text
 end
 
 function fish_user_key_bindings
+    fish_vi_key_bindings
     bind -M insert \ct search_text
     bind -M default \ct search_text
 end
-
-fish_user_key_bindings
