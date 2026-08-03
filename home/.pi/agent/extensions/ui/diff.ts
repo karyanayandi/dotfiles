@@ -120,12 +120,106 @@ export function diffLines(oldLines: string[], newLines: string[]): DiffLine[] {
 const DIFF_COLLAPSED_LINES = 24
 const EXPAND_HINT = " • Ctrl+O to expand"
 
-function colorFor(
-  kind: DiffLine["kind"],
-): "toolDiffAdded" | "toolDiffRemoved" | "dim" {
-  if (kind === "add") return "toolDiffAdded"
-  if (kind === "remove") return "toolDiffRemoved"
-  return "dim"
+// Tinted diff row backgrounds, ported from pi-tool-display.
+interface Rgb {
+  r: number
+  g: number
+  b: number
+}
+
+const ADDITION_TINT_TARGET: Rgb = { r: 84, g: 190, b: 118 }
+const DELETION_TINT_TARGET: Rgb = { r: 232, g: 95, b: 122 }
+const ROW_BACKGROUND_MIX_RATIO = 0.35
+const ANSI_BG_RESET = "\x1b[49m"
+
+const BASE16: Rgb[] = [
+  { r: 0, g: 0, b: 0 },
+  { r: 128, g: 0, b: 0 },
+  { r: 0, g: 128, b: 0 },
+  { r: 128, g: 128, b: 0 },
+  { r: 0, g: 0, b: 128 },
+  { r: 128, g: 0, b: 128 },
+  { r: 0, g: 128, b: 128 },
+  { r: 192, g: 192, b: 192 },
+  { r: 128, g: 128, b: 128 },
+  { r: 255, g: 0, b: 0 },
+  { r: 0, g: 255, b: 0 },
+  { r: 255, g: 255, b: 0 },
+  { r: 0, g: 0, b: 255 },
+  { r: 255, g: 0, b: 255 },
+  { r: 0, g: 255, b: 255 },
+  { r: 255, g: 255, b: 255 },
+]
+
+function ansi256ToRgb(code: number): Rgb {
+  if (code <= 15) return BASE16[code] ?? { r: 0, g: 0, b: 0 }
+  if (code <= 231) {
+    const value = code - 16
+    const steps = [0, 95, 135, 175, 215, 255]
+    return {
+      r: steps[Math.floor(value / 36)] ?? 0,
+      g: steps[Math.floor((value % 36) / 6)] ?? 0,
+      b: steps[value % 6] ?? 0,
+    }
+  }
+  const gray = 8 + (code - 232) * 10
+  return { r: gray, g: gray, b: gray }
+}
+
+function parseAnsiColorCode(ansi: string | undefined): Rgb | null {
+  if (!ansi) return null
+  const trueColor = /^\x1b\[(?:38|48);2;(\d{1,3});(\d{1,3});(\d{1,3})m$/.exec(
+    ansi,
+  )
+  if (trueColor)
+    return { r: +trueColor[1]!, g: +trueColor[2]!, b: +trueColor[3]! }
+  const bit = /^\x1b\[(?:38|48);5;(\d{1,3})m$/.exec(ansi)
+  if (bit) return ansi256ToRgb(+bit[1]!)
+  return null
+}
+
+function mixRgb(base: Rgb, tint: Rgb, ratio: number): Rgb {
+  const clamped = Math.max(0, Math.min(1, ratio))
+  return {
+    r: base.r * (1 - clamped) + tint.r * clamped,
+    g: base.g * (1 - clamped) + tint.g * clamped,
+    b: base.b * (1 - clamped) + tint.b * clamped,
+  }
+}
+
+function rgbToBgAnsi(color: Rgb): string {
+  const round = (value: number) =>
+    Math.max(0, Math.min(255, Math.round(value)))
+  return `\x1b[48;2;${round(color.r)};${round(color.g)};${round(color.b)}m`
+}
+
+interface DiffPalette {
+  addRowBg?: string
+  removeRowBg?: string
+}
+
+function resolvePalette(theme: Theme): DiffPalette {
+  if (typeof theme.getBgAnsi !== "function") return {}
+  let baseBg: Rgb | null = null
+  for (const slot of ["toolSuccessBg", "toolPendingBg", "userMessageBg"] as const) {
+    try {
+      baseBg = parseAnsiColorCode(theme.getBgAnsi(slot))
+    } catch {
+      baseBg = null
+    }
+    if (baseBg) break
+  }
+  if (!baseBg) return {}
+  // Fixed green/red targets, mixed toward the container background so text
+  // stays readable on light and dark themes alike.
+  return {
+    addRowBg: rgbToBgAnsi(
+      mixRgb(baseBg, ADDITION_TINT_TARGET, ROW_BACKGROUND_MIX_RATIO),
+    ),
+    removeRowBg: rgbToBgAnsi(
+      mixRgb(baseBg, DELETION_TINT_TARGET, ROW_BACKGROUND_MIX_RATIO),
+    ),
+  }
 }
 
 export function renderDiffText(
@@ -134,6 +228,7 @@ export function renderDiffText(
   expanded: boolean,
 ): string {
   if (entries.length === 0) return ""
+  const palette = resolvePalette(theme)
   const maxNum = Math.max(
     0,
     ...entries.map((entry) => Math.max(entry.oldNum ?? 0, entry.newNum ?? 0)),
@@ -146,27 +241,36 @@ export function renderDiffText(
         return theme.fg("muted", sanitizeTerminalText(entry.content))
       return ""
     }
-    const marker =
-      entry.kind === "add" ? "+" : entry.kind === "remove" ? "-" : " "
+    const { kind } = entry
     const num =
-      entry.kind === "add"
+      kind === "add"
         ? entry.newNum
-        : entry.kind === "remove"
+        : kind === "remove"
           ? entry.oldNum
           : (entry.newNum ?? entry.oldNum)
     const numText =
       num !== null ? String(num).padStart(numWidth, " ") : " ".repeat(numWidth)
-    const color = colorFor(entry.kind)
-    const content =
-      entry.kind === "context"
-        ? sanitizeTerminalText(entry.content)
-        : theme.fg(color, sanitizeTerminalText(entry.content))
-    return (
-      theme.fg(color, marker) +
-      theme.fg(color, numText) +
-      theme.fg("dim", " │ ") +
-      content
-    )
+    const numColor =
+      kind === "add"
+        ? "toolDiffAdded"
+        : kind === "remove"
+          ? "toolDiffRemoved"
+          : "dim"
+    // OpenCode-style: ▌ bar indicator, colored line number, │ divider.
+    const marker =
+      kind === "context" ? " " : theme.fg(numColor, "▌")
+    const prefix = `${marker} ${theme.fg(numColor, numText)} ${theme.fg("dim", "│ ")}`
+    let line = prefix + sanitizeTerminalText(entry.content)
+    const rowBg =
+      kind === "add"
+        ? palette.addRowBg
+        : kind === "remove"
+          ? palette.removeRowBg
+          : undefined
+    // theme.fg only resets the foreground (\x1b[39m), so the row background
+    // survives every colored segment; close it at the end of the line.
+    if (rowBg) line = `${rowBg}${line}${ANSI_BG_RESET}`
+    return line
   }
 
   const lines = entries.map(render).filter((line) => line !== "")

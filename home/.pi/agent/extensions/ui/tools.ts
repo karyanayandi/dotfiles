@@ -179,6 +179,61 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
   })
 }
 
+export function renderDefaultCall(
+  name: string,
+  args: unknown,
+  theme: Theme,
+): string {
+  const summary =
+    args && typeof args === "object" && !Array.isArray(args)
+      ? Object.entries(args as Record<string, unknown>)
+          .map(([key, value]) => {
+            const text =
+              typeof value === "string"
+                ? compactText(value, "")
+                : typeof value === "object" && value !== null
+                  ? compactText(JSON.stringify(value).replace(/\s+/g, " "), "")
+                  : compactText(String(value), "")
+            return text ? `${key}=${truncateToWidth(text, 40, "…", true)}` : ""
+          })
+          .filter(Boolean)
+          .join(" ")
+      : ""
+  let text = theme.fg("toolTitle", theme.bold(name))
+  if (summary)
+    text += theme.fg("accent", ` ${truncateToWidth(summary, 80, "…", true)}`)
+  return text
+}
+
+type CallRenderer = (
+  args: unknown,
+  theme: Theme,
+  context: unknown,
+) => Component
+
+function patchDefaultCallRenderer(): () => void {
+  const proto = ToolExecutionComponent.prototype as unknown as {
+    getCallRenderer: () => CallRenderer | undefined
+  }
+  const original = proto.getCallRenderer
+  const patched = function (this: ToolExecutionComponent) {
+    const renderer = original.call(this)
+    if (renderer) return renderer
+    // Tools without a renderCall (MCP tools like ctx_*, web_search) only
+    // show their bare name by default; add a compact args summary.
+    const { toolName } = this as unknown as { toolName: string }
+    return (args: unknown, theme: Theme): Component =>
+      new Text(renderDefaultCall(toolName, args, theme), 0, 0)
+  }
+  proto.getCallRenderer = patched
+  return () => {
+    const current = ToolExecutionComponent.prototype as unknown as {
+      getCallRenderer: () => CallRenderer | undefined
+    }
+    if (current.getCallRenderer === patched) current.getCallRenderer = original
+  }
+}
+
 export function removeToolSpacing(): () => void {
   const originalRender = ToolExecutionComponent.prototype.render
   const compactRender = function (
@@ -186,7 +241,6 @@ export function removeToolSpacing(): () => void {
     width: number,
   ): string[] {
     const rendered = originalRender.call(this, width)
-    const { expanded } = this as unknown as { expanded: boolean }
 
     const visibleAt = (line: string) => {
       const plain = line.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
@@ -196,18 +250,23 @@ export function removeToolSpacing(): () => void {
     const firstVisible = rendered.findIndex(visibleAt)
     if (firstVisible === -1) return []
 
-    if (!expanded) return [rendered[firstVisible]!]
-
+    // Show everything from the first visible line on, stripping the box
+    // padding. Each renderer already handles its own collapse: compact
+    // renderers return an empty Container when collapsed (so the single
+    // status line remains), opencode renderers cap output/diff inline and
+    // hide read-style results until Ctrl+O.
     let end = rendered.length
     while (end > firstVisible && !visibleAt(rendered[end - 1]!)) end--
     return rendered.slice(firstVisible, end)
   }
   ToolExecutionComponent.prototype.render = compactRender
+  const restoreCallRenderer = patchDefaultCallRenderer()
 
   return () => {
     if (ToolExecutionComponent.prototype.render === compactRender) {
       ToolExecutionComponent.prototype.render = originalRender
     }
+    restoreCallRenderer()
   }
 }
 

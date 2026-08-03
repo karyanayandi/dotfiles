@@ -58,3 +58,32 @@ test("renderDiffText collapses long diffs and numbers lines", () => {
 test("renderDiffText handles empty diff", () => {
   assert.equal(renderDiffText([], theme, false), "")
 })
+
+test("renderDiffText uses bars style with tinted row backgrounds", () => {
+  const richTheme = {
+    fg: (color: string, text: string) => `<${color}>${text}</${color}>`,
+    bold: (text: string) => `**${text}**`,
+    getFgAnsi: (color: string) =>
+      color === "toolDiffAdded"
+        ? "\u001b[38;2;131;165;152m"
+        : "\u001b[38;2;204;102;102m",
+    getBgAnsi: () => "\u001b[48;2;40;40;40m",
+  } as never
+  const [add, remove, context] = renderDiffText(
+    parseDiff("+1 const a = 1\n-2 const b = 2\n 3 const c = 3"),
+    richTheme,
+    true,
+  ).split("\n")
+  // Add/remove rows: ▌ bar + colored number + dim │ divider, tinted bg
+  assert.ok((add ?? "").includes("\u001b[48;2;"))
+  assert.match(add ?? "", /▌/)
+  assert.match(add ?? "", /│ /)
+  assert.match(add ?? "", /const a = 1/)
+  assert.ok((remove ?? "").includes("\u001b[48;2;"))
+  // Context rows: no bar, no background
+  assert.ok(!(context ?? "").includes("\u001b[48;2;"))
+  assert.match(
+    (context ?? "").replace(/<\/?\w+>/g, ""),
+    /^\s{2}3 │ const c = 3$/,
+  )
+})
