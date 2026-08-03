@@ -14,10 +14,16 @@ import type {
   AgentToolResult,
   ExtensionAPI,
   ExtensionContext,
+  Theme,
 } from "@earendil-works/pi-coding-agent"
-import { Text } from "@earendil-works/pi-tui"
+import {
+  Container,
+  Text,
+  truncateToWidth,
+  type Component,
+} from "@earendil-works/pi-tui"
 import { Cause, Data, Effect, Exit } from "effect"
-import { Type } from "typebox"
+import { type Static, Type } from "typebox"
 import { StringEnum } from "@earendil-works/pi-ai"
 import {
   buildFdArgs,
@@ -75,6 +81,56 @@ export function installNotifications(binaries: readonly ResolvedBinary[]) {
         `file-search: no system ${binary.tool} found — downloaded ${binary.tool} ${binary.version ?? ""}`.trimEnd() +
         ` to ${repositoryBinDir()}`,
     )
+}
+
+class SingleLine implements Component {
+  constructor(private text: string) {}
+
+  setText(text: string): void {
+    this.text = text
+  }
+
+  render(width: number): string[] {
+    if (width <= 0) return []
+    return [truncateToWidth(this.text, width, "…", true)]
+  }
+
+  invalidate(): void {}
+}
+
+function statusIcon(theme: Theme, isPartial: boolean, isError: boolean): string {
+  return isPartial
+    ? theme.fg("muted", "·")
+    : isError
+      ? theme.fg("error", "✕")
+      : theme.fg("success", "✓")
+}
+
+function compactLine(
+  name: string,
+  subject: string,
+  meta: string | undefined,
+  flags: readonly string[],
+  theme: Theme,
+  isPartial: boolean,
+  isError: boolean,
+  summary?: string,
+): string {
+  let text = `${statusIcon(theme, isPartial, isError)} ${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", subject)}`
+  if (meta) text += theme.fg("muted", ` ${meta}`)
+  if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
+  if (summary) text += theme.fg(isError ? "error" : "muted", ` — ${summary}`)
+  return text
+}
+
+function errorSummary(result: AgentToolResult<unknown>): string | undefined {
+  const lines = result.content
+    .flatMap((part) => (part.type === "text" ? [part.text] : []))
+    .join("\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+  return lines.length > 0 ? lines.at(-1) : undefined
 }
 
 class SearchError extends Data.TaggedError("SearchError")<{
@@ -210,6 +266,7 @@ export default function fileSearchTools(pi: ExtensionAPI) {
   pi.registerTool<ReturnType<typeof fdParameters>, FdToolDetails>({
     name: "fd",
     label: "Find Files",
+    renderShell: "self",
     description: FD_TOOL_DESCRIPTION,
     promptSnippet: FD_PROMPT_SNIPPET,
     promptGuidelines: FD_PROMPT_GUIDELINES,
@@ -246,41 +303,58 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       return unwrapToolExit(exit, "fd")
     },
 
-    renderCall(args, theme) {
-      let text = theme.fg("toolTitle", theme.bold("fd "))
-      text += theme.fg("accent", args.pattern ? `"${args.pattern}"` : "(all)")
-      if (args.path) text += theme.fg("muted", ` in ${args.path}`)
-      const flags = [
-        args.type && `type=${args.type}`,
-        args.extension && `ext=${args.extension}`,
-        args.glob && "glob",
-        args.hidden && "hidden",
-        args.max_depth !== undefined && `depth≤${args.max_depth}`,
-      ].filter((flag): flag is string => typeof flag === "string")
-      if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
-      return new Text(text, 0, 0)
+    renderCall(args, theme, context) {
+      const line =
+        context.lastComponent instanceof SingleLine
+          ? context.lastComponent
+          : new SingleLine("")
+      context.state.line = line
+      line.setText(
+        compactLine(
+          "fd",
+          args.pattern ? `"${args.pattern}"` : "(all)",
+          args.path ? `in ${args.path}` : undefined,
+          fdFlags(args),
+          theme,
+          context.isPartial,
+          context.isError,
+        ),
+      )
+      return line
     },
 
-    renderResult(result, { expanded, isPartial }, theme) {
-      if (isPartial) return new Text(theme.fg("warning", "Searching..."), 0, 0)
+    renderResult(result, { expanded, isPartial }, theme, context) {
       const details = result.details
-      if (!details || details.matchCount === 0) {
-        return new Text(theme.fg("dim", "No files found"), 0, 0)
-      }
-      let text = theme.fg(
-        "success",
-        `${details.matchCount} ${details.matchCount === 1 ? "entry" : "entries"}`,
+      const summary = context.isError
+        ? errorSummary(result)
+        : !details || details.matchCount === 0
+          ? "No files found"
+          : `${details.matchCount} ${details.matchCount === 1 ? "entry" : "entries"}${details.truncated ? " (truncated)" : ""}`
+      context.state.line?.setText(
+        compactLine(
+          "fd",
+          context.args.pattern ? `"${context.args.pattern}"` : "(all)",
+          context.args.path ? `in ${context.args.path}` : undefined,
+          fdFlags(context.args),
+          theme,
+          isPartial,
+          context.isError,
+          summary,
+        ),
       )
-      if (details.truncated) text += theme.fg("warning", " (truncated)")
-      if (expanded)
-        text += expandedPreview(result, details.fullOutputPath, theme)
-      return new Text(text, 0, 0)
+      if (!expanded) return new Container()
+      const preview =
+        details && details.matchCount > 0
+          ? expandedPreview(result, details.fullOutputPath, theme)
+          : ""
+      return preview ? new Text(preview, 0, 0) : new Container()
     },
   })
 
   pi.registerTool<ReturnType<typeof rgParameters>, RgToolDetails>({
     name: "rg",
     label: "Search Content",
+    renderShell: "self",
     description: RG_TOOL_DESCRIPTION,
     promptSnippet: RG_PROMPT_SNIPPET,
     promptGuidelines: RG_PROMPT_GUIDELINES,
@@ -317,37 +391,76 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       return unwrapToolExit(exit, "rg")
     },
 
-    renderCall(args, theme) {
-      let text = theme.fg("toolTitle", theme.bold("rg "))
-      text += theme.fg("accent", `"${args.pattern}"`)
-      if (args.path) text += theme.fg("muted", ` in ${args.path}`)
-      const flags = [
-        args.glob && `glob=${args.glob}`,
-        args.file_type && `type=${args.file_type}`,
-        args.fixed_strings && "literal",
-        args.hidden && "hidden",
-        args.context !== undefined && `ctx=${args.context}`,
-      ].filter((flag): flag is string => typeof flag === "string")
-      if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
-      return new Text(text, 0, 0)
+    renderCall(args, theme, context) {
+      const line =
+        context.lastComponent instanceof SingleLine
+          ? context.lastComponent
+          : new SingleLine("")
+      context.state.line = line
+      line.setText(
+        compactLine(
+          "rg",
+          `"${args.pattern}"`,
+          args.path ? `in ${args.path}` : undefined,
+          rgFlags(args),
+          theme,
+          context.isPartial,
+          context.isError,
+        ),
+      )
+      return line
     },
 
-    renderResult(result, { expanded, isPartial }, theme) {
-      if (isPartial) return new Text(theme.fg("warning", "Searching..."), 0, 0)
+    renderResult(result, { expanded, isPartial }, theme, context) {
       const details = result.details
-      if (!details || details.outputLines === 0) {
-        return new Text(theme.fg("dim", "No matches found"), 0, 0)
-      }
-      let text = theme.fg(
-        "success",
-        `${details.outputLines} output ${details.outputLines === 1 ? "line" : "lines"}`,
+      const summary = context.isError
+        ? errorSummary(result)
+        : !details || details.outputLines === 0
+          ? "No matches found"
+          : `${details.outputLines} output ${details.outputLines === 1 ? "line" : "lines"}${details.truncated ? " (truncated)" : ""}`
+      context.state.line?.setText(
+        compactLine(
+          "rg",
+          `"${context.args.pattern}"`,
+          context.args.path ? `in ${context.args.path}` : undefined,
+          rgFlags(context.args),
+          theme,
+          isPartial,
+          context.isError,
+          summary,
+        ),
       )
-      if (details.truncated) text += theme.fg("warning", " (truncated)")
-      if (expanded)
-        text += expandedPreview(result, details.fullOutputPath, theme)
-      return new Text(text, 0, 0)
+      if (!expanded) return new Container()
+      const preview =
+        details && details.outputLines > 0
+          ? expandedPreview(result, details.fullOutputPath, theme)
+          : ""
+      return preview ? new Text(preview, 0, 0) : new Container()
     },
   })
+}
+
+type FdParams = Static<ReturnType<typeof fdParameters>>
+type RgParams = Static<ReturnType<typeof rgParameters>>
+
+function fdFlags(args: FdParams): string[] {
+  return [
+    args.type && `type=${args.type}`,
+    args.extension && `ext=${args.extension}`,
+    args.glob && "glob",
+    args.hidden && "hidden",
+    args.max_depth !== undefined && `depth≤${args.max_depth}`,
+  ].filter((flag): flag is string => typeof flag === "string")
+}
+
+function rgFlags(args: RgParams): string[] {
+  return [
+    args.glob && `glob=${args.glob}`,
+    args.file_type && `type=${args.file_type}`,
+    args.fixed_strings && "literal",
+    args.hidden && "hidden",
+    args.context !== undefined && `ctx=${args.context}`,
+  ].filter((flag): flag is string => typeof flag === "string")
 }
 
 const PREVIEW_LINES = 20
