@@ -22,20 +22,14 @@
       "args": ["shadcn@latest", "mcp"],
       "directTools": true
     },
+    "firecrawl": {
+      "type": "remote",
+      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+    },
     "codebase-memory-mcp": {
       "type": "stdio",
       "command": "/usr/sbin/codebase-memory-mcp",
       "args": []
-    },
-    "zai-mcp-server": {
-      "type": "stdio",
-      "command": "bunx",
-      "args": ["zai-mcp-server@latest"],
-      "env": {
-        "Z_AI_MODE": "ZAI",
-        "Z_AI_API_KEY": "${Z_AI_API_KEY}"
-      },
-      "directTools": true
     }
   }
 }

@@ -1,8 +1,8 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "kimi-k2.7-code:cloud",
+  "defaultModel": "deepseek-v4-flash-free",
   "defaultProjectTrust": "always",
-  "defaultProvider": "ollama",
+  "defaultProvider": "opencode",
   "defaultThinkingLevel": "max",
   "editorPaddingX": 1,
   "enableInstallTelemetry": true,
@@ -11,28 +11,20 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.82.1",
+  "lastChangelogVersion": "0.83.0",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "git:github.com/hasit/pi-community-themes",
     "git:github.com/karyanayandi/pi-tasks",
     "npm:@ff-labs/pi-fff",
-    "npm:@narumitw/pi-goal",
-    "npm:@narumitw/pi-plan-mode",
     "npm:@ollama/pi-web-search",
-    "npm:@zeldrisho/pi-vite-plus",
     "npm:context-mode",
-    "npm:glm-vision",
-    "npm:pi-ask-user",
-    "npm:pi-btw",
     "npm:pi-caveman",
     "npm:pi-mcp-adapter",
     "npm:pi-notify-agent",
     "npm:pi-observational-memory",
-    "npm:pi-subagents",
-    "npm:pi-tool-display",
-    "npm:pi-zentui"
+    "npm:pi-tool-display"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,
