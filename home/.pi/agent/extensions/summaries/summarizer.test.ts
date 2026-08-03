@@ -4,7 +4,7 @@ import { parseRecapResponse, reasoningOptions } from "./src/summarizer.ts"
 
 test("omits reasoning when configured off", () => {
   assert.deepEqual(reasoningOptions("off"), {})
-  assert.deepEqual(reasoningOptions("medium"), { reasoning: "medium" })
+  assert.deepEqual(reasoningOptions("high"), { reasoning: "high" })
 })
 
 test("parses strict recap JSON", () => {
