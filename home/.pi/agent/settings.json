@@ -19,7 +19,6 @@
     "npm:context-mode",
     "npm:pi-caveman",
     "npm:pi-mcp-adapter",
-    "npm:pi-notify-agent",
     "npm:pi-observational-memory",
     "npm:pi-tool-display",
     "npm:pi-zentui"

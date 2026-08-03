@@ -74,8 +74,7 @@ function createClient() {
   if (!apiKey) {
     return Effect.fail(
       new MissingApiKeyError({
-        message:
-          "Missing FIRECRAWL_API_KEY in the environment or ~/.env",
+        message: "Missing FIRECRAWL_API_KEY in the environment or ~/.env",
       }),
     )
   }
