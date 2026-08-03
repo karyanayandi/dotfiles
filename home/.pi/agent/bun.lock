@@ -107,6 +107,18 @@
         "typescript": "^7.0.2",
       },
     },
+    "extensions/tasks": {
+      "name": "tasks",
+      "dependencies": {
+        "effect": "^4.0.0-beta.99",
+        "typebox": "^1.3.6",
+      },
+      "devDependencies": {
+        "@effect/tsgo": "^0.24.2",
+        "@types/node": "^26.1.1",
+        "typescript": "^7.0.2",
+      },
+    },
     "extensions/workflows": {
       "name": "workflows",
       "dependencies": {
@@ -1009,6 +1021,8 @@
     "subagents": ["subagents@workspace:extensions/subagents"],
 
     "summaries": ["summaries@workspace:extensions/summaries"],
+
+    "tasks": ["tasks@workspace:extensions/tasks"],
 
     "tinybench": ["tinybench@2.9.0", "", {}, "sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg=="],
 

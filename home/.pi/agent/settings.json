@@ -15,7 +15,6 @@
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
-    "git:github.com/karyanayandi/pi-tasks",
     "npm:@ollama/pi-web-search",
     "npm:context-mode",
     "npm:pi-caveman",
