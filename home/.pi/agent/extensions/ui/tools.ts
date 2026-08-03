@@ -123,15 +123,6 @@ function renderLine(
   return text
 }
 
-function bgFnForState(
-  theme: Theme,
-  state: { isPartial: boolean; isError: boolean },
-): (text: string) => string {
-  if (state.isPartial) return (text) => theme.bg("toolPendingBg", text)
-  if (state.isError) return (text) => theme.bg("toolErrorBg", text)
-  return (text) => theme.bg("toolSuccessBg", text)
-}
-
 function registerCompactTool<TParams extends TSchema, TDetails, TState>(
   pi: ExtensionAPI,
   factory: ToolFactory<TParams, TDetails, TState>,
@@ -156,7 +147,6 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
     },
     renderResult(result, { expanded }, theme, context) {
       const state = { isError: context.isError, isPartial: context.isPartial }
-      const bgFn = bgFnForState(theme, state)
       const summary = context.isError
         ? errorSummary(result)
         : renderer.summary?.(result, context.args)
@@ -175,7 +165,7 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
         renderer.expanded?.(result, context.args, context.isError) ??
         expandedText(result)
       return output
-        ? new Text(styleOutput(output, theme, context.isError), 0, 0, bgFn)
+        ? new Text(styleOutput(output, theme, context.isError), 0, 0)
         : new Container()
     },
   })
