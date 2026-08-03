@@ -1,8 +1,8 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "deepseek-v4-flash-free",
+  "defaultModel": "kimi-k2.7-code:cloud",
   "defaultProjectTrust": "always",
-  "defaultProvider": "opencode",
+  "defaultProvider": "ollama",
   "defaultThinkingLevel": "max",
   "editorPaddingX": 1,
   "enableInstallTelemetry": true,
@@ -22,13 +22,14 @@
     "npm:pi-mcp-adapter",
     "npm:pi-notify-agent",
     "npm:pi-observational-memory",
-    "npm:pi-tool-display"
+    "npm:pi-tool-display",
+    "npm:pi-zentui"
   ],
-  "quietStartup": false,
+  "quietStartup": true,
   "showHardwareCursor": false,
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "terminal": {
-    "showTerminalProgress": true
+    "showTerminalProgress": false
   }
 }
