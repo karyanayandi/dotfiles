@@ -15,7 +15,6 @@
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
-    "git:github.com/hasit/pi-community-themes",
     "git:github.com/karyanayandi/pi-tasks",
     "npm:@ollama/pi-web-search",
     "npm:context-mode",
@@ -27,7 +26,7 @@
   ],
   "quietStartup": false,
   "showHardwareCursor": false,
-  "theme": "ui-customization",
+  "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "terminal": {
     "showTerminalProgress": true
