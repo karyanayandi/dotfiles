@@ -1,5 +1,3 @@
-import { basename } from "node:path"
-
 import {
   CustomEditor,
   type ExtensionAPI,
@@ -197,25 +195,24 @@ export default function ui(pi: ExtensionAPI) {
         ]
           .filter(Boolean)
           .join(" ")
-        const directory = ctx.ui.theme.fg(
-          "success",
-          sanitizeTerminalText(basename(ctx.cwd)),
-        )
         const safeBranch = branch ? sanitizeTerminalText(branch) : undefined
         const gitStateIcon =
           dirty === undefined
             ? ""
-            : ` ${ctx.ui.theme.fg(dirty ? "error" : "success", dirty ? "✗" : "✓")}`
-        const projectStatus = safeBranch
-          ? `${directory} (${ctx.ui.theme.fg("accent", safeBranch)}${gitStateIcon})`
-          : directory
-        const projectStatusWithSpinner = working
-          ? `${projectStatus} ${ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")}`
-          : projectStatus
+            : ctx.ui.theme.fg(dirty ? "error" : "success", dirty ? "✗" : "✓")
+        const gitStatus =
+          safeBranch && gitStateIcon
+            ? `${ctx.ui.theme.fg("accent", safeBranch)} ${gitStateIcon}`
+            : safeBranch
+              ? ctx.ui.theme.fg("accent", safeBranch)
+              : undefined
+        const spinner = working
+          ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
+          : ""
 
         lines[top] = addBorderLabels(
           width,
-          projectStatusWithSpinner,
+          spinner,
           counts,
           (text) => this.borderColor(text),
         )
@@ -227,7 +224,12 @@ export default function ui(pi: ExtensionAPI) {
             )
         }
         const status = truncateToWidth(
-          `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
+          [
+            gitStatus,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
+          ]
+            .filter(Boolean)
+            .join(" · "),
           Math.max(0, width - 4),
           "…",
         )
