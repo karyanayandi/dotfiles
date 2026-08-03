@@ -1,7 +1,10 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import {
   CustomEditor,
   type ExtensionAPI,
   type KeybindingsManager,
+  getAgentDir,
 } from "@earendil-works/pi-coding-agent"
 import {
   truncateToWidth,
@@ -33,9 +36,86 @@ function isHorizontalBorder(line: string): boolean {
   return /^─+$/.test(plain) || /^─── [↑↓] \d+ more ─*$/.test(plain)
 }
 
+type Layout = "full" | "minimal"
+
+function parseLayout(value: unknown): Layout | undefined {
+  if (value === "full" || value === "minimal") return value
+  return undefined
+}
+
+function readSettingsField(path: string, field: "layout"): unknown {
+  if (!existsSync(path)) return undefined
+  try {
+    const settings = JSON.parse(readFileSync(path, "utf8"))
+    return settings.ui?.[field]
+  } catch {
+    return undefined
+  }
+}
+
+function readLayout(
+  cwd: string,
+  projectTrusted: boolean,
+): { layout: Layout; scope: "global" | "project" } {
+  const globalPath = join(getAgentDir(), "settings.json")
+  const globalLayout = parseLayout(readSettingsField(globalPath, "layout"))
+  const projectLayout = projectTrusted
+    ? parseLayout(readSettingsField(join(cwd, ".pi/settings.json"), "layout"))
+    : undefined
+  if (projectLayout) return { layout: projectLayout, scope: "project" }
+  if (globalLayout) return { layout: globalLayout, scope: "global" }
+  return { layout: "full", scope: "global" }
+}
+
+function writeLayout(
+  cwd: string,
+  scope: "global" | "project",
+  layout: Layout,
+): void {
+  const path =
+    scope === "global"
+      ? join(getAgentDir(), "settings.json")
+      : join(cwd, ".pi/settings.json")
+  const dir = dirname(path)
+  const current = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {}
+  const next = { ...current, ui: { ...current.ui, layout } }
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+  writeFileSync(path, JSON.stringify(next, null, 2))
+}
+
 export default function ui(pi: ExtensionAPI) {
   registerCompactTools(pi)
   const restoreToolSpacing = removeToolSpacing()
+
+  pi.registerCommand("/ui", {
+    description: "Toggle UI layout between full and minimal",
+    handler: async (args, ctx) => {
+      const { layout: current, scope } = readLayout(
+        ctx.cwd,
+        ctx.isProjectTrusted(),
+      )
+      const arg = args.trim().toLowerCase()
+      let next: Layout
+      if (arg === "full" || arg === "minimal") {
+        next = arg
+      } else {
+        const choice = await ctx.ui.select(`UI layout (current: ${current})`, [
+          "full",
+          "minimal",
+        ])
+        if (!choice) return
+        next = choice as Layout
+      }
+      if (next === current) {
+        ctx.ui.notify(`UI layout already ${current}`, "info")
+        return
+      }
+      writeLayout(ctx.cwd, scope, next)
+      layout = next
+      ctx.ui.notify(`UI layout: ${current} → ${next}`, "info")
+      tui?.requestRender()
+    },
+  })
 
   let tui: TUI | undefined
   let restoreMessages: (() => void) | undefined
@@ -53,6 +133,7 @@ export default function ui(pi: ExtensionAPI) {
   let spinnerFrame = 0
   let spinnerTimer: ReturnType<typeof setInterval> | undefined
   const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+  let layout: Layout = "full"
 
   const startSpinner = () => {
     working = true
@@ -161,9 +242,11 @@ export default function ui(pi: ExtensionAPI) {
     ctx.ui.setFooter(() => new EmptyFooter())
     ctx.ui.setHiddenThinkingLabel("")
     ctx.ui.setWorkingVisible(false)
+    layout = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
     void refreshGit(ctx.cwd)
 
     class SimpleEditor extends CustomEditor {
+      private readonly defaultBorderColor: (text: string) => string
       constructor(
         instance: TUI,
         theme: EditorTheme,
@@ -171,6 +254,7 @@ export default function ui(pi: ExtensionAPI) {
       ) {
         super(instance, theme, keybindings, { paddingX: 2 })
         tui = instance
+        this.defaultBorderColor = this.borderColor.bind(this)
         if (clearTerminalOnEditorMount) {
           clearTerminalOnEditorMount = false
           instance.terminal.clearScreen()
@@ -179,7 +263,32 @@ export default function ui(pi: ExtensionAPI) {
       }
 
       override render(width: number): string[] {
+        const isMinimal = layout === "minimal"
+        this.borderColor = isMinimal ? () => "" : this.defaultBorderColor
+        this.setPaddingX(2)
         const lines = super.render(width)
+        if (isMinimal) {
+          const indicator = working
+            ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
+            : ctx.ui.theme.fg("accent", "❯")
+          const firstEmpty = lines.findIndex((line) => line === "")
+          const firstContent = firstEmpty >= 0 ? firstEmpty + 1 : 0
+          if (firstContent < lines.length) {
+            let line = lines[firstContent]
+            const paddingX = this.getPaddingX()
+            let i = 0
+            let removed = 0
+            while (removed < paddingX && i < line.length && line[i] === " ") {
+              removed++
+              i++
+            }
+            line = indicator + " " + line.slice(i)
+            lines[firstContent] = truncateToWidth(line, width, "", true)
+          }
+          // Add a blank top margin and drop the bottom border.
+          return ["", ...lines.filter((line) => line !== "")]
+        }
+
         const borderIndices: number[] = []
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i]

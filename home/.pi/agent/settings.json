@@ -27,5 +27,8 @@
   "treeFilterMode": "all",
   "terminal": {
     "showTerminalProgress": false
+  },
+  "ui": {
+    "layout": "minimal"
   }
 }
