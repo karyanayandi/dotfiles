@@ -33,7 +33,7 @@
     "text": "",
     "thinkingText": "muted",
     "selectedBg": "selected",
-    "userMessageBg": "selected",
+    "userMessageBg": "bg",
     "userMessageText": "",
     "customMessageBg": "panelAlt",
     "customMessageText": "",
