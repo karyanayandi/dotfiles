@@ -210,11 +210,8 @@ export default function ui(pi: ExtensionAPI) {
           ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
           : ""
 
-        lines[top] = addBorderLabels(
-          width,
-          spinner,
-          counts,
-          (text) => this.borderColor(text),
+        lines[top] = addBorderLabels(width, spinner, counts, (text) =>
+          this.borderColor(text),
         )
         for (let i = top + 1; i < bottom; i++) {
           const line = lines[i]

@@ -57,7 +57,8 @@ class SingleLine implements Component {
   }
 
   render(width: number): string[] {
-    return width > 0 ? [truncateToWidth(this.text, width, "…")] : []
+    if (width <= 0) return []
+    return [truncateToWidth(this.text, width, "…", true)]
   }
 
   invalidate(): void {}
@@ -122,6 +123,15 @@ function renderLine(
   return text
 }
 
+function bgFnForState(
+  theme: Theme,
+  state: { isPartial: boolean; isError: boolean },
+): (text: string) => string {
+  if (state.isPartial) return (text) => theme.bg("toolPendingBg", text)
+  if (state.isError) return (text) => theme.bg("toolErrorBg", text)
+  return (text) => theme.bg("toolSuccessBg", text)
+}
+
 function registerCompactTool<TParams extends TSchema, TDetails, TState>(
   pi: ExtensionAPI,
   factory: ToolFactory<TParams, TDetails, TState>,
@@ -135,20 +145,18 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
       return factory(ctx.cwd).execute(toolCallId, params, signal, onUpdate, ctx)
     },
     renderCall(args, theme, context) {
+      const state = { isError: context.isError, isPartial: context.isPartial }
       const line =
         context.lastComponent instanceof SingleLine
           ? context.lastComponent
           : new SingleLine("")
       context.state.line = line
-      line.setText(
-        renderLine(original.name, renderer.call(args), theme, {
-          isError: context.isError,
-          isPartial: context.isPartial,
-        }),
-      )
+      line.setText(renderLine(original.name, renderer.call(args), theme, state))
       return line
     },
     renderResult(result, { expanded }, theme, context) {
+      const state = { isError: context.isError, isPartial: context.isPartial }
+      const bgFn = bgFnForState(theme, state)
       const summary = context.isError
         ? errorSummary(result)
         : renderer.summary?.(result, context.args)
@@ -157,7 +165,7 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
           original.name,
           renderer.call(context.args),
           theme,
-          { isError: context.isError, isPartial: context.isPartial },
+          state,
           summary,
         ),
       )
@@ -167,7 +175,7 @@ function registerCompactTool<TParams extends TSchema, TDetails, TState>(
         renderer.expanded?.(result, context.args, context.isError) ??
         expandedText(result)
       return output
-        ? new Text(styleOutput(output, theme, context.isError), 0, 0)
+        ? new Text(styleOutput(output, theme, context.isError), 0, 0, bgFn)
         : new Container()
     },
   })
@@ -180,9 +188,14 @@ export function removeToolSpacing(): () => void {
     width: number,
   ): string[] {
     const rendered = originalRender.call(this, width)
-    const lines = rendered[0] === "" ? rendered.slice(1) : rendered
     const { expanded } = this as unknown as { expanded: boolean }
-    return expanded ? lines : lines.slice(0, 1)
+    let start = 0
+    while (start < rendered.length && rendered[start] === "") start++
+    if (start >= rendered.length) return []
+    let end = rendered.length
+    if (!expanded) return [rendered[start]!]
+    while (end > start && rendered[end - 1] === "") end--
+    return rendered.slice(start, end)
   }
   ToolExecutionComponent.prototype.render = compactRender
 
