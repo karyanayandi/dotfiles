@@ -30,6 +30,6 @@
   },
   "ui": {
     "layout": "minimal",
-    "toolDisplay": "opencode"
+    "toolDisplay": "off"
   }
 }

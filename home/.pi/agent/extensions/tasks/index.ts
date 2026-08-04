@@ -14,10 +14,12 @@
  *   /tasks       — Interactive task management menu
  */
 
-import type {
-  ExtensionAPI,
-  ExtensionCommandContext,
-  ExtensionContext,
+import {
+  defineTool,
+  type ExtensionAPI,
+  type ExtensionCommandContext,
+  type ExtensionContext,
+  type ToolDefinition,
 } from "@earendil-works/pi-coding-agent"
 import { Effect, Exit, Cause } from "effect"
 import { randomUUID } from "node:crypto"
@@ -69,6 +71,9 @@ const TASK_TOOL_NAMES = new Set([
   "TaskStop",
   "TaskExecute",
 ])
+
+/** Exported tool definitions so the UI extension can apply custom rendering. */
+export const taskToolDefinitions: ToolDefinition[] = []
 
 /** How many turns without task tool usage before injecting a reminder. */
 const REMINDER_INTERVAL = 4
@@ -553,7 +558,7 @@ export default function tasks(pi: ExtensionAPI) {
 
   // ── Tool 1: TaskCreate ──
 
-  pi.registerTool({
+  const taskCreateDef = defineTool({
     name: "TaskCreate",
     label: "TaskCreate",
     description: `Use this tool to create a structured task list for your current coding session. This helps you track progress, organize complex tasks, and demonstrate thoroughness to the user.
@@ -640,10 +645,12 @@ All tasks are created with status \`pending\`.
       )
     },
   })
+  taskToolDefinitions.push(taskCreateDef)
+  pi.registerTool(taskCreateDef)
 
   // ── Tool 2: TaskList ──
 
-  pi.registerTool({
+  const taskListDef = defineTool({
     name: "TaskList",
     label: "TaskList",
     description: `Use this tool to list all tasks in the task list.
@@ -707,10 +714,12 @@ Use TaskGet with a specific task ID to view full details including description a
       return Promise.resolve(textResult(lines.join("\n")))
     },
   })
+  taskToolDefinitions.push(taskListDef)
+  pi.registerTool(taskListDef)
 
   // ── Tool 3: TaskGet ──
 
-  pi.registerTool({
+  const taskGetDef = defineTool({
     name: "TaskGet",
     label: "TaskGet",
     description: `Use this tool to retrieve a task by its ID from the task list.
@@ -776,10 +785,12 @@ Returns full task details:
       return Promise.resolve(textResult(lines.join("\n")))
     },
   })
+  taskToolDefinitions.push(taskGetDef)
+  pi.registerTool(taskGetDef)
 
   // ── Tool 4: TaskUpdate ──
 
-  pi.registerTool({
+  const taskUpdateDef = defineTool({
     name: "TaskUpdate",
     label: "TaskUpdate",
     description: `Use this tool to update a task in the task list.
@@ -929,10 +940,12 @@ Set up task dependencies:
       return Promise.resolve(textResult(msg))
     },
   })
+  taskToolDefinitions.push(taskUpdateDef)
+  pi.registerTool(taskUpdateDef)
 
   // ── Tool 5: TaskOutput ──
 
-  pi.registerTool({
+  const taskOutputDef = defineTool({
     name: "TaskOutput",
     label: "TaskOutput",
     description: `- Retrieves output from a running or completed task (background shell, agent, or remote session)
@@ -1050,10 +1063,12 @@ Set up task dependencies:
       )
     },
   })
+  taskToolDefinitions.push(taskOutputDef)
+  pi.registerTool(taskOutputDef)
 
   // ── Tool 6: TaskStop ──
 
-  pi.registerTool({
+  const taskStopDef = defineTool({
     name: "TaskStop",
     label: "TaskStop",
     description: `
@@ -1104,10 +1119,12 @@ Set up task dependencies:
       return textResult(`Task #${taskId} stopped successfully`)
     },
   })
+  taskToolDefinitions.push(taskStopDef)
+  pi.registerTool(taskStopDef)
 
   // ── Tool 7: TaskExecute ──
 
-  pi.registerTool({
+  const taskExecuteDef = defineTool({
     name: "TaskExecute",
     label: "TaskExecute",
     description: `Execute one or more tasks as subagents.
@@ -1226,6 +1243,8 @@ Set up task dependencies:
       return textResult(lines.join("\n\n"))
     },
   })
+  taskToolDefinitions.push(taskExecuteDef)
+  pi.registerTool(taskExecuteDef)
 
   // ── /tasks command ──
 

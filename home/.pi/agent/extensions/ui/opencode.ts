@@ -27,7 +27,7 @@ import {
   SingleLine,
   styleOutput,
   textOutput,
-} from "./tools.js"
+} from "./helpers.js"
 
 const BASH_COLLAPSED_LINES = 10
 const BASH_SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]

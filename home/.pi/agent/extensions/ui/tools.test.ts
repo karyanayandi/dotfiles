@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 
-import { renderDefaultCall } from "./tools.ts"
+import { renderDefaultCall } from "./helpers.ts"
 
 const theme = {
   fg: (color: string, text: string) => `<${color}>${text}</${color}>`,
@@ -20,7 +20,11 @@ test("renderDefaultCall shows name and compact args", () => {
 })
 
 test("renderDefaultCall truncates long values", () => {
-  const line = renderDefaultCall("ctx_execute", { code: "x".repeat(200) }, theme)
+  const line = renderDefaultCall(
+    "ctx_execute",
+    { code: "x".repeat(200) },
+    theme,
+  )
   const plain = line
     .replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
     .replace(/<\/?\w+>/g, "")

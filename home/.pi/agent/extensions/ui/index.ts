@@ -24,6 +24,7 @@ import {
 import { compactMessages } from "./messages.js"
 import { registerOpenCodeTools } from "./opencode.js"
 import { registerCompactTools, removeToolSpacing } from "./tools.js"
+import { installTaskToolPatch, setTaskDisplayMode } from "./tasks.js"
 
 class EmptyFooter implements Component {
   render(): string[] {
@@ -118,6 +119,8 @@ function writeUiSetting(
 }
 
 export default function ui(pi: ExtensionAPI) {
+  const restoreTaskToolPatch = installTaskToolPatch(pi)
+
   let restoreToolSpacing: (() => void) | undefined
   let restoreTools: Array<() => void> | undefined
   let restoreOpenCodeSpacing: (() => void) | undefined
@@ -125,17 +128,20 @@ export default function ui(pi: ExtensionAPI) {
 
   const applyCompactTools = () => {
     if (restoreTools) return
+    setTaskDisplayMode("minimal")
     restoreTools = registerCompactTools(pi)
     restoreToolSpacing = removeToolSpacing()
   }
 
   const applyOpenCodeTools = () => {
     if (restoreOpenCodeTools) return
+    setTaskDisplayMode("opencode")
     restoreOpenCodeTools = registerOpenCodeTools(pi)
     restoreOpenCodeSpacing = removeToolSpacing()
   }
 
   const removeToolDisplay = () => {
+    setTaskDisplayMode("off")
     if (restoreTools) {
       restoreToolSpacing?.()
       restoreToolSpacing = undefined
@@ -503,6 +509,7 @@ export default function ui(pi: ExtensionAPI) {
     restoreMessages?.()
     restoreMessages = undefined
     removeToolDisplay()
+    restoreTaskToolPatch()
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()
