@@ -29,7 +29,6 @@
     "showTerminalProgress": false
   },
   "ui": {
-    "layout": "minimal",
-    "toolDisplay": "off"
+    "layout": "minimal"
   }
 }
