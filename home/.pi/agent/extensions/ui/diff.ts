@@ -129,7 +129,7 @@ interface Rgb {
 
 const ADDITION_TINT_TARGET: Rgb = { r: 84, g: 190, b: 118 }
 const DELETION_TINT_TARGET: Rgb = { r: 232, g: 95, b: 122 }
-const ROW_BACKGROUND_MIX_RATIO = 0.35
+const ROW_BACKGROUND_MIX_RATIO = 0.12
 const ANSI_BG_RESET = "\x1b[49m"
 
 const BASE16: Rgb[] = [

@@ -3,7 +3,7 @@
   "defaultModel": "kimi-k2.7-code:cloud",
   "defaultProjectTrust": "always",
   "defaultProvider": "ollama",
-  "defaultThinkingLevel": "max",
+  "defaultThinkingLevel": "high",
   "editorPaddingX": 1,
   "enableInstallTelemetry": true,
   "enableSkillCommands": true,
@@ -29,6 +29,7 @@
     "showTerminalProgress": false
   },
   "ui": {
-    "layout": "minimal"
+    "layout": "minimal",
+    "toolDisplay": "opencode"
   }
 }

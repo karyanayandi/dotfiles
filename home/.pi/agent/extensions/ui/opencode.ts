@@ -54,7 +54,7 @@ const QUIET_COMMAND_PREFIXES = [
   "git push",
   "git stash",
   "git status",
-  "git tag",
+  "git log",
   "npm install",
   "pnpm install",
   "yarn install",
