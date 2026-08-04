@@ -21,7 +21,6 @@ import {
   addSideBorders,
   sanitizeTerminalText,
 } from "./layout.js"
-import { compactMessages } from "./messages.js"
 
 class EmptyFooter implements Component {
   render(): string[] {
@@ -85,7 +84,6 @@ function writeUiSetting(
 
 export default function ui(pi: ExtensionAPI) {
   let tui: TUI | undefined
-  let restoreMessages: (() => void) | undefined
   let succeeded = 0
   let failed = 0
   let branch: string | undefined
@@ -104,10 +102,7 @@ export default function ui(pi: ExtensionAPI) {
 
   const applySessionUI = (ctx: { ui: ExtensionUIContext }) => {
     const isOff = layout === "off"
-    restoreMessages?.()
-    restoreMessages = isOff ? undefined : compactMessages(ctx.ui.theme)
     ctx.ui.setFooter(isOff ? undefined : () => new EmptyFooter())
-    ctx.ui.setHiddenThinkingLabel(isOff ? undefined : "")
     ctx.ui.setWorkingVisible(!isOff)
   }
 
@@ -371,8 +366,6 @@ export default function ui(pi: ExtensionAPI) {
 
   pi.on("session_shutdown", () => {
     stopped = true
-    restoreMessages?.()
-    restoreMessages = undefined
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()
