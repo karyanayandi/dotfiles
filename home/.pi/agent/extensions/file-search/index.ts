@@ -15,6 +15,7 @@ import type {
   ExtensionAPI,
   ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
+import { Text } from "@earendil-works/pi-tui"
 import { Cause, Data, Effect, Exit } from "effect"
 import { Type } from "typebox"
 import { StringEnum } from "@earendil-works/pi-ai"
@@ -244,6 +245,37 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       )
       return unwrapToolExit(exit, "fd")
     },
+
+    renderCall(args, theme) {
+      let text = theme.fg("toolTitle", theme.bold("fd "))
+      text += theme.fg("accent", args.pattern ? `"${args.pattern}"` : "(all)")
+      if (args.path) text += theme.fg("muted", ` in ${args.path}`)
+      const flags = [
+        args.type && `type=${args.type}`,
+        args.extension && `ext=${args.extension}`,
+        args.glob && "glob",
+        args.hidden && "hidden",
+        args.max_depth !== undefined && `depth≤${args.max_depth}`,
+      ].filter((flag): flag is string => typeof flag === "string")
+      if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
+      return new Text(text, 0, 0)
+    },
+
+    renderResult(result, { expanded, isPartial }, theme) {
+      if (isPartial) return new Text(theme.fg("warning", "Searching..."), 0, 0)
+      const details = result.details
+      if (!details || details.matchCount === 0) {
+        return new Text(theme.fg("dim", "No files found"), 0, 0)
+      }
+      let text = theme.fg(
+        "success",
+        `${details.matchCount} ${details.matchCount === 1 ? "entry" : "entries"}`,
+      )
+      if (details.truncated) text += theme.fg("warning", " (truncated)")
+      if (expanded)
+        text += expandedPreview(result, details.fullOutputPath, theme)
+      return new Text(text, 0, 0)
+    },
   })
 
   pi.registerTool<ReturnType<typeof rgParameters>, RgToolDetails>({
@@ -284,7 +316,66 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       )
       return unwrapToolExit(exit, "rg")
     },
+
+    renderCall(args, theme) {
+      let text = theme.fg("toolTitle", theme.bold("rg "))
+      text += theme.fg("accent", `"${args.pattern}"`)
+      if (args.path) text += theme.fg("muted", ` in ${args.path}`)
+      const flags = [
+        args.glob && `glob=${args.glob}`,
+        args.file_type && `type=${args.file_type}`,
+        args.fixed_strings && "literal",
+        args.hidden && "hidden",
+        args.context !== undefined && `ctx=${args.context}`,
+      ].filter((flag): flag is string => typeof flag === "string")
+      if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
+      return new Text(text, 0, 0)
+    },
+
+    renderResult(result, { expanded, isPartial }, theme) {
+      if (isPartial) return new Text(theme.fg("warning", "Searching..."), 0, 0)
+      const details = result.details
+      if (!details || details.outputLines === 0) {
+        return new Text(theme.fg("dim", "No matches found"), 0, 0)
+      }
+      let text = theme.fg(
+        "success",
+        `${details.outputLines} output ${details.outputLines === 1 ? "line" : "lines"}`,
+      )
+      if (details.truncated) text += theme.fg("warning", " (truncated)")
+      if (expanded)
+        text += expandedPreview(result, details.fullOutputPath, theme)
+      return new Text(text, 0, 0)
+    },
   })
+}
+
+const PREVIEW_LINES = 20
+
+interface ThemeLike {
+  fg(color: string, text: string): string
+}
+
+function expandedPreview(
+  result: { content: { type: string; text?: string }[] },
+  fullOutputPath: string | undefined,
+  theme: ThemeLike,
+) {
+  let text = ""
+  const content = result.content[0]
+  if (content?.type === "text" && content.text) {
+    const lines = content.text.split("\n")
+    for (const line of lines.slice(0, PREVIEW_LINES)) {
+      text += `\n${theme.fg("dim", line)}`
+    }
+    if (lines.length > PREVIEW_LINES) {
+      text += `\n${theme.fg("muted", `... ${lines.length - PREVIEW_LINES} more lines`)}`
+    }
+  }
+  if (fullOutputPath) {
+    text += `\n${theme.fg("dim", `Full output: ${fullOutputPath}`)}`
+  }
+  return text
 }
 
 function fdParameters() {
