@@ -21,6 +21,8 @@ return {
           require "neotest-vitest",
           require "neotest-bun",
         },
+        -- open the output panel with the full error on run
+        output = { open_on_run = true },
       }
     end,
   },
