@@ -8,13 +8,11 @@ return {
   config = function(_, opts)
     require("pi-nvim").setup(opts)
 
-    vim.keymap.set({ "n", "v" }, "<leader>ad", "<cmd>Pi<CR>", { desc = "Pi dialog" })
-    vim.keymap.set("n", "<leader>aa", "<cmd>PiAsk<CR>", { desc = "Ask Pi" })
-    vim.keymap.set("n", "<leader>as", "<cmd>PiSend<CR>", { desc = "Pi send prompt" })
-    vim.keymap.set("n", "<leader>af", "<cmd>PiSendFile<CR>", { desc = "Pi send file" })
+    vim.keymap.set({ "n", "v" }, "<leader>aa", "<cmd>Pi<CR>", { desc = "Pi dialog" })
+    vim.keymap.set("n", "<leader>aS", "<cmd>PiSend<CR>", { desc = "Pi send prompt" })
+    vim.keymap.set("n", ";p", "<cmd>PiSend<CR>", { desc = "Pi send prompt" })
     vim.keymap.set("v", "<leader>av", "<cmd>PiSendSelection<CR>", { desc = "Pi send selection" })
-    vim.keymap.set("n", "<leader>ab", "<cmd>PiSendBuffer<CR>", { desc = "Pi send buffer" })
-    vim.keymap.set("n", "<leader>ap", "<cmd>PiPing<CR>", { desc = "Pi ping" })
-    vim.keymap.set("n", "<leader>aS", "<cmd>PiSessions<CR>", { desc = "Pi sessions" })
+    vim.keymap.set("n", "<leader>aP", "<cmd>PiPing<CR>", { desc = "Pi ping" })
+    vim.keymap.set("n", "<leader>as", "<cmd>PiSessions<CR>", { desc = "Pi sessions" })
   end,
 }
