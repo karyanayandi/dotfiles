@@ -170,7 +170,6 @@ end, {
   bang = true,
 })
 
--- ponytail: manual vim-cool replacement: stop hlsearch when cursor leaves a match
 local function cool_should_stop()
   if not vim.v.hlsearch or vim.fn.mode() ~= "n" then
     return false
@@ -210,7 +209,6 @@ vim.api.nvim_create_autocmd("InsertEnter", {
   end,
 })
 
--- ponytail: manual numb.nvim replacement: preview line number while typing in cmdline
 local function numb_save()
   local win = vim.api.nvim_get_current_win()
   local cursor = vim.api.nvim_win_get_cursor(win)
