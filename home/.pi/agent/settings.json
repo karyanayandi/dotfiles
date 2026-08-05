@@ -1,6 +1,6 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "kimi-k2.7-code:cloud",
+  "defaultModel": "deepseek-v4-flash:0731-cloud",
   "defaultProjectTrust": "always",
   "defaultProvider": "ollama",
   "defaultThinkingLevel": "high",
