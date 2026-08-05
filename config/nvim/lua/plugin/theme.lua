@@ -1,4 +1,3 @@
-
 return {
   {
     "RRethy/base16-nvim",
@@ -6,8 +5,6 @@ return {
     config = function()
       vim.cmd "colorscheme base16-gruvbox-dark-hard"
       local hl = vim.api.nvim_set_hl
-      -- base16-nvim doesn't theme neotest; wire it to existing groups
-      -- https://github.com/nvim-neotest/neotest
       hl(0, "NeotestPassed", { link = "DiagnosticOk" })
       hl(0, "NeotestFailed", { link = "DiagnosticError" })
       hl(0, "NeotestRunning", { link = "DiagnosticWarn" })
@@ -22,6 +19,12 @@ return {
       hl(0, "NeotestTest", { link = "Normal" })
       hl(0, "NeotestIndent", { link = "Normal" })
       hl(0, "NeotestExpandMarker", { link = "Normal" })
+      hl(0, "HopUnmatched", { link = "Comment" })
+      hl(0, "HopNextKey", { link = "String" })
+      hl(0, "HopNextKey1", { link = "Keyword", bold = true })
+      hl(0, "HopNextKey2", { link = "Type" })
+      hl(0, "HopCursorKey", { link = "Keyword", bold = true })
+      hl(0, "HopCurrentLine", { link = "CursorLine" })
     end,
   },
 }
