@@ -35,6 +35,14 @@ function isHorizontalBorder(line: string): boolean {
   return /^─+$/.test(plain) || /^─── [↑↓] \d+ more ─*$/.test(plain)
 }
 
+// pi-tui's editor draws a software caret as reverse-video (\x1b[7m…\x1b[0m).
+// Unlike the hardware cursor, that block is static text that ignores window
+// focus, so you can't tell which terminal has focus. Strip it so the only
+// visible caret is the hardware cursor, which every terminal ghosts on blur.
+function neutralizeFakeCursor(line: string): string {
+  return line.replace(/\u001b\[7m([\s\S]*?)\u001b\[0m/g, "$1")
+}
+
 type Layout = "full" | "minimal" | "off"
 
 function parseLayout(value: unknown): Layout | undefined {
@@ -261,6 +269,10 @@ export default function ui(pi: ExtensionAPI) {
         super(instance, theme, keybindings, { paddingX: 2 })
         tui = instance
         this.defaultBorderColor = this.borderColor.bind(this)
+        // Rely on the real terminal cursor for position so it ghosts when the
+        // window loses focus (like other TUIs) instead of pi's always-solid
+        // software block cursor. The fake cursor is stripped below.
+        instance.setShowHardwareCursor(true)
         if (clearTerminalOnEditorMount) {
           clearTerminalOnEditorMount = false
           instance.terminal.clearScreen()
@@ -271,12 +283,12 @@ export default function ui(pi: ExtensionAPI) {
       override render(width: number): string[] {
         if (layout === "off") {
           this.setPaddingX(1)
-          return super.render(width)
+          return super.render(width).map(neutralizeFakeCursor)
         }
         const isMinimal = layout === "minimal"
         this.borderColor = isMinimal ? () => "" : this.defaultBorderColor
         this.setPaddingX(2)
-        const lines = super.render(width)
+        const lines = super.render(width).map(neutralizeFakeCursor)
         if (isMinimal) {
           const indicator = working
             ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")

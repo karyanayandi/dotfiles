@@ -1,4 +1,6 @@
 font-family = JetBrainsMono NFM
 font-size = 13
+cursor-style = block
+cursor-style-blink = false
 
 theme = Gruvbox Dark Hard
