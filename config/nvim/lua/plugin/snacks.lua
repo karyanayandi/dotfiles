@@ -362,29 +362,29 @@ return {
       end
     end
 
-    -- opencode
-    function _OPENCODE_TOGGLE()
-      if vim.env.TMUX ~= nil and vim.env.TMUX ~= "" then
-        local pane_id = vim.g.opencode_tmux_pane
-        if pane_id then
-          vim.fn.system("tmux display-message -t " .. pane_id .. " -p '#{pane_id}' 2>/dev/null")
-          if vim.v.shell_error == 0 then
-            vim.fn.system("tmux kill-pane -t " .. pane_id)
-            vim.g.opencode_tmux_pane = nil
-            return
-          else
-            vim.g.opencode_tmux_pane = nil
-          end
-        end
-        local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'opencode'"
-        vim.g.opencode_tmux_pane = vim.fn.trim(result)
-      else
-        Snacks.terminal.toggle("opencode", {
-          interactive = true,
-          win = { position = "right", width = 0.4 },
-        })
-      end
-    end
+    --   -- opencode
+    --   function _OPENCODE_TOGGLE()
+    --     if vim.env.TMUX ~= nil and vim.env.TMUX ~= "" then
+    --       local pane_id = vim.g.opencode_tmux_pane
+    --       if pane_id then
+    --         vim.fn.system("tmux display-message -t " .. pane_id .. " -p '#{pane_id}' 2>/dev/null")
+    --         if vim.v.shell_error == 0 then
+    --           vim.fn.system("tmux kill-pane -t " .. pane_id)
+    --           vim.g.opencode_tmux_pane = nil
+    --           return
+    --         else
+    --           vim.g.opencode_tmux_pane = nil
+    --         end
+    --       end
+    --       local result = vim.fn.system "tmux split-window -h -p 40 -P -F '#{pane_id}' 'opencode'"
+    --       vim.g.opencode_tmux_pane = vim.fn.trim(result)
+    --     else
+    --       Snacks.terminal.toggle("opencode", {
+    --         interactive = true,
+    --         win = { position = "right", width = 0.4 },
+    --       })
+    --     end
+    --   end
   end,
   keys = {
     {
@@ -439,16 +439,16 @@ return {
       mode = { "n", "i" },
       desc = "Toggle Claude",
     },
+    -- {
+    --   ";o",
+    --   function()
+    --     _OPENCODE_TOGGLE()
+    --   end,
+    --   mode = { "n", "i" },
+    --   desc = "Toggle OpenCode",
+    -- },
     {
-      ";o",
-      function()
-        _OPENCODE_TOGGLE()
-      end,
-      mode = { "n", "i" },
-      desc = "Toggle OpenCode",
-    },
-    {
-      ";p",
+      ";a",
       function()
         _PI_TOGGLE()
       end,

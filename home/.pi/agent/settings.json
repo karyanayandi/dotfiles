@@ -19,6 +19,7 @@
     "npm:context-mode",
     "npm:pi-caveman",
     "npm:pi-mcp-adapter",
+    "npm:pi-nvim",
     "npm:pi-observational-memory",
     "npm:pi-tool-display"
   ],

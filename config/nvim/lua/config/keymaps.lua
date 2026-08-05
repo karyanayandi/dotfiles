@@ -68,14 +68,6 @@ keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
 keymap("n", ";v", "<cmd>vsplit<cr>", opts)
 keymap("n", ";s", "<cmd>split<cr>", opts)
 
--- AI
-keymap(
-  "n",
-  ";a",
-  "<cmd>PiAsk<cr>",
-  { desc = "Ask pi", noremap = true, silent = true }
-)
-
 -- Find
 keymap("n", ";f", "<cmd>FzfLua git_files<cr>", { desc = "Find git files", noremap = true, silent = true })
 keymap("n", ";d", "<cmd>FzfLua files<cr>", { desc = "Find files", noremap = true, silent = true })

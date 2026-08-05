@@ -117,16 +117,11 @@ return {
         "<cmd>w<CR>",
         desc = "Write",
       },
-      {
-        "<leader>ao",
-        "<cmd>lua _OPENCODE_TOGGLE()<CR>",
-        desc = "Open Opencode",
-      },
-      {
-        "<leader>ac",
-        "<cmd>lua _CLAUDE_TOGGLE()<CR>",
-        desc = "Open Claude",
-      },
+      -- {
+      --   "<leader>ao",
+      --   "<cmd>lua _OPENCODE_TOGGLE()<CR>",
+      --   desc = "Open Opencode",
+      -- },
       {
         "<leader>ap",
         "<cmd>lua _PI_TOGGLE()<CR>",
