@@ -147,8 +147,8 @@ export default function ui(pi: ExtensionAPI) {
           const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "—"]
           if (inputTokens > 0 || outputTokens > 0) {
             parts.push(
-              `\u{eaa1}${fmt(inputTokens)}`, // nf-cod-arrow_up: input
-              `\u{ea9a}${fmt(outputTokens)}`, // nf-cod-arrow_down: output
+              `\u{f062}${fmt(inputTokens)}`, // nf-fa-arrow_up: input
+              `\u{f063}${fmt(outputTokens)}`, // nf-fa-arrow_down: output
             )
           }
           const right = theme.fg("dim", parts.join(" | "))
