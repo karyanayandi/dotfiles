@@ -12,6 +12,7 @@ import {
   type Component,
   type EditorTheme,
   type TUI,
+  visibleWidth,
 } from "@earendil-works/pi-tui"
 import { Effect } from "effect"
 
@@ -21,6 +22,7 @@ import {
   addSideBorders,
   sanitizeTerminalText,
 } from "./layout.js"
+import type { ExtensionContext } from "@earendil-works/pi-coding-agent"
 
 class EmptyFooter implements Component {
   render(): string[] {
@@ -43,10 +45,16 @@ function neutralizeFakeCursor(line: string): string {
   return line.replace(/\u001b\[7m([\s\S]*?)\u001b\[0m/g, "$1")
 }
 
-type Layout = "full" | "minimal" | "off"
+type Layout = "full" | "lite" | "minimal" | "off"
 
 function parseLayout(value: unknown): Layout | undefined {
-  if (value === "full" || value === "minimal" || value === "off") return value
+  if (
+    value === "full" ||
+    value === "lite" ||
+    value === "minimal" ||
+    value === "off"
+  )
+    return value
   return undefined
 }
 
@@ -107,11 +115,53 @@ export default function ui(pi: ExtensionAPI) {
   let spinnerTimer: ReturnType<typeof setInterval> | undefined
   const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
   let layout: Layout = "full"
+  let inputTokens = 0
+  let outputTokens = 0
+  let tokensDirty = true
 
-  const applySessionUI = (ctx: { ui: ExtensionUIContext }) => {
-    const isOff = layout === "off"
-    ctx.ui.setFooter(isOff ? undefined : () => new EmptyFooter())
-    ctx.ui.setWorkingVisible(!isOff)
+  const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`)
+
+  const applySessionUI = (ctx: ExtensionContext) => {
+    if (layout === "lite") {
+      ctx.ui.setFooter((tui, theme) => ({
+        dispose() {},
+        invalidate() {},
+        render(width: number): string[] {
+          if (tokensDirty) {
+            tokensDirty = false
+            inputTokens = 0
+            outputTokens = 0
+            for (const e of ctx.sessionManager.getBranch()) {
+              if (e.type === "message" && e.message.role === "assistant") {
+                inputTokens += e.message.usage?.input ?? 0
+                outputTokens += e.message.usage?.output ?? 0
+              }
+            }
+          }
+          const left = theme.fg(
+            "dim",
+            sanitizeTerminalText(
+              `${ctx.model?.id ?? "no model"} · ${pi.getThinkingLevel()}`,
+            ),
+          )
+          const right = theme.fg(
+            "dim",
+            [
+              ctx.model ? fmt(ctx.model.contextWindow) : "—",
+              fmt(inputTokens),
+              fmt(outputTokens),
+            ].join(" | "),
+          )
+          const pad = " ".repeat(
+            Math.max(1, width - visibleWidth(left) - visibleWidth(right)),
+          )
+          return [truncateToWidth(left + pad + right, width)]
+        },
+      }))
+    } else {
+      ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
+    }
+    ctx.ui.setWorkingVisible(layout === "full" || layout === "minimal")
   }
 
   const startSpinner = () => {
@@ -138,7 +188,7 @@ export default function ui(pi: ExtensionAPI) {
       const arg = args.trim().toLowerCase()
       const [settingArg, valueArg] = arg.split(/\s+/, 2)
       const isLayoutArg = (v: string | undefined) =>
-        v === "full" || v === "minimal" || v === "off"
+        v === "full" || v === "lite" || v === "minimal" || v === "off"
 
       let next: Layout | undefined
       const value =
@@ -147,10 +197,12 @@ export default function ui(pi: ExtensionAPI) {
         next = value as Layout
       } else {
         const current = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
-        const choice = await ctx.ui.select(
-          `UI layout (current: ${current})`,
-          ["full", "minimal", "off"],
-        )
+        const choice = await ctx.ui.select(`UI layout (current: ${current})`, [
+          "full",
+          "lite",
+          "minimal",
+          "off",
+        ])
         if (!choice) return
         next = choice as Layout
       }
@@ -229,6 +281,11 @@ export default function ui(pi: ExtensionAPI) {
     }
   }
 
+  pi.on("message_end", () => {
+    tokensDirty = true
+    tui?.requestRender()
+  })
+
   pi.on("agent_start", (_event, ctx) => {
     if (layout !== "off") ctx.ui.setWorkingVisible(false)
     succeeded = 0
@@ -256,6 +313,9 @@ export default function ui(pi: ExtensionAPI) {
     stopped = false
     clearTerminalOnEditorMount = event.reason === "startup"
     layout = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
+    inputTokens = 0
+    outputTokens = 0
+    tokensDirty = true
     applySessionUI(ctx)
     void refreshGit(ctx.cwd)
 
@@ -281,7 +341,7 @@ export default function ui(pi: ExtensionAPI) {
       }
 
       override render(width: number): string[] {
-        if (layout === "off") {
+        if (layout === "off" || layout === "lite") {
           this.setPaddingX(1)
           return super.render(width).map(neutralizeFakeCursor)
         }

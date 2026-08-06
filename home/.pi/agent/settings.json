@@ -31,6 +31,6 @@
     "showTerminalProgress": false
   },
   "ui": {
-    "layout": "minimal"
+    "layout": "lite"
   }
 }
