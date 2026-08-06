@@ -144,14 +144,10 @@ export default function ui(pi: ExtensionAPI) {
               `${ctx.model?.id ?? "no model"} · ${pi.getThinkingLevel()}`,
             ),
           )
-          const right = theme.fg(
-            "dim",
-            [
-              ctx.model ? fmt(ctx.model.contextWindow) : "—",
-              fmt(inputTokens),
-              fmt(outputTokens),
-            ].join(" | "),
-          )
+          const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "—"]
+          if (inputTokens > 0 || outputTokens > 0)
+            parts.push(fmt(inputTokens), fmt(outputTokens))
+          const right = theme.fg("dim", parts.join(" | "))
           const pad = " ".repeat(
             Math.max(1, width - visibleWidth(left) - visibleWidth(right)),
           )
@@ -161,7 +157,7 @@ export default function ui(pi: ExtensionAPI) {
     } else {
       ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
     }
-    ctx.ui.setWorkingVisible(layout === "full" || layout === "minimal")
+    ctx.ui.setWorkingVisible(layout !== "off")
   }
 
   const startSpinner = () => {
