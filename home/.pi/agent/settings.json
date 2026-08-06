@@ -1,9 +1,9 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "deepseek-v4-flash:0731-cloud",
+  "defaultModel": "deepseek-v4-flash-free",
   "defaultProjectTrust": "always",
-  "defaultProvider": "ollama",
-  "defaultThinkingLevel": "high",
+  "defaultProvider": "opencode",
+  "defaultThinkingLevel": "max",
   "editorPaddingX": 1,
   "enableInstallTelemetry": true,
   "enableSkillCommands": true,
