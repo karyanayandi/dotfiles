@@ -17,5 +17,6 @@ bun add -g \
   wrangler@latest
 
 npm i -g \
+  pcu \
   pnpm \
   yarn
