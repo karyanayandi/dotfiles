@@ -23,7 +23,8 @@
     "npm:pi-nvim",
     "npm:pi-observational-memory",
     "npm:pi-tool-display",
-    "npm:pi-worktrunk"
+    "npm:pi-worktrunk",
+    "npm:pi-skill-palette"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,
