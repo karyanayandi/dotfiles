@@ -11,18 +11,19 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.84.0",
+  "lastChangelogVersion": "0.84.1",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
     "npm:@ollama/pi-web-search",
     "npm:context-mode",
+    "npm:pi-antigravity",
     "npm:pi-caveman",
     "npm:pi-mcp-adapter",
     "npm:pi-nvim",
     "npm:pi-observational-memory",
     "npm:pi-tool-display",
-    "npm:pi-antigravity"
+    "npm:pi-worktrunk"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,

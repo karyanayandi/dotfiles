@@ -116,6 +116,7 @@ yay -S --needed \
   wget \
   wiremix \
   wl-clipboard \
+  worktrunk \
   xdg-desktop-portal \
   xdg-desktop-portal-hyprland \
   xdg-user-dirs \
@@ -128,3 +129,4 @@ yay -S --needed \
   zip
 
 rustup toolchain install stable
+wt config plugins opencode install

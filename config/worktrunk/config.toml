@@ -1,0 +1,2 @@
+[commit.generation]
+command = "opencode run -m opencode/deepseek-v4-flash-free"
