@@ -1,9 +1,9 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "deepseek-v4-flash-free",
+  "defaultModel": "opencode/deepseek-v4-flash-free",
   "defaultProjectTrust": "always",
-  "defaultProvider": "opencode",
-  "defaultThinkingLevel": "max",
+  "defaultProvider": "omni",
+  "defaultThinkingLevel": "off",
   "editorPaddingX": 1,
   "enableInstallTelemetry": true,
   "enableSkillCommands": true,
