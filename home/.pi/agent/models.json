@@ -263,21 +263,12 @@
           "reasoning": true
         },
         {
-          "id": "oc/deepseek-v4-flash-free",
-          "name": "Deepseek V4 Flash Free",
-          "api": "omni-prompt-tools",
-          "input": ["text"],
-          "contextWindow": 1000000,
-          "maxTokens": 131072,
-          "reasoning": true
-        },
-        {
           "id": "opencode/deepseek-v4-flash-free",
           "name": "Deepseek V4 Flash Free",
           "api": "omni-prompt-tools",
           "input": ["text"],
           "contextWindow": 1000000,
-          "maxTokens": 384000,
+          "maxTokens": 131072,
           "reasoning": true
         }
       ]
