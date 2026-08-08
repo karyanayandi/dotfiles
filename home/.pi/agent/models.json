@@ -41,13 +41,244 @@
         },
         {
           "_launch": true,
-          "id": "deepseek-v4-flash:cloud",
-          "input": ["text"]
-        },
-        {
-          "_launch": true,
           "id": "deepseek-v4-flash:0731-cloud",
           "input": ["text"]
+        }
+      ]
+    },
+    "omni": {
+      "baseUrl": "http://localhost:20128",
+      "api": "omni-prompt-tools",
+      "apiKey": "sk-35a6bf73eb4f0c00-be8bb2-afd34a7a",
+      "models": [
+        {
+          "id": "agy/claude-opus-4-6-thinking",
+          "name": "Claude Opus 4 6 Thinking",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536,
+          "reasoning": true
+        },
+        {
+          "id": "agy/claude-opus-4-6-thinking-high",
+          "name": "Claude Opus 4 6 Thinking High",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000,
+          "maxTokens": 128000,
+          "reasoning": true
+        },
+        {
+          "id": "agy/claude-opus-4-6-thinking-low",
+          "name": "Claude Opus 4 6 Thinking Low",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000,
+          "maxTokens": 128000,
+          "reasoning": true
+        },
+        {
+          "id": "agy/claude-opus-4-6-thinking-medium",
+          "name": "Claude Opus 4 6 Thinking Medium",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000,
+          "maxTokens": 128000,
+          "reasoning": true
+        },
+        {
+          "id": "agy/claude-sonnet-4-6",
+          "name": "Claude Sonnet 4 6",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/claude-sonnet-4-6-high",
+          "name": "Claude Sonnet 4 6 High",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000,
+          "maxTokens": 64000
+        },
+        {
+          "id": "agy/claude-sonnet-4-6-low",
+          "name": "Claude Sonnet 4 6 Low",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000,
+          "maxTokens": 64000
+        },
+        {
+          "id": "agy/claude-sonnet-4-6-medium",
+          "name": "Claude Sonnet 4 6 Medium",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000,
+          "maxTokens": 64000
+        },
+        {
+          "id": "agy/gemini-2.5-flash",
+          "name": "Gemini 2.5 Flash",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65535
+        },
+        {
+          "id": "agy/gemini-2.5-flash-lite",
+          "name": "Gemini 2.5 Flash Lite",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65535
+        },
+        {
+          "id": "agy/gemini-2.5-flash-thinking",
+          "name": "Gemini 2.5 Flash Thinking",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65535
+        },
+        {
+          "id": "agy/gemini-3-flash",
+          "name": "Gemini 3 Flash",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3-flash-agent",
+          "name": "Gemini 3 Flash Agent",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3.1-flash-lite",
+          "name": "Gemini 3.1 Flash Lite",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65535
+        },
+        {
+          "id": "agy/gemini-3.1-pro-low",
+          "name": "Gemini 3.1 Pro Low",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65535
+        },
+        {
+          "id": "agy/gemini-3.5-flash-extra-low",
+          "name": "Gemini 3.5 Flash Extra Low",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3.5-flash-low",
+          "name": "Gemini 3.5 Flash Low",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3.6-flash-high",
+          "name": "Gemini 3.6 Flash High",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3.6-flash-low",
+          "name": "Gemini 3.6 Flash Low",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3.6-flash-medium",
+          "name": "Gemini 3.6 Flash Medium",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536
+        },
+        {
+          "id": "agy/gemini-3.6-flash-tiered",
+          "name": "Gemini 3.6 Flash Tiered",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1000000
+        },
+        {
+          "id": "agy/gemini-pro-agent",
+          "name": "Gemini Pro Agent",
+          "api": "omni-prompt-tools",
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65535
+        },
+        {
+          "id": "agy/gpt-oss-120b-medium",
+          "name": "Gpt Oss 120b Medium",
+          "api": "omni-prompt-tools",
+          "input": ["text"],
+          "contextWindow": 131072,
+          "maxTokens": 32768
+        },
+        {
+          "id": "cursor/auto",
+          "name": "Auto",
+          "api": "omni-prompt-tools",
+          "input": ["text"],
+          "contextWindow": 200000,
+          "reasoning": true
+        },
+        {
+          "id": "cursor/composer-2.5",
+          "name": "Composer 2.5",
+          "api": "omni-prompt-tools",
+          "input": ["text"],
+          "contextWindow": 200000,
+          "reasoning": true
+        },
+        {
+          "id": "cursor/composer-2.5-fast",
+          "name": "Composer 2.5 Fast",
+          "api": "omni-prompt-tools",
+          "input": ["text"],
+          "contextWindow": 200000,
+          "reasoning": true
+        },
+        {
+          "id": "oc/deepseek-v4-flash-free",
+          "name": "Deepseek V4 Flash Free",
+          "api": "omni-prompt-tools",
+          "input": ["text"],
+          "contextWindow": 1000000,
+          "maxTokens": 131072,
+          "reasoning": true
+        },
+        {
+          "id": "opencode/deepseek-v4-flash-free",
+          "name": "Deepseek V4 Flash Free",
+          "api": "omni-prompt-tools",
+          "input": ["text"],
+          "contextWindow": 1000000,
+          "maxTokens": 384000,
+          "reasoning": true
         }
       ]
     }
