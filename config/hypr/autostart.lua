@@ -32,6 +32,9 @@ hl.on("hyprland.start", function()
   -- Polkit agent
   hl.exec_cmd "systemctl --user start --now hyprpolkitagent.service"
 
+  -- Services (ollama + opencodex; idempotent, safe alongside boot services)
+  hl.exec_cmd "sh ~/.config/dotfiles/setup/start-services.sh"
+
   -- Wallpaper / bar / notifications
   hl.exec_cmd "hyprpaper"
   hl.exec_cmd "sh ~/.local/bin/random-wallpaper.sh"
