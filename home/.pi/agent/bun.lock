@@ -85,17 +85,6 @@
         "typescript": "catalog:",
       },
     },
-    "extensions/omniroute": {
-      "name": "omniroute",
-      "dependencies": {
-        "@earendil-works/pi-ai": "catalog:",
-        "@earendil-works/pi-coding-agent": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/tsgo": "catalog:",
-        "typescript": "catalog:",
-      },
-    },
     "extensions/shared": {
       "name": "@pi/shared",
       "dependencies": {
@@ -965,7 +954,6 @@
 
     "obug": ["obug@2.1.4", "", {}, "sha512-4a+OsYv9UktOJKE+l1A4OufDgdRF9PifWj+tJnHURo/P+WOxpG4GzUFL9qCalmWauao6ogiG+QvnCovwPoyAWA=="],
 
-    "omniroute": ["omniroute@workspace:extensions/omniroute"],
 
     "on-finished": ["on-finished@2.4.1", "", { "dependencies": { "ee-first": "1.1.1" } }, "sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg=="],
 
