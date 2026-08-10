@@ -1,8 +1,8 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "deepseek-v4-flash-free",
+  "defaultModel": "deepseek-v4-flash:0731-cloud",
   "defaultProjectTrust": "always",
-  "defaultProvider": "opencode",
+  "defaultProvider": "ollama",
   "defaultThinkingLevel": "max",
   "editorPaddingX": 1,
   "enableInstallTelemetry": true,
@@ -23,7 +23,8 @@
     "npm:pi-observational-memory",
     "npm:pi-tool-display",
     "npm:pi-worktrunk",
-    "npm:pi-skill-palette"
+    "npm:pi-skill-palette",
+    "npm:pi-set-model"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,
