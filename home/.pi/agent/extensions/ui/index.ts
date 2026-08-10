@@ -350,6 +350,9 @@ export default function ui(pi: ExtensionAPI) {
 
       override render(width: number): string[] {
         if (layout === "off" || layout === "lite") {
+          // Reset borderColor: a prior minimal render leaves it as () => "",
+          // which would make super.render draw invisible borders here.
+          this.borderColor = this.defaultBorderColor
           this.setPaddingX(1)
           return super.render(width).map(neutralizeFakeCursor)
         }
