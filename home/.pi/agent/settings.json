@@ -21,10 +21,10 @@
     "npm:pi-mcp-adapter",
     "npm:pi-nvim",
     "npm:pi-observational-memory",
-    "npm:pi-tool-display",
-    "npm:pi-worktrunk",
+    "npm:pi-set-model",
     "npm:pi-skill-palette",
-    "npm:pi-set-model"
+    "npm:pi-tool-display",
+    "npm:pi-worktrunk"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,
