@@ -138,6 +138,9 @@ export default function ui(pi: ExtensionAPI) {
               }
             }
           }
+          const spinner = working
+            ? theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
+            : ""
           const left = theme.fg(
             "dim",
             sanitizeTerminalText(
@@ -155,13 +158,18 @@ export default function ui(pi: ExtensionAPI) {
           const pad = " ".repeat(
             Math.max(1, width - visibleWidth(left) - visibleWidth(right)),
           )
-          return [truncateToWidth(left + pad + right, width)]
+          return [
+            truncateToWidth(
+              spinner + (spinner ? " " : "") + left + pad + right,
+              width,
+            ),
+          ]
         },
       }))
     } else {
       ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
     }
-    ctx.ui.setWorkingVisible(layout !== "off")
+    ctx.ui.setWorkingVisible(false)
   }
 
   const startSpinner = () => {
