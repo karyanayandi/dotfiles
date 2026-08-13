@@ -59,7 +59,7 @@ local servers = {
   "vue_ls",
   "yamlls",
   -- "nil_ls",
-  "tsgo",
+  "tsc",
 }
 
 vim.filetype.add { extension = { templ = "templ" } }
@@ -84,11 +84,11 @@ if should_enable_eslint() then
   table.insert(servers, "eslint")
 end
 
--- Mutually exclusive: deno or tsgo
+-- Mutually exclusive: deno or tsc
 if should_enable_deno() then
   table.insert(servers, "denols")
 else
-  table.insert(servers, "tsgo")
+  table.insert(servers, "tsc")
 end
 
 -- Enable LSP servers

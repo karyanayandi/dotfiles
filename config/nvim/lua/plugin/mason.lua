@@ -36,7 +36,7 @@ M.servers = {
   "templ",
   -- "ts_ls",
   "vue_ls",
-  "tsgo",
+  -- "tsgo", -- installs the native TS binary used by the `tsc` LSP server
   "yamlls",
 }
 
