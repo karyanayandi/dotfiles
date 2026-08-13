@@ -1,0 +1,247 @@
+import { describe, expect, test, vi } from "vitest"
+import {
+  initTheme,
+  ToolExecutionComponent,
+  type Theme,
+} from "@earendil-works/pi-coding-agent"
+import { type TUI, visibleWidth } from "@earendil-works/pi-tui"
+
+import { installToolSpacing, registerCompactTools } from "./compact.js"
+
+initTheme("dark")
+
+const theme = {
+  bold: (text: string) => text,
+  fg: (_color: string, text: string) => text,
+} as unknown as Theme
+
+const tui = { requestRender: vi.fn() } as unknown as TUI
+
+function createTools(getCompact: () => boolean) {
+  const tools = new Map<string, any>()
+  const pi = { registerTool: (tool: any) => tools.set(tool.name, tool) } as any
+  registerCompactTools(pi, getCompact)
+  return tools
+}
+
+function renderContext(args: unknown, state: Record<string, unknown> = {}) {
+  return {
+    args,
+    argsComplete: true,
+    cwd: "/tmp/example",
+    executionStarted: true,
+    expanded: false,
+    invalidate: vi.fn(),
+    isError: false,
+    isPartial: true,
+    lastComponent: undefined,
+    showImages: true,
+    state,
+    toolCallId: "tool-1",
+  }
+}
+
+const calls: Record<string, unknown> = {
+  bash: { command: "npm test" },
+  edit: { edits: [{ newText: "new", oldText: "old" }], path: "src/index.ts" },
+  find: { path: "src", pattern: "*.ts" },
+  grep: { path: "src", pattern: "registerTool" },
+  ls: { path: "src" },
+  read: { path: "src/index.ts" },
+  write: { content: "one\ntwo\nthree", path: "src/new.ts" },
+}
+
+describe("registerCompactTools", () => {
+  test("registers every built-in and selects the shell by layout", () => {
+    const compact = createTools(() => true)
+    expect([...compact.keys()].sort()).toEqual([
+      "bash",
+      "edit",
+      "find",
+      "grep",
+      "ls",
+      "read",
+      "write",
+    ])
+    // self shell (clean line) in compact layouts, default shell (bg box) otherwise
+    for (const tool of compact.values()) expect(tool.renderShell).toBe("self")
+    for (const tool of createTools(() => false).values()) {
+      expect(tool.renderShell).toBe("default")
+    }
+  })
+
+  test("collapsed call renders as one bounded line with subject and summary", () => {
+    const tools = createTools(() => true)
+    const tool = tools.get("write")
+    const args = calls.write
+    const state = {}
+    const call = tool?.renderCall?.(args, theme, renderContext(args, state))
+    const result = {
+      content: [
+        { type: "text", text: "Successfully wrote 13 bytes to src/new.ts" },
+      ],
+      details: undefined,
+    }
+    const collapsed = tool?.renderResult?.(
+      result,
+      { expanded: false, isPartial: false },
+      theme,
+      renderContext(args, state),
+    )
+
+    const lines = call?.render(80) ?? []
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toContain("write src/new.ts")
+    expect(lines[0]).toContain("3 lines")
+    // collapsed (non-expanded) result contributes no extra row
+    expect(collapsed?.render(80) ?? []).toEqual([])
+    expect(lines.join("\n")).not.toContain("one")
+    expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(80)
+  })
+
+  test("delegates to the original renderer when the layout is not compact", () => {
+    const tools = createTools(() => false)
+    const tool = tools.get("read")
+    const args = calls.read
+    const call = tool?.renderCall?.(args, theme, renderContext(args))
+    // non-compact renderCall delegates to pi's built-in read renderer (a Text)
+    const lines = call?.render(80) ?? []
+    expect(lines.length).toBeGreaterThan(0)
+    expect(lines.join("\n")).toContain("read")
+  })
+})
+
+describe("installToolSpacing", () => {
+  test("collapses a compact tool row to one non-empty line with a status prefix", () => {
+    const tool = createTools(() => true).get("ls")
+    const row = new ToolExecutionComponent(
+      "ls",
+      "tool-1",
+      calls.ls,
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    row.markExecutionStarted()
+    row.updateResult(
+      { content: [{ type: "text", text: "index.ts" }], isError: false },
+      false,
+    )
+
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      const lines = row.render(80)
+      expect(lines).toHaveLength(1)
+      expect(lines[0]).toContain("✓")
+      expect(visibleWidth(lines[0] ?? "")).toBeGreaterThan(0)
+    } finally {
+      restore()
+    }
+  })
+
+  test("leaves rows untouched when the layout is not compact", () => {
+    const tool = createTools(() => true).get("ls")
+    const row = new ToolExecutionComponent(
+      "ls",
+      "tool-1",
+      calls.ls,
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    row.markExecutionStarted()
+    row.updateResult(
+      { content: [{ type: "text", text: "index.ts" }], isError: false },
+      false,
+    )
+
+    const restore = installToolSpacing(() => false, theme)
+    try {
+      // self-rendered compact tool still yields its single content line
+      const lines = row.render(80)
+      expect(lines.length).toBeGreaterThanOrEqual(1)
+      expect(lines[0] ?? "").not.toContain("✓")
+    } finally {
+      restore()
+    }
+  })
+
+  test("augments bare-name fallback rows (Task tools) with their args", () => {
+    const fakeTask: any = {
+      name: "TaskUpdate",
+      label: "TaskUpdate",
+      description: "update a task",
+      parameters: {},
+      async execute() {
+        return {
+          content: [{ type: "text", text: "Task #3 updated" }],
+          details: undefined,
+        }
+      },
+    }
+    const row = new ToolExecutionComponent(
+      "TaskUpdate",
+      "tool-1",
+      { taskId: "3" },
+      {},
+      fakeTask,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    row.markExecutionStarted()
+    row.updateResult(
+      { content: [{ type: "text", text: "Task #3 updated" }], isError: false },
+      false,
+    )
+
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      const line = (row.render(80) ?? [""])[0] ?? ""
+      expect(line).toContain("TaskUpdate")
+      expect(line).toContain("taskId:3")
+    } finally {
+      restore()
+    }
+  })
+
+  test("never emits more than one row or overflows on a narrow terminal", () => {
+    const tool = createTools(() => true).get("grep")
+    const row = new ToolExecutionComponent(
+      "grep",
+      "tool-1",
+      calls.grep,
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    row.markExecutionStarted()
+    row.updateResult(
+      {
+        content: [{ type: "text", text: "match\nsecond match" }],
+        isError: false,
+      },
+      false,
+    )
+
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      for (const width of [8, 12, 24, 3]) {
+        const lines = row.render(width)
+        expect(lines, `width ${width}`).toHaveLength(1)
+        expect(
+          visibleWidth(lines[0] ?? ""),
+          `width ${width}`,
+        ).toBeLessThanOrEqual(width)
+      }
+    } finally {
+      restore()
+    }
+  })
+})

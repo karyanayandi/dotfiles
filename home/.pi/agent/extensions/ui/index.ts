@@ -3,7 +3,6 @@ import { dirname, join } from "node:path"
 import {
   CustomEditor,
   type ExtensionAPI,
-  type ExtensionUIContext,
   type KeybindingsManager,
   getAgentDir,
 } from "@earendil-works/pi-coding-agent"
@@ -22,6 +21,11 @@ import {
   addSideBorders,
   sanitizeTerminalText,
 } from "./layout.js"
+import {
+  installCompactMessages,
+  installToolSpacing,
+  registerCompactTools,
+} from "./compact.js"
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent"
 
 class EmptyFooter implements Component {
@@ -118,6 +122,13 @@ export default function ui(pi: ExtensionAPI) {
   let inputTokens = 0
   let outputTokens = 0
   let tokensDirty = true
+  let restoreCompactMessages: (() => void) | undefined
+  let restoreToolSpacing: (() => void) | undefined
+
+  // pi-minimalist message/tool style applies only to minimal and lite layouts.
+  // The getter is read at render time, so /ui layout switches take effect live.
+  const getCompact = () => layout === "minimal" || layout === "lite"
+  registerCompactTools(pi, getCompact)
 
   const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`)
 
@@ -319,6 +330,11 @@ export default function ui(pi: ExtensionAPI) {
     outputTokens = 0
     tokensDirty = true
     applySessionUI(ctx)
+    restoreCompactMessages?.()
+    restoreToolSpacing?.()
+    restoreCompactMessages = installCompactMessages(ctx.ui.theme, getCompact)
+    restoreToolSpacing = installToolSpacing(getCompact, ctx.ui.theme)
+    if (getCompact()) ctx.ui.setHiddenThinkingLabel("")
     void refreshGit(ctx.cwd)
 
     class SimpleEditor extends CustomEditor {
@@ -443,6 +459,10 @@ export default function ui(pi: ExtensionAPI) {
 
   pi.on("session_shutdown", () => {
     stopped = true
+    restoreCompactMessages?.()
+    restoreCompactMessages = undefined
+    restoreToolSpacing?.()
+    restoreToolSpacing = undefined
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()

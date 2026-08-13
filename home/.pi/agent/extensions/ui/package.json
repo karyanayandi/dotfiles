@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit -p .",
-    "test": "echo 'No tests'"
+    "test": "vitest run"
   },
   "dependencies": {
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/language-service": "^0.4.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "4.1.10"
   }
 }
