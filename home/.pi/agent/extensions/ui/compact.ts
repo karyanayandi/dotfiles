@@ -2,14 +2,11 @@ import {
   AssistantMessageComponent,
   UserMessageComponent,
   createBashToolDefinition,
-  createEditToolDefinition,
   createFindToolDefinition,
   createGrepToolDefinition,
   createLsToolDefinition,
   createReadToolDefinition,
-  createWriteToolDefinition,
   type AgentToolResult,
-  type EditToolDetails,
   type ExtensionAPI,
   type Theme,
   ToolExecutionComponent,
@@ -20,8 +17,15 @@ import {
   Container,
   Text,
   truncateToWidth,
+  wrapTextWithAnsi,
   type Component,
 } from "@earendil-works/pi-tui"
+
+// Left gutter for compact tool rows and user prompts.
+const COMPACT_INDENT = "  "
+// Gutter reserved on the first row of a tool call: indent + status + space.
+// Long call text wraps to the next line instead of being truncated.
+const CALL_GUTTER = COMPACT_INDENT.length + 2 // "  " + "✓ " = 4
 
 // Layout-conditional port of https://github.com/zackerydev/pi-minimalist-ui.
 // Everything here renders the compact single-line style only when `getCompact()`
@@ -74,7 +78,9 @@ class SingleLine implements Component {
   }
 
   render(width: number): string[] {
-    return width > 0 ? [truncateToWidth(this.text, width, "…")] : []
+    return width > 0
+      ? wrapTextWithAnsi(this.text, Math.max(1, width - CALL_GUTTER))
+      : []
   }
 
   invalidate(): void {}
@@ -173,6 +179,7 @@ function registerCompactTool(
           originalResult?.(result, options, theme, context) ?? new Container()
         )
       }
+      // Tools collapse to a single compact line.
       const summary = context.isError
         ? errorSummary(result)
         : renderer.summary?.(result, context.args)
@@ -189,17 +196,6 @@ function registerCompactTool(
         : new Container()
     },
   })
-}
-
-function countDiff(details: EditToolDetails | undefined): string | undefined {
-  if (!details?.diff) return undefined
-  let additions = 0
-  let removals = 0
-  for (const line of details.diff.split("\n")) {
-    if (line.startsWith("+") && !line.startsWith("+++")) additions++
-    if (line.startsWith("-") && !line.startsWith("---")) removals++
-  }
-  return `+${additions} −${removals}`
 }
 
 export function registerCompactTools(
@@ -245,51 +241,6 @@ export function registerCompactTools(
           ? { meta: `timeout ${args.timeout}s` }
           : {}),
       }),
-    },
-    getCompact,
-  )
-
-  registerCompactTool(
-    pi,
-    createEditToolDefinition,
-    {
-      call: (args) => ({
-        subject: compactText(args.path),
-        ...(Array.isArray(args.edits)
-          ? {
-              meta: `${args.edits.length} block${args.edits.length === 1 ? "" : "s"}`,
-            }
-          : {}),
-      }),
-      summary: (result) => countDiff(result.details),
-      expanded: (result, _args, isError) =>
-        isError
-          ? expandedText(result)
-          : (result.details?.diff ?? expandedText(result)),
-    },
-    getCompact,
-  )
-
-  registerCompactTool(
-    pi,
-    createWriteToolDefinition,
-    {
-      call: (args) => {
-        const count =
-          typeof args.content === "string" ? lineCount(args.content) : 0
-        return {
-          subject: compactText(args.path),
-          ...(count > 0
-            ? { meta: `${count} line${count === 1 ? "" : "s"}` }
-            : {}),
-        }
-      },
-      expanded: (result, args, isError) =>
-        isError
-          ? expandedText(result)
-          : typeof args.content === "string"
-            ? args.content
-            : expandedText(result),
     },
     getCompact,
   )
@@ -375,6 +326,24 @@ export function installToolSpacing(
     if (self.expanded) return rendered
     if (width <= 0) return []
 
+    // Degenerate width: too narrow to fit indent + status + a character. Emit
+    // one bounded line instead of overflowing.
+    if (width <= CALL_GUTTER) {
+      const raw =
+        rendered
+          .filter((line) => line !== "")
+          .map((l) => plainTerminalText(l).trim())
+          .filter((l) => l !== "")[0] ?? ""
+      return raw ? [truncateToWidth(raw, width, "…")] : []
+    }
+
+    // edit/write are owned by pi-tool-display and render their diffs inline in
+    // both states (collapsed shows up to diffCollapsedLines). Keep their rows
+    // uncollapsed.
+    if (self.toolName === "edit" || self.toolName === "write") {
+      return rendered.filter((line) => line !== "")
+    }
+
     const content = rendered.filter((line) => line !== "")
     if (content.length === 0) return []
 
@@ -399,18 +368,35 @@ export function installToolSpacing(
         ? compactArgs(self.args, theme)
         : ""
 
-    // A short call + result summary pair (e.g. fd/rg) is joined; a lone call
-    // line stays as-is. Longer output keeps only the call line.
-    const single =
-      (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
-      (args ? ` ${args}` : "")
     const status = self.result?.isError
       ? theme.fg("error", "✕")
       : self.isPartial
         ? theme.fg("muted", "·")
         : theme.fg("success", "✓")
-    const line = truncateToWidth(`${status} ${single}`, width, "…")
-    return [line]
+
+    // Compact (re-registered) tools already wrap their call line through a
+    // SingleLine at `width - CALL_GUTTER`; prepend the gutter and keep every
+    // wrapped row so long text flows onto following lines instead of being cut.
+    if (!isBgShell) {
+      const [first, ...rest] = content
+      return [
+        `${COMPACT_INDENT}${status} ${first}`,
+        ...rest.map((l) => `${COMPACT_INDENT}${l}`),
+      ]
+    }
+
+    // fd/rg, Task* and other custom tools: join a short call + result summary
+    // pair (or keep the call line), then wrap to width so long rows continue
+    // onto the next line.
+    const single =
+      (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
+      (args ? ` ${args}` : "")
+    const contentWidth = Math.max(1, width - COMPACT_INDENT.length - 2)
+    const wrapped = wrapTextWithAnsi(single, contentWidth)
+    return [
+      `${COMPACT_INDENT}${status} ${wrapped[0] ?? ""}`,
+      ...wrapped.slice(1).map((l) => `${COMPACT_INDENT}${l}`),
+    ]
   }
   ToolExecutionComponent.prototype.render = compactRender
   return () => {
@@ -494,7 +480,10 @@ export function installCompactMessages(
   ): string[] {
     if (!getCompact()) return originalUserRender.call(this, width)
     const { text } = this as unknown as UserMessageState
-    const content = theme.fg("dim", `› ${sanitizeMessageText(text)}`)
+    const content = theme.fg(
+      "dim",
+      `${COMPACT_INDENT}› ${sanitizeMessageText(text)}`,
+    )
     return new Text(content, 0, 0).render(width)
   }
   UserMessageComponent.prototype.render = compactUserRender

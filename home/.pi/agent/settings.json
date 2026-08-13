@@ -23,7 +23,8 @@
     "npm:pi-observational-memory",
     "npm:pi-set-model",
     "npm:pi-skill-palette",
-    "npm:pi-worktrunk"
+    "npm:pi-worktrunk",
+    "npm:pi-tool-display"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,

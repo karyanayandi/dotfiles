@@ -43,12 +43,10 @@ function renderContext(args: unknown, state: Record<string, unknown> = {}) {
 
 const calls: Record<string, unknown> = {
   bash: { command: "npm test" },
-  edit: { edits: [{ newText: "new", oldText: "old" }], path: "src/index.ts" },
   find: { path: "src", pattern: "*.ts" },
   grep: { path: "src", pattern: "registerTool" },
   ls: { path: "src" },
   read: { path: "src/index.ts" },
-  write: { content: "one\ntwo\nthree", path: "src/new.ts" },
 }
 
 describe("registerCompactTools", () => {
@@ -56,12 +54,10 @@ describe("registerCompactTools", () => {
     const compact = createTools(() => true)
     expect([...compact.keys()].sort()).toEqual([
       "bash",
-      "edit",
       "find",
       "grep",
       "ls",
       "read",
-      "write",
     ])
     // self shell (clean line) in compact layouts, default shell (bg box) otherwise
     for (const tool of compact.values()) expect(tool.renderShell).toBe("self")
@@ -72,14 +68,12 @@ describe("registerCompactTools", () => {
 
   test("collapsed call renders as one bounded line with subject and summary", () => {
     const tools = createTools(() => true)
-    const tool = tools.get("write")
-    const args = calls.write
+    const tool = tools.get("read")
+    const args = calls.read
     const state = {}
     const call = tool?.renderCall?.(args, theme, renderContext(args, state))
     const result = {
-      content: [
-        { type: "text", text: "Successfully wrote 13 bytes to src/new.ts" },
-      ],
+      content: [{ type: "text", text: "line one\nline two\nline three" }],
       details: undefined,
     }
     const collapsed = tool?.renderResult?.(
@@ -91,11 +85,10 @@ describe("registerCompactTools", () => {
 
     const lines = call?.render(80) ?? []
     expect(lines).toHaveLength(1)
-    expect(lines[0]).toContain("write src/new.ts")
+    expect(lines[0]).toContain("read src/index.ts")
     expect(lines[0]).toContain("3 lines")
     // collapsed (non-expanded) result contributes no extra row
     expect(collapsed?.render(80) ?? []).toEqual([])
-    expect(lines.join("\n")).not.toContain("one")
     expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(80)
   })
 
@@ -209,7 +202,7 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("never emits more than one row or overflows on a narrow terminal", () => {
+  test("wraps long rows to the next line instead of truncating on a narrow terminal", () => {
     const tool = createTools(() => true).get("grep")
     const row = new ToolExecutionComponent(
       "grep",
@@ -234,12 +227,18 @@ describe("installToolSpacing", () => {
     try {
       for (const width of [8, 12, 24, 3]) {
         const lines = row.render(width)
-        expect(lines, `width ${width}`).toHaveLength(1)
-        expect(
-          visibleWidth(lines[0] ?? ""),
-          `width ${width}`,
-        ).toBeLessThanOrEqual(width)
+        // may wrap onto several rows, but every row fits the terminal width
+        expect(lines.length, `width ${width}`).toBeGreaterThanOrEqual(1)
+        for (const line of lines) {
+          expect(visibleWidth(line), `width ${width}`).toBeLessThanOrEqual(
+            width,
+          )
+        }
       }
+      // long text is preserved (wrapped), not truncated to "…"
+      const wide = row.render(24).join("\n")
+      expect(wide.replace(/\x1b\[[0-9;]*m/g, "")).toContain("registerTool")
+      expect(wide).not.toContain("…")
     } finally {
       restore()
     }
