@@ -123,6 +123,8 @@ export default function ui(pi: ExtensionAPI) {
 
   const applySessionUI = (ctx: ExtensionContext) => {
     if (layout === "lite") {
+      // lite: rely on the vanilla "Working..." indicator in the response
+      // area instead of drawing a spinner in the footer.
       ctx.ui.setFooter((tui, theme) => ({
         dispose() {},
         invalidate() {},
@@ -138,9 +140,6 @@ export default function ui(pi: ExtensionAPI) {
               }
             }
           }
-          const spinner = working
-            ? theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
-            : ""
           const left = theme.fg(
             "dim",
             sanitizeTerminalText(
@@ -158,18 +157,13 @@ export default function ui(pi: ExtensionAPI) {
           const pad = " ".repeat(
             Math.max(1, width - visibleWidth(left) - visibleWidth(right)),
           )
-          return [
-            truncateToWidth(
-              spinner + (spinner ? " " : "") + left + pad + right,
-              width,
-            ),
-          ]
+          return [truncateToWidth(left + pad + right, width)]
         },
       }))
     } else {
       ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
     }
-    ctx.ui.setWorkingVisible(false)
+    if (layout !== "lite") ctx.ui.setWorkingVisible(false)
   }
 
   const startSpinner = () => {
@@ -295,7 +289,7 @@ export default function ui(pi: ExtensionAPI) {
   })
 
   pi.on("agent_start", (_event, ctx) => {
-    if (layout !== "off") ctx.ui.setWorkingVisible(false)
+    if (layout !== "lite") ctx.ui.setWorkingVisible(false)
     succeeded = 0
     failed = 0
     startSpinner()
@@ -314,7 +308,7 @@ export default function ui(pi: ExtensionAPI) {
   })
 
   pi.on("message_start", (_event, ctx) => {
-    if (layout !== "off") ctx.ui.setWorkingVisible(false)
+    if (layout !== "lite") ctx.ui.setWorkingVisible(false)
   })
 
   pi.on("session_start", (event, ctx) => {
