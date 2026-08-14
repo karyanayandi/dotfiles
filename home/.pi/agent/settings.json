@@ -11,7 +11,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "0.84.1",
+  "lastChangelogVersion": "0.84.2",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
@@ -24,7 +24,8 @@
     "npm:pi-set-model",
     "npm:pi-skill-palette",
     "npm:pi-worktrunk",
-    "npm:pi-tool-display"
+    "npm:pi-tool-display",
+    "npm:pi-ollama-cloud"
   ],
   "quietStartup": true,
   "showHardwareCursor": false,
@@ -34,6 +35,6 @@
     "showTerminalProgress": false
   },
   "ui": {
-    "layout": "minimal"
+    "layout": "lite"
   }
 }
