@@ -315,6 +315,22 @@ export function installToolSpacing(
   ): string[] {
     const rendered = originalRender.call(this, width)
     if (!getCompact()) return rendered
+    // Any tool (e.g. MCP tools like playwriter with no custom renderer) can
+    // surface an unexpected args/result shape when it isn't ready. A throw here
+    // runs in the render path and force-closes pi, so fall back to the original
+    // renderer instead of crashing. Either way, clamp every line to `width` — a
+    // line wider than the terminal makes pi's TUI throw and force-close.
+    try {
+      return clampLines(compactRenderInner.call(this, width, rendered), width)
+    } catch {
+      return clampLines(rendered, width)
+    }
+  }
+  const compactRenderInner = function (
+    this: ToolExecutionComponent,
+    width: number,
+    rendered: string[],
+  ): string[] {
     const self = this as unknown as {
       expanded: boolean
       isPartial: boolean
@@ -427,6 +443,13 @@ function compactArgs(args: unknown, theme: Theme): string {
     )
   }
   return parts.join(" ")
+}
+
+// Clamp every rendered line to `width`. pi's TUI throws (and force-closes) if
+// any line exceeds the terminal width, so the compact renderer must never emit
+// a wider line — regardless of a tool's renderShell or Box padding.
+function clampLines(lines: string[], width: number): string[] {
+  return lines.map((line) => truncateToWidth(line, width, "…"))
 }
 
 // --- compact message rendering ---
