@@ -15,8 +15,8 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd "hyprlock")
 
 -- Window state
-hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen { mode = "fullscreen" })
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen { mode = "maximized", action = "toggle" })
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen { mode = "fullscreen" })
+hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen { mode = "maximized", action = "toggle" })
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(
   mainMod .. " + ALT + Q",
