@@ -9,8 +9,8 @@
       "disabled": true
     }
   },
-  "model": "ollama-cloud/deepseek-v4-flash",
-  "small_model": "ollama-cloud/deepseek-v4-flash",
+  "model": "9router/oc/deepseek-v4-flash-free",
+  "small_model": "9router/oc/deepseek-v4-flash-free",
   "agent": {
     "explore": {
       "disable": true
@@ -20,6 +20,11 @@
     },
     "coder": {
       "model": "ollama-cloud/deepseek-v4-flash"
+    },
+    "explorer": {
+      "description": "Fast explorer subagent for codebase exploration",
+      "mode": "subagent",
+      "model": "9router/oc/deepseek-v4-flash-free"
     }
   },
   "mcp": {
@@ -105,6 +110,22 @@
       "npm": "@ai-sdk/openai-compatible",
       "options": {
         "baseURL": "http://127.0.0.1:11434/v1"
+      }
+    },
+    "9router": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:20128/v1",
+        "apiKey": "sk-56d3a6bbccf98bff-3qbmu3-2f219179"
+      },
+      "models": {
+        "oc/deepseek-v4-flash-free": {
+          "name": "oc/deepseek-v4-flash-free",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
       }
     }
   }

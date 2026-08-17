@@ -120,6 +120,32 @@
           }
         }
       ]
+    },
+    "9router": {
+      "api": "openai-completions",
+      "apiKey": "sk-56d3a6bbccf98bff-3qbmu3-2f219179",
+      "baseUrl": "http://127.0.0.1:20128/v1",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "thinkingFormat": "openai"
+      },
+      "models": [
+        {
+          "id": "oc/deepseek-v4-flash-free",
+          "input": ["text"],
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "none",
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "max",
+            "max": "max"
+          }
+        }
+      ]
     }
   }
 }
