@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Start ollama if not already running. Idempotent, safe to rerun.
-# Boot auto-start is handled by services (ollama systemd).
-# This script is for manual / post-reinstall use.
 
 pgrep -x ollama >/dev/null || nohup ollama serve >/tmp/ollama.log 2>&1 &
+pgrep -x 9router >/dev/null || nohup 9router >/tmp/9router.log 2>&1 &
 
 exit 0

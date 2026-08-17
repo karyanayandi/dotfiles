@@ -1,6 +1,7 @@
 #!/bin/bash
 
 bun add -g \
+  9router \
   @earendil-works/pi-coding-agent \
   @fission-ai/openspec@latest \
   @playwright/mcp@latest \
