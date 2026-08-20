@@ -55,7 +55,15 @@ hl.window_rule({
 	float = true,
 	size = { 1000, 600 },
 })
-hl.window_rule({ name = "picture-in-picture", match = { title = "^(Picture-in-Picture)$" }, float = true })
+hl.window_rule({
+	name = "picture-in-picture",
+	match = { title = ".*[Pp]icture.?in.?[Pp]icture.*" },
+	float = true,
+	pin = true,
+	keep_aspect_ratio = true,
+	size = { 480, 270 },
+	move = { "monitor_w-500", "monitor_h-290" },
+})
 
 -- Layer rules
 hl.layer_rule({ name = "waybar-noanim", match = { namespace = "waybar" }, no_anim = true })

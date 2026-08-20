@@ -124,7 +124,6 @@ window-rule {
 // }
 
 window-rule {
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     match app-id=r#"vicinae$"#
     match app-id=r#"chrome-nngceckbapebfimnlniiiahkandclblb-Default$"#
     match app-id=r#"org.gnome.FileRoller$"#
@@ -142,6 +141,15 @@ window-rule {
     match title="^Extract$"
     open-floating true
 }
+
+window-rule {
+    match title=r#".*[Pp]icture.?in.?[Pp]icture.*"# 
+    open-floating true
+    default-column-width { fixed 480; }
+    default-window-height { fixed 270; }
+    default-floating-position x=20 y=20 relative-to="bottom-right"
+}
+
 
 window-rule {
     match app-id=r#"org.gnome.FileRoller$"#
