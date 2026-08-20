@@ -1,0 +1,43 @@
+{
+  "mcp": {
+    "context7": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"
+      ],
+      "startup_timeout_ms": 60000,
+      "operation_timeout_ms": 30000,
+      "restart_limit": 2,
+      "enabled": true
+    },
+    "playwriter": {
+      "type": "local",
+      "command": ["bun", "x", "playwriter@latest"],
+      "startup_timeout_ms": 60000,
+      "operation_timeout_ms": 30000,
+      "restart_limit": 2,
+      "enabled": true
+    },
+    "shadcn": {
+      "type": "local",
+      "command": ["bun", "x", "shadcn@latest", "mcp"],
+      "startup_timeout_ms": 60000,
+      "operation_timeout_ms": 30000,
+      "restart_limit": 2,
+      "enabled": true
+    },
+    "codebase-memory-mcp": {
+      "type": "local",
+      "command": ["/usr/sbin/codebase-memory-mcp"],
+      "startup_timeout_ms": 60000,
+      "operation_timeout_ms": 30000,
+      "restart_limit": 2
+    },
+    "firecrawl": {
+      "type": "http",
+      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+    }
+  }
+}
