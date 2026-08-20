@@ -77,7 +77,7 @@ spawn-sh-at-startup "gsettings set org.gnome.desktop.interface 'Tela-grey-dark'"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Ice'"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface font-name 'Adwaita Sans 11'"
 
-spawn-sh-at-startup "~/.local/bin/random-wallpaper.sh"
+spawn-sh-at-startup "~/.local/bin/set-wallpaper.sh"
 
 hotkey-overlay {
     skip-at-startup

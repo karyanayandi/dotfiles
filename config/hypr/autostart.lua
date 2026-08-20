@@ -37,7 +37,7 @@ hl.on("hyprland.start", function()
 
   -- Wallpaper / bar / notifications
   hl.exec_cmd "hyprpaper"
-  hl.exec_cmd "sh ~/.local/bin/random-wallpaper.sh"
+  hl.exec_cmd "sh ~/.local/bin/set-wallpaper.sh"
   hl.exec_cmd "swaync"
   hl.exec_cmd "swayosd-server"
   hl.exec_cmd "vicinae server"
