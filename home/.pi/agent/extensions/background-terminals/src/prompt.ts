@@ -23,9 +23,9 @@ const RESULT_STDOUT_MAX_LINES = 40
 const RESULT_STDERR_MAX_LINES = 20
 
 export const BG_START_TOOL_DESCRIPTION =
-  "Start a long-running shell command as a background terminal (executed via the platform shell — sh -c on POSIX, cmd.exe /d /s /c on Windows). " +
+  "Start a long-running shell command as a background terminal (executed via the platform shell: sh -c on POSIX, cmd.exe /d /s /c on Windows). " +
   "Fire-and-forget: this returns immediately with an id, and you get a message with the final output when the process exits. " +
-  "The process receives NO stdin (immediate EOF) and there is no way to send input later — interactive commands will not work; use bg_kill to stop a stuck one. " +
+  "The process receives NO stdin (immediate EOF) and there is no way to send input later; interactive commands will not work. Use bg_kill to stop a stuck one. " +
   `Terminals are session-scoped: they are killed when the session ends or reloads. Output shown to you is tail-truncated (stdout ${formatSize(STATUS_STDOUT_MAX)}, stderr ${formatSize(STATUS_STDERR_MAX)}); the full logs are captured to files and in the /ps viewer. ` +
   `Max ${MAX_RUNNING} background terminals can run at once.`
 
@@ -34,7 +34,7 @@ export const BG_START_PROMPT_SNIPPET =
 
 export const BG_START_PROMPT_GUIDELINES = [
   "Use bg_start for commands expected to run long or indefinitely (servers, watch modes, long builds); use the regular bash tool for quick commands.",
-  "bg_start processes receive no stdin — never start a command that requires interactive input.",
+  "bg_start processes receive no stdin. Never start a command that requires interactive input.",
   "After bg_start, keep working; the exit result arrives automatically. Use bg_status only when you need current output before continuing.",
 ]
 

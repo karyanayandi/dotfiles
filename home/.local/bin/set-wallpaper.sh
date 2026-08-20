@@ -1,9 +1,6 @@
 #!/usr/bin/env sh
 
-# Wallpaper directory
 WP_FOLDER="${HOME}/.config/dotfiles/wallpapers"
-
-# Time in seconds to change wallpaper
 WAIT_TIME=10800
 
 # Start hyprpaper if not running
@@ -23,7 +20,7 @@ set_wallpaper() {
 
   MONITORS=$(hyprctl monitors | sed -n 's/^[[:space:]]*Monitor \([^[:space:]]*\).*/\1/p')
   echo "$MONITORS" | while read -r monitor; do
-    [ -n "$monitor" ] && hyprctl hyprpaper wallpaper "$monitor,$FILE" > /dev/null 2>&1
+    hyprctl hyprpaper wallpaper "$monitor,$FILE" > /dev/null 2>&1
   done
 }
 

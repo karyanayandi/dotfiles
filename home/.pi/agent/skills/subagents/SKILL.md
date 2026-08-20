@@ -12,7 +12,7 @@ report.
 
 ## Pi Harness
 
-**Harness:** `pi` **Prompt nicknames:** “pi”, “pi agent”, “pi subagent” **Best
+**Harness:** `pi` **Prompt nicknames:** "pi", "pi agent", "pi subagent" **Best
 default:** Use when the user does not request another harness. It inherits the
 parent model and thinking level when `model` or `reasoning_effort` is omitted.
 
@@ -34,8 +34,8 @@ These map directly to pi thinking levels.
 
 ## Claude Code Harness
 
-**Harness:** `claude` **Prompt nicknames:** “claude”, “Claude Code”, “claude
-agent”, “claude subagent”, "cc" **Best default:** use the latest fable model on
+**Harness:** `claude` **Prompt nicknames:** "claude", "Claude Code", "claude
+agent", "claude subagent", "cc" **Best default:** use the latest fable model on
 high reasoning. Do not default to anything else, if the user does not specify,
 use fable.
 
@@ -51,8 +51,8 @@ Requires Claude Code to be installed and authenticated.
 
 ## Codex Harness
 
-**Harness:** `codex` **Prompt nicknames:** “codex”, “Codex CLI”, “codex agent”,
-“codex subagent” **Best default:** `gpt-5.6-sol` with `high` effort for coding
+**Harness:** `codex` **Prompt nicknames:** "codex", "Codex CLI", "codex agent",
+"codex subagent" **Best default:** `gpt-5.6-sol` with `high` effort for coding
 work. Do not use anything other than sol unless the user specifically asks for
 it.
 

@@ -798,7 +798,7 @@ Returns full task details:
 ## When to Use This Tool
 
 **Before starting work on a task:**
-- Mark it in_progress BEFORE beginning — do not start work without updating status first
+- Mark it in_progress BEFORE beginning. Do not start work without updating status first
 - After resolving, call TaskList to find your next task
 
 **Mark tasks as resolved:**
@@ -1142,7 +1142,7 @@ Set up task dependencies:
 - **model**: Model override for agents (e.g., "sonnet", "haiku")
 - **max_turns**: Maximum turns per agent`,
     promptGuidelines: [
-      "Never use the Agent tool for tasks launched via TaskExecute — agents are already running.",
+      "Never use the Agent tool for tasks launched via TaskExecute. Agents are already running.",
     ],
     parameters: Type.Object({
       task_ids: Type.Array(Type.String(), {
@@ -1164,7 +1164,7 @@ Set up task dependencies:
         return textResult(
           "Subagent execution is currently unavailable (subagents extension not loaded " +
             "or version mismatch). You can run these as plain Agent-tool spawns, but tasks " +
-            "won't track them — status stays pending, cascade won't fire, TaskOutput stays empty.",
+            "won't track them. Status stays pending, cascade won't fire, TaskOutput stays empty.",
         )
       }
 
@@ -1183,7 +1183,7 @@ Set up task dependencies:
         }
         if (!task.metadata?.agentType) {
           results.push(
-            `#${taskId}: no agentType set — create with agentType parameter or update metadata`,
+            `#${taskId}: no agentType set. Create with agentType parameter or update metadata`,
           )
           continue
         }
@@ -1218,7 +1218,7 @@ Set up task dependencies:
         } catch (err: any) {
           debug(`spawn:error task=#${taskId}`, err)
           store.update(taskId, { status: "pending" })
-          results.push(`#${taskId}: spawn failed — ${err.message}`)
+          results.push(`#${taskId}: spawn failed. ${err.message}`)
         }
       }
 
@@ -1249,7 +1249,7 @@ Set up task dependencies:
   // ── /tasks command ──
 
   pi.registerCommand("tasks", {
-    description: "Manage tasks — view, create, clear completed",
+    description: "Manage tasks: view, create, clear completed",
     handler: async (_args: string, ctx: ExtensionCommandContext) => {
       const ui = ctx.ui
 

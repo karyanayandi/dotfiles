@@ -211,8 +211,8 @@ export default function (pi: ExtensionAPI) {
     })
     ui?.notify(
       snap.status === "error"
-        ? `by the way “${snap.title}” failed — reopen it with /subagents`
-        : `by the way “${snap.title}” answered — reopen it with /subagents`,
+        ? `by the way "${snap.title}" failed. Reopen it with /subagents`
+        : `by the way "${snap.title}" answered. Reopen it with /subagents`,
       snap.status === "error" ? "error" : "info",
     )
   }
