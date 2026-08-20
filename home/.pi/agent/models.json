@@ -144,6 +144,20 @@
             "xhigh": "max",
             "max": "max"
           }
+        },
+        {
+          "id": "oc/muse-spark-1.2-contributor-free",
+          "input": ["text"],
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "none",
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": "max"
+          }
         }
       ]
     }

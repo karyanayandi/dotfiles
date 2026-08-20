@@ -125,6 +125,13 @@
             "input": ["text", "image"],
             "output": ["text"]
           }
+        },
+        "oc/muse-spark-1.2-contributor-free": {
+          "name": "oc/deepseek-v4-flash-free",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
         }
       }
     }
