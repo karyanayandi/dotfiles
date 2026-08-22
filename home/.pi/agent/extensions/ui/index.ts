@@ -368,7 +368,7 @@ export default function ui(pi: ExtensionAPI) {
         }
         const isMinimal = layout === "minimal"
         this.borderColor = isMinimal ? () => "" : this.defaultBorderColor
-        this.setPaddingX(2)
+        this.setPaddingX(isMinimal ? 1 : 2)
         const lines = super.render(width).map(neutralizeFakeCursor)
         if (isMinimal) {
           const indicator = working
@@ -376,6 +376,7 @@ export default function ui(pi: ExtensionAPI) {
             : ctx.ui.theme.fg("text", "┃")
           const firstEmpty = lines.findIndex((line) => line === "")
           const firstContent = firstEmpty >= 0 ? firstEmpty + 1 : 0
+          const pad = " ".repeat(this.getPaddingX())
           if (firstContent < lines.length) {
             let line = lines[firstContent]
             const paddingX = this.getPaddingX()
@@ -385,7 +386,7 @@ export default function ui(pi: ExtensionAPI) {
               removed++
               i++
             }
-            line = indicator + " " + line.slice(i)
+            line = pad + indicator + " " + line.slice(i)
             lines[firstContent] = truncateToWidth(line, width, "", true)
           }
           // Add a blank top margin and drop the bottom border.
@@ -395,7 +396,7 @@ export default function ui(pi: ExtensionAPI) {
             width,
             "…",
           )
-          return ["", ...body, ctx.ui.theme.fg("muted", info)]
+          return ["", ...body, pad + ctx.ui.theme.fg("muted", info)]
         }
 
         const borderIndices: number[] = []
