@@ -3,6 +3,13 @@ return {
   config = function()
     local colors = require("base16-colorscheme").colors
 
+    local theme = require "lualine.themes.auto"
+    for _, mode in pairs(theme) do
+      if mode.c then
+        mode.c.bg = colors.base00
+      end
+    end
+
     local hide_in_width = function()
       return vim.fn.winwidth(0) > 80
     end
@@ -14,7 +21,7 @@ return {
       icon = { icons.git.Branch, align = "left" },
       use_mode_colors = false,
       color = function()
-        return { bg = colors.base03, fg = colors.base05, gui = "bold" }
+        return { bg = colors.base01, fg = colors.base05, gui = "bold" }
       end,
     }
 
@@ -53,7 +60,7 @@ return {
       shorting_target = 10,
       use_color_mode = true,
       color = function()
-        return { bg = colors.base03, fg = colors.base05 }
+        return { bg = colors.base00, fg = colors.base05 }
       end,
     }
 
@@ -69,7 +76,7 @@ return {
       },
       colored = true,
       color = function()
-        return { bg = colors.base03, fg = colors.base05 }
+        return { bg = colors.base01, fg = colors.base05 }
       end,
       update_in_insert = false,
       always_visible = false,
@@ -88,7 +95,7 @@ return {
       options = {
         globalstatus = true,
         icons_enabled = true,
-        theme = "auto",
+        theme = theme,
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
         always_divide_middle = true,
@@ -133,7 +140,6 @@ return {
         lualine_c = {},
         lualine_x = {},
         lualine_y = { diagnostics },
-        -- lualine_z = { filetype, "location" },
         lualine_z = { "location" },
       },
       extensions = {},
