@@ -372,8 +372,8 @@ export default function ui(pi: ExtensionAPI) {
         const lines = super.render(width).map(neutralizeFakeCursor)
         if (isMinimal) {
           const indicator = working
-            ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
-            : ctx.ui.theme.fg("accent", "┃")
+            ? ctx.ui.theme.fg("text", spinnerFrames[spinnerFrame] ?? "")
+            : ctx.ui.theme.fg("text", "┃")
           const firstEmpty = lines.findIndex((line) => line === "")
           const firstContent = firstEmpty >= 0 ? firstEmpty + 1 : 0
           if (firstContent < lines.length) {
