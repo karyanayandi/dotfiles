@@ -4,6 +4,7 @@ bun add -g \
   9router \
   @earendil-works/pi-coding-agent \
   @fission-ai/openspec@latest \
+  @playwright/cli@latest \
   @playwright/mcp@latest \
   agent-browser@latest \
   autocannon@latest \
