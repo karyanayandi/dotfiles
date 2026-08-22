@@ -373,7 +373,7 @@ export default function ui(pi: ExtensionAPI) {
         if (isMinimal) {
           const indicator = working
             ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
-            : ctx.ui.theme.fg("accent", "❯")
+            : ctx.ui.theme.fg("accent", "┃")
           const firstEmpty = lines.findIndex((line) => line === "")
           const firstContent = firstEmpty >= 0 ? firstEmpty + 1 : 0
           if (firstContent < lines.length) {
@@ -389,7 +389,13 @@ export default function ui(pi: ExtensionAPI) {
             lines[firstContent] = truncateToWidth(line, width, "", true)
           }
           // Add a blank top margin and drop the bottom border.
-          return ["", ...lines.filter((line) => line !== "")]
+          const body = lines.filter((line) => line !== "")
+          const info = truncateToWidth(
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
+            width,
+            "…",
+          )
+          return ["", ...body, ctx.ui.theme.fg("muted", info)]
         }
 
         const borderIndices: number[] = []
