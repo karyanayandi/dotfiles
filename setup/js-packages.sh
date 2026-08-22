@@ -21,3 +21,5 @@ npm i -g \
   pcu \
   pnpm \
   yarn
+
+bun x skills add https://skills.sh/p/aKGonvnAA4p1fkdf
