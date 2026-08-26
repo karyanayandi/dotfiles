@@ -1,9 +1,9 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "gpt-5.6-luna",
+  "defaultModel": "gpt-5.6-terra",
   "defaultProjectTrust": "always",
   "defaultProvider": "openai-codex",
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "medium",
   "editorPaddingX": 3,
   "enableInstallTelemetry": true,
   "enableSkillCommands": true,
