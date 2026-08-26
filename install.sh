@@ -85,6 +85,7 @@ yay -S --needed \
   python-pipx \
   qt5ct \
   qt6ct \
+  quickshell \
   reflector \
   reiserfsprogs \
   ripgrep \
@@ -111,7 +112,6 @@ yay -S --needed \
   uv \
   vicinae-bin \
   vivid \
-  waybar \
   wf-recorder \
   wget \
   wiremix \

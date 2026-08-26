@@ -66,7 +66,7 @@ hl.window_rule({
 })
 
 -- Layer rules
-hl.layer_rule({ name = "waybar-noanim", match = { namespace = "waybar" }, no_anim = true })
-hl.layer_rule({ name = "waybar-noblur", match = { namespace = "waybar" }, blur = false })
+hl.layer_rule({ name = "quickshell-noanim", match = { namespace = "quickshell" }, no_anim = true })
+hl.layer_rule({ name = "quickshell-noblur", match = { namespace = "quickshell" }, blur = false })
 hl.layer_rule({ name = "vicinae-blur", match = { namespace = "vicinae" }, blur = true, ignore_alpha = 0 })
 hl.layer_rule({ name = "vicinae-no-animation", match = { namespace = "vicinae" }, no_anim = true })

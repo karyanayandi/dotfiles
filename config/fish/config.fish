@@ -76,7 +76,7 @@ alias px "pnpx"
 alias r "paru -Rns"
 alias refresh "refresh-mirror && yay -Syyu && vp upgrade && mise upgrade && bun update -g && npm update -g && pi update && pi update --extensions && bunx skills update && rustup update"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
-alias reload-waybar "pkill waybar; waybar & disown"
+alias reload-quickshell "pkill quickshell; quickshell & disown"
 alias rm trash-put
 alias rmr rm
 alias s "paru -s"
