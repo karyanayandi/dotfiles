@@ -32,14 +32,8 @@ hl.on("hyprland.start", function()
   -- Polkit agent
   hl.exec_cmd "systemctl --user start --now hyprpolkitagent.service"
 
-  -- Services (ollama + 9router; idempotent, safe alongside boot services)
-  -- 9router: node script + interactive TUI. `--skip-update` + non-TTY stdin = tray
-  -- (headless) mode; without it the TUI exits on stdin EOF.
-  -- Idempotency via pidfile + kill -0: pgrep is unusable here (its own sh -c
-  -- cmdline contains the launch token "9router", so it always self-matches).
-  -- Keep the pidfile read UNQUOTED. exec_cmd's tokenizer mangles "$(...)".
-  -- hl.exec_cmd "pgrep -x ollama >/dev/null || nohup ollama serve >/tmp/ollama.log 2>&1 &"
-  hl.exec_cmd "if ! kill -0 $(cat /tmp/9router.pid 2>/dev/null) 2>/dev/null; then nohup 9router --skip-update >/tmp/9router.log 2>&1 & echo $! >/tmp/9router.pid; fi"
+  -- 9router
+  -- hl.exec_cmd "if ! kill -0 $(cat /tmp/9router.pid 2>/dev/null) 2>/dev/null; then nohup 9router --skip-update >/tmp/9router.log 2>&1 & echo $! >/tmp/9router.pid; fi"
 
   -- Desktop shell
   hl.exec_cmd "quickshell"
