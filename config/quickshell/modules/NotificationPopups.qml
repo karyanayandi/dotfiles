@@ -42,7 +42,7 @@ PanelWindow {
                 Rectangle {
                     id: bg
                     anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                    implicitHeight: inner.implicitHeight + 12
+                    implicitHeight: inner.implicitHeight + 20
                     radius: 24
                     // swaync: .notification bg alpha 0.85 border 1px @g0 shadow 0 0 8 rgba0,0,0,0.6
                     color: theme.colBgAlpha085
@@ -78,7 +78,7 @@ PanelWindow {
                     ColumnLayout {
                         id: inner
                         anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                        anchors.leftMargin: 14; anchors.rightMargin: 14; anchors.topMargin: 14; anchors.bottomMargin: 6
+                        anchors.leftMargin: 18; anchors.rightMargin: 18; anchors.topMargin: 18; anchors.bottomMargin: 10
                         spacing: 0
 
                         RowLayout {
@@ -116,12 +116,12 @@ PanelWindow {
                         }
                         // actions — swaync floating: bg @background-alt radius 8 margin 6 border 1 transparent hover @hover + border @selected
                         RowLayout {
-                            visible: row.notif.actions.length > 0
+                            visible: row.notif.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate").length > 0
                             Layout.fillWidth: true
                             Layout.topMargin: 8
                             spacing: 6
                             Repeater {
-                                model: row.notif.actions
+                                model: row.notif.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate")
                                 delegate: Rectangle {
                                     required property var modelData
                                     Layout.fillWidth: true; implicitHeight: 30; radius: 8

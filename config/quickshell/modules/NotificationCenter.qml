@@ -13,7 +13,7 @@ PanelWindow {
     anchors { top: true; right: true }
     margins { top: 18; right: 18 }
     implicitWidth: 420
-    implicitHeight: 860
+    implicitHeight: 920
     exclusiveZone: 0
     color: "transparent"
     mask: Region { item: bg }
@@ -33,7 +33,7 @@ PanelWindow {
         id: bg
         anchors.top: parent.top; anchors.right: parent.right
         width: 420
-        height: Math.min(860, col.implicitHeight + 24)
+        height: Math.min(920, col.implicitHeight + 24)
         radius: 24
         // swaync: background alpha(@background,0.95) border 1px @gruvbox0 shadow 0 0 10 rgba0,0,0,0.6
         color: theme.colBgAlpha095
@@ -42,7 +42,7 @@ PanelWindow {
         ColumnLayout {
             id: col
             anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-            anchors.margins: 12 // swaync padding 12
+            anchors.margins: 18 // swaync padding 12 + more
             spacing: 0
 
             // widget-title: margin 6, font 1.2em, button bg @background-alt radius 6 padding 4 16
@@ -98,7 +98,7 @@ PanelWindow {
             Flickable {
                 id: flick
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.min(640, flickContent.implicitHeight)
+                Layout.preferredHeight: Math.min(720, flickContent.implicitHeight)
                 clip: true
                 contentHeight: flickContent.implicitHeight
                 contentWidth: width
@@ -180,7 +180,7 @@ PanelWindow {
                                         Rectangle {
                                             id: cardBg
                                             anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                                            implicitHeight: cardInner.implicitHeight + 8
+                                            implicitHeight: cardInner.implicitHeight + 16
                                             radius: 16
                                             color: theme.colBgAlt
                                             border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : "transparent"
@@ -199,8 +199,8 @@ PanelWindow {
                                             ColumnLayout {
                                                 id: cardInner
                                                 anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                                                anchors.margins: 4
-                                                spacing: 0
+                                                anchors.margins: 8
+                                                spacing: 4
 
                                                 RowLayout {
                                                     Layout.fillWidth: true
@@ -238,14 +238,14 @@ PanelWindow {
                                                 }
                                                 // actions — swaync: bg alpha(@selected,0.6) radius 12 margin 6 hover @selected
                                                 RowLayout {
-                                                    visible: notif.actions.length > 0
+                                                    visible: notif.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate").length > 0
                                                     Layout.fillWidth: true
                                                     Layout.leftMargin: 0; Layout.rightMargin: 0; Layout.bottomMargin: 0; Layout.topMargin: 0
                                                     spacing: 0
                                                     // min-height 3.4em like swaync
                                                     Layout.preferredHeight: 38
                                                     Repeater {
-                                                        model: notif.actions
+                                                        model: notif.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate")
                                                         delegate: Rectangle {
                                                             required property var modelData
                                                             Layout.fillWidth: true; Layout.fillHeight: true
