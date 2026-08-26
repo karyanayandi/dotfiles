@@ -38,7 +38,10 @@ Item {
 
     GridView {
         id: grid
-        anchors.fill: parent
+        width: Math.floor(parent.width / cellWidth) * cellWidth
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         visible: root.valueGrid
         clip: true
         boundsBehavior: Flickable.StopAtBounds
