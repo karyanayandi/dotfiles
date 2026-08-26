@@ -20,6 +20,7 @@ import {
   addBorderLabels,
   addBottomLabel,
   addSideBorders,
+  renderExtensionStatuses,
   sanitizeTerminalText,
 } from "./layout.js"
 import {
@@ -30,6 +31,18 @@ import {
 class EmptyFooter implements Component {
   render(): string[] {
     return []
+  }
+
+  invalidate(): void {}
+}
+
+class MinimalFooter implements Component {
+  constructor(
+    private readonly getStatuses: () => ReadonlyMap<string, string>,
+  ) {}
+
+  render(width: number) {
+    return renderExtensionStatuses(this.getStatuses(), width)
   }
 
   invalidate(): void {}
@@ -170,6 +183,13 @@ export default function ui(pi: ExtensionAPI) {
           return [truncateToWidth(left + pad + right, width)]
         },
       }))
+    } else if (layout === "minimal") {
+      // Minimal replaces pi's footer, so retain extension activity indicators
+      // (subagents, workflows, and similar status producers) in one row.
+      ctx.ui.setFooter(
+        (_tui, _theme, footerData) =>
+          new MinimalFooter(() => footerData.getExtensionStatuses()),
+      )
     } else {
       ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
     }

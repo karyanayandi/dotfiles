@@ -52,6 +52,26 @@ export function addBorderLabels(
   )
 }
 
+export function renderExtensionStatuses(
+  statuses: ReadonlyMap<string, string>,
+  width: number,
+) {
+  if (width <= 0) return []
+
+  const line = [...statuses.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, text]) =>
+      text
+        .replace(/[\r\n\t]/g, " ")
+        .replace(/ +/g, " ")
+        .trim(),
+    )
+    .filter(Boolean)
+    .join(" ")
+
+  return line ? [truncateToWidth(line, width, "…")] : []
+}
+
 export function addBottomLabel(
   width: number,
   label: string,
