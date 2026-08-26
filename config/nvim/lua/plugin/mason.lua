@@ -28,6 +28,7 @@ M.servers = {
   -- "nil_ls",
   "prismals",
   "pyright",
+  "qmlls",
   "rust_analyzer",
   "sqls",
   "svelte",
