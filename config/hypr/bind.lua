@@ -2,7 +2,6 @@
 
 local terminal = "foot"
 local fileManager = "nemo"
-local menu = "wofi"
 local browser = "helium-browser"
 local mainMod = "SUPER"
 
@@ -10,7 +9,7 @@ local mainMod = "SUPER"
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.exec_cmd "foot")
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + SHIFT + Space", hl.dsp.exec_cmd(menu .. " --show drun"))
+hl.bind(mainMod .. " + SHIFT + Space", hl.dsp.exec_cmd "qs ipc call launcher open apps")
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd "hyprlock")
 
@@ -24,9 +23,13 @@ hl.bind(
 )
 hl.bind(mainMod .. " + V", hl.dsp.window.float { action = "toggle" })
 
--- Vicinae clipboard
-hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd "vicinae toggle")
-hl.bind(mainMod .. " + P", hl.dsp.exec_cmd "vicinae vicinae://launch/clipboard/history")
+-- Spotlight (quickshell launcher)
+hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd "qs ipc call launcher open apps")
+hl.bind(mainMod .. " + P", hl.dsp.exec_cmd "qs ipc call launcher open clipboard")
+hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd "qs ipc call launcher open emoji")
+hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call launcher open nerd")
+hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd "qs ipc call launcher open bluetooth")
+hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd "qs ipc call launcher open audio")
 
 -- Dwindle layout extras
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo { action = "toggle" })

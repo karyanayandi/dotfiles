@@ -117,6 +117,7 @@ yay -S --needed \
   wiremix \
   wl-clipboard \
   worktrunk \
+  wtype \
   xdg-desktop-portal \
   xdg-desktop-portal-hyprland \
   xdg-user-dirs \

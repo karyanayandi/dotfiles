@@ -66,7 +66,6 @@ layer-rule {
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
 
-spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "swayidle -w"
 spawn-sh-at-startup "export SSH_AUTH_SOCK"
 spawn-sh-at-startup "$(gnome-keyring-daemon --start)"
@@ -192,11 +191,15 @@ binds {
 
     Mod+E hotkey-overlay-title="Open File Manager" { spawn "/usr/bin/nemo"; }
 
-    Mod+Space repeat=false hotkey-overlay-title="Run an Application: Vicinae" { spawn "vicinae" "toggle"; }
-    Mod+Shift+Space repeat=false hotkey-overlay-title="Run an Runner" { spawn "vicinae" "dmenu"; }
+    Mod+Space repeat=false hotkey-overlay-title="Spotlight: Apps" { spawn-sh "qs ipc call launcher open apps"; }
+    Mod+Shift+Space repeat=false hotkey-overlay-title="Spotlight: Runner" { spawn-sh "qs ipc call launcher open apps"; }
     // Mod+Shift+W hotkey-overlay-title="Run an Websearch" { spawn-sh "walker --width 1280 -m websearch"; }
     // Mod+Shift+B hotkey-overlay-title="Open Bluetooth" { spawn-sh "walker --width 1280 -m bluetooth"; }
-    Mod+P repeat=false hotkey-overlay-title="Open Clipboard" { spawn "vicinae" "vicinae://extensions/vicinae/clipboard/history"; }
+    Mod+P repeat=false hotkey-overlay-title="Clipboard (autopaste)" { spawn-sh "qs ipc call launcher open clipboard"; }
+    Mod+Alt+E hotkey-overlay-title="Emoji Picker" { spawn-sh "qs ipc call launcher open emoji"; }
+    Mod+Alt+N hotkey-overlay-title="Nerd Font Picker" { spawn-sh "qs ipc call launcher open nerd"; }
+    Mod+Alt+B hotkey-overlay-title="Bluetooth Manager" { spawn-sh "qs ipc call launcher open bluetooth"; }
+    Mod+Alt+A hotkey-overlay-title="Audio Manager" { spawn-sh "qs ipc call launcher open audio"; }
 
     Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 

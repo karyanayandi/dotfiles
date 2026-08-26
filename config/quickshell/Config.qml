@@ -25,6 +25,12 @@ QtObject {
     property int centerWidth: 420
     property int centerMaxHeight: 720
 
+    // launcher (spotlight)
+    property int launcherWidth: 680
+    property int launcherMaxHeight: 560
+    property int launcherRadius: 20
+    property int launcherInputHeight: 56
+
     // animations (ms)
     property int animFast: 120
     property int animNormal: 200
