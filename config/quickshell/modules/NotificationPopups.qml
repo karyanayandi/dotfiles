@@ -47,7 +47,7 @@ PanelWindow {
                 Rectangle {
                     id: bg
                     anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                    implicitHeight: inner.implicitHeight + 20
+                    implicitHeight: inner.implicitHeight + 40
                     radius: 24
                     color: theme.colBgAlpha085
                     border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : theme.colBorder
@@ -79,7 +79,7 @@ PanelWindow {
                     ColumnLayout {
                         id: inner
                         anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-                        anchors.leftMargin: 18; anchors.rightMargin: 18; anchors.topMargin: 18; anchors.bottomMargin: 10
+                        anchors.leftMargin: 18; anchors.rightMargin: 18; anchors.topMargin: 26; anchors.bottomMargin: 16
                         spacing: 0
 
                         RowLayout {
