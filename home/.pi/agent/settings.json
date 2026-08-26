@@ -6,7 +6,7 @@
   "defaultThinkingLevel": "medium",
   "editorPaddingX": 3,
   "enableInstallTelemetry": true,
-  "enableSkillCommands": true,
+  "enableSkillCommands": false,
   "hideThinkingBlock": false,
   "images": {
     "blockImages": false
