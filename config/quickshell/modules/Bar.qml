@@ -33,7 +33,6 @@ PanelWindow {
         width: implicitWidth
         height: 38
         radius: 10
-        // apple: translucent material — floating functional layer, content scrolls underneath
         color: barWin.theme.colBgAlpha095
         border.color: Qt.rgba(1,1,1,0.08); border.width: 1
 
@@ -44,7 +43,6 @@ PanelWindow {
             anchors.topMargin: 4; anchors.bottomMargin: 4
             spacing: 4
 
-            // workspaces
             RowLayout {
                 id: wsRow
                 Layout.leftMargin: 15; Layout.rightMargin: 15; spacing: 0
@@ -65,7 +63,6 @@ PanelWindow {
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: wsText.implicitWidth + 20
                         color: isUrgent ? barWin.theme.colUrgent : (wsMouse.containsMouse ? barWin.theme.colAccent : "transparent")
-                        // apple: response on pointer-down — instant feedback, continuous during interaction
                         scale: wsMouse.pressed ? 0.96 : 1
                         Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                         Behavior on color { ColorAnimation { duration: 180; easing.type: Easing.OutCubic } }
@@ -102,7 +99,6 @@ PanelWindow {
 
             Item { Layout.fillWidth: true }
 
-            // tray icons
             Text {
                 text: "󰍛"; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 6
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10

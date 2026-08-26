@@ -4,7 +4,6 @@ import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
 
-// 1:1 swaync floating — overlay top right, 400px, alpha 0.85, radius 24, stacked
 PanelWindow {
     id: win
     required property var theme
@@ -36,9 +35,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 implicitHeight: bg.implicitHeight
                 color: "transparent"
-                // apple: spatial consistency — enter/exit same path (from right), symmetric easing
                 Layout.topMargin: 0; Layout.bottomMargin: 16
-                // apple: materialize — scale+opacity together so surface reads as material arriving, not just fade
                 opacity: 0
                 property real _enter: 0
                 Component.onCompleted: { opacity = 1; _enter = 1 }
@@ -46,14 +43,12 @@ PanelWindow {
                 scale: 0.96 + row._enter * 0.04
                 Behavior on opacity { NumberAnimation { duration: 360; easing.type: Easing.OutCubic } }
                 Behavior on _enter { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
-                // hint in direction of gesture — slight scale grows toward final position
 
                 Rectangle {
                     id: bg
                     anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                     implicitHeight: inner.implicitHeight + 20
                     radius: 24
-                    // apple: translucent floating material — blur approx via alpha, bright top edge
                     color: theme.colBgAlpha085
                     border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : Qt.rgba(1,1,1,0.08)
                     border.width: notif.urgency === NotificationUrgency.Critical ? 2 : 1
@@ -71,7 +66,6 @@ PanelWindow {
                     }
                     MouseArea { anchors.fill: parent; hoverEnabled: true; onEntered: ttl.stop(); onExited: ttl.restart() }
 
-                    // close — swaync .close-button margin 6 padding 2 radius 6 transparent hover @selected / @g2
                     Rectangle {
                         anchors.top: parent.top; anchors.right: parent.right
                         anchors.topMargin: 6; anchors.rightMargin: 6
@@ -121,7 +115,6 @@ PanelWindow {
                                 }
                             }
                         }
-                        // actions — swaync floating: bg @background-alt radius 8 margin 6 border 1 transparent hover @hover + border @selected
                         RowLayout {
                             visible: row.notif.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate").length > 0
                             Layout.fillWidth: true

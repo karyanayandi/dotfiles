@@ -1,7 +1,7 @@
 import QtQuick
 
 QtObject {
-    // gruvbox palette — exact swaync
+    // gruvbox palette
     property color g0: "#1d2021"
     property color g1: "#32302f"
     property color g2: "#45403d"
@@ -18,7 +18,6 @@ QtObject {
     property color g13: "#fabd2f"
     property color g14: "#b8bb26"
     property color g15: "#d3869b"
-    // semantic — @define
     property color colFg: g5
     property color colBg: g0
     property color colBgAlt: g1
@@ -32,8 +31,7 @@ QtObject {
     property color colBorder: g0
     property color colDndChecked: g10
     property color colActionBg: Qt.rgba(0xd5/255, 0xc4/255, 0xa1/255, 0.6)
-    // helpers
-    property color colBgAlpha095: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.95)
+    property color colBgAlpha095: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 1.0)
     property color colBgAlpha085: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.95)
     property string fontFamily: "JetBrainsMono NFM"
     property string fontFallback: "Nerd Font"

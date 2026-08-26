@@ -8,7 +8,6 @@ PanelWindow {
     required property var theme
     required property var audio
 
-    // apple: keep alive through exit so interruptible (grab mid-flight) works — visible until opacity settles
     property real _osdOpacity: audio.osdVisible ? 1 : 0
     Behavior on _osdOpacity { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
     visible: audio.osdVisible || _osdOpacity > 0.01
@@ -27,7 +26,6 @@ PanelWindow {
         anchors.centerIn: parent
         width: 360; height: 44
         opacity: win._osdOpacity
-        // apple: materialize — scale+blur together; critically damped, no bounce (no momentum)
         scale: 0.96 + win._osdOpacity * 0.04
         transformOrigin: Item.Center
         Behavior on scale { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
@@ -37,7 +35,6 @@ PanelWindow {
         id: osdBg
         anchors.fill: parent
         radius: 10
-        // apple: translucent material with bright top edge
         color: win.theme.colBgAlpha095
         border.color: Qt.rgba(1,1,1,0.10); border.width: 1
         RowLayout {

@@ -18,8 +18,6 @@ Item {
     property string osdIcon: ""
     property int osdPercent: 30
 
-    // single source for bar icon — uses polled vol/muted (kept in sync via Connections + poll)
-    // sink only for headphone detection + muted override, not for volume shadowing
     readonly property string volumeIcon: {
         var s = svc.sink
         var m = svc.muted || (s && s.audio ? s.audio.muted : false)
@@ -93,7 +91,6 @@ Item {
         function onVolumeChanged() { if (Pipewire.defaultAudioSink?.audio) svc.vol = Pipewire.defaultAudioSink.audio.volume }
         function onMutedChanged() { if (Pipewire.defaultAudioSink?.audio) svc.muted = Pipewire.defaultAudioSink.audio.muted }
     }
-    // when default sink changes, immediately sync vol/muted
     onSinkChanged: {
         if (svc.sink && svc.sink.audio) {
             svc.vol = svc.sink.audio.volume

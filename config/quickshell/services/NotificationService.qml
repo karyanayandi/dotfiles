@@ -9,7 +9,6 @@ Item {
 
     property bool doNotDisturb: false
     property bool controlCenterVisible: false
-    // robust count: ObjectModel may expose count as undefined initially — fallback to values.length
     property int notifCount: {
         if (!server.trackedNotifications) return 0
         let c = server.trackedNotifications.count
@@ -79,12 +78,10 @@ Item {
         popups = []
     }
 
-    // grouped by appName for stacked view like swaync notification-group
     function grouped() {
         let map = {}
         let order = []
         let src = server.trackedNotifications.values ? server.trackedNotifications.values : []
-        // fallback iterate via count/get if values not available
         if (!src || src.length === 0) {
             let cnt = notifCount
             src = []
@@ -96,7 +93,6 @@ Item {
             let key = n.appName || "Unknown"
             if (!map[key]) { map[key] = { appName: key, appIcon: n.appIcon || n.desktopEntry || "", notifications: [] }; order.push(key) }
             map[key].notifications.push(n)
-            // keep most recent icon
             if (n.appIcon) map[key].appIcon = n.appIcon
         }
         return order.map(k => map[k])
