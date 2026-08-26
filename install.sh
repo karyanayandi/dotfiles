@@ -106,6 +106,7 @@ yay -S --needed \
   ttf-cascadia-code-nerd \
   ttf-firacode-nerd \
   ttf-jetbrains-mono-nerd \
+  unixodbc \
   unrar \
   unzip \
   usage \
