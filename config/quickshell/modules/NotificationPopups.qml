@@ -50,7 +50,7 @@ PanelWindow {
                     implicitHeight: inner.implicitHeight + 20
                     radius: 24
                     color: theme.colBgAlpha085
-                    border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : Qt.rgba(1,1,1,0.08)
+                    border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : theme.colBorder
                     border.width: notif.urgency === NotificationUrgency.Critical ? 2 : 1
 
                     Timer {

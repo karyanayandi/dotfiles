@@ -34,7 +34,7 @@ PanelWindow {
         height: 38
         radius: 10
         color: barWin.theme.colBgAlpha095
-        border.color: Qt.rgba(1,1,1,0.08); border.width: 1
+        border.color: barWin.theme.colBorder; border.width: 1
 
         RowLayout {
             id: barContent

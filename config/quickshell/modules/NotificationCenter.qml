@@ -26,7 +26,7 @@ PanelWindow {
         id: scrim
         anchors.fill: parent
         radius: 24
-        color: "#1d2021"
+        color: theme.colBg
         opacity: win._centerOpacity * 0.85
         Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
         MouseArea {
@@ -53,7 +53,7 @@ PanelWindow {
         anchors.fill: parent
         radius: 24
         color: theme.colBgAlpha095
-        border.color: Qt.rgba(1,1,1,0.14); border.width: 1
+        border.color: theme.colBorderStrong; border.width: 1
 
         ColumnLayout {
             id: col

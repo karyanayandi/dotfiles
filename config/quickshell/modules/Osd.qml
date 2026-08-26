@@ -52,7 +52,7 @@ PanelWindow {
             anchors.fill: card
             anchors.topMargin: 2
             radius: card.radius
-            color: Qt.rgba(0, 0, 0, 0.32)
+            color: win.theme.colShadow
             z: -1
         }
 
@@ -60,8 +60,8 @@ PanelWindow {
             id: card
             anchors.fill: parent
             radius: 18
-            color: Qt.rgba(0.11, 0.11, 0.11, 0.78)
-            border.color: Qt.rgba(1, 1, 1, 0.10)
+            color: win.theme.colBgAlpha078
+            border.color: win.theme.colBorder
             border.width: 1
 
             Rectangle {
@@ -70,7 +70,7 @@ PanelWindow {
                 anchors.right: parent.right
                 height: 1
                 radius: parent.radius
-                color: Qt.rgba(1, 1, 1, 0.14)
+                color: win.theme.colBorderStrong
                 opacity: 0.9
             }
 
@@ -83,7 +83,7 @@ PanelWindow {
                     id: glyph
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: win.audio.osdIcon
-                    color: "white"
+                    color: win.theme.colFg
                     opacity: win.audio.muted && win.audio.osdKind === "sink" ? 0.55 : 1.0
                     font.family: win.theme.fontFamily
                     font.pixelSize: 56
@@ -98,12 +98,12 @@ PanelWindow {
                     id: meter
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: 144; height: 6; radius: 3
-                    color: Qt.rgba(1, 1, 1, 0.22)
+                    color: win.theme.colMeterBg
                     Rectangle {
                         anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
                         width: parent.width * Math.min(1, win.audio.osdPercent / 100)
                         radius: 3
-                        color: win.audio.muted && win.audio.osdKind === "sink" ? Qt.rgba(1, 1, 1, 0.45) : "white"
+                        color: win.audio.muted && win.audio.osdKind === "sink" ? win.theme.colMuted : win.theme.colMeterFg
                         Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                         Behavior on color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
                     }
@@ -118,7 +118,7 @@ PanelWindow {
                         if (win.audio.muted) return "Muted"
                         return win.audio.osdPercent + "%"
                     }
-                    color: Qt.rgba(1, 1, 1, 0.58)
+                    color: win.theme.colMuted
                     font.family: win.theme.fontFamily
                     font.pixelSize: 11
                     font.weight: Font.Medium
