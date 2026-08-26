@@ -17,7 +17,7 @@ PanelWindow {
     anchors { top: true; right: true }
     margins { top: 18; right: 18 }
     implicitWidth: Config.centerWidth
-    implicitHeight: 920
+    implicitHeight: bgWrap.height
     exclusiveZone: 0
     color: "transparent"
     mask: Region { item: bgWrap }
@@ -41,7 +41,7 @@ PanelWindow {
     Item {
         id: bgWrap
         anchors.top: parent.top; anchors.right: parent.right
-        width: Config.centerWidth; height: bg.height
+        width: Config.centerWidth; height: col.implicitHeight + 36
         property real slide: win.notifs.controlCenterVisible ? 0 : 28
         transform: Translate { x: bgWrap.slide }
         opacity: win._centerOpacity
