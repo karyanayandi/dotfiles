@@ -13,7 +13,7 @@ Item {
         store.reload();
         try {
             let v = JSON.parse(store.text() || "[]");
-            if (Array.isArray(v)) root.history = v;
+            if (Array.isArray(v)) root.history = v.slice().sort((a, b) => (b.time || 0) - (a.time || 0));
         } catch(e) {}
         pollTimer.start();
     }

@@ -75,6 +75,7 @@ Item {
                 subtitle: new Date(entry.time).toLocaleTimeString() + " \u00b7 " + (entry.img ? "image" : entry.text.length + " chars"),
                 icon: entry.img ? "" : "\u{f0147}",
                 text: entry.text,
+                time: entry.time,
                 index,
                 actionHint: "\u21b5 paste",
                 _score: score(entry.img ? "image" : entry.text, query) * 0.9
@@ -103,7 +104,9 @@ Item {
             results = results.concat(devices)
         }
 
-        results.sort((left, right) => right._score - left._score)
+        results.sort((left, right) => mode === "clipboard"
+            ? (right.time || 0) - (left.time || 0)
+            : right._score - left._score)
         return results.slice(0, 200)
     }
 
