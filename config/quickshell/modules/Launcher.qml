@@ -19,7 +19,13 @@ PanelWindow {
         model.selected = 0
         visibleLauncher = true
         input.clear()
-        Qt.callLater(() => input.focusInput())
+        Qt.callLater(() => {
+            if (model.mode === "wallpaper") {
+                const current = model.results.findIndex(item => item.path === win.wallpaper.current)
+                if (current >= 0) model.selected = current
+            }
+            input.focusInput()
+        })
     }
 
     IpcHandler {
