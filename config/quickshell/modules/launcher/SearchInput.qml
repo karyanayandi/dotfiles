@@ -7,7 +7,7 @@ RowLayout {
     property string mode: "all"
     signal queryChanged(string query)
     signal escapePressed()
-    signal selectionMoved(int amount)
+    signal selectionMoved(string direction)
     signal selected(bool ctrl)
 
     function focusInput() { input.forceActiveFocus() }
@@ -42,8 +42,9 @@ RowLayout {
         onTextChanged: root.queryChanged(text)
         Keys.onPressed: event => {
             if (event.key === Qt.Key_Escape) root.escapePressed()
-            else if (event.key === Qt.Key_Down) root.selectionMoved(1)
-            else if (event.key === Qt.Key_Up) root.selectionMoved(-1)
+            else if (event.key === Qt.Key_Down) root.selectionMoved("down")
+            else if (event.key === Qt.Key_Up) root.selectionMoved("up")
+            else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && (root.mode === "emoji" || root.mode === "nerd")) root.selectionMoved(event.key === Qt.Key_Left ? "left" : "right")
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.selected(!!(event.modifiers & Qt.ControlModifier))
             else return
             event.accepted = true

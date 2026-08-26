@@ -114,13 +114,30 @@ PanelWindow {
                             win.visibleLauncher = false
                         }
                     }
-                    onSelectionMoved: amount => model.selected = Math.max(0, Math.min(model.selected + amount, model.results.length - 1))
+                    onSelectionMoved: direction => {
+                        const count = model.results.length
+                        const gridMode = model.mode === "emoji" || model.mode === "nerd"
+                        if (!gridMode) {
+                            model.selected = Math.max(0, Math.min(model.selected + (direction === "up" ? -1 : 1), count - 1))
+                            return
+                        }
+
+                        const columns = results.gridColumns
+                        const selected = model.selected
+                        let next = selected
+                        if (direction === "left" && selected % columns > 0) next--
+                        else if (direction === "right" && selected % columns < columns - 1 && selected + 1 < count) next++
+                        else if (direction === "up" && selected >= columns) next -= columns
+                        else if (direction === "down" && selected + columns < count) next += columns
+                        model.selected = next
+                    }
                     onSelected: ctrl => model.triggerSelected(ctrl)
                 }
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: Theme.colBorder; opacity: 0.9 }
 
                 LauncherParts.Results {
+                    id: results
                     Layout.fillWidth: true
                     Layout.preferredHeight: 360
                     model: model.results

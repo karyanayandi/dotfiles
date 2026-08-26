@@ -8,6 +8,7 @@ Item {
     property int selected: 0
     property string emptyText: "No results"
     readonly property bool valueGrid: root.model.length > 0 && (root.model[0].kind === "emoji" || root.model[0].kind === "nerd")
+    readonly property int gridColumns: Math.max(1, Math.floor(grid.width / grid.cellWidth))
     signal selectionRequested(int index)
     signal activated(int index, bool ctrl)
 
