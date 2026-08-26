@@ -1,7 +1,25 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
 import { loadShortcuts, saveShortcuts } from "./src/config.ts"
 import { pick } from "./src/picker.ts"
-import { isShortcut } from "./src/shortcut.ts"
+
+type ModelShortcut = `ctrl+${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
+
+function isModelShortcut(shortcut: string): shortcut is ModelShortcut {
+  return /^ctrl\+[0-9]$/.test(shortcut)
+}
+
+const availableShortcuts = [
+  "ctrl+1",
+  "ctrl+2",
+  "ctrl+3",
+  "ctrl+4",
+  "ctrl+5",
+  "ctrl+6",
+  "ctrl+7",
+  "ctrl+8",
+  "ctrl+9",
+  "ctrl+0",
+] as const
 
 export default function modelShortcuts(pi: ExtensionAPI) {
   pi.registerCommand("model-shortcuts", {
@@ -36,10 +54,6 @@ export default function modelShortcuts(pi: ExtensionAPI) {
         return
       }
 
-      const defaults = Array.from(
-        { length: 9 },
-        (_, index) => `ctrl+${index + 1}`,
-      )
       const items = [
         ...Object.entries(shortcuts)
           .sort(([left], [right]) => left.localeCompare(right))
@@ -48,30 +62,16 @@ export default function modelShortcuts(pi: ExtensionAPI) {
             label: shortcut,
             description: target,
           })),
-        ...defaults
+        ...availableShortcuts
           .filter((shortcut) => !(shortcut in shortcuts))
           .map((shortcut) => ({
             value: shortcut,
             label: shortcut,
             description: "unassigned",
           })),
-        {
-          value: "custom",
-          label: "Custom shortcut…",
-          description: "Type any Pi shortcut",
-        },
       ]
-      const selected = await pick(ctx, "Select shortcut", items)
-      if (!selected) return
-      const shortcut =
-        selected === "custom"
-          ? await ctx.ui.input("Shortcut", "ctrl+4")
-          : selected
-      if (!shortcut?.trim()) return
-      if (!isShortcut(shortcut.trim())) {
-        ctx.ui.notify(`Invalid Pi shortcut: ${shortcut.trim()}`, "error")
-        return
-      }
+      const shortcut = await pick(ctx, "Select shortcut", items)
+      if (!shortcut || !isModelShortcut(shortcut)) return
 
       const models = ctx.modelRegistry
         .getAvailable()
@@ -84,10 +84,10 @@ export default function modelShortcuts(pi: ExtensionAPI) {
       const target = await pick(ctx, "Select model", models)
       if (!target) return
 
-      shortcuts[shortcut.trim()] = target
+      shortcuts[shortcut] = target
       saveShortcuts(shortcuts)
       ctx.ui.notify(
-        `Saved ${shortcut.trim()} → ${target}; reloading shortcuts`,
+        `Saved ${shortcut} → ${target}; reloading shortcuts`,
         "info",
       )
       await ctx.reload()
@@ -95,8 +95,10 @@ export default function modelShortcuts(pi: ExtensionAPI) {
   })
 
   for (const [shortcut, target] of Object.entries(loadShortcuts())) {
-    if (!isShortcut(shortcut)) {
-      console.error(`Model shortcuts: invalid shortcut ${shortcut}`)
+    if (!isModelShortcut(shortcut)) {
+      console.error(
+        `Model shortcuts: only ctrl+0 through ctrl+9 are supported; got ${shortcut}`,
+      )
       continue
     }
 
