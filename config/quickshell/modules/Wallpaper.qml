@@ -15,6 +15,7 @@ Variants {
         color: "black"
         WlrLayershell.layer: WlrLayer.Background
         WlrLayershell.namespace: "quickshell-wallpaper"
+        WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
         Image {
