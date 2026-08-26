@@ -11,6 +11,7 @@ Item {
     property bool muted: false
     property real prevVol: 0.3
     property bool prevMuted: false
+    property bool _synced: false
 
     property bool osdVisible: false
     property string osdKind: "sink"
@@ -73,9 +74,14 @@ Item {
                 if (data === "mute") svc.muted = true
                 else if (data === "unmute") svc.muted = false
                 else { var v = parseFloat(data); if (!isNaN(v)) svc.vol = v }
-                if (Math.abs(svc.vol - svc.prevVol) > 0.005 || svc.muted !== svc.prevMuted) {
-                    svc.prevVol = svc.vol; svc.prevMuted = svc.muted
-                    if (svc.osdVisible || Math.abs(svc.vol - 0.3) > 0.001) svc.showOsd("sink")
+                var volChanged = Math.abs(svc.vol - svc.prevVol) > 0.005
+                var muteChanged = svc.muted !== svc.prevMuted
+                if (volChanged || muteChanged) {
+                    var firstSync = !svc._synced
+                    svc.prevVol = svc.vol
+                    svc.prevMuted = svc.muted
+                    svc._synced = true
+                    if (!firstSync) svc.showOsd("sink")
                 }
             }
         }
