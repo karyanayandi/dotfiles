@@ -103,7 +103,10 @@ PanelWindow {
                 LauncherParts.SearchInput {
                     id: input
                     mode: model.mode
-                    onQueryChanged: query => model.query = query
+                    onQueryChanged: query => {
+                        model.query = query
+                        model.selected = 0
+                    }
                     onEscapePressed: {
                         if (model.mode !== "all" && !model.pinnedMode) {
                             model.mode = "all"
