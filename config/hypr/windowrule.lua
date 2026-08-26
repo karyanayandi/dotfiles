@@ -68,4 +68,3 @@ hl.window_rule({
 -- Layer rules
 hl.layer_rule({ name = "quickshell-noanim", match = { namespace = "quickshell" }, no_anim = true })
 hl.layer_rule({ name = "quickshell-noblur", match = { namespace = "quickshell" }, blur = false })
-hl.layer_rule({ name = "quickshell-launcher-blur", match = { namespace = "quickshell-launcher" }, blur = true, ignore_alpha = 0 })
