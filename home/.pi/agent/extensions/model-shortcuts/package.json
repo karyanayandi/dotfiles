@@ -1,0 +1,16 @@
+{
+  "name": "model-shortcuts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit -p .",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "catalog:",
+    "@earendil-works/pi-tui": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}
