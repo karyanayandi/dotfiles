@@ -9,6 +9,7 @@ RowLayout {
     signal escapePressed()
     signal selectionMoved(string direction)
     signal selected(bool ctrl)
+    signal cycleWallpaperInterval()
 
     function focusInput() { input.forceActiveFocus() }
     function clear() { input.text = "" }
@@ -41,7 +42,8 @@ RowLayout {
         focus: true
         onTextChanged: root.queryChanged(text)
         Keys.onPressed: event => {
-            if (event.key === Qt.Key_Escape) root.escapePressed()
+            if (root.mode === "wallpaper" && event.key === Qt.Key_B && (event.modifiers & Qt.ControlModifier)) root.cycleWallpaperInterval()
+            else if (event.key === Qt.Key_Escape) root.escapePressed()
             else if (event.key === Qt.Key_Down) root.selectionMoved("down")
             else if (event.key === Qt.Key_Up) root.selectionMoved("up")
             else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && (root.mode === "emoji" || root.mode === "nerd" || root.mode === "wallpaper")) root.selectionMoved(event.key === Qt.Key_Left ? "left" : "right")

@@ -143,6 +143,7 @@ PanelWindow {
                         model.selected = next
                     }
                     onSelected: ctrl => model.triggerSelected(ctrl)
+                    onCycleWallpaperInterval: win.wallpaper.cycleInterval()
                 }
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: Theme.colBorder; opacity: 0.9 }
@@ -165,6 +166,7 @@ PanelWindow {
                     mode: model.mode
                     bluetooth: model.bluetooth
                     clipboard: model.clipboard
+                    wallpaper: win.wallpaper
                 }
             }
         }

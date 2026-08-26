@@ -10,21 +10,47 @@ Item {
     readonly property string storePath: Quickshell.env("HOME") + "/.cache/quickshell/wallpaper"
     property var wallpapers: []
     property string current: ""
+    property int rotationInterval: 10800000
+    readonly property var intervalOptions: [0, 1800000, 3600000, 10800000, 21600000, 43200000]
+    readonly property string rotationLabel: {
+        if (root.rotationInterval === 0) return "Off"
+        if (root.rotationInterval < 3600000) return root.rotationInterval / 60000 + "m"
+        return root.rotationInterval / 3600000 + "h"
+    }
 
     FileView { id: store; path: root.storePath; blockLoading: true }
 
     Component.onCompleted: {
         store.reload()
-        root.current = (store.text() || "").trim()
+        const saved = (store.text() || "").trim()
+        try {
+            const state = JSON.parse(saved)
+            root.current = state.wallpaper || ""
+            if (root.intervalOptions.includes(state.interval)) root.rotationInterval = state.interval
+        } catch (error) {
+            root.current = saved
+        }
         scan.running = true
+    }
+
+    function save() {
+        store.setText(JSON.stringify({ wallpaper: root.current, interval: root.rotationInterval }))
+        store.writeFile()
     }
 
     function setWallpaper(path) {
         if (!path) return
         root.current = path
-        store.setText(path)
-        store.writeFile()
-        rotation.restart()
+        root.save()
+        if (root.rotationInterval > 0) rotation.restart()
+    }
+
+    function cycleInterval() {
+        const currentIndex = root.intervalOptions.indexOf(root.rotationInterval)
+        root.rotationInterval = root.intervalOptions[(currentIndex + 1) % root.intervalOptions.length]
+        root.save()
+        if (root.rotationInterval > 0) rotation.restart()
+        else rotation.stop()
     }
 
     function randomize() {
@@ -49,8 +75,8 @@ Item {
 
     Timer {
         id: rotation
-        interval: 10800000
-        running: root.wallpapers.length > 1
+        interval: Math.max(1000, root.rotationInterval)
+        running: root.wallpapers.length > 1 && root.rotationInterval > 0
         repeat: true
         onTriggered: root.randomize()
     }

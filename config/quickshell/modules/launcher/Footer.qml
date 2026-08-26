@@ -7,6 +7,7 @@ RowLayout {
     property string mode: "all"
     required property var bluetooth
     required property var clipboard
+    required property var wallpaper
 
     Layout.fillWidth: true
     Layout.leftMargin: 14
@@ -18,6 +19,25 @@ RowLayout {
     Text { text: "\u21B5 select"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
     Text { text: "esc close"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
     Item { Layout.fillWidth: true }
+
+    Rectangle {
+        visible: root.mode === "wallpaper"
+        height: 24
+        radius: 8
+        color: root.wallpaper.rotationInterval > 0 ? Theme.g7 : Theme.colChipBg
+        border.color: Theme.colBorder
+        border.width: 1
+        implicitWidth: randomLabel.implicitWidth + 20
+        Text {
+            id: randomLabel
+            anchors.centerIn: parent
+            text: "ctrl+b  random " + root.wallpaper.rotationLabel
+            color: root.wallpaper.rotationInterval > 0 ? Theme.colBg : Theme.colFg
+            font.family: Theme.fontFamily
+            font.pixelSize: 11
+        }
+        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.wallpaper.cycleInterval() }
+    }
 
     Rectangle {
         visible: root.mode === "bluetooth"
