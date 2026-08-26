@@ -11,15 +11,16 @@ import "../services" as Services
 PanelWindow {
     id: win
     property bool visibleLauncher: false
+    property bool pinnedMode: false
     property string query: ""
     property int selected: 0
-    property string mode: "apps" 
+    property string mode: "all"
     property var audioSvc
 
     IpcHandler {
         target: "launcher"
-        function toggle() { win.visibleLauncher = !win.visibleLauncher; if (win.visibleLauncher) { win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) } }
-        function open(arg: string) { let m = arg || "apps"; win.mode = m; win.visibleLauncher=true; win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) }
+        function toggle() { win.visibleLauncher = !win.visibleLauncher; if (win.visibleLauncher) { win.mode="all"; win.pinnedMode=false; win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) } }
+        function open(arg: string) { let m = arg || "all"; win.mode = (m==="apps") ? "all" : m; win.pinnedMode = m!=="apps" && m!=="all"; win.visibleLauncher=true; win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) }
         function close() { win.visibleLauncher=false }
     }
 
@@ -102,13 +103,10 @@ PanelWindow {
                         focus: true
                         onTextChanged: { win.query = text; win.selected = 0 }
                         Keys.onPressed: e => {
-                            if (e.key === Qt.Key_Escape) { win.visibleLauncher=false; e.accepted=true }
-                            else if (e.key === Qt.Key_Down) { let n = (win.mode==="emoji"||win.mode==="nerd") ? gridCols : 1; let max = resultCount()-1; win.selected = Math.min(win.selected+n, max); e.accepted=true }
-                            else if (e.key === Qt.Key_Up) { let n = (win.mode==="emoji"||win.mode==="nerd") ? gridCols : 1; win.selected = Math.max(win.selected-n, 0); e.accepted=true }
-                            else if (e.key === Qt.Key_Left && (win.mode==="emoji"||win.mode==="nerd")) { win.selected = Math.max(win.selected-1, 0); e.accepted=true }
-                            else if (e.key === Qt.Key_Right && (win.mode==="emoji"||win.mode==="nerd")) { win.selected = Math.min(win.selected+1, resultCount()-1); e.accepted=true }
+                            if (e.key === Qt.Key_Escape) { if (win.mode!=="all" && !win.pinnedMode) { win.mode="all"; input.text=""; win.selected=0; } else win.visibleLauncher=false; e.accepted=true }
+                            else if (e.key === Qt.Key_Down) { win.selected = Math.min(win.selected+1, resultCount()-1); e.accepted=true }
+                            else if (e.key === Qt.Key_Up) { win.selected = Math.max(win.selected-1, 0); e.accepted=true }
                             else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter) { triggerSelected(e.modifiers & Qt.ControlModifier); e.accepted=true }
-                            else if (e.key === Qt.Key_Tab) { cycleMode(); e.accepted=true }
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
@@ -119,7 +117,7 @@ PanelWindow {
                                 if (win.mode==="nerd") return "Search Nerd Fonts\u2026"
                                 if (win.mode==="bluetooth") return "Bluetooth devices\u2026"
                                 if (win.mode==="power") return "Search power actions\u2026"
-                                return "Search apps, clipboard, emoji\u2026  (Tab to switch mode)"
+                                return "Search apps, clipboard, emoji, power\u2026"
                             }
                             color: Theme.g19
                             font.pixelSize: win.mode==="emoji" ? 18 : 15
@@ -144,52 +142,6 @@ PanelWindow {
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: Theme.colBorder; opacity: 0.9 }
 
-                Row {
-                    id: chips
-                    Layout.fillWidth: true
-                    Layout.leftMargin: 12; Layout.rightMargin: 12; Layout.topMargin: 10; Layout.bottomMargin: 6
-                    spacing: 8
-                    Repeater {
-                        model: [
-                            {id:"apps", label:"Apps", icon:"\u{f003b}"},
-                            {id:"clipboard", label:"Clipboard", icon:"\u{f0147}"},
-                            {id:"emoji", label:"Emoji", icon:"\u{1f600}"},
-                            {id:"nerd", label:"Nerd", icon:"\u{f0b10}"},
-                            {id:"bluetooth", label:"Bluetooth", icon:"\u{f00af}"},
-                            {id:"power", label:"Power", icon:"\u{f0425}"}
-                        ]
-                        delegate: Rectangle {
-                            required property var modelData
-                            property bool active: win.mode === modelData.id
-                            height: 28; radius: 14
-                            color: active ? Theme.colFg : Theme.colChipBg
-                            border.color: active ? Theme.colFg : Theme.colBorder
-                            border.width: active?0:1
-                            scale: ma.pressed ? 0.96 : 1
-                            Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
-                            Behavior on color { ColorAnimation { duration: 140 } }
-
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: 6
-                                Text { text: modelData.icon; color: active?Theme.colBg:Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 12 }
-                                Text { text: modelData.label; color: active?Theme.colBg:Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: active?Font.DemiBold:Font.Normal }
-                            }
-                            implicitWidth: chipLabel.implicitWidth + 28
-                            Text { id: chipLabel; visible:false; text: modelData.label; font.family: Theme.fontFamily; font.pixelSize: 12 }
-                            width: Math.max(64, implicitWidth)
-
-                            MouseArea {
-                                id: ma
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: { win.mode = modelData.id; win.selected=0; input.forceActiveFocus() }
-                            }
-                        }
-                    }
-                }
-
                 Item {
                     id: resultsArea
                     Layout.fillWidth: true
@@ -198,7 +150,7 @@ PanelWindow {
                 ListView {
                     id: list
                     anchors.fill: parent
-                    visible: count>0 && !(win.mode==="emoji" || win.mode==="nerd")
+                    visible: count>0
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
                     ScrollBar.vertical: ScrollBar { }
@@ -225,23 +177,23 @@ PanelWindow {
                                 border.color: Theme.colBorder; border.width: 1
                                 IconImage {
                                     anchors.centerIn: parent
-                                    visible: win.mode==="apps" && !!modelData.icon
+                                    visible: modelData.kind==="app" && !!modelData.icon
                                     source: visible ? Quickshell.iconPath(modelData.icon, "application-x-executable") : ""
                                     implicitWidth: 22; implicitHeight: 22
                                 }
                                 Image {
                                     anchors.centerIn: parent
-                                    visible: win.mode==="clipboard" && !!modelData.img
+                                    visible: modelData.kind==="clip" && !!modelData.img
                                     source: visible ? "file://" + modelData.img : ""
                                     width: 26; height: 26; fillMode: Image.PreserveAspectFit
                                     asynchronous: true
                                 }
                                 Text {
                                     anchors.centerIn: parent
-                                    visible: !(win.mode==="apps" && !!modelData.icon) && !(win.mode==="clipboard" && !!modelData.img)
+                                    visible: !(modelData.kind==="app" && !!modelData.icon) && !(modelData.kind==="clip" && !!modelData.img)
                                     text: modelData.icon || "\u{f003b}"
                                     color: isSel ? Theme.colBg : Theme.colFg
-                                    font.family: win.mode==="emoji" ? "Noto Color Emoji" : Theme.fontFamily; font.pixelSize: win.mode==="emoji" ? 18 : 15
+                                    font.family: (modelData.kind==="emoji") ? "Noto Color Emoji" : Theme.fontFamily; font.pixelSize: (modelData.kind==="emoji") ? 18 : 15
                                 }
                             }
                             ColumnLayout {
@@ -279,50 +231,6 @@ PanelWindow {
                     }
                 }
 
-                GridView {
-                    id: grid
-                    anchors.fill: parent
-                    visible: count>0 && (win.mode==="emoji" || win.mode==="nerd")
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-                    ScrollBar.vertical: ScrollBar { }
-
-                    model: filteredModel
-                    currentIndex: win.selected
-                    cellWidth: 56
-                    cellHeight: 56
-                    highlightMoveDuration: 120
-                    delegate: Item {
-                        width: grid.cellWidth
-                        height: grid.cellHeight
-                        required property var modelData
-                        required property int index
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 48; height: 48
-                            radius: 10
-                            color: index === win.selected ? Theme.colHoverAlpha : (cellMa.containsMouse ? Theme.colBgSec : "transparent")
-                            border.color: index === win.selected ? Theme.colBorderStrong : "transparent"
-                            border.width: 1
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.icon
-                                color: Theme.colFg
-                                font.family: win.mode==="emoji" ? "Noto Color Emoji" : Theme.fontFamily
-                                font.pixelSize: win.mode==="emoji" ? 26 : 22
-                            }
-                            MouseArea {
-                                id: cellMa
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: win.selected = index
-                                onClicked: { win.selected = index; triggerSelected(mouse.modifiers & Qt.ControlModifier) }
-                            }
-                        }
-                    }
-                }
-
                 Text {
                     anchors.centerIn: resultsArea
                     visible: resultCount()===0
@@ -337,8 +245,6 @@ PanelWindow {
                     Layout.topMargin: 8; Layout.bottomMargin: 10
                     spacing: 12
                     Text { text: "\u21B5 select"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
-                    Text { text: "\u21E7\u21B5 copy"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10; visible: win.mode==="clipboard"||win.mode==="emoji"||win.mode==="nerd" }
-                    Text { text: "tab mode"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
                     Text { text: "esc close"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
                     Item { Layout.fillWidth: true }
                     Rectangle {
@@ -378,8 +284,7 @@ PanelWindow {
     Services.NerdFontService { id: nerdSvc }
 
     property var appsModel: []
-    readonly property int gridCols: Math.max(1, Math.floor((Config.launcherWidth - 24) / 56))
-    function resultCount() { return (win.mode==="emoji" || win.mode==="nerd") ? grid.count : list.count }
+    function resultCount() { return list.count }
     function refreshApps() {
         appsModel = DesktopEntries.applications.values.filter(e => !e.noDisplay && e.execString).map(e => ({
             title: e.name || e.id,
@@ -393,8 +298,7 @@ PanelWindow {
     property var filteredModel: {
         let q = win.query.toLowerCase().trim();
         let m = win.mode;
-        let grid = (m==="emoji" || m==="nerd");
-        let limit = grid ? 300 : 200;
+        let limit = 200;
         function score(s, q){
             if (!q) return 1;
             s=s.toLowerCase();
@@ -404,85 +308,93 @@ PanelWindow {
             let j=0; for(let c of q){ let i=s.indexOf(c,j); if(i===-1) return 0; j=i+1; }
             return 1;
         }
-        if (m==="apps") {
-            let arr = win.appsModel.map(function(a){ let b={}; for(let k in a) b[k]=a[k]; b._s = score(a.title,q)+score(a.exec||"",q)*0.5; return b; }).filter(function(a){ return !q || a._s>0 });
-            arr.sort(function(a,b){ return b._s - a._s });
-            return arr.slice(0,limit);
+        let out = [];
+        // apps: always in the unified list
+        if (m==="all" || m==="apps") {
+            out = out.concat(win.appsModel.map(function(a){ a.kind="app"; a._s = score(a.title,q)+score(a.subtitle,q)*0.5; return a; }).filter(function(a){ return !q || a._s>0 }));
         }
-        if (m==="clipboard") {
-            let arr = clipSvc.history.map((h,i)=> ({
-                img: h.img || "",
-                title: h.img ? "\u{1f5bc} Image" : (h.preview||h.text).slice(0,72) + (h.text.length>72?"\u2026":""),
-                subtitle: new Date(h.time).toLocaleTimeString() + " \u00B7 " + (h.img ? "image" : h.text.length + " chars"),
-                icon: h.img ? "" : "\u{f0147}", text: h.text, idx: i, actionHint: "\u21B5 paste"
-            }));
-            if (q) arr = arr.filter(x=> x.img ? true : x.text.toLowerCase().includes(q));
-            return arr.slice(0,limit);
-        }
-        if (m==="emoji") {
-            let arr = emojiSvc.emojis.map(x=> ({ title: x.e + "  " + x.n, subtitle: x.n, icon: x.e, text: x.e, actionHint:"\u21B5 paste"}));
-            if (q) arr = arr.filter(x=> x.title.toLowerCase().includes(q) || x.subtitle.includes(q));
-            return arr.slice(0,limit);
-        }
-        if (m==="nerd") {
-            let arr = nerdSvc.icons.map(x=> ({ title: x.c + "  " + x.n, subtitle: x.k + " \u00B7 " + x.n, icon: x.c, text: x.c, actionHint:"\u21B5 paste"}));
-            if (q) arr = arr.filter(x=> x.n.toLowerCase().includes(q) || x.k.includes(q));
-            return arr.slice(0,limit);
+        // source switchers: submenu of the root list
+        if (m==="all") {
+            let switches = [
+                { title:"Emoji Picker", subtitle:"search + paste emoji", icon:"\u{1f600}", go:"emoji" },
+                { title:"Nerd Fonts", subtitle:"search + paste icons", icon:"\u{f0b10}", go:"nerd" },
+                { title:"Clipboard History", subtitle:"paste recent clips", icon:"\u{f0147}", go:"clipboard" },
+                { title:"Bluetooth", subtitle:"manage devices", icon:"\u{f00af}", go:"bluetooth" },
+                { title:"Power", subtitle:"lock, reboot, shutdown\u2026", icon:"\u{f0425}", go:"power" }
+            ];
+            out = out.concat(switches.map(x=> { x.kind="switch"; x._s = score(x.title+" "+x.subtitle, q); return x; }).filter(x=> x._s>0));
         }
         if (m==="power") {
-            let arr = [
+            out = out.concat([
                 { title:"Lock", subtitle:"hyprlock", icon:"\u{f023}", cmd:"hyprlock" },
                 { title:"Logout", subtitle:"exit Hyprland", icon:"\u{f08b}", cmd:"hyprctl dispatch exit" },
                 { title:"Suspend", subtitle:"systemctl suspend", icon:"\u{f186}", cmd:"systemctl suspend" },
                 { title:"Reboot", subtitle:"systemctl reboot", icon:"\u{f021}", cmd:"systemctl reboot" },
                 { title:"Shutdown", subtitle:"systemctl poweroff", icon:"\u{f0425}", cmd:"systemctl poweroff" }
-            ];
-            if (q) arr = arr.filter(x=> x.title.toLowerCase().includes(q) || x.subtitle.includes(q));
-            return arr;
+            ].map(x=> { x.kind="power"; x._s = score(x.title+" "+x.subtitle, q)*0.5 + (q?0:0.4); return x; }).filter(x=> x._s>0));
+        }
+        // other sources: only via pinned mode (submenu / keybind)
+        if (m==="clipboard") {
+            out = out.concat(clipSvc.history.map((h,i)=> ({
+                kind:"clip",
+                img: h.img || "",
+                title: h.img ? "\u{1f5bc} Image" : (h.preview||h.text).slice(0,72) + (h.text.length>72?"\u2026":""),
+                subtitle: new Date(h.time).toLocaleTimeString() + " \u00B7 " + (h.img ? "image" : h.text.length + " chars"),
+                icon: h.img ? "" : "\u{f0147}", text: h.text, idx: i, actionHint: "\u21B5 paste",
+                _s: score(h.img ? "image" : h.text, q)*0.9
+            })).filter(x=> x._s>0));
+        }
+        if (m==="emoji") {
+            out = out.concat(emojiSvc.emojis.map(x=> ({kind:"emoji", title: x.e + "  " + x.n, subtitle: x.n, icon: x.e, text: x.e, actionHint:"\u21B5 paste", _s: score(x.n,q)*0.8})).filter(x=> x._s>0));
+        }
+        if (m==="nerd") {
+            out = out.concat(nerdSvc.icons.map(x=> ({kind:"nerd", title: x.c + "  " + x.n, subtitle: x.k + " \u00B7 " + x.n, icon: x.c, text: x.c, actionHint:"\u21B5 paste", _s: score(x.n,q)*0.7})).filter(x=> x._s>0));
         }
         if (m==="bluetooth") {
             let arr = btSvc.devices.map(d=> ({
+                kind:"bt",
                 title: d.name, subtitle: d.addr + (d.connected?" \u00B7 connected":""), icon: "\u{f00af}",
-                addr: d.addr, connected: d.connected, actionHint: d.connected?"disconnect":"connect"
+                addr: d.addr, connected: d.connected, _s: score(d.name, q), actionHint: d.connected?"disconnect":"connect"
             }));
-            if (q) arr = arr.filter(x=> x.title.toLowerCase().includes(q));
+            if (q) arr = arr.filter(x=> x._s>0);
             arr.sort((a,b)=> (b.connected?1:0) - (a.connected?1:0));
-            if (!q) arr.unshift({ title: btSvc.powered?"Bluetooth On":"Bluetooth Off", subtitle: "Toggle power", icon: "\u{f00af}", _action:"power", actionHint:"toggle"});
-            return arr.slice(0,limit);
+            if (!q) arr.unshift({ kind:"bt", title: btSvc.powered?"Bluetooth On":"Bluetooth Off", subtitle: "Toggle power", icon: "\u{f00af}", _action:"power", actionHint:"toggle"});
+            out = out.concat(arr);
         }
-        return [];
+        out.sort(function(a,b){ return b._s - a._s });
+        return out.slice(0,limit);
     }
 
-    function cycleMode(){
-        let order=["apps","clipboard","emoji","nerd","bluetooth","power"];
-        let i=order.indexOf(win.mode);
-        win.mode = order[(i+1)%order.length];
-        win.selected=0;
-    }
     function triggerSelected(ctrl){
-        let m = win.filteredModel[win.selected];
-        if(!m) return;
-        let mode = win.mode;
-        if(mode==="apps"){
-            if(m.entry && m.entry.execute) m.entry.execute();
-            else { let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win); p.command=["sh","-c",(m.exec||"")+" >/dev/null 2>&1 & disown"]; p.running=true; }
+        let it = win.filteredModel[win.selected];
+        if(!it) return;
+        if(it.kind==="app"){
+            if(it.entry && it.entry.execute) it.entry.execute();
+            else { let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win); p.command=["sh","-c",(it.exec||"")+" >/dev/null 2>&1 & disown"]; p.running=true; }
             win.visibleLauncher=false;
-        } else if(mode==="clipboard"){
-            if(m.img) { clipSvc.copyFile(m.img); }
-            else if(ctrl) clipSvc.copy(m.text);
-            else clipSvc.autopaste(m.text);
+        } else if(it.kind==="clip"){
+            if(it.img) { clipSvc.copyFile(it.img); }
+            else if(ctrl) clipSvc.copy(it.text);
+            else clipSvc.autopaste(it.text);
             win.visibleLauncher=false;
-        } else if(mode==="emoji"||mode==="nerd"){
-            if(ctrl) { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + m.text.replace(/'/g,"'\\\\''") + "' | wl-copy"]; pp.running=true; }
-            else { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + m.text.replace(/'/g,"'\\\\''") + "' | wl-copy; sleep 0.12; if command -v wtype >/dev/null 2>&1; then wtype -- '" + m.text.replace(/'/g,"'\\\\''") + "' 2>/dev/null; fi"]; pp.running=true; }
+        } else if(it.kind==="emoji"||it.kind==="nerd"){
+            if(ctrl) { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + it.text.replace(/'/g,"'\\''") + "' | wl-copy"]; pp.running=true; }
+            else { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + it.text.replace(/'/g,"'\\''") + "' | wl-copy; sleep 0.12; if command -v wtype >/dev/null 2>&1; then wtype -- '" + it.text.replace(/'/g,"'\\''") + "' 2>/dev/null; fi"]; pp.running=true; }
             win.visibleLauncher=false;
-        } else if(mode==="bluetooth"){
-            if(m._action==="power") btSvc.togglePower();
-            else if(m.connected) btSvc.disconnect(m.addr);
-            else btSvc.connect(m.addr);
-        } else if(mode==="power"){
+        } else if(it.kind==="switch"){
+            win.mode = it.go;
+            win.pinnedMode = false;
+            input.text = "";
+            win.selected = 0;
+            if(it.go==="bluetooth") btSvc.refresh();
+            input.forceActiveFocus();
+        } else if(it.kind==="bt"){
+            if(it._action==="power") btSvc.togglePower();
+            else if(it.connected) btSvc.disconnect(it.addr);
+            else btSvc.connect(it.addr);
+        } else if(it.kind==="power"){
             let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win);
-            p.command=["sh","-c",m.cmd+" >/dev/null 2>&1"];
+            p.command=["sh","-c",it.cmd+" >/dev/null 2>&1"];
             p.running=true;
             win.visibleLauncher=false;
         }
