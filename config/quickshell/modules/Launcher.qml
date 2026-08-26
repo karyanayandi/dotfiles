@@ -1,27 +1,43 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
+import "launcher" as LauncherParts
 import ".."
-import "../services" as Services
 
 PanelWindow {
     id: win
     property bool visibleLauncher: false
-    property bool pinnedMode: false
-    property string query: ""
-    property int selected: 0
-    property string mode: "all"
-    property var audioSvc
+
+    function open(mode) {
+        const selectedMode = mode || "all"
+        model.mode = selectedMode === "apps" ? "all" : selectedMode
+        model.pinnedMode = selectedMode !== "apps" && selectedMode !== "all"
+        model.query = ""
+        model.selected = 0
+        visibleLauncher = true
+        input.clear()
+        Qt.callLater(() => input.focusInput())
+    }
 
     IpcHandler {
         target: "launcher"
-        function toggle() { win.visibleLauncher = !win.visibleLauncher; if (win.visibleLauncher) { win.mode="all"; win.pinnedMode=false; win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) } }
-        function open(arg: string) { let m = arg || "all"; win.mode = (m==="apps") ? "all" : m; win.pinnedMode = m!=="apps" && m!=="all"; win.visibleLauncher=true; win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) }
-        function close() { win.visibleLauncher=false }
+        function toggle() {
+            if (win.visibleLauncher) win.visibleLauncher = false
+            else win.open("all")
+        }
+        function open(arg: string) { win.open(arg) }
+        function close() { win.visibleLauncher = false }
+    }
+
+    LauncherParts.LauncherModel {
+        id: model
+        onCloseRequested: win.visibleLauncher = false
+        onSourceOpened: {
+            input.clear()
+            input.focusInput()
+        }
     }
 
     visible: visibleLauncher || _opacity > 0.01
@@ -38,10 +54,14 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(0x1d/255,0x20/255,0x21/255, visibleLauncher?0.34:0)
+        color: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, visibleLauncher ? 0.34 : 0)
         opacity: win._opacity
         Behavior on color { ColorAnimation { duration: 220; easing.type: Easing.OutCubic } }
-        MouseArea { anchors.fill: parent; onClicked: win.visibleLauncher=false; enabled: win.visibleLauncher }
+        MouseArea {
+            anchors.fill: parent
+            enabled: win.visibleLauncher
+            onClicked: win.visibleLauncher = false
+        }
     }
 
     Item {
@@ -49,16 +69,16 @@ PanelWindow {
         width: Math.min(Config.launcherWidth, parent.width - 48)
         scale: 0.96 + win._opacity * 0.04
         opacity: win._opacity
-        Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
-        Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        implicitHeight: card.implicitHeight
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        implicitHeight: card.implicitHeight
+        Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
         Rectangle {
             id: card
             width: parent.width
-            implicitHeight: col.implicitHeight + 2
+            implicitHeight: column.implicitHeight + 2
             radius: Config.launcherRadius
             color: Theme.colLauncherBg
             border.color: Theme.colLauncherBorder
@@ -72,333 +92,59 @@ PanelWindow {
                 opacity: 0.55
                 z: -1
             }
+
             ColumnLayout {
-                id: col
-                anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                id: column
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
                 spacing: 0
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Config.launcherInputHeight
-                    spacing: 12
-                    Layout.leftMargin: 16; Layout.rightMargin: 16
-
-                    Text {
-                        text: "\u{f0349}"
-                        color: Theme.colMuted
-                        font.family: Theme.fontFamily; font.pixelSize: 18
-                        Layout.alignment: Qt.AlignVCenter
-                    }
-                    TextInput {
-                        id: input
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignVCenter
-                        color: Theme.colFg
-                        selectionColor: Theme.colSelected
-                        selectedTextColor: Theme.colBg
-                        font.family: Theme.fontFamily
-                        font.pixelSize: 17
-                        font.weight: Font.Normal
-                        clip: true
-                        focus: true
-                        onTextChanged: { win.query = text; win.selected = 0 }
-                        Keys.onPressed: e => {
-                            if (e.key === Qt.Key_Escape) { if (win.mode!=="all" && !win.pinnedMode) { win.mode="all"; input.text=""; win.selected=0; } else win.visibleLauncher=false; e.accepted=true }
-                            else if (e.key === Qt.Key_Down) { win.selected = Math.min(win.selected+1, resultCount()-1); e.accepted=true }
-                            else if (e.key === Qt.Key_Up) { win.selected = Math.max(win.selected-1, 0); e.accepted=true }
-                            else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter) { triggerSelected(e.modifiers & Qt.ControlModifier); e.accepted=true }
-                        }
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: !parent.text.length
-                            text: {
-                                if (win.mode==="clipboard") return "Search clipboard\u2026  (autopaste on Enter, copy on Ctrl+Enter)"
-                                if (win.mode==="emoji") return "Search emoji\u2026  (e.g. fire, heart)"
-                                if (win.mode==="nerd") return "Search Nerd Fonts\u2026"
-                                if (win.mode==="bluetooth") return "Bluetooth devices\u2026"
-                                if (win.mode==="power") return "Search power actions\u2026"
-                                return "Search apps, clipboard, emoji, power\u2026"
-                            }
-                            color: Theme.g19
-                            font.pixelSize: win.mode==="emoji" ? 18 : 15
+                LauncherParts.SearchInput {
+                    id: input
+                    mode: model.mode
+                    onQueryChanged: query => model.query = query
+                    onEscapePressed: {
+                        if (model.mode !== "all" && !model.pinnedMode) {
+                            model.mode = "all"
+                            model.query = ""
+                            model.selected = 0
+                            input.clear()
+                        } else {
+                            win.visibleLauncher = false
                         }
                     }
-                    Text {
-                        visible: input.text.length>0
-                        text: "\u2715"
-                        color: Theme.colMuted; font.pixelSize: 14; font.family: Theme.fontFamily
-                        Layout.alignment: Qt.AlignVCenter
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { input.text=""; input.forceActiveFocus() } }
-                    }
-                    Text {
-                        text: "esc"
-                        color: Qt.rgba(0x7c/255,0x6f/255,0x64/255,0.9)
-                        font.family: Theme.fontFamily; font.pixelSize: 10
-                        visible: !input.text.length
-                        Layout.alignment: Qt.AlignVCenter
-                        Rectangle { anchors.centerIn: parent; width: parent.width+10; height: parent.height+6; radius: 6; color: Theme.colChipBg; z: -1; border.color: Theme.colBorder; border.width: 1 }
-                    }
+                    onSelectionMoved: amount => model.selected = Math.max(0, Math.min(model.selected + amount, model.results.length - 1))
+                    onSelected: ctrl => model.triggerSelected(ctrl)
                 }
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: Theme.colBorder; opacity: 0.9 }
 
-                Item {
-                    id: resultsArea
+                LauncherParts.Results {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 360
-
-                ListView {
-                    id: list
-                    anchors.fill: parent
-                    visible: count>0
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-                    ScrollBar.vertical: ScrollBar { }
-
-                    model: filteredModel
-                    currentIndex: win.selected
-                    highlightMoveDuration: 140
-                    highlightMoveVelocity: -1
-                    highlight: Rectangle { radius: 10; color: Theme.colHoverAlpha; border.color: Theme.colBorder; border.width: 1 }
-                    delegate: Item {
-                        width: list.width
-                        height: 52
-                        required property var modelData
-                        required property int index
-                        property bool isSel: index === win.selected
-
-                        RowLayout {
-                            anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12
-                            spacing: 12
-                            Rectangle {
-                                Layout.preferredWidth: 32; Layout.preferredHeight: 32
-                                radius: 8
-                                color: isSel ? Theme.colFg : Theme.g1
-                                border.color: Theme.colBorder; border.width: 1
-                                IconImage {
-                                    anchors.centerIn: parent
-                                    visible: modelData.kind==="app" && !!modelData.icon
-                                    source: visible ? Quickshell.iconPath(modelData.icon, "application-x-executable") : ""
-                                    implicitWidth: 22; implicitHeight: 22
-                                }
-                                Image {
-                                    anchors.centerIn: parent
-                                    visible: modelData.kind==="clip" && !!modelData.img
-                                    source: visible ? "file://" + modelData.img : ""
-                                    width: 26; height: 26; fillMode: Image.PreserveAspectFit
-                                    asynchronous: true
-                                }
-                                Text {
-                                    anchors.centerIn: parent
-                                    visible: !(modelData.kind==="app" && !!modelData.icon) && !(modelData.kind==="clip" && !!modelData.img)
-                                    text: modelData.icon || "\u{f003b}"
-                                    color: isSel ? Theme.colBg : Theme.colFg
-                                    font.family: (modelData.kind==="emoji") ? "Noto Color Emoji" : Theme.fontFamily; font.pixelSize: (modelData.kind==="emoji") ? 18 : 15
-                                }
-                            }
-                            ColumnLayout {
-                                Layout.fillWidth: true; spacing: 1
-                                Layout.alignment: Qt.AlignVCenter
-                                Text {
-                                    text: modelData.title || ""
-                                    color: Theme.colFg
-                                    font.family: Theme.fontFamily; font.pixelSize: 14
-                                    font.weight: isSel?Font.DemiBold:Font.Normal
-                                    elide: Text.ElideRight; Layout.fillWidth: true
-                                }
-                                Text {
-                                    text: modelData.subtitle || ""
-                                    color: Theme.g19
-                                    font.family: Theme.fontFamily; font.pixelSize: 11
-                                    elide: Text.ElideRight; Layout.fillWidth: true
-                                    visible: text.length>0
-                                }
-                            }
-                            Text {
-                                visible: !!modelData.actionHint
-                                text: modelData.actionHint
-                                color: Theme.colMuted; font.family: Theme.fontFamily; font.pixelSize: 10
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.selected = index
-                            onClicked: { win.selected=index; triggerSelected(mouse.modifiers & Qt.ControlModifier) }
-                        }
+                    model: model.results
+                    selected: model.selected
+                    emptyText: model.mode === "clipboard" ? "No clipboard history yet — copy something" : model.mode === "bluetooth" ? "No devices — press Scan" : "No results"
+                    onSelectionRequested: index => model.selected = index
+                    onActivated: (index, ctrl) => {
+                        model.selected = index
+                        model.triggerSelected(ctrl)
                     }
                 }
 
-                Text {
-                    anchors.centerIn: resultsArea
-                    visible: resultCount()===0
-                    text: win.mode==="clipboard" ? "No clipboard history yet \u2014 copy something" : win.mode==="bluetooth" ? "No devices \u2014 press Scan" : "No results"
-                    color: Theme.g19; font.family: Theme.fontFamily; font.pixelSize: 12
-                }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.leftMargin: 14; Layout.rightMargin: 14
-                    Layout.topMargin: 8; Layout.bottomMargin: 10
-                    spacing: 12
-                    Text { text: "\u21B5 select"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
-                    Text { text: "esc close"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
-                    Item { Layout.fillWidth: true }
-                    Rectangle {
-                        visible: win.mode==="bluetooth"
-                        height: 24; radius: 8
-                        color: btSvc.scanning ? Theme.colHoverAlpha : Theme.colChipBg
-                        border.color: Theme.colBorder; border.width: 1
-                        implicitWidth: btLabel.implicitWidth + 20
-                        Text { id: btLabel; anchors.centerIn: parent; text: btSvc.scanning ? "Scanning\u2026" : "Scan"; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 11 }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: btSvc.scan() }
-                    }
-                    Rectangle {
-                        visible: win.mode==="bluetooth"
-                        height: 24; radius: 8
-                        color: btSvc.powered ? Theme.g7 : Theme.colChipBg
-                        border.color: Theme.colBorder; border.width: 1
-                        implicitWidth: pwLabel.implicitWidth + 20
-                        Text { id: pwLabel; anchors.centerIn: parent; text: btSvc.powered ? "BT On" : "BT Off"; color: btSvc.powered?Theme.colBg:Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 11 }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: btSvc.togglePower() }
-                    }
-                    Rectangle {
-                        visible: win.mode==="clipboard"
-                        height: 24; radius: 8
-                        color: Theme.colChipBg; border.color: Theme.colBorder; border.width: 1
-                        implicitWidth: clrLabel.implicitWidth + 20
-                        Text { id: clrLabel; anchors.centerIn: parent; text: "Clear"; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 11 }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: clipSvc.clear() }
-                    }
+                LauncherParts.Footer {
+                    mode: model.mode
+                    bluetooth: model.bluetooth
+                    clipboard: model.clipboard
                 }
             }
         }
     }
 
-    Services.ClipboardService { id: clipSvc }
-    Services.BluetoothService { id: btSvc }
-    Services.EmojiService { id: emojiSvc }
-    Services.NerdFontService { id: nerdSvc }
-
-    property var appsModel: []
-    function resultCount() { return list.count }
-    function refreshApps() {
-        appsModel = DesktopEntries.applications.values.filter(e => !e.noDisplay && e.execString).map(e => ({
-            title: e.name || e.id,
-            subtitle: (e.execString || "").split(" ")[0].replace(/^.*\//, ""),
-            icon: e.icon || "",
-            entry: e,
-            actionHint: "\u21B5"
-        }));
+    onVisibleLauncherChanged: if (visibleLauncher) {
+        Qt.callLater(() => input.focusInput())
+        model.refreshApps()
+        if (model.mode === "bluetooth") model.refreshBluetooth()
     }
-    Timer { interval: 500; running: true; repeat: true; onTriggered: if (win.appsModel.length === 0) win.refreshApps() }
-    property var filteredModel: {
-        let q = win.query.toLowerCase().trim();
-        let m = win.mode;
-        let limit = 200;
-        function score(s, q){
-            if (!q) return 1;
-            s=s.toLowerCase();
-            if (s===q) return 100;
-            if (s.startsWith(q)) return 50;
-            if (s.includes(q)) return 10;
-            let j=0; for(let c of q){ let i=s.indexOf(c,j); if(i===-1) return 0; j=i+1; }
-            return 1;
-        }
-        let out = [];
-        // apps: always in the unified list
-        if (m==="all" || m==="apps") {
-            out = out.concat(win.appsModel.map(function(a){ a.kind="app"; a._s = score(a.title,q)+score(a.subtitle,q)*0.5; return a; }).filter(function(a){ return !q || a._s>0 }));
-        }
-        // source switchers: submenu of the root list
-        if (m==="all") {
-            let switches = [
-                { title:"Emoji Picker", subtitle:"search + paste emoji", icon:"\u{1f600}", go:"emoji" },
-                { title:"Nerd Fonts", subtitle:"search + paste icons", icon:"\u{f0b10}", go:"nerd" },
-                { title:"Clipboard History", subtitle:"paste recent clips", icon:"\u{f0147}", go:"clipboard" },
-                { title:"Bluetooth", subtitle:"manage devices", icon:"\u{f00af}", go:"bluetooth" },
-                { title:"Power", subtitle:"lock, reboot, shutdown\u2026", icon:"\u{f0425}", go:"power" }
-            ];
-            out = out.concat(switches.map(x=> { x.kind="switch"; x._s = score(x.title+" "+x.subtitle, q); return x; }).filter(x=> x._s>0));
-        }
-        if (m==="power") {
-            out = out.concat([
-                { title:"Lock", subtitle:"hyprlock", icon:"\u{f023}", cmd:"hyprlock" },
-                { title:"Logout", subtitle:"exit Hyprland", icon:"\u{f08b}", cmd:"hyprctl dispatch exit" },
-                { title:"Suspend", subtitle:"systemctl suspend", icon:"\u{f186}", cmd:"systemctl suspend" },
-                { title:"Reboot", subtitle:"systemctl reboot", icon:"\u{f021}", cmd:"systemctl reboot" },
-                { title:"Shutdown", subtitle:"systemctl poweroff", icon:"\u{f0425}", cmd:"systemctl poweroff" }
-            ].map(x=> { x.kind="power"; x._s = score(x.title+" "+x.subtitle, q)*0.5 + (q?0:0.4); return x; }).filter(x=> x._s>0));
-        }
-        // other sources: only via pinned mode (submenu / keybind)
-        if (m==="clipboard") {
-            out = out.concat(clipSvc.history.map((h,i)=> ({
-                kind:"clip",
-                img: h.img || "",
-                title: h.img ? "\u{1f5bc} Image" : (h.preview||h.text).slice(0,72) + (h.text.length>72?"\u2026":""),
-                subtitle: new Date(h.time).toLocaleTimeString() + " \u00B7 " + (h.img ? "image" : h.text.length + " chars"),
-                icon: h.img ? "" : "\u{f0147}", text: h.text, idx: i, actionHint: "\u21B5 paste",
-                _s: score(h.img ? "image" : h.text, q)*0.9
-            })).filter(x=> x._s>0));
-        }
-        if (m==="emoji") {
-            out = out.concat(emojiSvc.emojis.map(x=> ({kind:"emoji", title: x.e + "  " + x.n, subtitle: x.n, icon: x.e, text: x.e, actionHint:"\u21B5 paste", _s: score(x.n,q)*0.8})).filter(x=> x._s>0));
-        }
-        if (m==="nerd") {
-            out = out.concat(nerdSvc.icons.map(x=> ({kind:"nerd", title: x.c + "  " + x.n, subtitle: x.k + " \u00B7 " + x.n, icon: x.c, text: x.c, actionHint:"\u21B5 paste", _s: score(x.n,q)*0.7})).filter(x=> x._s>0));
-        }
-        if (m==="bluetooth") {
-            let arr = btSvc.devices.map(d=> ({
-                kind:"bt",
-                title: d.name, subtitle: d.addr + (d.connected?" \u00B7 connected":""), icon: "\u{f00af}",
-                addr: d.addr, connected: d.connected, _s: score(d.name, q), actionHint: d.connected?"disconnect":"connect"
-            }));
-            if (q) arr = arr.filter(x=> x._s>0);
-            arr.sort((a,b)=> (b.connected?1:0) - (a.connected?1:0));
-            if (!q) arr.unshift({ kind:"bt", title: btSvc.powered?"Bluetooth On":"Bluetooth Off", subtitle: "Toggle power", icon: "\u{f00af}", _action:"power", actionHint:"toggle"});
-            out = out.concat(arr);
-        }
-        out.sort(function(a,b){ return b._s - a._s });
-        return out.slice(0,limit);
-    }
-
-    function triggerSelected(ctrl){
-        let it = win.filteredModel[win.selected];
-        if(!it) return;
-        if(it.kind==="app"){
-            if(it.entry && it.entry.execute) it.entry.execute();
-            else { let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win); p.command=["sh","-c",(it.exec||"")+" >/dev/null 2>&1 & disown"]; p.running=true; }
-            win.visibleLauncher=false;
-        } else if(it.kind==="clip"){
-            if(it.img) { clipSvc.copyFile(it.img); }
-            else if(ctrl) clipSvc.copy(it.text);
-            else clipSvc.autopaste(it.text);
-            win.visibleLauncher=false;
-        } else if(it.kind==="emoji"||it.kind==="nerd"){
-            if(ctrl) { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + it.text.replace(/'/g,"'\\''") + "' | wl-copy"]; pp.running=true; }
-            else { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + it.text.replace(/'/g,"'\\''") + "' | wl-copy; sleep 0.12; if command -v wtype >/dev/null 2>&1; then wtype -- '" + it.text.replace(/'/g,"'\\''") + "' 2>/dev/null; fi"]; pp.running=true; }
-            win.visibleLauncher=false;
-        } else if(it.kind==="switch"){
-            win.mode = it.go;
-            win.pinnedMode = false;
-            input.text = "";
-            win.selected = 0;
-            if(it.go==="bluetooth") btSvc.refresh();
-            input.forceActiveFocus();
-        } else if(it.kind==="bt"){
-            if(it._action==="power") btSvc.togglePower();
-            else if(it.connected) btSvc.disconnect(it.addr);
-            else btSvc.connect(it.addr);
-        } else if(it.kind==="power"){
-            let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win);
-            p.command=["sh","-c",it.cmd+" >/dev/null 2>&1"];
-            p.running=true;
-            win.visibleLauncher=false;
-        }
-    }
-
-    onVisibleLauncherChanged: if(visibleLauncher) { Qt.callLater(()=> input.forceActiveFocus()); refreshApps(); if(mode==="bluetooth") btSvc.refresh(); }
 }

@@ -7,7 +7,7 @@ ShellRoot {
     Services.NotificationService { id: notifs }
 
     Modules.Bar { audio: audio; notifs: notifs }
-    Modules.Launcher { audioSvc: audio }
+    Modules.Launcher {}
     Modules.Osd { audio: audio }
     Modules.NotificationPopups { notifs: notifs }
     Modules.NotificationCenter { notifs: notifs }
