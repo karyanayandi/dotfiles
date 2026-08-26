@@ -1,7 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
-import QtQuick.Layouts
+import QtQuick.Window
 
 PanelWindow {
     id: win
@@ -9,52 +9,123 @@ PanelWindow {
     required property var audio
 
     property real _osdOpacity: audio.osdVisible ? 1 : 0
-    Behavior on _osdOpacity { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
-    visible: audio.osdVisible || _osdOpacity > 0.01
-    anchors.top: true
-    margins.top: 80
-    implicitWidth: 380
-    implicitHeight: 56
-    exclusiveZone: 0
-    color: "transparent"
-    mask: Region { item: osdWrap }
-    WlrLayershell.namespace: "quickshell-osd"
-    WlrLayershell.layer: WlrLayer.Overlay
-
-    Item {
-        id: osdWrap
-        anchors.centerIn: parent
-        width: 360; height: 44
-        opacity: win._osdOpacity
-        scale: 0.96 + win._osdOpacity * 0.04
-        transformOrigin: Item.Center
-        Behavior on scale { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
-        Behavior on opacity { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
-
-    Rectangle {
-        id: osdBg
-        anchors.fill: parent
-        radius: 10
-        color: win.theme.colBgAlpha095
-        border.color: Qt.rgba(1,1,1,0.10); border.width: 1
-        RowLayout {
-            anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; spacing: 12
-            Text { text: win.audio.osdIcon; color: win.theme.colFg; font.family: win.theme.fontFamily; font.pixelSize: 18; Layout.alignment: Qt.AlignVCenter }
-            Rectangle {
-                Layout.fillWidth: true; Layout.preferredHeight: 8; Layout.alignment: Qt.AlignVCenter; radius: 4; color: win.theme.colAccent
-                Rectangle {
-                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
-                    width: parent.width * Math.min(1, win.audio.osdPercent / 100)
-                    radius: 4; color: win.audio.muted && win.audio.osdKind === "sink" ? win.theme.colUrgent : win.theme.colFg
-                    Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
-                }
-            }
-            Text {
-                text: win.audio.osdKind === "mic" ? (win.audio.muted ? "muted" : "mic") : (win.audio.muted ? "muted" : win.audio.osdPercent + "%")
-                color: win.theme.colFg; font.family: win.theme.fontFamily; font.pixelSize: 13
-                Layout.alignment: Qt.AlignVCenter; Layout.preferredWidth: 52; horizontalAlignment: Text.AlignRight
-            }
+    Behavior on _osdOpacity {
+        NumberAnimation {
+            duration: win.audio.osdVisible ? 360 : 220
+            easing.type: win.audio.osdVisible ? Easing.OutCubic : Easing.InCubic
         }
     }
+
+    anchors.top: true
+    margins.top: Math.round((Screen.height / 2) - 88)
+    implicitWidth: 200
+    implicitHeight: 176
+    exclusiveZone: 0
+    color: "transparent"
+    visible: audio.osdVisible || _osdOpacity > 0.01
+    mask: Region { item: cardWrap }
+
+    WlrLayershell.namespace: "quickshell-osd"
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+    Item {
+        id: cardWrap
+        anchors.centerIn: parent
+        width: 200
+        height: 176
+        opacity: win._osdOpacity
+        scale: 0.86 + win._osdOpacity * 0.14
+        transformOrigin: Item.Center
+        Behavior on scale {
+            NumberAnimation {
+                duration: win.audio.osdVisible ? 420 : 200
+                easing.type: win.audio.osdVisible ? Easing.OutBack : Easing.InCubic
+                easing.overshoot: 1.12
+            }
+        }
+        Behavior on opacity {
+            NumberAnimation { duration: 260; easing.type: Easing.OutCubic }
+        }
+
+        Rectangle {
+            anchors.fill: card
+            anchors.topMargin: 2
+            radius: card.radius
+            color: Qt.rgba(0, 0, 0, 0.32)
+            z: -1
+        }
+
+        Rectangle {
+            id: card
+            anchors.fill: parent
+            radius: 18
+            color: Qt.rgba(0.11, 0.11, 0.11, 0.78)
+            border.color: Qt.rgba(1, 1, 1, 0.10)
+            border.width: 1
+
+            Rectangle {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 1
+                radius: parent.radius
+                color: Qt.rgba(1, 1, 1, 0.14)
+                opacity: 0.9
+            }
+
+            Column {
+                anchors.centerIn: parent
+                spacing: 0
+                width: parent.width
+
+                Text {
+                    id: glyph
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: win.audio.osdIcon
+                    color: "white"
+                    opacity: win.audio.muted && win.audio.osdKind === "sink" ? 0.55 : 1.0
+                    font.family: win.theme.fontFamily
+                    font.pixelSize: 56
+                    font.weight: Font.Normal
+                    horizontalAlignment: Text.AlignHCenter
+                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                }
+
+                Item { width: 1; height: 18 }
+
+                Rectangle {
+                    id: meter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 144; height: 6; radius: 3
+                    color: Qt.rgba(1, 1, 1, 0.22)
+                    Rectangle {
+                        anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                        width: parent.width * Math.min(1, win.audio.osdPercent / 100)
+                        radius: 3
+                        color: win.audio.muted && win.audio.osdKind === "sink" ? Qt.rgba(1, 1, 1, 0.45) : "white"
+                        Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                    }
+                }
+
+                Item { width: 1; height: 10 }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: {
+                        if (win.audio.osdKind === "mic") return win.audio.muted ? "Microphone muted" : "Microphone"
+                        if (win.audio.muted) return "Muted"
+                        return win.audio.osdPercent + "%"
+                    }
+                    color: Qt.rgba(1, 1, 1, 0.58)
+                    font.family: win.theme.fontFamily
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
+                    font.letterSpacing: 0.3
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+        }
     }
 }
