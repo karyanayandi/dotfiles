@@ -175,7 +175,9 @@ export class TaskWidget {
 
     const spinnerChar = SPINNER[this.widgetFrame % SPINNER.length]
     const lines: string[] = [
-      truncate(theme.fg("accent", "●") + " " + theme.fg("accent", statusText)),
+      truncate(
+        "  " + theme.fg("accent", "●") + " " + theme.fg("accent", statusText),
+      ),
     ]
 
     const showAll = this.config.showAll ?? false
