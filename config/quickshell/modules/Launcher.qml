@@ -23,9 +23,9 @@ PanelWindow {
 
     IpcHandler {
         target: "launcher"
-        function toggle() {
+        function toggle(arg: string) {
             if (win.visibleLauncher) win.visibleLauncher = false
-            else win.open("all")
+            else win.open(arg || "all")
         }
         function open(arg: string) { win.open(arg) }
         function close() { win.visibleLauncher = false }
