@@ -20,8 +20,6 @@
     "npm:pi-mcp-adapter",
     "npm:pi-nvim",
     "npm:pi-observational-memory",
-    "npm:pi-ollama-cloud",
-    "npm:pi-set-model",
     "npm:pi-skill-palette",
     "npm:pi-tool-display",
     "npm:pi-worktrunk"
@@ -36,9 +34,10 @@
   "ui": {
     "layout": "minimal"
   },
+  "tuiMode": "fullscreen",
   "modelThinkingLevels": {
+    "openai-codex/gpt-5.6-terra": "high",
     "openai-codex/gpt-5.6-sol": "medium",
-    "opencode/muse-spark-1.2-contributor-free": "xhigh",
-    "9router/oc/deepseek-v4-flash-free": "max"
+    "openai-codex/gpt-5.6-luna": "max"
   }
 }

@@ -27,20 +27,6 @@ import {
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
-type ThinkingLevel = ReturnType<ExtensionAPI["getThinkingLevel"]>
-type ThinkingModel = Pick<
-  NonNullable<ExtensionContext["model"]>,
-  "thinkingLevelMap"
->
-
-export function effectiveThinkingLevel(
-  model: ThinkingModel | undefined,
-  level: ThinkingLevel,
-) {
-  const mapped = model?.thinkingLevelMap?.[level]
-  return typeof mapped === "string" ? mapped : level
-}
-
 class EmptyFooter implements Component {
   render(): string[] {
     return []
@@ -167,7 +153,7 @@ export default function ui(pi: ExtensionAPI) {
           const left = theme.fg(
             "dim",
             sanitizeTerminalText(
-              `${ctx.model?.id ?? "no model"} · ${effectiveThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
+              `${ctx.model?.id ?? "no model"} · ${pi.getThinkingLevel()}`,
             ),
           )
           const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "—"]
@@ -405,7 +391,7 @@ export default function ui(pi: ExtensionAPI) {
           // Add a blank top margin and drop the bottom border.
           const body = lines.filter((line) => line !== "")
           const info = truncateToWidth(
-            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${effectiveThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
             width,
             "…",
           )
@@ -455,7 +441,7 @@ export default function ui(pi: ExtensionAPI) {
         const status = truncateToWidth(
           [
             gitStatus,
-            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${effectiveThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
           ]
             .filter(Boolean)
             .join(" · "),
