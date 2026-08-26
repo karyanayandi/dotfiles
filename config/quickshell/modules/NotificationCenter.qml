@@ -17,7 +17,7 @@ PanelWindow {
     anchors { top: true; right: true }
     margins { top: 18; right: 18 }
     implicitWidth: Config.centerWidth
-    implicitHeight: bgWrap.height
+    implicitHeight: 920
     exclusiveZone: 0
     color: "transparent"
     mask: Region { item: bgWrap }
@@ -41,7 +41,7 @@ PanelWindow {
     Item {
         id: bgWrap
         anchors.top: parent.top; anchors.right: parent.right
-        width: Config.centerWidth; height: col.implicitHeight + 36
+        width: Config.centerWidth; height: parent.height
         property real slide: win.notifs.controlCenterVisible ? 0 : 28
         transform: Translate { x: bgWrap.slide }
         opacity: win._centerOpacity
@@ -59,7 +59,7 @@ PanelWindow {
 
             ColumnLayout {
                 id: col
-                anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+                anchors.fill: parent
                 anchors.margins: 18
                 spacing: 0
 
@@ -113,7 +113,7 @@ PanelWindow {
                 Flickable {
                     id: flick
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Math.min(Config.centerMaxHeight, flickContent.implicitHeight)
+                    Layout.fillHeight: true
                     clip: true
                     contentHeight: flickContent.implicitHeight
                     contentWidth: width
