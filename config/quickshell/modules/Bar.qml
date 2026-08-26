@@ -2,7 +2,6 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
 
@@ -145,21 +144,7 @@ PanelWindow {
 
             Text {
                 id: volText
-                text: {
-                    var sink = Pipewire.defaultAudioSink
-                    var m = barWin.audio.muted
-                    var v = barWin.audio.vol
-                    if (sink && sink.audio) { if (sink.audio.muted) m = true; if (sink.audio.volume !== undefined) v = sink.audio.volume }
-                    if (m) return "󰸈"
-                    var d = sink && sink.description ? sink.description : ""
-                    var n = sink && sink.properties ? (sink.properties["node.name"] || "") : ""
-                    if (d.toLowerCase().indexOf("headphone") !== -1 || n.toLowerCase().indexOf("headphone") !== -1) return "󰋋"
-                    if (v <= 0.01) return ""
-                    if (v < 0.2) return ""
-                    if (v < 0.4) return ""
-                    if (v < 0.8) return "󰕾"
-                    return ""
-                }
+                text: barWin.audio.volumeIcon
                 color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea {
