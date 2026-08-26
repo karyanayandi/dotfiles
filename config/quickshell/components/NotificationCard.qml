@@ -12,7 +12,6 @@ Rectangle {
     property bool showClose: true
     signal closeRequested()
 
-    // filtered actions helper (excludes "activate")
     property var filteredActions: notification ? notification.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate") : []
 
     radius: cardRadius
@@ -21,7 +20,6 @@ Rectangle {
     border.width: notification && notification.urgency === NotificationUrgency.Critical ? 1 : 0
     implicitHeight: inner.implicitHeight + 16
 
-    // close button (top-right)
     Rectangle {
         visible: root.showClose
         anchors.top: parent.top; anchors.right: parent.right

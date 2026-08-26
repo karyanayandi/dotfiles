@@ -7,17 +7,14 @@ import QtQuick.Layouts
 import ".."
 import "../services" as Services
 
-// Spotlight \u2014 gruvbox dark hard monochrome, Apple fluid
-// ponytail: single PanelWindow replaces vicinae (apps+clipboard+emoji+nerd+bt+audio)
 PanelWindow {
     id: win
     property bool visibleLauncher: false
     property string query: ""
     property int selected: 0
-    property string mode: "apps" // apps | clipboard | emoji | nerd | bluetooth | audio
+    property string mode: "apps" 
     property var audioSvc
 
-    // IPC \u2014 qs ipc call launcher toggle / open <mode>
     IpcHandler {
         target: "launcher"
         function toggle() { win.visibleLauncher = !win.visibleLauncher; if (win.visibleLauncher) { win.query=""; win.selected=0; Qt.callLater(()=> input.forceActiveFocus()) } }
@@ -37,7 +34,6 @@ PanelWindow {
     property real _opacity: visibleLauncher ? 1 : 0
     Behavior on _opacity { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
 
-    // scrim \u2014 dim + click to close, interruptible
     Rectangle {
         anchors.fill: parent
         color: Qt.rgba(0x1d/255,0x20/255,0x21/255, visibleLauncher?0.34:0)
@@ -46,11 +42,9 @@ PanelWindow {
         MouseArea { anchors.fill: parent; onClicked: win.visibleLauncher=false; enabled: win.visibleLauncher }
     }
 
-    // centered card
     Item {
         id: cardWrap
         width: Math.min(Config.launcherWidth, parent.width - 48)
-        // Apple: scale from 0.96 + blur concept (opacity+scale together)
         scale: 0.96 + win._opacity * 0.04
         opacity: win._opacity
         Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
@@ -62,14 +56,12 @@ PanelWindow {
         Rectangle {
             id: card
             width: parent.width
-            // height grows with results, capped
             implicitHeight: col.implicitHeight + 2
             radius: Config.launcherRadius
             color: Theme.colLauncherBg
             border.color: Theme.colLauncherBorder
             border.width: 1
 
-            // heavy shadow \u2014 bigger surface = thicker
             Rectangle {
                 anchors.fill: parent
                 anchors.topMargin: 6
@@ -83,7 +75,6 @@ PanelWindow {
                 anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                 spacing: 0
 
-                // \u2014\u2014\u2014 search row \u2014 Apple: respond on keydown, continuous feedback \u2014\u2014\u2014
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Config.launcherInputHeight
@@ -106,7 +97,6 @@ PanelWindow {
                         font.family: Theme.fontFamily
                         font.pixelSize: 17
                         font.weight: Font.Normal
-                        // Apple tracking: neutral for input
                         clip: true
                         focus: true
                         onTextChanged: { win.query = text; win.selected = 0 }
@@ -119,7 +109,6 @@ PanelWindow {
                             else if (e.key === Qt.Key_Return || e.key === Qt.Key_Enter) { triggerSelected(e.modifiers & Qt.ControlModifier); e.accepted=true }
                             else if (e.key === Qt.Key_Tab) { cycleMode(); e.accepted=true }
                         }
-                        // placeholder
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: !parent.text.length
@@ -135,7 +124,6 @@ PanelWindow {
                             font.pixelSize: win.mode==="emoji" ? 18 : 15
                         }
                     }
-                    // clear / hint
                     Text {
                         visible: input.text.length>0
                         text: "\u2715"
@@ -155,7 +143,6 @@ PanelWindow {
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: Theme.colBorder; opacity: 0.9 }
 
-                // \u2014\u2014\u2014 mode chips \u2014 Apple: segmented control, respect grab offset later if draggable \u2014\u2014\u2014
                 Row {
                     id: chips
                     Layout.fillWidth: true
@@ -177,7 +164,6 @@ PanelWindow {
                             color: active ? Theme.colFg : Theme.colChipBg
                             border.color: active ? Theme.colFg : Theme.colBorder
                             border.width: active?0:1
-                            // Apple: instant feedback on press (scale), not on release
                             scale: ma.pressed ? 0.96 : 1
                             Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
                             Behavior on color { ColorAnimation { duration: 140 } }
@@ -188,7 +174,6 @@ PanelWindow {
                                 Text { text: modelData.icon; color: active?Theme.colBg:Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 12 }
                                 Text { text: modelData.label; color: active?Theme.colBg:Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: active?Font.DemiBold:Font.Normal }
                             }
-                            // pill padding via implicit
                             implicitWidth: chipLabel.implicitWidth + 28
                             Text { id: chipLabel; visible:false; text: modelData.label; font.family: Theme.fontFamily; font.pixelSize: 12 }
                             width: Math.max(64, implicitWidth)
@@ -204,7 +189,6 @@ PanelWindow {
                     }
                 }
 
-                // \u2014\u2014\u2014 results \u2014\u2014\u2014
                 ListView {
                     id: list
                     Layout.fillWidth: true
@@ -226,7 +210,6 @@ PanelWindow {
                         RowLayout {
                             anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 12
                             spacing: 12
-                            // icon bubble \u2014 monochrome gruvbox
                             Rectangle {
                                 Layout.preferredWidth: 32; Layout.preferredHeight: 32
                                 radius: 8
@@ -238,7 +221,6 @@ PanelWindow {
                                     source: visible ? Quickshell.iconPath(modelData.icon, "application-x-executable") : ""
                                     implicitWidth: 22; implicitHeight: 22
                                 }
-                                // image thumbnails for clipboard entries
                                 Image {
                                     anchors.centerIn: parent
                                     visible: win.mode==="clipboard" && !!modelData.img
@@ -331,7 +313,6 @@ PanelWindow {
                     }
                 }
 
-                // empty
                 Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 56
@@ -343,7 +324,6 @@ PanelWindow {
                     }
                 }
 
-                // footer hint \u2014 Apple: wayfinding
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.leftMargin: 14; Layout.rightMargin: 14
@@ -354,7 +334,6 @@ PanelWindow {
                     Text { text: "tab mode"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
                     Text { text: "esc close"; color: Theme.g18; font.family: Theme.fontFamily; font.pixelSize: 10 }
                     Item { Layout.fillWidth: true }
-                    // bluetooth/audio quick actions
                     Rectangle {
                         visible: win.mode==="bluetooth"
                         height: 24; radius: 8
@@ -386,14 +365,11 @@ PanelWindow {
         }
     }
 
-    // \u2014\u2014\u2014 services \u2014\u2014\u2014
     Services.ClipboardService { id: clipSvc }
     Services.BluetoothService { id: btSvc }
     Services.EmojiService { id: emojiSvc }
     Services.NerdFontService { id: nerdSvc }
 
-    // Pipewire is via AudioService singleton passed from shell
-    // \u2014\u2014\u2014 models \u2014\u2014\u2014
     property var appsModel: []
     readonly property int gridCols: Math.max(1, Math.floor((Config.launcherWidth - 24) / 56))
     function resultCount() { return (win.mode==="emoji" || win.mode==="nerd") ? grid.count : list.count }
@@ -407,7 +383,6 @@ PanelWindow {
         }));
     }
     Timer { interval: 500; running: true; repeat: true; onTriggered: if (win.appsModel.length === 0) win.refreshApps() }
-    // filtered
     property var filteredModel: {
         let q = win.query.toLowerCase().trim();
         let m = win.mode;
@@ -419,7 +394,6 @@ PanelWindow {
             if (s===q) return 100;
             if (s.startsWith(q)) return 50;
             if (s.includes(q)) return 10;
-            // fuzzy-ish: chars in order
             let j=0; for(let c of q){ let i=s.indexOf(c,j); if(i===-1) return 0; j=i+1; }
             return 1;
         }
@@ -455,14 +429,11 @@ PanelWindow {
             }));
             if (q) arr = arr.filter(x=> x.title.toLowerCase().includes(q));
             arr.sort((a,b)=> (b.connected?1:0) - (a.connected?1:0));
-            // add header actions
             if (!q) arr.unshift({ title: btSvc.powered?"Bluetooth On":"Bluetooth Off", subtitle: "Toggle power", icon: "\u{f00af}", _action:"power", actionHint:"toggle"});
             return arr.slice(0,limit);
         }
         if (m==="audio") {
-            // use Pipewire via AudioService + wpctl fallback
             let out=[];
-            // we list sinks/sources via Process poll
             for (let d of audioDevices) out.push(d);
             if (q) out = out.filter(x=> x.title.toLowerCase().includes(q));
             return out.slice(0,limit);
@@ -470,7 +441,6 @@ PanelWindow {
         return [];
     }
 
-    // audio devices polled
     property var audioDevices: []
     Process {
         id: audioPoll
@@ -478,7 +448,6 @@ PanelWindow {
         running: true
         stdout: SplitParser {
             onRead: data => {
-                // parse wpctl Sinks section
                 let lines=data.split("\\n");
                 let devs=[];
                 let inSinks=false;
@@ -511,12 +480,11 @@ PanelWindow {
             else { let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win); p.command=["sh","-c",(m.exec||"")+" >/dev/null 2>&1 & disown"]; p.running=true; }
             win.visibleLauncher=false;
         } else if(mode==="clipboard"){
-            if(m.img) { clipSvc.copyFile(m.img); } // images can't be typed — copy only, notify
+            if(m.img) { clipSvc.copyFile(m.img); }
             else if(ctrl) clipSvc.copy(m.text);
             else clipSvc.autopaste(m.text);
             win.visibleLauncher=false;
         } else if(mode==="emoji"||mode==="nerd"){
-            // ponytail: autopaste char, ctrl = copy only
             if(ctrl) { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + m.text.replace(/'/g,"'\\\\''") + "' | wl-copy"]; pp.running=true; }
             else { let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win); pp.command=["sh","-c","printf %s '" + m.text.replace(/'/g,"'\\\\''") + "' | wl-copy; sleep 0.12; if command -v wtype >/dev/null 2>&1; then wtype -- '" + m.text.replace(/'/g,"'\\\\''") + "' 2>/dev/null; fi"]; pp.running=true; }
             win.visibleLauncher=false;
@@ -524,7 +492,6 @@ PanelWindow {
             if(m._action==="power") btSvc.togglePower();
             else if(m.connected) btSvc.disconnect(m.addr);
             else btSvc.connect(m.addr);
-            // stay open
         } else if(mode==="audio"){
             let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win);
             pp.command=["sh","-c","wpctl set-default " + m.pid + " 2>/dev/null || pactl set-default-sink " + m.pid + " 2>/dev/null"];
@@ -533,6 +500,5 @@ PanelWindow {
         }
     }
 
-    // focus grab on open \u2014 Apple: respond on down, not up
     onVisibleLauncherChanged: if(visibleLauncher) { Qt.callLater(()=> input.forceActiveFocus()); refreshApps(); if(mode==="audio") audioPoll.running=true; if(mode==="bluetooth") btSvc.refresh(); }
 }

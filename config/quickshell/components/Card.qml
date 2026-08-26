@@ -1,6 +1,5 @@
 import QtQuick
 
-// ponytail: minimal shared panel card, handles bg/border/radius/shadow in one place
 Rectangle {
     id: root
     property alias shadowColor: shadow.color
@@ -31,6 +30,5 @@ Rectangle {
         opacity: 0.9
     }
 
-    // expose shadow for OSD-like use
     Rectangle { id: shadow; visible: false }
 }
