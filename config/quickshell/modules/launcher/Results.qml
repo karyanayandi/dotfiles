@@ -95,6 +95,15 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: root.wallpaperGrid && index === root.selected
+                    radius: parent.radius
+                    color: "transparent"
+                    border.color: Theme.g6
+                    border.width: 3
+                }
             }
 
             Text {
