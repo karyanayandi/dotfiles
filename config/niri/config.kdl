@@ -199,7 +199,6 @@ binds {
     Mod+Alt+E hotkey-overlay-title="Emoji Picker" { spawn-sh "qs ipc call launcher open emoji"; }
     Mod+Alt+N hotkey-overlay-title="Nerd Font Picker" { spawn-sh "qs ipc call launcher open nerd"; }
     Mod+Alt+B hotkey-overlay-title="Bluetooth Manager" { spawn-sh "qs ipc call launcher open bluetooth"; }
-    Mod+Alt+A hotkey-overlay-title="Audio Manager" { spawn-sh "qs ipc call launcher open audio"; }
 
     Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 

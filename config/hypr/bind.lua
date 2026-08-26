@@ -29,7 +29,6 @@ hl.bind(mainMod .. " + P", hl.dsp.exec_cmd "qs ipc call launcher open clipboard"
 hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd "qs ipc call launcher open emoji")
 hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call launcher open nerd")
 hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd "qs ipc call launcher open bluetooth")
-hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd "qs ipc call launcher open audio")
 
 -- Dwindle layout extras
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo { action = "toggle" })
@@ -47,7 +46,7 @@ hl.bind("Print", hl.dsp.exec_cmd "~/.local/bin/screenshot.sh")
 
 -- Notifications
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd "qs ipc call notifications toggle")
-hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call notifications clear")
+hl.bind(mainMod .. " + CTRL + N", hl.dsp.exec_cmd "qs ipc call notifications clear")
 
 -- Focus
 hl.bind(mainMod .. " + H", hl.dsp.focus { direction = "l" })

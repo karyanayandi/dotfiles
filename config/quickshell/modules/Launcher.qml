@@ -118,7 +118,6 @@ PanelWindow {
                                 if (win.mode==="emoji") return "Search emoji\u2026  (e.g. fire, heart)"
                                 if (win.mode==="nerd") return "Search Nerd Fonts\u2026"
                                 if (win.mode==="bluetooth") return "Bluetooth devices\u2026"
-                                if (win.mode==="audio") return "Audio sinks & sources\u2026"
                                 return "Search apps, clipboard, emoji\u2026  (Tab to switch mode)"
                             }
                             color: Theme.g19
@@ -155,8 +154,7 @@ PanelWindow {
                             {id:"clipboard", label:"Clipboard", icon:"\u{f0147}"},
                             {id:"emoji", label:"Emoji", icon:"\u{1f600}"},
                             {id:"nerd", label:"Nerd", icon:"\u{f0b10}"},
-                            {id:"bluetooth", label:"Bluetooth", icon:"\u{f00af}"},
-                            {id:"audio", label:"Audio", icon:"\u{f04c3}"}
+                            {id:"bluetooth", label:"Bluetooth", icon:"\u{f00af}"}
                         ]
                         delegate: Rectangle {
                             required property var modelData
@@ -439,41 +437,11 @@ PanelWindow {
             if (!q) arr.unshift({ title: btSvc.powered?"Bluetooth On":"Bluetooth Off", subtitle: "Toggle power", icon: "\u{f00af}", _action:"power", actionHint:"toggle"});
             return arr.slice(0,limit);
         }
-        if (m==="audio") {
-            let out=[];
-            for (let d of audioDevices) out.push(d);
-            if (q) out = out.filter(x=> x.title.toLowerCase().includes(q));
-            return out.slice(0,limit);
-        }
         return [];
     }
 
-    property var audioDevices: []
-    Process {
-        id: audioPoll
-        command: ["sh","-c", "wpctl status 2>/dev/null | awk '/Sinks:/,/Sources:/{print}' | head -n 40; echo '---'; pactl list short sinks 2>/dev/null | head -n 20"]
-        running: true
-        stdout: SplitParser {
-            onRead: data => {
-                let lines=data.split("\\n");
-                let devs=[];
-                let inSinks=false;
-                for(let l of lines){
-                    if(l.includes("Sinks:")) {inSinks=true; continue}
-                    if(l.includes("Sources:")||l.includes("---")) {inSinks=false; if(l.includes("---")) break; continue}
-                    let m=l.match(new RegExp("\\*?\\s*([0-9]+)\\.\\s*(.+?)\\s*\\[vol:"));
-                    if(m && inSinks) devs.push({ title: m[2].trim(), subtitle: "Sink \u00B7 " + m[1], icon:"\u{f04c3}", pid: m[1], kind:"sink", actionHint:"set default"});
-                    let m2=l.match(new RegExp("\\*?\\s*([0-9]+)\\.\\s*(.+?)\\s*\\[vol:"));
-                    if(m2 && !inSinks && l.includes("vol:")) devs.push({ title: m2[2].trim(), subtitle:"Source \u00B7 "+m2[1], icon:"\uF130", pid: m2[1], kind:"source", actionHint:"set default"});
-                }
-                if(devs.length) win.audioDevices = devs;
-            }
-        }
-    }
-    Timer { interval: 4000; running: win.visibleLauncher && win.mode==="audio"; repeat: true; onTriggered: audioPoll.running=true }
-
     function cycleMode(){
-        let order=["apps","clipboard","emoji","nerd","bluetooth","audio"];
+        let order=["apps","clipboard","emoji","nerd","bluetooth"];
         let i=order.indexOf(win.mode);
         win.mode = order[(i+1)%order.length];
         win.selected=0;
@@ -499,13 +467,8 @@ PanelWindow {
             if(m._action==="power") btSvc.togglePower();
             else if(m.connected) btSvc.disconnect(m.addr);
             else btSvc.connect(m.addr);
-        } else if(mode==="audio"){
-            let pp=Qt.createQmlObject('import Quickshell.Io; Process {}', win);
-            pp.command=["sh","-c","wpctl set-default " + m.pid + " 2>/dev/null || pactl set-default-sink " + m.pid + " 2>/dev/null"];
-            pp.running=true;
-            win.visibleLauncher=false;
         }
     }
 
-    onVisibleLauncherChanged: if(visibleLauncher) { Qt.callLater(()=> input.forceActiveFocus()); refreshApps(); if(mode==="audio") audioPoll.running=true; if(mode==="bluetooth") btSvc.refresh(); }
+    onVisibleLauncherChanged: if(visibleLauncher) { Qt.callLater(()=> input.forceActiveFocus()); refreshApps(); if(mode==="bluetooth") btSvc.refresh(); }
 }
