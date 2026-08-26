@@ -49,6 +49,7 @@ local servers = {
   "prismals",
   "pyright",
   "rust_analyzer",
+  "qmlls",
   "sqls",
   "svelte",
   "svelteserver",
