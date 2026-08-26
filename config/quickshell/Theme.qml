@@ -33,7 +33,7 @@ QtObject {
     property color colActionBg: Qt.rgba(0xd5/255, 0xc4/255, 0xa1/255, 0.6)
     property color colBgAlpha095: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 1.0)
     property color colBgAlpha085: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.95)
-    property string fontFamily: "JetBrainsMono NFM"
+    property string fontFamily: "JetBrainsMono NF"
     property string fontFallback: "Nerd Font"
     property int fontSize: 15
 }

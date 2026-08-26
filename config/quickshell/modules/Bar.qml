@@ -100,7 +100,7 @@ PanelWindow {
             Item { Layout.fillWidth: true }
 
             Text {
-                text: "󰍛"; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 6
+                text: "󰍛"; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["ghostty","-e","btm"]; p.running = true } }
             }
@@ -113,7 +113,7 @@ PanelWindow {
             Text {
                 id: volText
                 text: barWin.audio.volumeIcon
-                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 10
+                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 scale: volMa.pressed ? 0.92 : 1
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
@@ -134,7 +134,7 @@ PanelWindow {
                 Layout.preferredWidth: 36; Layout.preferredHeight: 30; Layout.rightMargin: 20
                 scale: bellMa.pressed ? 0.92 : 1
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
-                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 2 }
+                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize }
                 Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 6; anchors.rightMargin: 6; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 10 }
                 MouseArea {
                     id: bellMa
