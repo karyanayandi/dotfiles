@@ -1,5 +1,10 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
-import { loadShortcuts, saveShortcuts } from "./src/config.ts"
+import {
+  loadShortcuts,
+  saveShortcuts,
+  thinkingLevels,
+  type ShortcutConfig,
+} from "./src/config.ts"
 import { pick } from "./src/picker.ts"
 
 type ModelShortcut = `ctrl+${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
@@ -21,6 +26,10 @@ const availableShortcuts = [
   "ctrl+0",
 ] as const
 
+function describeTarget({ model, thinkingLevel }: ShortcutConfig) {
+  return `${model} · thinking:${thinkingLevel ?? "default"}`
+}
+
 export default function modelShortcuts(pi: ExtensionAPI) {
   pi.registerCommand("model-shortcuts", {
     description: "Configure model keyboard shortcuts",
@@ -38,7 +47,7 @@ export default function modelShortcuts(pi: ExtensionAPI) {
           .map(([shortcut, target]) => ({
             value: shortcut,
             label: shortcut,
-            description: target,
+            description: describeTarget(target),
           }))
         if (items.length === 0) {
           ctx.ui.notify("No model shortcuts configured", "info")
@@ -60,7 +69,7 @@ export default function modelShortcuts(pi: ExtensionAPI) {
           .map(([shortcut, target]) => ({
             value: shortcut,
             label: shortcut,
-            description: target,
+            description: describeTarget(target),
           })),
         ...availableShortcuts
           .filter((shortcut) => !(shortcut in shortcuts))
@@ -81,20 +90,33 @@ export default function modelShortcuts(pi: ExtensionAPI) {
           description: model.provider,
         }))
         .sort((left, right) => left.value.localeCompare(right.value))
-      const target = await pick(ctx, "Select model", models)
-      if (!target) return
+      const model = await pick(ctx, "Select model", models)
+      if (!model) return
 
+      const selectedThinkingLevel = await pick(ctx, "Select thinking level", [
+        { value: "default", label: "default", description: "Use setting" },
+        ...thinkingLevels.map((level) => ({ value: level, label: level })),
+      ])
+      if (!selectedThinkingLevel) return
+
+      const thinkingLevel = thinkingLevels.find(
+        (level) => level === selectedThinkingLevel,
+      )
+      const target: ShortcutConfig = {
+        model,
+        ...(thinkingLevel ? { thinkingLevel } : {}),
+      }
       shortcuts[shortcut] = target
       saveShortcuts(shortcuts)
       ctx.ui.notify(
-        `Saved ${shortcut} → ${target}; reloading shortcuts`,
+        `Saved ${shortcut} → ${describeTarget(target)}; reloading shortcuts`,
         "info",
       )
       await ctx.reload()
     },
   })
 
-  for (const [shortcut, target] of Object.entries(loadShortcuts())) {
+  for (const [shortcut, config] of Object.entries(loadShortcuts())) {
     if (!isModelShortcut(shortcut)) {
       console.error(
         `Model shortcuts: only ctrl+0 through ctrl+9 are supported; got ${shortcut}`,
@@ -102,29 +124,30 @@ export default function modelShortcuts(pi: ExtensionAPI) {
       continue
     }
 
-    const [provider, ...modelParts] = target.split("/")
+    const [provider, ...modelParts] = config.model.split("/")
     const modelId = modelParts.join("/")
 
     if (!provider || !modelId) {
       console.error(
-        `Model shortcuts: ${shortcut} must target provider/model, got ${target}`,
+        `Model shortcuts: ${shortcut} must target provider/model, got ${config.model}`,
       )
       continue
     }
 
     pi.registerShortcut(shortcut, {
-      description: `Switch to ${target}`,
+      description: `Switch to ${describeTarget(config)}`,
       handler: async (ctx) => {
         const model = ctx.modelRegistry.find(provider, modelId)
         if (!model) {
-          ctx.ui.notify(`Model not found: ${target}`, "error")
+          ctx.ui.notify(`Model not found: ${config.model}`, "error")
           return
         }
 
         if (await pi.setModel(model)) {
-          ctx.ui.notify(`Model: ${target}`, "info")
+          if (config.thinkingLevel) pi.setThinkingLevel(config.thinkingLevel)
+          ctx.ui.notify(`Model: ${describeTarget(config)}`, "info")
         } else {
-          ctx.ui.notify(`No credentials for ${target}`, "error")
+          ctx.ui.notify(`No credentials for ${config.model}`, "error")
         }
       },
     })
