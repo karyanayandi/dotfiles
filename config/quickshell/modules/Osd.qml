@@ -2,11 +2,12 @@ import Quickshell
 import Quickshell.Wayland
 import QtQuick
 import QtQuick.Window
+import ".."
 
 PanelWindow {
     id: win
-    required property var theme
     required property var audio
+    property var theme: Theme
 
     property real _osdOpacity: audio.osdVisible ? 1 : 0
     Behavior on _osdOpacity {
@@ -18,8 +19,8 @@ PanelWindow {
 
     anchors.top: true
     margins.top: Math.round((Screen.height / 2) - 88)
-    implicitWidth: 200
-    implicitHeight: 176
+    implicitWidth: Config.osdWidth
+    implicitHeight: Config.osdHeight
     exclusiveZone: 0
     color: "transparent"
     visible: audio.osdVisible || _osdOpacity > 0.01
@@ -32,8 +33,8 @@ PanelWindow {
     Item {
         id: cardWrap
         anchors.centerIn: parent
-        width: 200
-        height: 176
+        width: Config.osdWidth
+        height: Config.osdHeight
         opacity: win._osdOpacity
         scale: 0.86 + win._osdOpacity * 0.14
         transformOrigin: Item.Center
@@ -52,16 +53,16 @@ PanelWindow {
             anchors.fill: card
             anchors.topMargin: 2
             radius: card.radius
-            color: win.theme.colShadow
+            color: Theme.colShadow
             z: -1
         }
 
         Rectangle {
             id: card
             anchors.fill: parent
-            radius: 18
-            color: win.theme.colBgAlpha078
-            border.color: win.theme.colBorder
+            radius: Config.osdRadius
+            color: Theme.colBgAlpha078
+            border.color: Theme.colBorder
             border.width: 1
 
             Rectangle {
@@ -70,7 +71,7 @@ PanelWindow {
                 anchors.right: parent.right
                 height: 1
                 radius: parent.radius
-                color: win.theme.colBorderStrong
+                color: Theme.colBorderStrong
                 opacity: 0.9
             }
 
@@ -83,9 +84,9 @@ PanelWindow {
                     id: glyph
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: win.audio.osdIcon
-                    color: win.theme.colFg
+                    color: Theme.colFg
                     opacity: win.audio.muted && win.audio.osdKind === "sink" ? 0.55 : 1.0
-                    font.family: win.theme.fontFamily
+                    font.family: Theme.fontFamily
                     font.pixelSize: 56
                     font.weight: Font.Normal
                     horizontalAlignment: Text.AlignHCenter
@@ -98,12 +99,12 @@ PanelWindow {
                     id: meter
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: 144; height: 6; radius: 3
-                    color: win.theme.colMeterBg
+                    color: Theme.colMeterBg
                     Rectangle {
                         anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
                         width: parent.width * Math.min(1, win.audio.osdPercent / 100)
                         radius: 3
-                        color: win.audio.muted && win.audio.osdKind === "sink" ? win.theme.colMuted : win.theme.colMeterFg
+                        color: win.audio.muted && win.audio.osdKind === "sink" ? Theme.colMuted : Theme.colMeterFg
                         Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                         Behavior on color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
                     }
@@ -118,8 +119,8 @@ PanelWindow {
                         if (win.audio.muted) return "Muted"
                         return win.audio.osdPercent + "%"
                     }
-                    color: win.theme.colMuted
-                    font.family: win.theme.fontFamily
+                    color: Theme.colMuted
+                    font.family: Theme.fontFamily
                     font.pixelSize: 11
                     font.weight: Font.Medium
                     font.letterSpacing: 0.3

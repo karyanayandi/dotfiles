@@ -3,8 +3,8 @@ import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
-import ".."
-import "../components" as Comp
+import "../.."
+import "../../components" as Comp
 
 PanelWindow {
     id: win

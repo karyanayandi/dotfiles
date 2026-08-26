@@ -4,12 +4,14 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
+import "bar" as BarParts
+import ".."
 
 PanelWindow {
     id: barWin
-    required property var theme
     required property var audio
     required property var notifs
+    property var theme: Theme
 
     property string submap: ""
     Connections {
@@ -18,8 +20,8 @@ PanelWindow {
     }
 
     anchors { bottom: true; left: true; right: true }
-    implicitHeight: 48
-    exclusiveZone: 48
+    implicitHeight: Config.barExclusiveZone
+    exclusiveZone: Config.barExclusiveZone
     color: "transparent"
     WlrLayershell.namespace: "quickshell"
     WlrLayershell.layer: WlrLayer.Top
@@ -28,84 +30,32 @@ PanelWindow {
         id: bar
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        implicitWidth: Math.max(400, Math.min(900, barContent.implicitWidth + 32))
+        anchors.bottomMargin: Config.barBottomMargin
+        implicitWidth: Math.max(Config.barMinWidth, Math.min(Config.barMaxWidth, barContent.implicitWidth + 32))
         width: implicitWidth
-        height: 38
-        radius: 10
-        color: barWin.theme.colBgAlpha095
-        border.color: barWin.theme.colBorder; border.width: 1
+        height: Config.barHeight
+        radius: Config.barRadius
+        color: Theme.colBgAlpha095
+        border.color: Theme.colBorder; border.width: 1
 
         RowLayout {
             id: barContent
             anchors.fill: parent
-            anchors.leftMargin: 12; anchors.rightMargin: 12
+            anchors.leftMargin: Config.barSideMargin; anchors.rightMargin: Config.barSideMargin
             anchors.topMargin: 4; anchors.bottomMargin: 4
             spacing: 4
 
-            RowLayout {
-                id: wsRow
-                Layout.leftMargin: 15; Layout.rightMargin: 15; spacing: 0
-                Layout.alignment: Qt.AlignVCenter
-                WheelHandler {
-                    onWheel: e => {
-                        if (e.angleDelta.y > 0) Hyprland.dispatch("workspace e-1")
-                        else if (e.angleDelta.y < 0) Hyprland.dispatch("workspace e+1")
-                    }
-                }
-                Repeater {
-                    model: Hyprland.workspaces
-                    delegate: Rectangle {
-                        required property var modelData
-                        property bool isActive: modelData.active === true
-                        property bool isFocused: modelData.focused === true
-                        property bool isUrgent: modelData.urgent === true
-                        Layout.preferredHeight: 30
-                        Layout.preferredWidth: wsText.implicitWidth + 20
-                        color: isUrgent ? barWin.theme.colUrgent : (wsMouse.containsMouse ? barWin.theme.colAccent : "transparent")
-                        scale: wsMouse.pressed ? 0.96 : 1
-                        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
-                        Behavior on color { ColorAnimation { duration: 180; easing.type: Easing.OutCubic } }
-                        Rectangle {
-                            anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
-                            height: isFocused || isActive ? 3 : 0
-                            color: barWin.theme.colFg
-                            visible: isFocused || isActive
-                        }
-                        Text {
-                            id: wsText; anchors.centerIn: parent
-                            text: modelData.name
-                            color: barWin.theme.colFg
-                            font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
-                        }
-                        MouseArea {
-                            id: wsMouse; anchors.fill: parent; hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: modelData.activate()
-                        }
-                    }
-                }
-            }
-
-            Text {
-                visible: barWin.submap !== "" && barWin.submap !== "default"
-                text: barWin.submap
-                color: barWin.theme.colFg
-                font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
-                font.italic: true
-                leftPadding: 10; rightPadding: 10
-                Layout.alignment: Qt.AlignVCenter
-            }
+            BarParts.Workspaces { submap: barWin.submap }
 
             Item { Layout.fillWidth: true }
 
             Text {
-                text: "󰍛"; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
+                text: "󰍛"; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["ghostty","-e","btm"]; p.running = true } }
             }
             Text {
-                text: ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
+                text: ""; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["ghostty","-e","bluetui"]; p.running = true } }
             }
@@ -113,7 +63,7 @@ PanelWindow {
             Text {
                 id: volText
                 text: barWin.audio.volumeIcon
-                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
+                color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 scale: volMa.pressed ? 0.92 : 1
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
@@ -134,8 +84,8 @@ PanelWindow {
                 Layout.preferredWidth: 36; Layout.preferredHeight: 30; Layout.rightMargin: 20
                 scale: bellMa.pressed ? 0.92 : 1
                 Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
-                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize }
-                Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 6; anchors.rightMargin: 6; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 10 }
+                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: Theme.fontSize }
+                Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 6; anchors.rightMargin: 6; text: ""; color: Theme.colUrgent; font.family: Theme.fontFamily; font.pixelSize: 10 }
                 MouseArea {
                     id: bellMa
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -146,13 +96,7 @@ PanelWindow {
                 }
             }
 
-            Text {
-                id: clock; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
-                Layout.alignment: Qt.AlignVCenter; Layout.rightMargin: 10; leftPadding: 10; rightPadding: 10
-                text: Qt.formatDateTime(new Date(), "HH:mm")
-                Timer { interval: 1000; running: true; repeat: true; onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm") }
-                MouseArea { anchors.fill: parent; hoverEnabled: true }
-            }
+            BarParts.Clock {}
         }
     }
 }
