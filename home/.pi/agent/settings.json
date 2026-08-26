@@ -1,8 +1,8 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "muse-spark-1.2-contributor-free",
+  "defaultModel": "gpt-5.6-luna",
   "defaultProjectTrust": "always",
-  "defaultProvider": "opencode",
+  "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "high",
   "editorPaddingX": 3,
   "enableInstallTelemetry": true,
@@ -36,7 +36,7 @@
   },
   "tuiMode": "fullscreen",
   "modelThinkingLevels": {
-    "openai-codex/gpt-5.6-terra": "high",
+    "openai-codex/gpt-5.6-terra": "medium",
     "openai-codex/gpt-5.6-sol": "medium",
     "openai-codex/gpt-5.6-luna": "max"
   }

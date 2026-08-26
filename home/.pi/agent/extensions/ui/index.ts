@@ -6,11 +6,14 @@ import {
   type ExtensionContext,
   type KeybindingsManager,
   getAgentDir,
+  ThinkingSelectorComponent,
 } from "@earendil-works/pi-coding-agent"
 import {
   truncateToWidth,
   type Component,
   type EditorTheme,
+  type SelectItem,
+  type SelectList,
   type TUI,
   visibleWidth,
 } from "@earendil-works/pi-tui"
@@ -28,6 +31,68 @@ import {
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
+
+type ThinkingLevel = ReturnType<ExtensionAPI["getThinkingLevel"]>
+type ThinkingModel = Pick<
+  NonNullable<ExtensionContext["model"]>,
+  "provider" | "id"
+>
+type ThinkingSelectorInternals = {
+  buildSelectList(items: SelectItem[], preselect: string): SelectList
+}
+
+const GPT_THINKING_LABELS: Record<string, string> = {
+  minimal: "light",
+  low: "light",
+  medium: "medium",
+  high: "high",
+  xhigh: "extra high",
+  max: "ultra",
+}
+
+function isCodexGpt(model: ThinkingModel | undefined) {
+  return model?.provider === "openai-codex" && model.id.startsWith("gpt-5.6-")
+}
+
+export function displayThinkingLevel(
+  model: ThinkingModel | undefined,
+  level: ThinkingLevel | string,
+) {
+  return isCodexGpt(model) ? (GPT_THINKING_LABELS[level] ?? level) : level
+}
+
+function installThinkingSelectorLabels(
+  getModel: () => ExtensionContext["model"],
+) {
+  const prototype =
+    ThinkingSelectorComponent.prototype as unknown as ThinkingSelectorInternals
+  const originalBuildSelectList = prototype.buildSelectList
+
+  prototype.buildSelectList = function (items, preselect) {
+    const model = getModel()
+    if (!isCodexGpt(model)) {
+      return originalBuildSelectList.call(this, items, preselect)
+    }
+
+    const hasLight = items.some((item) => item.value === "minimal")
+    const visibleItems = hasLight
+      ? items.filter((item) => item.value !== "low")
+      : items
+    return originalBuildSelectList.call(
+      this,
+      visibleItems.map((item) => ({
+        ...item,
+        label: displayThinkingLevel(model, item.value),
+      })),
+      preselect,
+    )
+  }
+
+  return () => {
+    prototype.buildSelectList = originalBuildSelectList
+  }
+}
+
 class EmptyFooter implements Component {
   render(): string[] {
     return []
@@ -136,6 +201,8 @@ export default function ui(pi: ExtensionAPI) {
   let tokensDirty = true
   let restoreCompactMessages: (() => void) | undefined
   let restoreToolSpacing: (() => void) | undefined
+  let restoreThinkingSelectorLabels: (() => void) | undefined
+  let currentModel: ExtensionContext["model"]
 
   // pi-minimalist message/tool style applies only to minimal and lite layouts.
   // The getter is read at render time, so /ui layout switches take effect live.
@@ -166,7 +233,7 @@ export default function ui(pi: ExtensionAPI) {
           const left = theme.fg(
             "dim",
             sanitizeTerminalText(
-              `${ctx.model?.id ?? "no model"} · ${pi.getThinkingLevel()}`,
+              `${ctx.model?.id ?? "no model"} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
             ),
           )
           const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "—"]
@@ -318,6 +385,11 @@ export default function ui(pi: ExtensionAPI) {
     tui?.requestRender()
   })
 
+  pi.on("model_select", (event) => {
+    currentModel = event.model
+    tui?.requestRender()
+  })
+
   pi.on("agent_start", (_event, ctx) => {
     if (layout !== "lite") ctx.ui.setWorkingVisible(false)
     succeeded = 0
@@ -343,6 +415,11 @@ export default function ui(pi: ExtensionAPI) {
 
   pi.on("session_start", (event, ctx) => {
     stopped = false
+    restoreThinkingSelectorLabels?.()
+    currentModel = ctx.model
+    restoreThinkingSelectorLabels = installThinkingSelectorLabels(
+      () => currentModel,
+    )
     clearTerminalOnEditorMount = event.reason === "startup"
     layout = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
     inputTokens = 0
@@ -411,7 +488,7 @@ export default function ui(pi: ExtensionAPI) {
           // Add a blank top margin and drop the bottom border.
           const body = lines.filter((line) => line !== "")
           const info = truncateToWidth(
-            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
             width,
             "…",
           )
@@ -461,7 +538,7 @@ export default function ui(pi: ExtensionAPI) {
         const status = truncateToWidth(
           [
             gitStatus,
-            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
           ]
             .filter(Boolean)
             .join(" · "),
@@ -489,6 +566,9 @@ export default function ui(pi: ExtensionAPI) {
     restoreCompactMessages = undefined
     restoreToolSpacing?.()
     restoreToolSpacing = undefined
+    restoreThinkingSelectorLabels?.()
+    restoreThinkingSelectorLabels = undefined
+    currentModel = undefined
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()
