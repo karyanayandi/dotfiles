@@ -58,6 +58,23 @@ interface CompactRenderer<TDetails> {
   ) => string
 }
 
+type ToolRender = ToolExecutionComponent["render"]
+
+interface PatchableToolExecutionPrototype {
+  render: ToolRender
+  __piUiToolSpacingOriginalRender?: ToolRender
+  __piUiToolSpacingPatched?: boolean
+  __piUiToolSpacingPatchVersion?: number
+  __piUiToolSpacingPatchOwner?: object
+}
+
+const TOOL_SPACING_PATCH_VERSION = 1
+const TOOL_SPACING_PATCH_OWNER = {}
+
+function getToolExecutionPrototype() {
+  return ToolExecutionComponent.prototype as unknown as PatchableToolExecutionPrototype
+}
+
 // The workspace ships two typebox builds (pi bundles 1.3.7, the root catalog
 // resolves 1.3.11), so their `Static<T>` types are mutually unassignable. The
 // original tool renderers are therefore captured with loose `any` signatures —
@@ -305,7 +322,43 @@ export function installToolSpacing(
   getCompact: () => boolean,
   theme: Theme,
 ): () => void {
-  const originalRender = ToolExecutionComponent.prototype.render
+  const prototype = getToolExecutionPrototype()
+  const previousOriginalRender = prototype.__piUiToolSpacingOriginalRender
+  const hasPreviousPatch =
+    typeof previousOriginalRender === "function" &&
+    previousOriginalRender !== prototype.render
+  const isCurrentPatch =
+    prototype.__piUiToolSpacingPatchOwner === TOOL_SPACING_PATCH_OWNER
+  let restoredStalePatch = false
+
+  // Session reloads can load a fresh copy of this module before old patch
+  // state has been cleaned up. Restore that wrapper before installing one.
+  if (hasPreviousPatch && !isCurrentPatch) {
+    prototype.render = previousOriginalRender
+    delete prototype.__piUiToolSpacingOriginalRender
+    delete prototype.__piUiToolSpacingPatched
+    delete prototype.__piUiToolSpacingPatchVersion
+    delete prototype.__piUiToolSpacingPatchOwner
+    restoredStalePatch = true
+  }
+
+  // Multiple UI extension instances may share one prototype. Keep one wrapper;
+  // stacking it is what turns one status icon into a row of check marks.
+  if (
+    !restoredStalePatch &&
+    prototype.__piUiToolSpacingPatched &&
+    prototype.__piUiToolSpacingPatchVersion === TOOL_SPACING_PATCH_VERSION &&
+    typeof prototype.__piUiToolSpacingOriginalRender === "function"
+  ) {
+    return () => {}
+  }
+
+  if (!prototype.__piUiToolSpacingOriginalRender) {
+    prototype.__piUiToolSpacingOriginalRender = prototype.render
+  }
+  const originalRender = prototype.__piUiToolSpacingOriginalRender
+  if (!originalRender) return () => {}
+
   const compactRender = function (
     this: ToolExecutionComponent,
     width: number,
@@ -411,10 +464,17 @@ export function installToolSpacing(
       ...wrapped.slice(1).map((l) => `${COMPACT_INDENT}${l}`),
     ]
   }
-  ToolExecutionComponent.prototype.render = compactRender
+  prototype.render = compactRender
+  prototype.__piUiToolSpacingPatched = true
+  prototype.__piUiToolSpacingPatchVersion = TOOL_SPACING_PATCH_VERSION
+  prototype.__piUiToolSpacingPatchOwner = TOOL_SPACING_PATCH_OWNER
   return () => {
-    if (ToolExecutionComponent.prototype.render === compactRender) {
-      ToolExecutionComponent.prototype.render = originalRender
+    if (prototype.render === compactRender) {
+      prototype.render = originalRender
+      delete prototype.__piUiToolSpacingOriginalRender
+      delete prototype.__piUiToolSpacingPatched
+      delete prototype.__piUiToolSpacingPatchVersion
+      delete prototype.__piUiToolSpacingPatchOwner
     }
   }
 }

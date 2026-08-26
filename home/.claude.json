@@ -1,0 +1,24 @@
+{
+  "firstStartTime": "2026-08-26T13:59:58.959Z",
+  "machineID": "fb17b1b74de964ecd73d6eb25f17719d134b5f23a1f3158673fd8cb6460825b6",
+  "opusProMigrationComplete": true,
+  "sonnet1m45MigrationComplete": true,
+  "seenNotifications": {},
+  "hasResetAutoModeOptInForDefaultOffer": true,
+  "migrationVersion": 13,
+  "userID": "9582e5f492f5806d01283e49503fc46c361097ef85010a765c4c226ad68a6e66",
+  "projects": {
+    "/home/karyana/.config/dotfiles": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "hasUnseenTeamArtifacts": false
+    }
+  }
+}

@@ -84,3 +84,6 @@ NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex"
 
 [projects."/home/karyana/Codes/projects/shopin"]
 trust_level = "trusted"
+
+[projects."/home/karyana/.config/dotfiles"]
+trust_level = "trusted"

@@ -134,6 +134,35 @@ describe("installToolSpacing", () => {
     }
   })
 
+  test("does not stack status prefixes when installed more than once", () => {
+    const tool = createTools(() => true).get("ls")
+    const row = new ToolExecutionComponent(
+      "ls",
+      "tool-1",
+      calls.ls,
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    row.markExecutionStarted()
+    row.updateResult(
+      { content: [{ type: "text", text: "index.ts" }], isError: false },
+      false,
+    )
+
+    const restoreFirst = installToolSpacing(() => true, theme)
+    const restoreSecond = installToolSpacing(() => true, theme)
+    try {
+      const line = row.render(80)[0] ?? ""
+      expect(line.match(/✓/g)).toHaveLength(1)
+    } finally {
+      restoreSecond()
+      restoreFirst()
+    }
+  })
+
   test("leaves rows untouched when the layout is not compact", () => {
     const tool = createTools(() => true).get("ls")
     const row = new ToolExecutionComponent(
