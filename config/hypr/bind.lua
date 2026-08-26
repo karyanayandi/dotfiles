@@ -29,6 +29,7 @@ hl.bind(mainMod .. " + P", hl.dsp.exec_cmd "qs ipc call launcher open clipboard"
 hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd "qs ipc call launcher open emoji")
 hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call launcher open nerd")
 hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd "qs ipc call launcher open bluetooth")
+hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd "qs ipc call launcher open power")
 
 -- Dwindle layout extras
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo { action = "toggle" })

@@ -118,6 +118,7 @@ PanelWindow {
                                 if (win.mode==="emoji") return "Search emoji\u2026  (e.g. fire, heart)"
                                 if (win.mode==="nerd") return "Search Nerd Fonts\u2026"
                                 if (win.mode==="bluetooth") return "Bluetooth devices\u2026"
+                                if (win.mode==="power") return "Search power actions\u2026"
                                 return "Search apps, clipboard, emoji\u2026  (Tab to switch mode)"
                             }
                             color: Theme.g19
@@ -154,7 +155,8 @@ PanelWindow {
                             {id:"clipboard", label:"Clipboard", icon:"\u{f0147}"},
                             {id:"emoji", label:"Emoji", icon:"\u{1f600}"},
                             {id:"nerd", label:"Nerd", icon:"\u{f0b10}"},
-                            {id:"bluetooth", label:"Bluetooth", icon:"\u{f00af}"}
+                            {id:"bluetooth", label:"Bluetooth", icon:"\u{f00af}"},
+                            {id:"power", label:"Power", icon:"\u{f0425}"}
                         ]
                         delegate: Rectangle {
                             required property var modelData
@@ -427,6 +429,17 @@ PanelWindow {
             if (q) arr = arr.filter(x=> x.n.toLowerCase().includes(q) || x.k.includes(q));
             return arr.slice(0,limit);
         }
+        if (m==="power") {
+            let arr = [
+                { title:"Lock", subtitle:"hyprlock", icon:"\u{f023}", cmd:"hyprlock" },
+                { title:"Logout", subtitle:"exit Hyprland", icon:"\u{f08b}", cmd:"hyprctl dispatch exit" },
+                { title:"Suspend", subtitle:"systemctl suspend", icon:"\u{f186}", cmd:"systemctl suspend" },
+                { title:"Reboot", subtitle:"systemctl reboot", icon:"\u{f021}", cmd:"systemctl reboot" },
+                { title:"Shutdown", subtitle:"systemctl poweroff", icon:"\u{f0425}", cmd:"systemctl poweroff" }
+            ];
+            if (q) arr = arr.filter(x=> x.title.toLowerCase().includes(q) || x.subtitle.includes(q));
+            return arr;
+        }
         if (m==="bluetooth") {
             let arr = btSvc.devices.map(d=> ({
                 title: d.name, subtitle: d.addr + (d.connected?" \u00B7 connected":""), icon: "\u{f00af}",
@@ -441,7 +454,7 @@ PanelWindow {
     }
 
     function cycleMode(){
-        let order=["apps","clipboard","emoji","nerd","bluetooth"];
+        let order=["apps","clipboard","emoji","nerd","bluetooth","power"];
         let i=order.indexOf(win.mode);
         win.mode = order[(i+1)%order.length];
         win.selected=0;
@@ -467,6 +480,11 @@ PanelWindow {
             if(m._action==="power") btSvc.togglePower();
             else if(m.connected) btSvc.disconnect(m.addr);
             else btSvc.connect(m.addr);
+        } else if(mode==="power"){
+            let p=Qt.createQmlObject('import Quickshell.Io; Process {}', win);
+            p.command=["sh","-c",m.cmd+" >/dev/null 2>&1"];
+            p.running=true;
+            win.visibleLauncher=false;
         }
     }
 
