@@ -25,7 +25,7 @@
     "npm:pi-worktrunk"
   ],
   "quietStartup": true,
-  "showHardwareCursor": false,
+  "showHardwareCursor": true,
   "theme": "gruvbox-dark-hard",
   "treeFilterMode": "all",
   "terminal": {
