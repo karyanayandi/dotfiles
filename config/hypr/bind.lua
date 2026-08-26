@@ -43,8 +43,8 @@ hl.bind(mainMod .. " + ALT + P", hl.dsp.exec_cmd "~/.local/bin/color-picker.sh")
 hl.bind("Print", hl.dsp.exec_cmd "~/.local/bin/screenshot.sh")
 
 -- Notifications
-hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd "swaync-client -t -sw")
-hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "swaync-client -t --close-all")
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd "qs ipc call notifications toggle")
+hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call notifications clear")
 
 -- Focus
 hl.bind(mainMod .. " + H", hl.dsp.focus { direction = "l" })

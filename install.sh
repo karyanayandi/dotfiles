@@ -53,6 +53,7 @@ yay -S --needed \
   lazygit \
   less \
   libnotify \
+  libnotify \
   librewolf-bin \
   libxcrypt-compat \
   local-by-flywheel-bin \
@@ -96,7 +97,6 @@ yay -S --needed \
   starship \
   stow \
   swappy \
-  swaync \
   tela-icon-theme \
   tmux \
   trash-cli \

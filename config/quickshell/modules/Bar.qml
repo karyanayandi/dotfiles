@@ -9,42 +9,13 @@ PanelWindow {
     id: barWin
     required property var theme
     required property var audio
+    required property var notifs
 
-    // submap + notifs live here (bar-owned)
     property string submap: ""
     Connections {
         target: Hyprland
         function onRawEvent(event) { if (event.name === "submap") barWin.submap = event.data }
     }
-
-    property bool notifDnd: false
-    property bool notifHasDot: false
-    Process {
-        id: notifProc
-        command: ["sh","-c","swaync-client -swb 2>/dev/null || echo '{\"count\":0}'"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data) return
-                try {
-                    const j = JSON.parse(data.trim())
-                    const alt = (j.alt || "").toString().toLowerCase()
-                    const clazz = (j.class || "").toString().toLowerCase()
-                    const text = (j.text || "").toString()
-                    let count = 0
-                    if (j.count !== undefined) count = parseInt(j.count) || 0
-                    else if (j.notification_count !== undefined) count = parseInt(j.notification_count) || 0
-                    else count = parseInt(text) || 0
-                    const hasNotif = count > 0 || alt.indexOf("notification") !== -1 || clazz.indexOf("notification") !== -1
-                    const isDnd = !!(j.dnd || j.doNotDisturb || j.inhibited || alt.indexOf("dnd") !== -1 || clazz.indexOf("dnd") !== -1)
-                    barWin.notifHasDot = hasNotif
-                    barWin.notifDnd = isDnd
-                } catch(e) {}
-            }
-        }
-    }
-    Timer { interval: 2000; running: true; repeat: true; onTriggered: notifProc.running = true; Component.onCompleted: notifProc.running = true }
-    Process { id: notifClickProc }
-    Process { id: notifRightProc }
 
     anchors { bottom: true; left: true; right: true }
     implicitHeight: 48
@@ -145,7 +116,7 @@ PanelWindow {
             Text {
                 id: volText
                 text: barWin.audio.volumeIcon
-                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
+                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 3
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea {
                     anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -159,14 +130,14 @@ PanelWindow {
             }
 
             Item {
-                Layout.preferredHeight: 30; Layout.preferredWidth: notifText.implicitWidth + 20; Layout.rightMargin: 20
-                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifDnd ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize }
-                Text { visible: barWin.notifHasDot; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 4; anchors.rightMargin: 2; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 8 }
+                Layout.preferredWidth: 36; Layout.preferredHeight: 30; Layout.rightMargin: 20
+                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize }
+                Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 3; anchors.rightMargin: 3; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 10 }
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: mouse => {
-                        if (mouse.button === Qt.RightButton) { notifRightProc.command = ["swaync-client","-d","-sw"]; notifRightProc.running = true }
-                        else { notifClickProc.command = ["swaync-client","-t","-sw"]; notifClickProc.running = true }
+                        if (mouse.button === Qt.RightButton) barWin.notifs.toggleDnd()
+                        else barWin.notifs.toggleCenter()
                     }
                 }
             }

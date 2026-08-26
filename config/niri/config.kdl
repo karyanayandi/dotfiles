@@ -65,7 +65,6 @@ layer-rule {
 }
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
-spawn-at-startup "swaync"
 
 spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "swayidle -w"
@@ -187,8 +186,8 @@ binds {
     Mod+Shift+G hotkey-overlay-title="Stop Screen Recording" { spawn-sh "~/.local/bin/stop-screen-record.sh"; }
     Mod+Alt+G hotkey-overlay-title="Start Area Screen Recording" { spawn-sh "~/.local/bin/screen-record-area.sh"; }
     Mod+Alt+P hotkey-overlay-title="Color Picker" {spawn-sh "~/.local/bin/color-picker.sh"; }
-    Mod+Shift+N hotkey-overlay-title="Open Notification" {spawn-sh "swaync-client -t -sw"; }
-    Mod+Alt+N hotkey-overlay-title="Clear All Notification" {spawn-sh "swaync-client --close-all"; }
+    Mod+Shift+N hotkey-overlay-title="Open Notification" {spawn-sh "qs ipc call notifications toggle"; }
+    Mod+Alt+N hotkey-overlay-title="Clear All Notification" {spawn-sh "qs ipc call notifications clear"; }
     Mod+B hotkey-overlay-title="Open Browser" { spawn "/usr/bin/helium-browser"; }
 
     Mod+E hotkey-overlay-title="Open File Manager" { spawn "/usr/bin/nemo"; }
