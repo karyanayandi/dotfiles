@@ -78,14 +78,6 @@ PanelWindow {
                 opacity: 0.55
                 z: -1
             }
-            // top highlight \u2014 light catching material
-            Rectangle {
-                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
-                height: 1; radius: parent.radius
-                color: Theme.colBorderStrong
-                opacity: 0.9
-            }
-
             ColumnLayout {
                 id: col
                 anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
