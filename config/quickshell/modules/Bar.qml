@@ -98,12 +98,7 @@ PanelWindow {
 
             // tray icons
             Text {
-                text: ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
-                Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
-                MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["ghostty","-e","yazi"]; p.running = true } }
-            }
-            Text {
-                text: "󰍛"; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize
+                text: "󰍛"; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 6
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["ghostty","-e","btm"]; p.running = true } }
             }
@@ -116,7 +111,7 @@ PanelWindow {
             Text {
                 id: volText
                 text: barWin.audio.volumeIcon
-                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 3
+                color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 10
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
                 MouseArea {
                     anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -131,8 +126,8 @@ PanelWindow {
 
             Item {
                 Layout.preferredWidth: 36; Layout.preferredHeight: 30; Layout.rightMargin: 20
-                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize }
-                Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 3; anchors.rightMargin: 3; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 10 }
+                Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 6 }
+                Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 6; anchors.rightMargin: 6; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 10 }
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: mouse => {
