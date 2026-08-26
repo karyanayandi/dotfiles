@@ -7,7 +7,8 @@ Item {
     property var model: []
     property int selected: 0
     property string emptyText: "No results"
-    readonly property bool valueGrid: root.model.length > 0 && (root.model[0].kind === "emoji" || root.model[0].kind === "nerd")
+    readonly property bool wallpaperGrid: root.model.length > 0 && root.model[0].kind === "wallpaper"
+    readonly property bool valueGrid: root.model.length > 0 && (root.model[0].kind === "emoji" || root.model[0].kind === "nerd" || root.wallpaperGrid)
     readonly property int gridColumns: Math.max(1, Math.floor(grid.width / grid.cellWidth))
     signal selectionRequested(int index)
     signal activated(int index, bool ctrl)
@@ -48,8 +49,8 @@ Item {
         boundsBehavior: Flickable.StopAtBounds
         model: root.model
         currentIndex: root.selected
-        cellWidth: 64
-        cellHeight: 56
+        cellWidth: root.wallpaperGrid ? 160 : 64
+        cellHeight: root.wallpaperGrid ? 108 : 56
         onCurrentIndexChanged: if (currentIndex >= 0 && root.valueGrid) positionViewAtIndex(currentIndex, GridView.Contain)
         delegate: Item {
             required property var modelData
@@ -62,12 +63,43 @@ Item {
                 anchors.margins: 4
                 radius: 10
                 color: index === root.selected ? Theme.colHoverAlpha : "transparent"
-                border.color: index === root.selected ? Theme.colBorder : "transparent"
-                border.width: 1
+                border.color: index === root.selected ? Theme.g6 : Theme.colBorder
+                border.width: index === root.selected ? 2 : 1
+                clip: true
+
+                Image {
+                    anchors.fill: parent
+                    visible: root.wallpaperGrid
+                    source: visible ? "file://" + modelData.path : ""
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    cache: true
+                }
+
+                Rectangle {
+                    visible: root.wallpaperGrid
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 28
+                    color: Theme.colBgAlpha078
+                    Text {
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        text: modelData.title || ""
+                        color: Theme.colFg
+                        font.family: Theme.fontFamily
+                        font.pixelSize: 10
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
             }
 
             Text {
                 anchors.fill: parent
+                visible: !root.wallpaperGrid
                 text: modelData.text || modelData.icon || ""
                 color: Theme.colFg
                 font.family: modelData.kind === "emoji" ? "Noto Color Emoji" : Theme.fontFamily

@@ -75,8 +75,6 @@ spawn-sh-at-startup "gsettings set org.gnome.desktop.interface 'Tela-grey-dark'"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Ice'"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface font-name 'Adwaita Sans 11'"
 
-spawn-sh-at-startup "~/.local/bin/set-wallpaper.sh"
-
 hotkey-overlay {
     skip-at-startup
 }
@@ -122,7 +120,6 @@ window-rule {
 // }
 
 window-rule {
-    match app-id=r#"vicinae$"#
     match app-id=r#"chrome-nngceckbapebfimnlniiiahkandclblb-Default$"#
     match app-id=r#"org.gnome.FileRoller$"#
     match app-id=r#"mpv$"#
@@ -199,6 +196,7 @@ binds {
     Mod+Alt+E hotkey-overlay-title="Emoji Picker" { spawn-sh "qs ipc call launcher open emoji"; }
     Mod+Alt+N hotkey-overlay-title="Nerd Font Picker" { spawn-sh "qs ipc call launcher open nerd"; }
     Mod+Alt+B hotkey-overlay-title="Bluetooth Manager" { spawn-sh "qs ipc call launcher open bluetooth"; }
+    Mod+Alt+W hotkey-overlay-title="Wallpaper Picker" { spawn-sh "qs ipc call launcher open wallpaper"; }
 
     Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 

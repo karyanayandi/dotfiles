@@ -9,6 +9,7 @@ import ".."
 PanelWindow {
     id: win
     property bool visibleLauncher: false
+    required property var wallpaper
 
     function open(mode) {
         const selectedMode = mode || "all"
@@ -33,6 +34,7 @@ PanelWindow {
 
     LauncherParts.LauncherModel {
         id: model
+        wallpaper: win.wallpaper
         onCloseRequested: win.visibleLauncher = false
         onSourceOpened: {
             input.clear()
@@ -119,7 +121,7 @@ PanelWindow {
                     }
                     onSelectionMoved: direction => {
                         const count = model.results.length
-                        const gridMode = model.mode === "emoji" || model.mode === "nerd"
+                        const gridMode = model.mode === "emoji" || model.mode === "nerd" || model.mode === "wallpaper"
                         if (!gridMode) {
                             model.selected = Math.max(0, Math.min(model.selected + (direction === "up" ? -1 : 1), count - 1))
                             return

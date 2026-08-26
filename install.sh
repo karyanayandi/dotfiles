@@ -42,7 +42,6 @@ yay -S --needed \
   helium-bin \
   hyprcursor \
   hyprlock \
-  hyprpaper \
   hyprpicker \
   imv \
   inxi \
@@ -53,7 +52,6 @@ yay -S --needed \
   lazydocker \
   lazygit \
   less \
-  libnotify \
   libnotify \
   librewolf-bin \
   libxcrypt-compat \
@@ -111,7 +109,6 @@ yay -S --needed \
   unzip \
   usage \
   uv \
-  vicinae-bin \
   vivid \
   wf-recorder \
   wget \

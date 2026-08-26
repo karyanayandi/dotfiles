@@ -41,9 +41,7 @@ hl.on("hyprland.start", function()
   -- hl.exec_cmd "pgrep -x ollama >/dev/null || nohup ollama serve >/tmp/ollama.log 2>&1 &"
   hl.exec_cmd "if ! kill -0 $(cat /tmp/9router.pid 2>/dev/null) 2>/dev/null; then nohup 9router --skip-update >/tmp/9router.log 2>&1 & echo $! >/tmp/9router.pid; fi"
 
-  -- Wallpaper / bar / notifications
-  hl.exec_cmd "hyprpaper"
-  hl.exec_cmd "sh ~/.local/bin/set-wallpaper.sh"
+  -- Desktop shell
   hl.exec_cmd "quickshell"
 
   io.open(lock, "w"):close()

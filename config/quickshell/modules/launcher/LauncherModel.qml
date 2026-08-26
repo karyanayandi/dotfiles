@@ -7,6 +7,7 @@ import "../../services" as Services
 Item {
     id: root
     visible: false
+    required property var wallpaper
     property bool pinnedMode: false
     property string query: ""
     property int selected: 0
@@ -46,6 +47,7 @@ Item {
                 { title: "Nerd Fonts", subtitle: "search + paste icons", icon: "\u{f0b10}", go: "nerd" },
                 { title: "Clipboard History", subtitle: "paste recent clips", icon: "\u{f0147}", go: "clipboard" },
                 { title: "Bluetooth", subtitle: "manage devices", icon: "\u{f00af}", go: "bluetooth" },
+                { title: "Wallpapers", subtitle: "preview and choose", icon: "\u{f108}", go: "wallpaper" },
                 { title: "Power", subtitle: "lock, reboot, shutdown\u2026", icon: "\u{f0425}", go: "power" }
             ]
             results = results.concat(switchers.map(item => {
@@ -66,6 +68,15 @@ Item {
                 item._score = score(item.title + " " + item.subtitle, query) * 0.5 + (query ? 0 : 0.4)
                 return item
             }).filter(item => item._score > 0))
+        }
+        if (mode === "wallpaper") {
+            results = results.concat(root.wallpaper.wallpapers.map(path => ({
+                kind: "wallpaper",
+                title: path.split("/").pop().replace(/\.[^.]+$/, ""),
+                subtitle: path === root.wallpaper.current ? "Current" : "",
+                path,
+                _score: score(path.split("/").pop(), query)
+            })).filter(item => item._score > 0))
         }
         if (mode === "clipboard") {
             results = results.concat(clipSvc.history.map((entry, index) => ({
@@ -137,6 +148,9 @@ Item {
         if (item.kind === "app") {
             if (item.entry && item.entry.execute) item.entry.execute()
             else run((item.exec || "") + " >/dev/null 2>&1 & disown")
+            root.closeRequested()
+        } else if (item.kind === "wallpaper") {
+            root.wallpaper.setWallpaper(item.path)
             root.closeRequested()
         } else if (item.kind === "clip") {
             if (item.img) clipSvc.copyFile(item.img)

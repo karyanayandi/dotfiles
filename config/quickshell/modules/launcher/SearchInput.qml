@@ -44,7 +44,7 @@ RowLayout {
             if (event.key === Qt.Key_Escape) root.escapePressed()
             else if (event.key === Qt.Key_Down) root.selectionMoved("down")
             else if (event.key === Qt.Key_Up) root.selectionMoved("up")
-            else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && (root.mode === "emoji" || root.mode === "nerd")) root.selectionMoved(event.key === Qt.Key_Left ? "left" : "right")
+            else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && (root.mode === "emoji" || root.mode === "nerd" || root.mode === "wallpaper")) root.selectionMoved(event.key === Qt.Key_Left ? "left" : "right")
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.selected(!!(event.modifiers & Qt.ControlModifier))
             else return
             event.accepted = true
@@ -59,7 +59,8 @@ RowLayout {
                 if (root.mode === "nerd") return "Search Nerd Fonts\u2026"
                 if (root.mode === "bluetooth") return "Bluetooth devices\u2026"
                 if (root.mode === "power") return "Search power actions\u2026"
-                return "Search apps, clipboard, emoji, power\u2026"
+                if (root.mode === "wallpaper") return "Search wallpapers\u2026"
+                return "Search apps, clipboard, emoji, wallpapers\u2026"
             }
             color: Theme.g19
             font.pixelSize: root.mode === "emoji" ? 18 : 15
