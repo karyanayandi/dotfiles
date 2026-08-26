@@ -8,23 +8,38 @@ PanelWindow {
     required property var theme
     required property var audio
 
-    visible: audio.osdVisible
+    // apple: keep alive through exit so interruptible (grab mid-flight) works — visible until opacity settles
+    property real _osdOpacity: audio.osdVisible ? 1 : 0
+    Behavior on _osdOpacity { NumberAnimation { duration: 280; easing.type: Easing.OutCubic } }
+    visible: audio.osdVisible || _osdOpacity > 0.01
     anchors.top: true
     margins.top: 80
     implicitWidth: 380
     implicitHeight: 56
     exclusiveZone: 0
     color: "transparent"
-    mask: Region { item: osdBg }
+    mask: Region { item: osdWrap }
     WlrLayershell.namespace: "quickshell-osd"
     WlrLayershell.layer: WlrLayer.Overlay
 
+    Item {
+        id: osdWrap
+        anchors.centerIn: parent
+        width: 360; height: 44
+        opacity: win._osdOpacity
+        // apple: materialize — scale+blur together; critically damped, no bounce (no momentum)
+        scale: 0.96 + win._osdOpacity * 0.04
+        transformOrigin: Item.Center
+        Behavior on scale { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+
     Rectangle {
         id: osdBg
-        anchors.centerIn: parent
-        width: 360; height: 44; radius: 10
-        color: win.theme.colBg
-        border.color: win.theme.colAccent; border.width: 1
+        anchors.fill: parent
+        radius: 10
+        // apple: translucent material with bright top edge
+        color: win.theme.colBgAlpha095
+        border.color: Qt.rgba(1,1,1,0.10); border.width: 1
         RowLayout {
             anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; spacing: 12
             Text { text: win.audio.osdIcon; color: win.theme.colFg; font.family: win.theme.fontFamily; font.pixelSize: 18; Layout.alignment: Qt.AlignVCenter }
@@ -43,5 +58,6 @@ PanelWindow {
                 Layout.alignment: Qt.AlignVCenter; Layout.preferredWidth: 52; horizontalAlignment: Text.AlignRight
             }
         }
+    }
     }
 }

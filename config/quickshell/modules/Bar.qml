@@ -33,7 +33,9 @@ PanelWindow {
         width: implicitWidth
         height: 38
         radius: 10
-        color: barWin.theme.colBg
+        // apple: translucent material — floating functional layer, content scrolls underneath
+        color: barWin.theme.colBgAlpha095
+        border.color: Qt.rgba(1,1,1,0.08); border.width: 1
 
         RowLayout {
             id: barContent
@@ -63,6 +65,10 @@ PanelWindow {
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: wsText.implicitWidth + 20
                         color: isUrgent ? barWin.theme.colUrgent : (wsMouse.containsMouse ? barWin.theme.colAccent : "transparent")
+                        // apple: response on pointer-down — instant feedback, continuous during interaction
+                        scale: wsMouse.pressed ? 0.96 : 1
+                        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: 180; easing.type: Easing.OutCubic } }
                         Rectangle {
                             anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
                             height: isFocused || isActive ? 3 : 0
@@ -113,7 +119,10 @@ PanelWindow {
                 text: barWin.audio.volumeIcon
                 color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 10
                 Layout.alignment: Qt.AlignVCenter; leftPadding: 10; rightPadding: 10
+                scale: volMa.pressed ? 0.92 : 1
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
                 MouseArea {
+                    id: volMa
                     anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                     onClicked: mouse => {
@@ -125,10 +134,14 @@ PanelWindow {
             }
 
             Item {
+                id: notifBell
                 Layout.preferredWidth: 36; Layout.preferredHeight: 30; Layout.rightMargin: 20
+                scale: bellMa.pressed ? 0.92 : 1
+                Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutCubic } }
                 Text { id: notifText; anchors.centerIn: parent; text: barWin.notifs.doNotDisturb ? "" : ""; color: barWin.theme.colFg; font.family: barWin.theme.fontFamily; font.pixelSize: barWin.theme.fontSize + 2 }
                 Text { visible: barWin.notifs.hasUnread; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 6; anchors.rightMargin: 6; text: ""; color: barWin.theme.colUrgent; font.family: barWin.theme.fontFamily; font.pixelSize: 10 }
                 MouseArea {
+                    id: bellMa
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor; acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: mouse => {
                         if (mouse.button === Qt.RightButton) barWin.notifs.toggleDnd()

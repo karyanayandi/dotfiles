@@ -36,20 +36,27 @@ PanelWindow {
                 Layout.fillWidth: true
                 implicitHeight: bg.implicitHeight
                 color: "transparent"
-                // swaync .floating-notifications .notification-row .notification-background: margin 16, radius 24, bg alpha 0.85
+                // apple: spatial consistency — enter/exit same path (from right), symmetric easing
                 Layout.topMargin: 0; Layout.bottomMargin: 16
+                // apple: materialize — scale+opacity together so surface reads as material arriving, not just fade
+                opacity: 0
+                property real _enter: 0
+                Component.onCompleted: { opacity = 1; _enter = 1 }
+                transform: Translate { x: (1 - row._enter) * 24 }
+                scale: 0.96 + row._enter * 0.04
+                Behavior on opacity { NumberAnimation { duration: 360; easing.type: Easing.OutCubic } }
+                Behavior on _enter { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
+                // hint in direction of gesture — slight scale grows toward final position
 
                 Rectangle {
                     id: bg
                     anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
                     implicitHeight: inner.implicitHeight + 20
                     radius: 24
-                    // swaync: .notification bg alpha 0.85 border 1px @g0 shadow 0 0 8 rgba0,0,0,0.6
+                    // apple: translucent floating material — blur approx via alpha, bright top edge
                     color: theme.colBgAlpha085
-                    border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : theme.g0
+                    border.color: notif.urgency === NotificationUrgency.Critical ? theme.colCritical : Qt.rgba(1,1,1,0.08)
                     border.width: notif.urgency === NotificationUrgency.Critical ? 2 : 1
-
-                    Behavior on opacity { NumberAnimation { duration: 200 } }
 
                     Timer {
                         id: ttl

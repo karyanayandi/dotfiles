@@ -9,35 +9,56 @@ PanelWindow {
     id: win
     required property var theme
     required property var notifs
-    visible: notifs.controlCenterVisible
+    // apple: keep window alive through exit animation — visible until opacity settles (interruptible)
+    property real _targetOpacity: notifs.controlCenterVisible ? 1 : 0
+    property real _centerOpacity: _targetOpacity
+    Behavior on _centerOpacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+    visible: notifs.controlCenterVisible || _centerOpacity > 0.01
     anchors { top: true; right: true }
     margins { top: 18; right: 18 }
     implicitWidth: 420
     implicitHeight: 920
     exclusiveZone: 0
     color: "transparent"
-    mask: Region { item: bg }
+    mask: Region { item: bgWrap }
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "quickshell-center"
 
-    MouseArea {
+    // apple: scrim — dim to focus, same path out as in (symmetric)
+    Rectangle {
+        id: scrim
         anchors.fill: parent
-        enabled: win.visible
-        onClicked: m => {
-            const p = bg.mapFromItem(win.contentItem, m.x, m.y)
-            if (p.x < 0 || p.x > bg.width || p.y < 0 || p.y > bg.height) win.notifs.controlCenterVisible = false
+        color: "#000000"
+        opacity: win._centerOpacity * 0.18
+        Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
+        MouseArea {
+            anchors.fill: parent
+            enabled: win.notifs.controlCenterVisible
+            onClicked: win.notifs.controlCenterVisible = false
         }
     }
 
+    Item {
+        id: bgWrap
+        anchors.top: parent.top; anchors.right: parent.right
+        width: 420; height: bg.height
+        // apple: interruptible sheet — animate from presentation value, never target value (no jump)
+        // Critically damped (damping 1.0) response 0.35s — graceful, no overshoot for non-momentum sheet
+        property real slide: win.notifs.controlCenterVisible ? 0 : 28
+        transform: Translate { x: bgWrap.slide }
+        opacity: win._centerOpacity
+        scale: 0.97 + win._centerOpacity * 0.03
+        Behavior on slide { NumberAnimation { duration: 360; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+        Behavior on scale { NumberAnimation { duration: 360; easing.type: Easing.OutCubic } }
+
     Rectangle {
         id: bg
-        anchors.top: parent.top; anchors.right: parent.right
-        width: 420
-        height: Math.min(920, col.implicitHeight + 24)
+        anchors.fill: parent
         radius: 24
-        // swaync: background alpha(@background,0.95) border 1px @gruvbox0 shadow 0 0 10 rgba0,0,0,0.6
+        // apple: translucent material — floating layer, content scrolls under; bright top edge = light catching material
         color: theme.colBgAlpha095
-        border.color: theme.g0; border.width: 1
+        border.color: Qt.rgba(1,1,1,0.10); border.width: 1
 
         ColumnLayout {
             id: col
@@ -275,5 +296,6 @@ PanelWindow {
                 }
             }
         }
+      }
     }
 }
