@@ -97,7 +97,6 @@ yay -S --needed \
   stow \
   swappy \
   swaync \
-  swayosd \
   tela-icon-theme \
   tmux \
   trash-cli \

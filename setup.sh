@@ -12,7 +12,6 @@ sh ./setup/go.sh
 sh ./setup/gtk-theme.sh
 sh ./setup/js-packages.sh
 sh ./setup/rust.sh
-sh ./setup/swayosd.sh
 sh ./setup/tmux.sh
 sh ./setup/viteplus.sh
 sh ./setup/zram.sh

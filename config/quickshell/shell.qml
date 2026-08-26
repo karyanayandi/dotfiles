@@ -7,14 +7,8 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-PanelWindow {
+ShellRoot {
     id: root
-    anchors { bottom: true; left: true; right: true }
-    implicitHeight: 48
-    exclusiveZone: 48
-    color: "transparent"
-    WlrLayershell.namespace: "quickshell"
-    WlrLayershell.layer: WlrLayer.Top
 
     property color colFg: "#d4be98"
     property color colBg: "#1d2021"
@@ -31,9 +25,57 @@ PanelWindow {
         }
     }
 
+    // Audio — Pipewire as source of truth, wpctl for control + OSD
     property var sink: Pipewire.defaultAudioSink
     property real pollVol: 0.3
     property bool pollMuted: false
+    property real prevPollVol: 0.3
+    property bool prevPollMuted: false
+
+    // OSD state
+    property bool osdVisible: false
+    property string osdKind: "sink"
+    property string osdIcon: ""
+    property int osdPercent: 30
+    Timer {
+        id: osdHide
+        interval: 1800
+        onTriggered: root.osdVisible = false
+    }
+    function showOsd(kind) {
+        root.osdKind = kind || "sink"
+        var muted = root.pollMuted
+        var v = root.pollVol
+        if (root.sink && root.sink.audio && root.sink.audio.muted) muted = true
+        root.osdPercent = Math.round(v * 100)
+        if (kind === "mic") {
+            root.osdIcon = muted ? "" : ""
+        } else {
+            if (muted) root.osdIcon = "󰸈"
+            else if (v <= 0.01) root.osdIcon = ""
+            else if (v < 0.34) root.osdIcon = ""
+            else if (v < 0.67) root.osdIcon = "󰕾"
+            else root.osdIcon = ""
+        }
+        root.osdVisible = true
+        osdHide.restart()
+    }
+
+    Process { id: volRaiseProc;  command: ["wpctl","set-volume","@DEFAULT_AUDIO_SINK@","5%+","-l","1.0"] }
+    Process { id: volLowerProc;  command: ["wpctl","set-volume","@DEFAULT_AUDIO_SINK@","5%-"] }
+    Process { id: volMuteProc;   command: ["wpctl","set-mute","@DEFAULT_AUDIO_SINK@","toggle"] }
+    Process { id: micMuteProc;   command: ["wpctl","set-mute","@DEFAULT_AUDIO_SOURCE@","toggle"] }
+    Process {
+        id: micPoll
+        command: ["sh","-c","pactl get-source-mute @DEFAULT_SOURCE@ 2>/dev/null | grep -q 'yes' && echo mute || echo unmute"]
+        stdout: SplitParser {
+            onRead: data => {
+                data = data.trim()
+                if (data === "mute") root.pollMuted = true
+            }
+        }
+    }
+
     Process {
         id: volPoll
         command: ["sh", "-c", "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | cut -d' ' -f2; pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | grep -q 'yes' && echo mute || echo unmute"]
@@ -47,6 +89,11 @@ PanelWindow {
                     var v = parseFloat(data)
                     if (!isNaN(v)) root.pollVol = v
                 }
+                if (Math.abs(root.pollVol - root.prevPollVol) > 0.005 || root.pollMuted !== root.prevPollMuted) {
+                    root.prevPollVol = root.pollVol
+                    root.prevPollMuted = root.pollMuted
+                    if (root.osdVisible || Math.abs(root.pollVol - 0.3) > 0.001) root.showOsd("sink")
+                }
             }
         }
     }
@@ -56,6 +103,23 @@ PanelWindow {
         repeat: true
         onTriggered: volPoll.running = true
         Component.onCompleted: volPoll.running = true
+    }
+
+    function volRaise() { volRaiseProc.running = true; volPoll.running = true; showOsd("sink"); Qt.callLater(() => volPoll.running = true) }
+    function volLower() { volLowerProc.running = true; volPoll.running = true; showOsd("sink"); Qt.callLater(() => volPoll.running = true) }
+    function volMuteToggle() { volMuteProc.running = true; showOsd("sink"); Qt.callLater(() => volPoll.running = true) }
+    function micMuteToggle() { micMuteProc.running = true; showOsd("mic") }
+
+    Connections {
+        target: Pipewire.defaultAudioSink ? Pipewire.defaultAudioSink.audio : null
+        function onVolumeChanged() {
+            if (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio)
+                root.pollVol = Pipewire.defaultAudioSink.audio.volume
+        }
+        function onMutedChanged() {
+            if (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio)
+                root.pollMuted = Pipewire.defaultAudioSink.audio.muted
+        }
     }
 
     property bool notifDnd: false
@@ -92,6 +156,16 @@ PanelWindow {
     }
     Process { id: notifClickProc }
     Process { id: notifRightProc }
+
+    // ── Bar ──────────────────────────────────────────────
+    PanelWindow {
+        id: barWin
+        anchors { bottom: true; left: true; right: true }
+        implicitHeight: 48
+        exclusiveZone: 48
+        color: "transparent"
+        WlrLayershell.namespace: "quickshell"
+        WlrLayershell.layer: WlrLayer.Top
 
     Rectangle {
         id: bar
@@ -242,6 +316,7 @@ PanelWindow {
                     var v = root.pollVol
                     if (sink && sink.audio) {
                         if (sink.audio.muted) muted = true
+                        if (sink.audio.volume !== undefined) v = sink.audio.volume
                     }
                     if (muted) return "󰸈"
                     var d = sink && sink.description ? sink.description : ""
@@ -268,12 +343,12 @@ PanelWindow {
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                     onClicked: mouse => {
-                        if (mouse.button === Qt.MiddleButton) { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["swayosd-client","--output-volume","mute-toggle"]; p.running = true }
+                        if (mouse.button === Qt.MiddleButton) root.volMuteToggle()
                         else { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["ghostty","-e","wiremix"]; p.running = true }
                     }
                     onWheel: wheel => {
-                        if (wheel.angleDelta.y > 0) { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["swayosd-client","--output-volume","raise"]; p.running = true; volPoll.running = true }
-                        else if (wheel.angleDelta.y < 0) { let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent); p.command = ["swayosd-client","--output-volume","lower"]; p.running = true; volPoll.running = true }
+                        if (wheel.angleDelta.y > 0) root.volRaise()
+                        else if (wheel.angleDelta.y < 0) root.volLower()
                     }
                 }
             }
@@ -333,6 +408,73 @@ PanelWindow {
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
+                }
+            }
+        }
+    }
+    }
+
+    // ── Volume / Mic OSD (replaces swayosd) ──────────────
+    PanelWindow {
+        id: osdWin
+        visible: root.osdVisible
+        anchors.top: true
+        margins.top: 80
+        implicitWidth: 380
+        implicitHeight: 56
+        exclusiveZone: 0
+        color: "transparent"
+        mask: Region { item: osdBg }
+        WlrLayershell.namespace: "quickshell-osd"
+        WlrLayershell.layer: WlrLayer.Overlay
+
+        Rectangle {
+            id: osdBg
+            anchors.centerIn: parent
+            width: 360
+            height: 44
+            radius: 10
+            color: root.colBg
+            border.color: root.colAccent
+            border.width: 1
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 14
+                anchors.rightMargin: 14
+                spacing: 12
+
+                Text {
+                    text: root.osdIcon
+                    color: root.colFg
+                    font.family: root.fontFamily
+                    font.pixelSize: 18
+                    Layout.alignment: Qt.AlignVCenter
+                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 8
+                    Layout.alignment: Qt.AlignVCenter
+                    radius: 4
+                    color: root.colAccent
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        width: parent.width * Math.min(1, root.osdPercent / 100)
+                        radius: 4
+                        color: root.pollMuted && root.osdKind === "sink" ? root.colUrgent : root.colFg
+                        Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                    }
+                }
+                Text {
+                    text: root.osdKind === "mic" ? (root.pollMuted ? "muted" : "mic") : (root.pollMuted ? "muted" : root.osdPercent + "%")
+                    color: root.colFg
+                    font.family: root.fontFamily
+                    font.pixelSize: 13
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 52
+                    horizontalAlignment: Text.AlignRight
                 }
             }
         }
