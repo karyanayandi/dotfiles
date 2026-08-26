@@ -8,19 +8,19 @@ Item {
     property int maxSize: 100
     readonly property string storePath: "/home/karyana/.cache/quickshell/clipboard.json"
 
-    FileView { id: store; path: root.storePath }
+    FileView { id: store; path: root.storePath; blockLoading: true }
     Component.onCompleted: {
         store.reload();
         try {
             let v = JSON.parse(store.text() || "[]");
             if (Array.isArray(v)) root.history = v;
         } catch(e) {}
-        // watch clipboard poll
         pollTimer.start();
     }
 
     function save() {
         store.setText(JSON.stringify(root.history.slice(0, root.maxSize)));
+        store.writeFile();
     }
 
     readonly property string imgDir: "/home/karyana/.cache/quickshell/clip-img"
@@ -29,7 +29,6 @@ Item {
     Timer { id: pollTimer; interval: 700; running: false; repeat: true; onTriggered: pastePoll.running = true }
     Process {
         id: pastePoll
-        // ponytail: png only, add jpeg/webm targets here if needed
         command: ["sh","-c",
             "mkdir -p " + root.imgDir + "; " +
             "if wl-paste --list-types 2>/dev/null | grep -qx 'image/png'; then " +
