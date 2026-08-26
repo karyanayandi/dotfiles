@@ -70,6 +70,7 @@ alias lzg lazygit
 alias oc "opencode"
 alias os "openspec"
 alias pac "sudo pacman -S"
+alias pi "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi"
 alias pkglist "paru -Qe"
 alias pn "pnpm"
 alias px "pnpx"
