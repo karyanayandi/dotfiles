@@ -92,12 +92,14 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
-        width: 400
+        implicitWidth: Math.max(400, Math.min(900, barContent.implicitWidth + 32))
+        width: implicitWidth
         height: 38
         radius: 10
         color: root.colBg
 
         RowLayout {
+            id: barContent
             anchors.fill: parent
             anchors.leftMargin: 12
             anchors.rightMargin: 12
