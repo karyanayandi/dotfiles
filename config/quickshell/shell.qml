@@ -68,11 +68,17 @@ PanelWindow {
                 if (!data) return
                 try {
                     const j = JSON.parse(data.trim())
-                    const count = (j.count !== undefined ? j.count : (j.notification_count !== undefined ? j.notification_count : 0))
-                    const dnd = (j.dnd !== undefined ? j.dnd : (j.doNotDisturb !== undefined ? j.doNotDisturb : false))
-                    const inhibited = (j.inhibited !== undefined ? j.inhibited : false)
-                    root.notifDnd = !!(dnd || inhibited)
-                    root.notifHasDot = count > 0
+                    const alt = (j.alt || "").toString().toLowerCase()
+                    const clazz = (j.class || "").toString().toLowerCase()
+                    const text = (j.text || "").toString()
+                    let count = 0
+                    if (j.count !== undefined) count = parseInt(j.count) || 0
+                    else if (j.notification_count !== undefined) count = parseInt(j.notification_count) || 0
+                    else count = parseInt(text) || 0
+                    const hasNotif = count > 0 || alt.indexOf("notification") !== -1 || clazz.indexOf("notification") !== -1
+                    const isDnd = !!(j.dnd || j.doNotDisturb || j.inhibited || alt.indexOf("dnd") !== -1 || clazz.indexOf("dnd") !== -1)
+                    root.notifHasDot = hasNotif
+                    root.notifDnd = isDnd
                 } catch(e) {}
             }
         }
