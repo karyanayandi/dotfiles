@@ -21,6 +21,7 @@ yay -S --needed \
   distrobox \
   eglinfo \
   eza \
+  fastfetch \
   fd \
   fetch-git \
   ffmpeg \
