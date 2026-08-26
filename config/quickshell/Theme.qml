@@ -48,7 +48,6 @@ QtObject {
     property color colBgAlpha085: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.85)
     property color colBgAlpha078: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.78)
     property string fontFamily: "JetBrainsMono NF"
-    // spotlight material (gruvbox hard monochrome)
     property color colLauncherBg: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.88)
     property color colLauncherBorder: Qt.rgba(0x7c/255, 0x6f/255, 0x64/255, 0.35)
     property color colInputBg: Qt.rgba(0x3c/255, 0x38/255, 0x36/255, 0.65)

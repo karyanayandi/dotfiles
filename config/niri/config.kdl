@@ -191,8 +191,8 @@ binds {
 
     Mod+E hotkey-overlay-title="Open File Manager" { spawn "/usr/bin/nemo"; }
 
-    Mod+Space repeat=false hotkey-overlay-title="Spotlight: Apps" { spawn-sh "qs ipc call launcher open apps"; }
-    Mod+Shift+Space repeat=false hotkey-overlay-title="Spotlight: Runner" { spawn-sh "qs ipc call launcher open apps"; }
+    Mod+Space repeat=false hotkey-overlay-title="Launcher: Apps" { spawn-sh "qs ipc call launcher open apps"; }
+    Mod+Shift+Space repeat=false hotkey-overlay-title="Launcher: Runner" { spawn-sh "qs ipc call launcher open apps"; }
     // Mod+Shift+W hotkey-overlay-title="Run an Websearch" { spawn-sh "walker --width 1280 -m websearch"; }
     // Mod+Shift+B hotkey-overlay-title="Open Bluetooth" { spawn-sh "walker --width 1280 -m bluetooth"; }
     Mod+P repeat=false hotkey-overlay-title="Clipboard (autopaste)" { spawn-sh "qs ipc call launcher open clipboard"; }

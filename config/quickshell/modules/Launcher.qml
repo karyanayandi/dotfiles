@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import ".."
 import "../services" as Services
@@ -189,12 +190,19 @@ PanelWindow {
                     }
                 }
 
+                Item {
+                    id: resultsArea
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 360
+
                 ListView {
                     id: list
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Math.min(360, contentHeight)
+                    anchors.fill: parent
                     visible: count>0 && !(win.mode==="emoji" || win.mode==="nerd")
                     clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    ScrollBar.vertical: ScrollBar { }
+
                     model: filteredModel
                     currentIndex: win.selected
                     highlightMoveDuration: 140
@@ -273,10 +281,12 @@ PanelWindow {
 
                 GridView {
                     id: grid
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Math.min(340, contentHeight)
+                    anchors.fill: parent
                     visible: count>0 && (win.mode==="emoji" || win.mode==="nerd")
                     clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    ScrollBar.vertical: ScrollBar { }
+
                     model: filteredModel
                     currentIndex: win.selected
                     cellWidth: 56
@@ -313,15 +323,12 @@ PanelWindow {
                     }
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 56
-                    visible: list.count===0
-                    Text {
-                        anchors.centerIn: parent
-                        text: win.mode==="clipboard" ? "No clipboard history yet \u2014 copy something" : win.mode==="bluetooth" ? "No devices \u2014 press Scan" : "No results"
-                        color: Theme.g19; font.family: Theme.fontFamily; font.pixelSize: 12
-                    }
+                Text {
+                    anchors.centerIn: resultsArea
+                    visible: resultCount()===0
+                    text: win.mode==="clipboard" ? "No clipboard history yet \u2014 copy something" : win.mode==="bluetooth" ? "No devices \u2014 press Scan" : "No results"
+                    color: Theme.g19; font.family: Theme.fontFamily; font.pixelSize: 12
+                }
                 }
 
                 RowLayout {
@@ -387,7 +394,7 @@ PanelWindow {
         let q = win.query.toLowerCase().trim();
         let m = win.mode;
         let grid = (m==="emoji" || m==="nerd");
-        let limit = grid ? 60 : 8;
+        let limit = grid ? 300 : 200;
         function score(s, q){
             if (!q) return 1;
             s=s.toLowerCase();
