@@ -45,6 +45,7 @@ const SETTLE_GRACE_MS = 1_000
  * Terminate (≤2.5s) + settle grace (1s) + flush (1.5s) stays inside the 5s
  * scope-close bound, so teardown remains bounded end to end. */
 const SPILL_FLUSH_TIMEOUT_MS = 1_500
+const GLOBAL_NOTIFY_INTERVAL_MS = 100
 const ERROR_TEXT_MAX_LENGTH = 4_096
 
 function bounded(text: string) {
@@ -280,6 +281,8 @@ const makeManager = Effect.gen(function* () {
   /** ids with an in-flight kill() collecting the result (settle → consumed). */
   const killInterest = new Map<string, number>()
   const listeners = new Set<() => void>()
+  let globalNotifyTimer: ReturnType<typeof setTimeout> | undefined
+  let lastGlobalNotifyAt = 0
   const idListeners = new Map<string, Set<() => void>>()
   let counter = 0
   let reserved = 0
@@ -289,7 +292,8 @@ const makeManager = Effect.gen(function* () {
     | ((snap: TerminalSnapshot, consumed: boolean) => void)
     | undefined
 
-  const notify = (id?: string) => {
+  const notifyGlobalListeners = () => {
+    lastGlobalNotifyAt = Date.now()
     // oxlint-disable-next-line no-useless-spread
     for (const listener of [...listeners]) {
       try {
@@ -297,6 +301,19 @@ const makeManager = Effect.gen(function* () {
       } catch {
         // A failed widget/render listener must not corrupt lifecycle state.
       }
+    }
+  }
+
+  const notify = (id?: string) => {
+    if (!globalNotifyTimer) {
+      const delay = Math.max(
+        0,
+        GLOBAL_NOTIFY_INTERVAL_MS - (Date.now() - lastGlobalNotifyAt),
+      )
+      globalNotifyTimer = setTimeout(() => {
+        globalNotifyTimer = undefined
+        notifyGlobalListeners()
+      }, delay)
     }
     if (id) {
       for (const listener of idListeners.get(id) ?? []) {
@@ -826,6 +843,8 @@ const makeManager = Effect.gen(function* () {
 
   const disposeAll = Effect.gen(function* () {
     disposed = true
+    if (globalNotifyTimer) clearTimeout(globalNotifyTimer)
+    globalNotifyTimer = undefined
     const all = [...entries.values()]
     entries.clear()
     yield* Effect.forEach(
