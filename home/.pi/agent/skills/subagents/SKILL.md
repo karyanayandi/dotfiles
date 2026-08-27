@@ -25,29 +25,11 @@ bare model id only works when unambiguous. Common picks in this environment:
 | Model                            | Recommended effort |
 | -------------------------------- | ------------------ |
 | inherited parent model (default) | inherited          |
-| `openai-codex/gpt-5.6-sol`       | `high`             |
-| `openai-codex/gpt-5.6-terra`     | `high`             |
-| `opencode/claude-fable-5`        | `medium`           |
+| `openai-codex/gpt-5.6-sol`       | `medium`           |
+| `openai-codex/gpt-5.6-terra`     | `medium`           |
 
 **Thinking budgets:** `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
 These map directly to pi thinking levels.
-
-## Claude Code Harness
-
-**Harness:** `claude` **Prompt nicknames:** "claude", "Claude Code", "claude
-agent", "claude subagent", "cc" **Best default:** use the latest fable model on
-high reasoning. Do not default to anything else, if the user does not specify,
-use fable.
-
-| Model hint | Model               | Recommended effort |
-| ---------- | ------------------- | ------------------ |
-| `fable`    | latest Claude Fable | `high`             |
-
-**Thinking budgets:** `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
-The extension maps these to Claude thinking-token budgets: 0, 1,024, 4,096,
-10,000, 16,000, 32,000, and 63,999 tokens respectively.
-
-Requires Claude Code to be installed and authenticated.
 
 ## Codex Harness
 
@@ -58,8 +40,8 @@ it.
 
 | Model           | Recommended effort |
 | --------------- | ------------------ |
-| `gpt-5.6-sol`   | `high`             |
-| `gpt-5.6-terra` | `high`             |
+| `gpt-5.6-sol`   | `medium`           |
+| `gpt-5.6-terra` | `medium`           |
 | `gpt-5.6-luna`  | `high`             |
 
 **Thinking budgets accepted by the extension:** `off`, `minimal`, `low`,
