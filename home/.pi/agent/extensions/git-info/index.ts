@@ -105,7 +105,8 @@ export default function gitInfo(pi: ExtensionAPI) {
             run("git", ["rev-parse", "--short", "HEAD"], ctx, GIT_TIMEOUT_MS),
             run(
               "git",
-              ["status", "--porcelain=v1", "--untracked-files=all"],
+              // Avoid recursively scanning every untracked file on each poll.
+              ["status", "--porcelain=v1", "--untracked-files=normal"],
               ctx,
               GIT_TIMEOUT_MS,
             ),
