@@ -90,3 +90,8 @@ trust_level = "trusted"
 
 [projects."/home/karyana/Codes/projects/ui"]
 trust_level = "trusted"
+
+[hooks.state]
+
+[hooks.state."/home/karyana/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:6e0810ddbc4df1a4490fe5335b707d742f1cf3f3ce7769630340603092237593"
