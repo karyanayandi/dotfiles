@@ -10,11 +10,21 @@ conversation, cannot ask the user, and cannot spawn subagents or workflows. Give
 every child a self-contained prompt with paths, constraints, and the expected
 report.
 
+## Defaults
+
+Run `/subagent-defaults` in TUI to choose default harness and model. Pi model
+picker has search input: type model or provider terms, then use arrows + Enter.
+Defaults persist in `~/.pi/agent/subagent-defaults.json`.
+
+When `subagent_spawn` omits `harness` or `model`, extension uses configured
+default. Explicit tool values override it. Fresh config defaults to Pi; Pi
+inherits parent model when no Pi default model is set.
+
 ## Pi Harness
 
-**Harness:** `pi` **Prompt nicknames:** "pi", "pi agent", "pi subagent" **Best
-default:** Use when the user does not request another harness. It inherits the
-parent model and thinking level when `model` or `reasoning_effort` is omitted.
+**Harness:** `pi` **Prompt nicknames:** "pi", "pi agent", "pi subagent". Use
+configured default unless task requires another harness. Pi inherits parent
+thinking level when `reasoning_effort` is omitted.
 
 Do not use models from the Anthropic provider even if one appears in the model
 list.
@@ -53,9 +63,9 @@ Requires the Codex CLI to be installed and authenticated.
 
 ## Spawn and Manage
 
-Call `subagent_spawn` with a complete `prompt`, short `name`, chosen `harness`,
-and optional `working_dir`, `model`, and `reasoning_effort`. At most four
-subagents run concurrently.
+Call `subagent_spawn` with complete `prompt`, short `name`, optional `harness`,
+`working_dir`, `model`, and `reasoning_effort`. Omit harness/model for
+configured defaults. At most four subagents run concurrently.
 
 - `subagent_check({ id })`: peek without blocking.
 - `subagent_list()`: list all runs.

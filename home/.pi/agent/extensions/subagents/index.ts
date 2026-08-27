@@ -40,7 +40,9 @@ import {
 } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
 import { Type } from "typebox"
+import { pick } from "../model-shortcuts/src/picker.ts"
 import { deriveBtwTitle, isModelVisible } from "./src/by-the-way.ts"
+import { loadSubagentDefaults, saveSubagentDefaults } from "./src/defaults.ts"
 import {
   BACKEND_NAMES,
   formatElapsed,
@@ -297,7 +299,9 @@ export default function (pi: ExtensionAPI) {
     }),
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const manager = await getManager()
-      const harness = params.harness ?? "pi"
+      const defaults = loadSubagentDefaults()
+      const harness = params.harness ?? defaults.harness
+      const model = params.model ?? defaults.models[harness]
 
       const cwd = path.resolve(ctx.cwd, params.working_dir ?? ".")
       if (!fs.existsSync(cwd) || !fs.statSync(cwd).isDirectory()) {
@@ -311,7 +315,7 @@ export default function (pi: ExtensionAPI) {
           prompt: params.prompt,
           title,
           cwd,
-          model: params.model,
+          model,
           reasoningEffort: params.reasoning_effort,
           parent: {
             parentCwd: ctx.cwd,
@@ -715,6 +719,75 @@ export default function (pi: ExtensionAPI) {
     description:
       "Ask a one-off side question while the main agent keeps working",
     handler: runByTheWay,
+  })
+
+  pi.registerCommand("subagent-defaults", {
+    description: "Configure default harness and model for subagents",
+    handler: async (_args, ctx) => {
+      if (ctx.mode !== "tui") {
+        if (ctx.hasUI)
+          ctx.ui.notify(
+            "Subagent defaults are only available in the TUI.",
+            "error",
+          )
+        return
+      }
+
+      const current = loadSubagentDefaults()
+      const selectedHarness = await ctx.ui.select(
+        `Default subagent harness (current: ${current.harness})`,
+        [...BACKEND_NAMES],
+      )
+      const harness = BACKEND_NAMES.find((name) => name === selectedHarness)
+      if (!harness) return
+
+      let model: string | undefined
+      if (harness === "pi") {
+        const models = ctx.modelRegistry
+          .getAvailable()
+          .filter((candidate) => candidate.provider !== "anthropic")
+          .map((candidate) => `${candidate.provider}/${candidate.id}`)
+          .sort((left, right) => left.localeCompare(right))
+        const selected = await pick(ctx, "Pi subagent model", [
+          {
+            value: "",
+            label: "Inherit parent model",
+            description: "Use current parent model",
+          },
+          ...models.map((value) => ({ value, label: value })),
+        ])
+        if (selected === null) return
+        model = selected || undefined
+      } else {
+        const selected = await ctx.ui.select("Codex subagent model", [
+          "Use Codex CLI default",
+          "gpt-5.6-sol",
+          "gpt-5.6-terra",
+          "gpt-5.6-luna",
+          "Custom…",
+        ])
+        if (!selected) return
+        if (selected === "Custom…") {
+          const custom = await ctx.ui.input(
+            "Codex model",
+            current.models.codex ?? "gpt-5.6-sol",
+          )
+          if (!custom?.trim()) return
+          model = custom.trim()
+        } else if (selected !== "Use Codex CLI default") {
+          model = selected
+        }
+      }
+
+      const models = { ...current.models }
+      if (model) models[harness] = model
+      else delete models[harness]
+      saveSubagentDefaults({ harness, models })
+      ctx.ui.notify(
+        `Subagent defaults: ${harness} · ${model ?? (harness === "pi" ? "inherit parent model" : "Codex CLI default")}`,
+        "info",
+      )
+    },
   })
 
   pi.registerCommand("subagents", {
