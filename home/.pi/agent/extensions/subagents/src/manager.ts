@@ -47,9 +47,10 @@ export const MAX_TRACKED = 64
 const STOP_TIMEOUT_MS = 5_000
 const GLOBAL_NOTIFY_INTERVAL_MS = 100
 const ERROR_TEXT_MAX_LENGTH = 4_096
-const TRANSCRIPT_TEXT_MAX_LENGTH = 64 * 1_024
-const LIVE_ASSISTANT_MAX_LENGTH = 128 * 1_024
-const FINAL_TEXT_MAX_LENGTH = 1_024 * 1_024
+// Parent UI shows only output tails; full child transcripts live on disk.
+const TRANSCRIPT_TEXT_MAX_LENGTH = 16 * 1_024
+const LIVE_ASSISTANT_MAX_LENGTH = 16 * 1_024
+const FINAL_TEXT_MAX_LENGTH = 64 * 1_024
 const MAX_TRANSCRIPT_ITEMS = 512
 
 function bounded(text: string) {
