@@ -22,12 +22,12 @@ diffRemoved = "#cc241d"
 skill = "#b16286"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-08-26T11:22:52Z"
+last_updated = "2026-08-27T22:08:50Z"
 source_type = "local"
 source = "/home/karyana/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-08-26T11:20:03Z"
+last_updated = "2026-08-27T22:17:14Z"
 source_type = "local"
 source = "/home/karyana/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -86,4 +86,7 @@ NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex"
 trust_level = "trusted"
 
 [projects."/home/karyana/.config/dotfiles"]
+trust_level = "trusted"
+
+[projects."/home/karyana/Codes/projects/ui"]
 trust_level = "trusted"
