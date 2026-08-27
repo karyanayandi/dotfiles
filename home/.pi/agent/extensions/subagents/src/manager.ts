@@ -45,6 +45,7 @@ import {
 export const MAX_RUNNING = 4
 export const MAX_TRACKED = 64
 const STOP_TIMEOUT_MS = 5_000
+const GLOBAL_NOTIFY_INTERVAL_MS = 100
 const ERROR_TEXT_MAX_LENGTH = 4_096
 const TRANSCRIPT_TEXT_MAX_LENGTH = 64 * 1_024
 const LIVE_ASSISTANT_MAX_LENGTH = 128 * 1_024
@@ -181,6 +182,8 @@ const makeManager = Effect.gen(function* () {
   const entries = new Map<string, Entry>()
   const waitInterest = new Map<string, number>()
   const listeners = new Set<() => void>()
+  let globalNotifyTimer: ReturnType<typeof setTimeout> | undefined
+  let lastGlobalNotifyAt = 0
   /** One-shot nextChange waiters, swapped out before invocation so waiters
    * re-registering during notification are not visited in the same sweep. */
   let changeWaiters: Array<() => void> = []
@@ -194,10 +197,8 @@ const makeManager = Effect.gen(function* () {
     | ((snap: SubagentSnapshot, consumed: boolean) => void)
     | undefined
 
-  const notify = (id?: string) => {
-    const waiters = changeWaiters
-    changeWaiters = []
-    for (const waiter of waiters) waiter()
+  const notifyGlobalListeners = () => {
+    lastGlobalNotifyAt = Date.now()
     // oxlint-disable-next-line no-useless-spread
     for (const listener of [...listeners]) {
       try {
@@ -205,6 +206,22 @@ const makeManager = Effect.gen(function* () {
       } catch {
         // A failed status/render listener must not corrupt lifecycle state.
       }
+    }
+  }
+
+  const notify = (id?: string) => {
+    const waiters = changeWaiters
+    changeWaiters = []
+    for (const waiter of waiters) waiter()
+    if (!globalNotifyTimer) {
+      const delay = Math.max(
+        0,
+        GLOBAL_NOTIFY_INTERVAL_MS - (Date.now() - lastGlobalNotifyAt),
+      )
+      globalNotifyTimer = setTimeout(() => {
+        globalNotifyTimer = undefined
+        notifyGlobalListeners()
+      }, delay)
     }
     if (id) {
       for (const listener of idListeners.get(id) ?? []) {
@@ -605,17 +622,16 @@ const makeManager = Effect.gen(function* () {
             pruneSettled()
           }),
         ),
-        Effect.map(
-          (): ReadonlyArray<CancelResult> =>
-            unique.map((id) => {
-              const snapshot = entries.get(id)?.snapshot
-              return {
-                id,
-                title: snapshot?.title ?? "?",
-                status: snapshot?.status ?? "error",
-                cancelled: runningIds.includes(id),
-              }
-            }),
+        Effect.map((): ReadonlyArray<CancelResult> =>
+          unique.map((id) => {
+            const snapshot = entries.get(id)?.snapshot
+            return {
+              id,
+              title: snapshot?.title ?? "?",
+              status: snapshot?.status ?? "error",
+              cancelled: runningIds.includes(id),
+            }
+          }),
         ),
       )
     })
@@ -655,6 +671,8 @@ const makeManager = Effect.gen(function* () {
 
   const disposeAll = Effect.gen(function* () {
     disposed = true
+    if (globalNotifyTimer) clearTimeout(globalNotifyTimer)
+    globalNotifyTimer = undefined
     const all = [...entries.values()]
     entries.clear()
     yield* Effect.forEach(
