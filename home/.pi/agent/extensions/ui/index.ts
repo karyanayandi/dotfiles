@@ -270,7 +270,7 @@ export default function ui(pi: ExtensionAPI) {
     spinnerTimer = setInterval(() => {
       spinnerFrame = (spinnerFrame + 1) % spinnerFrames.length
       tui?.requestRender()
-    }, 80)
+    }, 120)
     tui?.requestRender()
   }
 
