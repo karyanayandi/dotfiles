@@ -10,10 +10,12 @@ test("subagent defaults retain valid harnesses and models", () => {
     parseSubagentDefaults({
       harness: "codex",
       models: { pi: "openai-codex/gpt-5.6-sol", codex: "gpt-5.6-sol" },
+      reasoningEfforts: { pi: "medium", codex: "high" },
     }),
     {
       harness: "codex",
       models: { pi: "openai-codex/gpt-5.6-sol", codex: "gpt-5.6-sol" },
+      reasoningEfforts: { pi: "medium", codex: "high" },
     },
   )
   assert.deepEqual(

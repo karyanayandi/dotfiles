@@ -1,18 +1,25 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { getAgentDir } from "@earendil-works/pi-coding-agent"
-import { BACKEND_NAMES, type BackendName } from "./domain.ts"
+import {
+  BACKEND_NAMES,
+  REASONING_EFFORTS,
+  type BackendName,
+  type ReasoningEffort,
+} from "./domain.ts"
 
 const configPath = join(getAgentDir(), "subagent-defaults.json")
 
 export interface SubagentDefaults {
   readonly harness: BackendName
   readonly models: Partial<Record<BackendName, string>>
+  readonly reasoningEfforts: Partial<Record<BackendName, ReasoningEffort>>
 }
 
 export const DEFAULT_SUBAGENT_DEFAULTS: SubagentDefaults = {
   harness: "pi",
   models: {},
+  reasoningEfforts: {},
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -20,6 +27,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isBackendName = (value: unknown): value is BackendName =>
   typeof value === "string" && BACKEND_NAMES.some((name) => name === value)
+
+const isReasoningEffort = (value: unknown): value is ReasoningEffort =>
+  typeof value === "string" &&
+  REASONING_EFFORTS.some((effort) => effort === value)
 
 export function parseSubagentDefaults(value: unknown) {
   if (!isRecord(value) || !isBackendName(value.harness)) {
@@ -38,7 +49,17 @@ export function parseSubagentDefaults(value: unknown) {
       )
     : {}
 
-  return { harness: value.harness, models }
+  const reasoningEffortValues = value.reasoningEfforts
+  const reasoningEfforts = isRecord(reasoningEffortValues)
+    ? Object.fromEntries(
+        BACKEND_NAMES.flatMap((harness) => {
+          const effort = reasoningEffortValues[harness]
+          return isReasoningEffort(effort) ? [[harness, effort]] : []
+        }),
+      )
+    : {}
+
+  return { harness: value.harness, models, reasoningEfforts }
 }
 
 export function loadSubagentDefaults() {

@@ -12,13 +12,15 @@ report.
 
 ## Defaults
 
-Run `/subagent-defaults` in TUI to choose default harness and model. Pi model
-picker has search input: type model or provider terms, then use arrows + Enter.
-Defaults persist in `~/.pi/agent/subagent-defaults.json`.
+Run `/subagent-defaults` in TUI to choose default harness, model, and reasoning
+effort. Pi model picker has search input: type model or provider terms, then use
+arrows + Enter. Model picker then opens reasoning-effort selector. Defaults
+persist in `~/.pi/agent/subagent-defaults.json`.
 
-When `subagent_spawn` omits `harness` or `model`, extension uses configured
-default. Explicit tool values override it. Fresh config defaults to Pi; Pi
-inherits parent model when no Pi default model is set.
+When `subagent_spawn` omits `harness`, `model`, or `reasoning_effort`, extension
+uses configured default. Explicit tool values override it. Fresh config defaults
+to Pi; Pi inherits parent model and reasoning effort when no Pi defaults are
+set.
 
 ## Pi Harness
 

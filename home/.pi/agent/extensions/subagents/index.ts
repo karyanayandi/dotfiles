@@ -302,6 +302,8 @@ export default function (pi: ExtensionAPI) {
       const defaults = loadSubagentDefaults()
       const harness = params.harness ?? defaults.harness
       const model = params.model ?? defaults.models[harness]
+      const reasoningEffort =
+        params.reasoning_effort ?? defaults.reasoningEfforts[harness]
 
       const cwd = path.resolve(ctx.cwd, params.working_dir ?? ".")
       if (!fs.existsSync(cwd) || !fs.statSync(cwd).isDirectory()) {
@@ -316,7 +318,7 @@ export default function (pi: ExtensionAPI) {
           title,
           cwd,
           model,
-          reasoningEffort: params.reasoning_effort,
+          reasoningEffort,
           parent: {
             parentCwd: ctx.cwd,
             projectTrusted: resolveChildProjectTrust({
@@ -779,12 +781,29 @@ export default function (pi: ExtensionAPI) {
         }
       }
 
+      const selectedEffort = await ctx.ui.select(
+        `Subagent reasoning effort (current: ${current.reasoningEfforts[harness] ?? "default"})`,
+        [
+          harness === "pi"
+            ? "Inherit parent reasoning effort"
+            : "Use Codex CLI default",
+          ...REASONING_EFFORTS,
+        ],
+      )
+      if (!selectedEffort) return
+      const reasoningEffort = REASONING_EFFORTS.find(
+        (effort) => effort === selectedEffort,
+      )
+
       const models = { ...current.models }
       if (model) models[harness] = model
       else delete models[harness]
-      saveSubagentDefaults({ harness, models })
+      const reasoningEfforts = { ...current.reasoningEfforts }
+      if (reasoningEffort) reasoningEfforts[harness] = reasoningEffort
+      else delete reasoningEfforts[harness]
+      saveSubagentDefaults({ harness, models, reasoningEfforts })
       ctx.ui.notify(
-        `Subagent defaults: ${harness} · ${model ?? (harness === "pi" ? "inherit parent model" : "Codex CLI default")}`,
+        `Subagent defaults: ${harness} · ${model ?? (harness === "pi" ? "inherit parent model" : "Codex CLI default")} · ${reasoningEffort ?? "default effort"}`,
         "info",
       )
     },
