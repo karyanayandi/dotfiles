@@ -67,7 +67,8 @@ alias ls "eza --group-directories-first --icons"
 alias lsl "eza --group-directories-first -lh --icons"
 alias lzd lazydocker
 alias lzg lazygit
-alias oc "opencode"
+alias oc "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
+alias opencode "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
 alias os "openspec"
 alias pac "sudo pacman -S"
 alias pi "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi"
