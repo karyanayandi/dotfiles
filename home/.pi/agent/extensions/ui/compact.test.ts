@@ -192,45 +192,6 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("augments bare-name fallback rows (Task tools) with their args", () => {
-    const fakeTask: any = {
-      name: "TaskUpdate",
-      label: "TaskUpdate",
-      description: "update a task",
-      parameters: {},
-      async execute() {
-        return {
-          content: [{ type: "text", text: "Task #3 updated" }],
-          details: undefined,
-        }
-      },
-    }
-    const row = new ToolExecutionComponent(
-      "TaskUpdate",
-      "tool-1",
-      { taskId: "3" },
-      {},
-      fakeTask,
-      tui,
-      "/tmp/example",
-    )
-    row.setArgsComplete()
-    row.markExecutionStarted()
-    row.updateResult(
-      { content: [{ type: "text", text: "Task #3 updated" }], isError: false },
-      false,
-    )
-
-    const restore = installToolSpacing(() => true, theme)
-    try {
-      const line = (row.render(80) ?? [""])[0] ?? ""
-      expect(line).toContain("TaskUpdate")
-      expect(line).toContain("taskId:3")
-    } finally {
-      restore()
-    }
-  })
-
   test("wraps long rows to the next line instead of truncating on a narrow terminal", () => {
     const tool = createTools(() => true).get("grep")
     const row = new ToolExecutionComponent(

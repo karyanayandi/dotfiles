@@ -133,18 +133,6 @@
         "typescript": "catalog:",
       },
     },
-    "extensions/tasks": {
-      "name": "tasks",
-      "dependencies": {
-        "effect": "catalog:",
-        "typebox": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/tsgo": "catalog:",
-        "@types/node": "catalog:",
-        "typescript": "catalog:",
-      },
-    },
     "extensions/ui": {
       "name": "ui",
       "dependencies": {
@@ -926,8 +914,6 @@
     "subagents": ["subagents@workspace:extensions/subagents"],
 
     "summaries": ["summaries@workspace:extensions/summaries"],
-
-    "tasks": ["tasks@workspace:extensions/tasks"],
 
     "tinybench": ["tinybench@2.9.0", "", {}, "sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg=="],
 

@@ -311,12 +311,12 @@ export function registerCompactTools(
 
 /**
  * Collapse each tool's transcript row to a single line in compact layouts.
- * This is what gives un-wrapped tools (fd, rg, every Task* tool, and other custom
- * tools) the pi-minimalist single-line look without re-registering them. When a
+ * This is what gives un-wrapped custom tools the pi-minimalist single-line look
+ * without re-registering them. When a
  * tool renders a short call+summary pair (exactly two content lines, e.g. fd/rg)
  * they are joined; otherwise only the call line is kept, augmented with the
  * call's args when the tool has no custom renderer (bare-name fallback). Never
- * touches the file-search or tasks extensions.
+ * touches the file-search extension.
  */
 export function installToolSpacing(
   getCompact: () => boolean,
