@@ -9,8 +9,8 @@
       "disabled": true
     }
   },
-  "model": "9router/oc/deepseek-v4-flash-free",
-  "small_model": "9router/oc/deepseek-v4-flash-free",
+  "model": "openai/gpt-5.6-terra",
+  "small_model": "openai/gpt-5.6-luna",
   "agent": {
     "explore": {
       "disable": true
@@ -19,12 +19,12 @@
       "disable": true
     },
     "coder": {
-      "model": "ollama-cloud/deepseek-v4-flash"
+      "model": "openai/gpt-5.6-terra"
     },
     "explorer": {
       "description": "Fast explorer subagent for codebase exploration",
       "mode": "subagent",
-      "model": "9router/oc/deepseek-v4-flash-free"
+      "model": "openai/gpt-5.6-terra"
     }
   },
   "mcp": {
@@ -65,53 +65,6 @@
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "provider": {
-    "ollama": {
-      "models": {
-        "deepseek-v4-flash:cloud": {
-          "name": "deepseek-v4-flash:cloud"
-        },
-        "deepseek-v4-pro:cloud": {
-          "name": "deepseek-v4-fpro:cloud",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
-          }
-        },
-        "kimi-k2.7-code:cloud": {
-          "name": "kimi-k2.7-code:cloud",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
-          }
-        },
-        "glm-5.2:cloud": {
-          "name": "glm-5.1:cloud",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
-          }
-        },
-        "minimax-m3:cloud": {
-          "name": "minimax-m3:cloud",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
-          }
-        },
-        "qwen3-coder-next:cloud": {
-          "name": "qwen3-coder-next:cloud",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
-          }
-        }
-      },
-      "name": "Ollama",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "http://127.0.0.1:11434/v1"
-      }
-    },
     "9router": {
       "npm": "@ai-sdk/openai-compatible",
       "options": {
@@ -119,13 +72,6 @@
         "apiKey": "sk-56d3a6bbccf98bff-3qbmu3-2f219179"
       },
       "models": {
-        "oc/deepseek-v4-flash-free": {
-          "name": "oc/deepseek-v4-flash-free",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
-          }
-        },
         "oc/muse-spark-1.2-contributor-free": {
           "name": "oc/deepseek-v4-flash-free",
           "modalities": {
