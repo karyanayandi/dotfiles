@@ -61,7 +61,7 @@ Rectangle {
                 Text {
                     visible: root.notification ? root.notification.body !== "" : false
                     text: root.notification ? root.notification.body : ""
-                    color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 13; opacity: 0.95
+                    color: Theme.colFg; linkColor: Theme.g9; font.family: Theme.fontFamily; font.pixelSize: 13; opacity: 0.95
                     wrapMode: Text.Wrap; Layout.fillWidth: true; maximumLineCount: 6; lineHeight: 1.15
                 }
                 Text {
