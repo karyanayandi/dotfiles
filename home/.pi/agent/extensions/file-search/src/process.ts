@@ -1,11 +1,13 @@
+import { spawn } from "node:child_process"
+import { createWriteStream } from "node:fs"
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import {
   DEFAULT_MAX_BYTES,
   DEFAULT_MAX_LINES,
   truncateHead,
 } from "@earendil-works/pi-coding-agent"
-import { Effect, FileSystem, Stream } from "effect"
-import { ChildProcess } from "effect/unstable/process"
 import type { CapturedOutput } from "./output.ts"
 
 const STDERR_MAX_BYTES = 64 * 1024
@@ -67,80 +69,80 @@ function finishStdout(state: PreviewState, fullOutputPath: string) {
   } satisfies CapturedOutput
 }
 
-function collectStderr<E, R>(stream: Stream.Stream<Uint8Array, E, R>) {
-  return Stream.runFold(
-    stream,
-    () => Buffer.alloc(0),
-    (captured, chunk) => {
-      if (captured.byteLength >= STDERR_MAX_BYTES) return captured
-      const remaining = STDERR_MAX_BYTES - captured.byteLength
-      return Buffer.concat([captured, chunk.subarray(0, remaining)])
-    },
-  ).pipe(Effect.map((bytes) => bytes.toString("utf8")))
+function abortError() {
+  return new DOMException("The operation was aborted", "AbortError")
 }
 
-export function executeSearchProcess(options: {
+export async function executeSearchProcess(options: {
   readonly command: string
   readonly args: readonly string[]
   readonly cwd: string
   readonly tempPrefix: string
+  readonly signal?: AbortSignal
 }) {
-  return Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem
-    const directory = yield* fs.makeTempDirectory({
-      prefix: options.tempPrefix,
+  const directory = await mkdtemp(join(tmpdir(), options.tempPrefix))
+  const fullOutputPath = join(directory, "output.txt")
+  let retainDirectory = false
+
+  try {
+    if (options.signal?.aborted) throw abortError()
+
+    const process = spawn(options.command, options.args, {
+      cwd: options.cwd,
+      stdio: ["ignore", "pipe", "pipe"],
     })
-    const fullOutputPath = join(directory, "output.txt")
-    let retainDirectory = false
+    const output = createWriteStream(fullOutputPath)
+    const preview = makePreviewState()
+    const stderr: Buffer[] = []
+    let stderrBytes = 0
 
-    return yield* Effect.gen(function* () {
-      const preview = makePreviewState()
-      const process = yield* ChildProcess.make(options.command, options.args, {
-        cwd: options.cwd,
-        stdin: "ignore",
-        stdout: "pipe",
-        stderr: "pipe",
-      })
+    const close = new Promise<number | null>((resolve, reject) => {
+      process.once("error", reject)
+      process.once("close", resolve)
+    })
+    const outputClosed = new Promise<void>((resolve, reject) => {
+      output.once("error", reject)
+      output.once("close", resolve)
+    })
+    const abort = () => process.kill()
+    options.signal?.addEventListener("abort", abort, { once: true })
+    if (options.signal?.aborted) abort()
 
-      const result = yield* Effect.all(
-        {
-          exitCode: process.exitCode,
-          stdout: process.stdout.pipe(
-            Stream.tap((chunk) =>
-              Effect.sync(() => observeStdout(preview, chunk)),
-            ),
-            Stream.run(fs.sink(fullOutputPath)),
-          ),
-          stderr: collectStderr(process.stderr),
-        },
-        { concurrency: "unbounded" },
-      )
-      const output = finishStdout(preview, fullOutputPath)
-      retainDirectory = output.truncated
+    process.stdout.on("data", (chunk: Buffer) => {
+      observeStdout(preview, chunk)
+      if (!output.write(chunk)) process.stdout.pause()
+    })
+    output.on("drain", () => process.stdout.resume())
+    process.stdout.once("end", () => output.end())
+    process.stderr.on("data", (chunk: Buffer) => {
+      if (stderrBytes >= STDERR_MAX_BYTES) return
+      const captured = chunk.subarray(0, STDERR_MAX_BYTES - stderrBytes)
+      stderr.push(captured)
+      stderrBytes += captured.byteLength
+    })
+
+    try {
+      const code = await close
+      await outputClosed
+      if (options.signal?.aborted) throw abortError()
+      const captured = finishStdout(preview, fullOutputPath)
+      retainDirectory = captured.truncated
       return {
-        code: Number(result.exitCode),
-        stderr: result.stderr,
-        output,
+        code: code ?? -1,
+        stderr: Buffer.concat(stderr, stderrBytes).toString("utf8"),
+        output: captured,
       }
-    }).pipe(
-      Effect.ensuring(
-        Effect.suspend(() =>
-          retainDirectory
-            ? Effect.void
-            : fs
-                .remove(directory, { recursive: true, force: true })
-                .pipe(Effect.orDie),
-        ),
-      ),
-    )
-  }).pipe(Effect.scoped)
+    } finally {
+      options.signal?.removeEventListener("abort", abort)
+      if (!output.closed) output.destroy()
+      if (!process.killed && options.signal?.aborted) process.kill()
+    }
+  } finally {
+    if (!retainDirectory) await rm(directory, { recursive: true, force: true })
+  }
 }
 
-export function discardCapturedOutput(output: CapturedOutput) {
-  if (!output.fullOutputPath) return Effect.void
-  const directory = dirname(output.fullOutputPath)
-  return Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem
-    yield* fs.remove(directory, { recursive: true, force: true })
-  })
+export async function discardCapturedOutput(output: CapturedOutput) {
+  if (!output.fullOutputPath) return
+  await rm(dirname(output.fullOutputPath), { recursive: true, force: true })
 }

@@ -13,9 +13,8 @@
  * "N background terminal(s) running • /ps to view". `/ps` opens a two-stage
  * full-screen overlay (list → read-only detail with stdout/stderr toggle).
  *
- * Architecture: Effect v4 core (manager service behind one ManagedRuntime);
- * this file is the async boundary where tool handlers run effects via
- * runTool. Node stream plumbing inside the manager is plain callbacks.
+ * Architecture: one Promise-based manager per session. Tool cancellation
+ * stops waiting, never process cleanup. Node stream plumbing is callbacks.
  */
 
 import * as fs from "node:fs"
@@ -29,7 +28,7 @@ import { getMarkdownTheme } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
 import { Type } from "typebox"
 import type { TerminalSnapshot } from "./src/domain.ts"
-import { TerminalManager, type TerminalManagerShape } from "./src/manager.ts"
+import type { TerminalManagerShape } from "./src/manager.ts"
 import {
   BG_KILL_PARAMETER_DESCRIPTIONS,
   BG_KILL_TOOL_DESCRIPTION,
@@ -69,15 +68,13 @@ export default function (pi: ExtensionAPI) {
 
   /** Resolve the manager service once per runtime and wire the extension hooks. */
   const getManager = () => {
-    managerPromise ??= getRuntime()
-      .runPromise(TerminalManager)
-      .then((manager) => {
-        manager.view.setOnSettled(onSettled)
-        unsubStatus?.()
-        unsubStatus = manager.view.subscribe(() => updateWidget(manager))
-        updateWidget(manager)
-        return manager
-      })
+    managerPromise ??= Promise.resolve(getRuntime().manager).then((manager) => {
+      manager.view.setOnSettled(onSettled)
+      unsubStatus?.()
+      unsubStatus = manager.view.subscribe(() => updateWidget(manager))
+      updateWidget(manager)
+      return manager
+    })
     return managerPromise
   }
 
@@ -237,10 +234,7 @@ export default function (pi: ExtensionAPI) {
       // TUI renderer) before bounding the length.
       const title =
         params.title.replace(/\s+/g, " ").trim().slice(0, 80) || "terminal"
-      const snap = await runTool(
-        getRuntime(),
-        manager.start({ command, title, cwd }),
-      )
+      const snap = await runTool(manager.start({ command, title, cwd }))
 
       return {
         content: [{ type: "text", text: buildStartResult(snap) }],
@@ -331,7 +325,7 @@ export default function (pi: ExtensionAPI) {
         )
       }
 
-      const report = await runTool(getRuntime(), manager.kill(ids), {
+      const report = await runTool(manager.kill(ids), {
         signal,
         interruptMessage:
           "Kill wait aborted; termination continues in the background.",

@@ -7,11 +7,9 @@
     "test": "node --test *.test.ts"
   },
   "dependencies": {
-    "effect": "catalog:",
     "firecrawl": "catalog:"
   },
   "devDependencies": {
-    "@effect/tsgo": "catalog:",
     "typescript": "catalog:"
   }
 }

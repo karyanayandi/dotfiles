@@ -1,6 +1,6 @@
 /**
  * Subagents — spawn background subagents on one of three backends
- * (pi, Codex) unified behind a single Effect service interface.
+ * (pi, Codex) unified behind one promise-based interface.
  *
  * Tools (for the parent LLM):
  * - subagent_spawn: fire-and-forget spawn (prompt, title, agent, working_dir,
@@ -13,9 +13,8 @@
  * Unawaited subagents queue their result as a follow-up message when they
  * settle. `/subagents` opens a picker + full interactive takeover view.
  *
- * Architecture: Effect v4 generators throughout (backends -> manager ->
- * runtime); this file is the async boundary where tool handlers run effects
- * against one shared ManagedRuntime. All three backends are real: pi runs
+ * Architecture: promises throughout (backends -> manager -> runtime). All
+ * backends are real: pi runs
  * in-process SDK sessions; Codex speaks JSON-RPC to a scoped `codex app-server`
  * process.
  */
@@ -51,7 +50,7 @@ import {
   type SubagentSnapshot,
 } from "./src/domain.ts"
 import { formatActivityStatus, formatContextUtilization } from "./src/format.ts"
-import { SubagentManager, type SubagentManagerShape } from "./src/manager.ts"
+import type { SubagentManagerShape } from "./src/manager.ts"
 import {
   buildSubagentResultMessage,
   buildSubagentSpawnResult,
@@ -148,15 +147,13 @@ export default function (pi: ExtensionAPI) {
 
   /** Resolve the manager service once per runtime and wire the extension hooks. */
   const getManager = () => {
-    managerPromise ??= getRuntime()
-      .runPromise(SubagentManager)
-      .then((manager) => {
-        manager.view.setOnSettled(onSettled)
-        unsubStatus?.()
-        unsubStatus = manager.view.subscribe(() => updateStatus(manager))
-        updateStatus(manager)
-        return manager
-      })
+    managerPromise ??= Promise.resolve(getRuntime().manager).then((manager) => {
+      manager.view.setOnSettled(onSettled)
+      unsubStatus?.()
+      unsubStatus = manager.view.subscribe(() => updateStatus(manager))
+      updateStatus(manager)
+      return manager
+    })
     return managerPromise
   }
 
@@ -312,27 +309,30 @@ export default function (pi: ExtensionAPI) {
 
       const title = params.name.trim().slice(0, 160) || "subagent"
       const snap = await runTool(
-        getRuntime(),
-        manager.spawn(harness, {
-          prompt: params.prompt,
-          title,
-          cwd,
-          model,
-          reasoningEffort,
-          parent: {
-            parentCwd: ctx.cwd,
-            projectTrusted: resolveChildProjectTrust({
+        manager.spawn(
+          harness,
+          {
+            prompt: params.prompt,
+            title,
+            cwd,
+            model,
+            reasoningEffort,
+            parent: {
               parentCwd: ctx.cwd,
-              childCwd: cwd,
-              parentTrusted: ctx.isProjectTrusted(),
-            }),
-            inheritedModel: ctx.model
-              ? { provider: ctx.model.provider, id: ctx.model.id }
-              : undefined,
-            inheritedThinkingLevel: pi.getThinkingLevel(),
-            modelRegistry: ctx.modelRegistry,
+              projectTrusted: resolveChildProjectTrust({
+                parentCwd: ctx.cwd,
+                childCwd: cwd,
+                parentTrusted: ctx.isProjectTrusted(),
+              }),
+              inheritedModel: ctx.model
+                ? { provider: ctx.model.provider, id: ctx.model.id }
+                : undefined,
+              inheritedThinkingLevel: pi.getThinkingLevel(),
+              modelRegistry: ctx.modelRegistry,
+            },
           },
-        }),
+          signal,
+        ),
         { signal, interruptMessage: "Subagent spawn aborted." },
       )
 
@@ -389,15 +389,18 @@ export default function (pi: ExtensionAPI) {
       }
 
       await runTool(
-        getRuntime(),
-        manager.waitFor(ids, (pending) => {
-          onUpdate?.({
-            content: [
-              { type: "text", text: `Waiting for ${pending.join(", ")}...` },
-            ],
-            details: { pending },
-          })
-        }),
+        manager.waitFor(
+          ids,
+          (pending) => {
+            onUpdate?.({
+              content: [
+                { type: "text", text: `Waiting for ${pending.join(", ")}...` },
+              ],
+              details: { pending },
+            })
+          },
+          signal,
+        ),
         { signal, interruptMessage: "Wait aborted. Subagents keep running." },
       )
 
@@ -481,7 +484,7 @@ export default function (pi: ExtensionAPI) {
         )
       }
 
-      const report = await runTool(getRuntime(), manager.cancel(ids), {
+      const report = await runTool(manager.cancel(ids, signal), {
         signal,
         interruptMessage: "Subagent cancellation aborted.",
       })
@@ -687,7 +690,6 @@ export default function (pi: ExtensionAPI) {
     let snap: SubagentSnapshot
     try {
       snap = await runTool(
-        getRuntime(),
         manager.spawn("pi", {
           origin: "btw",
           prompt,

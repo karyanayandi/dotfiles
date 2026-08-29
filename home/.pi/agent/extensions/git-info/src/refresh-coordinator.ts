@@ -1,13 +1,25 @@
-import { Effect, Semaphore } from "effect"
-
 /** Serializes explicit refreshes while allowing background refreshes to coalesce. */
 export function makeRefreshCoordinator() {
-  const semaphore = Semaphore.makeUnsafe(1)
+  let pending = 0
+  let tail = Promise.resolve()
+
+  const run = <T>(task: () => Promise<T>) => {
+    pending += 1
+    const result = tail.then(task)
+    tail = result.then(
+      () => undefined,
+      () => undefined,
+    )
+    return result.finally(() => {
+      pending -= 1
+    })
+  }
 
   return {
-    run: <A, E, R>(effect: Effect.Effect<A, E, R>) =>
-      semaphore.withPermit(effect),
-    runIfIdle: <A, E, R>(effect: Effect.Effect<A, E, R>) =>
-      semaphore.withPermitsIfAvailable(1)(effect).pipe(Effect.asVoid),
+    run,
+    runIfIdle: (task: () => Promise<unknown>) => {
+      if (pending > 0) return Promise.resolve()
+      return run(task).then(() => undefined)
+    },
   }
 }

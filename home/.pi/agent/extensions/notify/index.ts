@@ -6,7 +6,6 @@ import type {
   ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
 import type { AssistantMessage, TextContent } from "@earendil-works/pi-ai"
-import { Effect } from "effect"
 
 const APP_NAME = "Pi"
 const DEFAULT_MIN_NOTIFY_MS = 3000
@@ -108,101 +107,91 @@ function windowsToastScript(title: string, body: string): string {
   ].join("; ")
 }
 
-function runDetached(command: string, args: string[]): Effect.Effect<void> {
-  return Effect.callback((resume) => {
-    execFile(command, args, { windowsHide: true }, () => {
-      resume(Effect.void)
-    })
+function runDetached(command: string, args: string[]): Promise<void> {
+  return new Promise((resolve) => {
+    execFile(command, args, { windowsHide: true }, () => resolve())
   })
 }
 
-function notifyKitty(title: string, body: string): Effect.Effect<void> {
-  return Effect.sync(() => {
-    process.stdout.write(`\x1b]99;i=1:d=0;${title}\x1b\\`)
-    process.stdout.write(`\x1b]99;i=1:p=body;${body}\x1b\\`)
-  })
+function notifyKitty(title: string, body: string): void {
+  process.stdout.write(`\x1b]99;i=1:d=0;${title}\x1b\\`)
+  process.stdout.write(`\x1b]99;i=1:p=body;${body}\x1b\\`)
 }
 
-function notifyOsc777(title: string, body: string): Effect.Effect<void> {
-  return Effect.sync(() => {
-    process.stdout.write(`\x1b]777;notify;${title};${body}\x07`)
-  })
+function notifyOsc777(title: string, body: string): void {
+  process.stdout.write(`\x1b]777;notify;${title};${body}\x07`)
 }
 
-function sendTerminalNotification(
-  title: string,
-  body: string,
-): Effect.Effect<void> {
+function sendTerminalNotification(title: string, body: string): void {
   if (process.env.KITTY_WINDOW_ID) {
     return notifyKitty(title, body)
   }
   return notifyOsc777(title, body)
 }
 
-function sendDesktopNotification(
+async function sendDesktopNotification(
   title: string,
   body: string,
-): Effect.Effect<boolean> {
+): Promise<boolean> {
   if (canUseWindowsToast()) {
-    return runDetached("powershell.exe", [
+    await runDetached("powershell.exe", [
       "-NoProfile",
       "-Command",
       windowsToastScript(title, body),
-    ]).pipe(Effect.map(() => true))
+    ])
+    return true
   }
 
   if (isMac() && commandExists("osascript")) {
-    return runDetached("osascript", [
+    await runDetached("osascript", [
       "-e",
       `display notification "${appleScriptQuote(body)}" with title "${appleScriptQuote(title)}"`,
-    ]).pipe(Effect.map(() => true))
+    ])
+    return true
   }
 
   if (isLinux() && hasDesktopSession() && commandExists("notify-send")) {
-    return runDetached("notify-send", [title, body]).pipe(
-      Effect.map(() => true),
-    )
+    await runDetached("notify-send", [title, body])
+    return true
   }
 
-  return Effect.succeed(false)
+  return false
 }
 
-function playTerminalBell(): Effect.Effect<void> {
-  return Effect.sync(() => process.stdout.write("\x07"))
+function playTerminalBell(): void {
+  process.stdout.write("\x07")
 }
 
-function requestTerminalAttention(): Effect.Effect<void> {
-  return playTerminalBell()
+function requestTerminalAttention(): void {
+  playTerminalBell()
 }
 
-function playSound(): Effect.Effect<SoundPlayback> {
-  return Effect.gen(function* () {
-    if (canUseWindowsToast() && commandExists("rundll32.exe")) {
-      yield* runDetached("rundll32.exe", ["user32.dll,MessageBeep"])
+async function playSound(): Promise<SoundPlayback> {
+  if (canUseWindowsToast() && commandExists("rundll32.exe")) {
+    await runDetached("rundll32.exe", ["user32.dll,MessageBeep"])
+    return "external"
+  }
+
+  if (isMac() && commandExists("osascript")) {
+    await runDetached("osascript", ["-e", "beep"])
+    return "external"
+  }
+
+  if (isLinux()) {
+    if (commandExists("canberra-gtk-play")) {
+      await runDetached("canberra-gtk-play", ["-i", "complete"])
       return "external"
     }
 
-    if (isMac() && commandExists("osascript")) {
-      yield* runDetached("osascript", ["-e", "beep"])
+    const soundFile = LINUX_SOUND_FILES.find((file) => existsSync(file))
+    if (soundFile && commandExists("paplay")) {
+      await runDetached("paplay", [soundFile])
       return "external"
     }
+  }
 
-    if (isLinux()) {
-      if (commandExists("canberra-gtk-play")) {
-        yield* runDetached("canberra-gtk-play", ["-i", "complete"])
-        return "external"
-      }
-
-      const soundFile = LINUX_SOUND_FILES.find((file) => existsSync(file))
-      if (soundFile && commandExists("paplay")) {
-        yield* runDetached("paplay", [soundFile])
-        return "external"
-      }
-    }
-
-    yield* requestTerminalAttention()
-    return "terminal-bell"
-  })
+  requestTerminalAttention()
+  return "terminal-bell"
 }
 
 function isAssistantMessage(message: {
@@ -277,7 +266,7 @@ function resolveOutcome(
   return { outcome: "other", reason: stopReason ?? "unknown" }
 }
 
-function notifyOutcome(
+async function notifyOutcome(
   pi: ExtensionAPI,
   ctx: ExtensionContext,
   durationMs: number,
@@ -286,37 +275,29 @@ function notifyOutcome(
   attentionEnabled: boolean,
   reason?: string,
   messagePreview?: string,
-): Effect.Effect<void> {
-  return Effect.gen(function* () {
-    const label = getProjectLabel(ctx, pi)
-    const duration = formatDuration(durationMs)
-    const title =
-      kind === "success" ? "Pi - Job finished" : "Pi - Agent stopped with error"
+): Promise<void> {
+  const label = getProjectLabel(ctx, pi)
+  const duration = formatDuration(durationMs)
+  const title =
+    kind === "success" ? "Pi - Job finished" : "Pi - Agent stopped with error"
 
-    let body = `${label} • ${duration}`
-    if (kind === "error" && reason) body += ` • ${reason}`
-    else if (messagePreview) body += ` • ${messagePreview}`
+  let body = `${label} • ${duration}`
+  if (kind === "error" && reason) body += ` • ${reason}`
+  else if (messagePreview) body += ` • ${messagePreview}`
 
-    const desktopSent = yield* sendDesktopNotification(title, body)
-    if (!desktopSent) {
-      yield* sendTerminalNotification(title, body)
-    }
+  const desktopSent = await sendDesktopNotification(title, body)
+  if (!desktopSent) sendTerminalNotification(title, body)
 
-    const soundPlayback = soundEnabled ? yield* playSound() : undefined
-    if (attentionEnabled && soundPlayback !== "terminal-bell") {
-      yield* requestTerminalAttention()
-    }
-  })
+  const soundPlayback = soundEnabled ? await playSound() : undefined
+  if (attentionEnabled && soundPlayback !== "terminal-bell") {
+    requestTerminalAttention()
+  }
 }
 
-function dispatchNotification(effect: Effect.Effect<void>): void {
-  Effect.runFork(
-    effect.pipe(
-      Effect.catchCause((cause) =>
-        Effect.logWarning("Notify dispatch failed", cause),
-      ),
-    ),
-  )
+function dispatchNotification(notification: Promise<void>): void {
+  void notification.catch((error: unknown) => {
+    console.warn("Notify dispatch failed", error)
+  })
 }
 
 export default function notifyExtension(pi: ExtensionAPI): void {

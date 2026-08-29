@@ -16,7 +16,6 @@ import {
   Text,
   truncateToWidth,
 } from "@earendil-works/pi-tui"
-import { Cause, Effect, Exit } from "effect"
 import { Type, type Static } from "typebox"
 import {
   ASK_USER_PARAMETER_DESCRIPTIONS,
@@ -329,20 +328,15 @@ export default function askUser(pi: ExtensionAPI) {
           }
         })
 
-      const uiExit = await Effect.runPromiseExit(
-        Effect.tryPromise(showQuestion),
-        signal ? { signal } : undefined,
-      )
-
-      if (Exit.isFailure(uiExit)) {
-        if (Cause.hasInterruptsOnly(uiExit.cause)) {
+      let result: SelectionResult
+      try {
+        result = await showQuestion(signal ?? new AbortController().signal)
+      } catch (error) {
+        if (signal?.aborted) {
           return reply(buildAskUserResultMessage({ kind: "cancelled" }))
         }
-        const [first] = Cause.prettyErrors(uiExit.cause)
-        throw new Error(first?.message ?? Cause.pretty(uiExit.cause))
+        throw error
       }
-
-      const result = uiExit.value
 
       if (!result) {
         return reply(buildAskUserResultMessage({ kind: "dismissed" }))

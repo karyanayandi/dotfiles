@@ -6,7 +6,6 @@ import {
   truncateToWidth,
   visibleWidth,
 } from "@earendil-works/pi-tui"
-import { Effect } from "effect"
 import { runCommand } from "./process.ts"
 
 // oxlint-disable no-control-regex -- this module processes raw terminal/ANSI output
@@ -78,13 +77,14 @@ function cleanDisplayPath(path: string) {
   return sanitizeTerminalText(path).replace(/[\r\n\t]/g, " ")
 }
 
-const run = (cwd: string, args: string[]) =>
-  runCommand("git", args, cwd, 10_000)
+const run = (cwd: string, args: string[], signal?: AbortSignal) =>
+  runCommand("git", args, cwd, 10_000, signal)
 
-const loadFile = Effect.fn("git-info.loadFile")(function* (
+async function loadFile(
   repoRoot: string,
   changedPath: ChangedPath,
   hasHead: boolean,
+  signal?: AbortSignal,
 ) {
   const useNoIndex = changedPath.status === "??" || !hasHead
   const diffArguments = useNoIndex
@@ -110,10 +110,10 @@ const loadFile = Effect.fn("git-info.loadFile")(function* (
   const statArguments = useNoIndex
     ? ["diff", "--no-index", "--numstat", "--", "/dev/null", changedPath.path]
     : ["diff", "--numstat", "HEAD", "--", changedPath.path]
-  const [diffResult, statResult] = yield* Effect.all(
-    [run(repoRoot, diffArguments), run(repoRoot, statArguments)],
-    { concurrency: "unbounded" },
-  )
+  const [diffResult, statResult] = await Promise.all([
+    run(repoRoot, diffArguments, signal),
+    run(repoRoot, statArguments, signal),
+  ])
   const stats = parseNumstat(statResult.stdout)
   const allDiffLines = diffResult.stdout
     .trimEnd()
@@ -136,37 +136,33 @@ const loadFile = Effect.fn("git-info.loadFile")(function* (
     name: cleanDisplayPath(basename(changedPath.path)),
     path: cleanDisplayPath(changedPath.path),
   } satisfies ChangedFile
-})
+}
 
-export const loadChangedFiles = Effect.fn("git-info.loadChangedFiles")(
-  function* (cwd: string) {
-    const rootResult = yield* run(cwd, ["rev-parse", "--show-toplevel"])
-    if (rootResult.code !== 0) return null
+export async function loadChangedFiles(cwd: string, signal?: AbortSignal) {
+  const rootResult = await run(cwd, ["rev-parse", "--show-toplevel"], signal)
+  if (rootResult.code !== 0) return null
 
-    const repoRoot = rootResult.stdout.trim()
-    const [statusResult, headResult] = yield* Effect.all(
-      [
-        run(repoRoot, [
-          "status",
-          "--porcelain=v1",
-          "-z",
-          "--untracked-files=all",
-        ]),
-        run(repoRoot, ["rev-parse", "--verify", "HEAD"]),
-      ],
-      { concurrency: "unbounded" },
+  const repoRoot = rootResult.stdout.trim()
+  const [statusResult, headResult] = await Promise.all([
+    run(
+      repoRoot,
+      ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+      signal,
+    ),
+    run(repoRoot, ["rev-parse", "--verify", "HEAD"], signal),
+  ])
+  if (statusResult.code !== 0) return null
+
+  const changedPaths = parseChangedPaths(statusResult.stdout)
+  const files: ChangedFile[] = []
+  for (const changedPath of changedPaths) {
+    files.push(
+      await loadFile(repoRoot, changedPath, headResult.code === 0, signal),
     )
-    if (statusResult.code !== 0) return null
+  }
 
-    const changedPaths = parseChangedPaths(statusResult.stdout)
-    const files: ChangedFile[] = []
-    for (const changedPath of changedPaths) {
-      files.push(yield* loadFile(repoRoot, changedPath, headResult.code === 0))
-    }
-
-    return files
-  },
-)
+  return files
+}
 
 function padToWidth(text: string, width: number) {
   const truncated = truncateToWidth(text, width, "")

@@ -10,11 +10,9 @@
     "test": "node --test --experimental-strip-types *.test.ts"
   },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "catalog:",
-    "effect": "catalog:"
+    "@earendil-works/pi-coding-agent": "catalog:"
   },
   "devDependencies": {
-    "@effect/tsgo": "catalog:",
     "typescript": "catalog:"
   }
 }

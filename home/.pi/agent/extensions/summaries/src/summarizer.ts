@@ -1,16 +1,17 @@
 import type { ModelRegistry } from "@earendil-works/pi-coding-agent"
 import { completeSimple } from "@earendil-works/pi-ai/compat"
-import { Data, Effect } from "effect"
 import type { SummaryConfig } from "./config.ts"
 import { buildSummaryPrompt, SUMMARY_SYSTEM_PROMPT } from "./prompt.ts"
 
 const RECAP_MAX_LENGTH = 2_400
 const NEXT_MAX_LENGTH = 400
 
-class SummaryError extends Data.TaggedError("SummaryError")<{
-  readonly message: string
-  readonly cause?: unknown
-}> {}
+class SummaryError extends Error {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options)
+    this.name = "SummaryError"
+  }
+}
 
 export interface RunRecap {
   readonly recap: string
@@ -76,9 +77,7 @@ export function parseRecapResponse(text: string) {
     const parsed = parseCandidate(candidate)
     if (parsed) return parsed
   }
-  throw new SummaryError({
-    message: "The summary model did not return valid recap JSON.",
-  })
+  throw new SummaryError("The summary model did not return valid recap JSON.")
 }
 
 export function reasoningOptions(reasoning: SummaryConfig["reasoning"]) {
@@ -100,20 +99,22 @@ export function summarizeRun(options: {
   readonly transcript: string
   readonly signal: AbortSignal
 }) {
-  const completion = Effect.tryPromise({
-    try: async (effectSignal) => {
+  const signal = AbortSignal.any([options.signal, AbortSignal.timeout(45_000)])
+
+  return (async () => {
+    try {
       const model = options.modelRegistry.find(
         options.config.provider,
         options.config.model,
       )
       if (!model) {
-        throw new SummaryError({
-          message: `Summary model is unavailable: ${options.config.provider}/${options.config.model}`,
-        })
+        throw new SummaryError(
+          `Summary model is unavailable: ${options.config.provider}/${options.config.model}`,
+        )
       }
 
       const auth = await options.modelRegistry.getApiKeyAndHeaders(model)
-      if (!auth.ok) throw new SummaryError({ message: auth.error })
+      if (!auth.ok) throw new SummaryError(auth.error)
 
       const response = await completeSimple(
         model,
@@ -133,7 +134,7 @@ export function summarizeRun(options: {
           headers: auth.headers,
           maxTokens: 1_000,
           maxRetries: 1,
-          signal: effectSignal,
+          signal,
           timeoutMs: 40_000,
           ...reasoningOptions(options.config.reasoning),
         },
@@ -143,20 +144,17 @@ export function summarizeRun(options: {
         response.stopReason === "error" ||
         response.stopReason === "aborted"
       ) {
-        throw new SummaryError({
-          message: response.errorMessage ?? "Summary model request failed.",
-        })
+        throw new SummaryError(
+          response.errorMessage ?? "Summary model request failed.",
+        )
       }
       return parseRecapResponse(assistantText(response.content))
-    },
-    catch: (cause) =>
-      cause instanceof SummaryError
-        ? cause
-        : new SummaryError({
-            message: cause instanceof Error ? cause.message : String(cause),
-            cause,
-          }),
-  }).pipe(Effect.timeout("45 seconds"))
-
-  return Effect.runPromise(completion, { signal: options.signal })
+    } catch (cause) {
+      if (cause instanceof SummaryError) throw cause
+      throw new SummaryError(
+        cause instanceof Error ? cause.message : String(cause),
+        { cause },
+      )
+    }
+  })()
 }

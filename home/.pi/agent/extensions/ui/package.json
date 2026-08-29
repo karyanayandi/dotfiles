@@ -6,11 +6,8 @@
     "check": "tsc --noEmit -p .",
     "test": "vitest run"
   },
-  "dependencies": {
-    "effect": "catalog:"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@effect/language-service": "^0.4.0",
     "typescript": "catalog:",
     "vitest": "4.1.10"
   }

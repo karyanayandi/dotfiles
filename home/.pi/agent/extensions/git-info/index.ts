@@ -2,7 +2,6 @@ import type {
   ExtensionAPI,
   ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
-import { Effect, Fiber, Schedule } from "effect"
 import {
   emptyGitInfoState,
   GIT_INFO_CHANNEL,
@@ -10,9 +9,8 @@ import {
   type PullRequestInfo,
 } from "@pi/shared/dashboard-state"
 import { loadChangedFiles, showChangedFiles } from "./src/changed-files-view.ts"
-import { runCommand, type CommandRunner } from "./src/process.ts"
+import { runCommand } from "./src/process.ts"
 import { makeRefreshCoordinator } from "./src/refresh-coordinator.ts"
-import { createRuntime, runEffect, type GitInfoRuntime } from "./src/runtime.ts"
 
 const POLL_INTERVAL_MS = 3_000
 const GIT_TIMEOUT_MS = 3_000
@@ -44,137 +42,171 @@ function parsePullRequestJson(value: string) {
   }
 }
 
+function delay(ms: number, signal: AbortSignal) {
+  return new Promise<boolean>((resolve) => {
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort)
+      resolve(true)
+    }, ms)
+    const onAbort = () => {
+      clearTimeout(timer)
+      resolve(false)
+    }
+    signal.addEventListener("abort", onAbort, { once: true })
+  })
+}
+
+function abortedError(message: string) {
+  return new Error(message)
+}
+
 export default function gitInfo(pi: ExtensionAPI) {
   let state = emptyGitInfoState()
-  let runtime: GitInfoRuntime | undefined
-  let pollingFiber: Fiber.Fiber<void> | undefined
+  let polling: { controller: AbortController; done: Promise<void> } | undefined
   let currentContext: ExtensionContext | undefined
   let generation = 0
   let queriedPrBranch: string | null = null
   const refreshCoordinator = makeRefreshCoordinator()
-
-  const getRuntime = () => (runtime ??= createRuntime())
   const publish = () => pi.events.emit(GIT_INFO_CHANNEL, { ...state })
   const run = (
     command: string,
     args: string[],
     ctx: ExtensionContext,
     timeout: number,
-  ) => runCommand(command, args, ctx.cwd, timeout)
+    signal?: AbortSignal,
+  ) => runCommand(command, args, ctx.cwd, timeout, signal)
 
-  const lookupPullRequest = (ctx: ExtensionContext, branch: string) =>
-    Effect.gen(function* () {
-      const result = yield* run(
-        "gh",
-        ["pr", "view", branch, "--json", "number,url,state,isDraft"],
-        ctx,
-        GH_TIMEOUT_MS,
-      )
-      if (result.code !== 0) return null
-      return parsePullRequestJson(result.stdout)
-    })
+  const lookupPullRequest = async (
+    ctx: ExtensionContext,
+    branch: string,
+    signal?: AbortSignal,
+  ) => {
+    const result = await run(
+      "gh",
+      ["pr", "view", branch, "--json", "number,url,state,isDraft"],
+      ctx,
+      GH_TIMEOUT_MS,
+      signal,
+    )
+    if (result.code !== 0) return null
+    return parsePullRequestJson(result.stdout)
+  }
 
-  const refreshEffect = (
+  const refreshTask = async (
     ctx: ExtensionContext,
     forcePullRequest: boolean,
     refreshGeneration: number,
+    signal?: AbortSignal,
+  ) => {
+    if (refreshGeneration !== generation) return
+    currentContext = ctx
+
+    const repo = await run(
+      "git",
+      ["rev-parse", "--is-inside-work-tree"],
+      ctx,
+      GIT_TIMEOUT_MS,
+      signal,
+    )
+    if (refreshGeneration !== generation) return
+
+    if (repo.code !== 0 || repo.stdout.trim() !== "true") {
+      queriedPrBranch = null
+      state = emptyGitInfoState()
+      publish()
+      return
+    }
+
+    const [branchResult, headResult, statusResult] = await Promise.all([
+      run("git", ["branch", "--show-current"], ctx, GIT_TIMEOUT_MS, signal),
+      run("git", ["rev-parse", "--short", "HEAD"], ctx, GIT_TIMEOUT_MS, signal),
+      run(
+        "git",
+        // Avoid recursively scanning every untracked file on each poll.
+        ["status", "--porcelain=v1", "--untracked-files=normal"],
+        ctx,
+        GIT_TIMEOUT_MS,
+        signal,
+      ),
+    ])
+    if (refreshGeneration !== generation) return
+
+    const branchName = branchResult.stdout.trim()
+    const shortHead = headResult.stdout.trim()
+    const branch =
+      branchName || (shortHead ? `detached@${shortHead}` : "detached")
+    const branchChanged = branchName !== queriedPrBranch
+
+    state = {
+      ...state,
+      isRepository: true,
+      branch,
+      changedFiles:
+        statusResult.code === 0 ? countChangedFiles(statusResult.stdout) : 0,
+      pullRequest: branchChanged ? null : state.pullRequest,
+    }
+    publish()
+
+    if (!branchName) {
+      // queriedPrBranch is never "", so branchChanged already cleared pullRequest.
+      queriedPrBranch = null
+      return
+    }
+
+    if (forcePullRequest || branchChanged) {
+      queriedPrBranch = branchName
+      const pullRequest = await lookupPullRequest(ctx, branchName, signal)
+      if (refreshGeneration !== generation) return
+      state = { ...state, pullRequest }
+      publish()
+    }
+  }
+
+  const refresh = (
+    ctx: ExtensionContext,
+    forcePullRequest = false,
+    signal?: AbortSignal,
   ) =>
-    Effect.suspend(() => {
-      if (refreshGeneration !== generation) return Effect.void
-      currentContext = ctx
-
-      return Effect.gen(function* () {
-        const repo = yield* run(
-          "git",
-          ["rev-parse", "--is-inside-work-tree"],
-          ctx,
-          GIT_TIMEOUT_MS,
-        )
-        if (refreshGeneration !== generation) return
-
-        if (repo.code !== 0 || repo.stdout.trim() !== "true") {
-          queriedPrBranch = null
-          state = emptyGitInfoState()
-          publish()
-          return
-        }
-
-        const [branchResult, headResult, statusResult] = yield* Effect.all(
-          [
-            run("git", ["branch", "--show-current"], ctx, GIT_TIMEOUT_MS),
-            run("git", ["rev-parse", "--short", "HEAD"], ctx, GIT_TIMEOUT_MS),
-            run(
-              "git",
-              // Avoid recursively scanning every untracked file on each poll.
-              ["status", "--porcelain=v1", "--untracked-files=normal"],
-              ctx,
-              GIT_TIMEOUT_MS,
-            ),
-          ],
-          { concurrency: "unbounded" },
-        )
-        if (refreshGeneration !== generation) return
-
-        const branchName = branchResult.stdout.trim()
-        const shortHead = headResult.stdout.trim()
-        const branch =
-          branchName || (shortHead ? `detached@${shortHead}` : "detached")
-        const branchChanged = branchName !== queriedPrBranch
-
-        state = {
-          ...state,
-          isRepository: true,
-          branch,
-          changedFiles:
-            statusResult.code === 0
-              ? countChangedFiles(statusResult.stdout)
-              : 0,
-          pullRequest: branchChanged ? null : state.pullRequest,
-        }
-        publish()
-
-        if (!branchName) {
-          // queriedPrBranch is never "", so branchChanged already cleared pullRequest.
-          queriedPrBranch = null
-          return
-        }
-
-        if (forcePullRequest || branchChanged) {
-          queriedPrBranch = branchName
-          const pullRequest = yield* lookupPullRequest(ctx, branchName)
-          if (refreshGeneration !== generation) return
-          state = { ...state, pullRequest }
-          publish()
-        }
-      })
-    })
-
-  const refresh = (ctx: ExtensionContext, forcePullRequest = false) =>
-    refreshCoordinator.run(refreshEffect(ctx, forcePullRequest, generation))
-
-  const refreshIfIdle = (ctx: ExtensionContext) =>
-    refreshCoordinator.runIfIdle(refreshEffect(ctx, false, generation))
-
-  const reportBackgroundDefect = (defect: unknown) =>
-    Effect.logError("git-info background task defect", defect)
-
-  const poll = () =>
-    Effect.suspend(() =>
-      currentContext ? refreshIfIdle(currentContext) : Effect.void,
-    ).pipe(
-      Effect.catchDefect(reportBackgroundDefect),
-      Effect.repeat(Schedule.fixed(POLL_INTERVAL_MS)),
-      Effect.delay(POLL_INTERVAL_MS),
-      Effect.asVoid,
+    refreshCoordinator.run(() =>
+      refreshTask(ctx, forcePullRequest, generation, signal),
     )
 
-  const forkBackground = (effect: Effect.Effect<void, never, CommandRunner>) =>
-    getRuntime().runFork(
-      effect.pipe(Effect.catchDefect(reportBackgroundDefect)),
+  const refreshIfIdle = (ctx: ExtensionContext, signal?: AbortSignal) =>
+    refreshCoordinator.runIfIdle(() =>
+      refreshTask(ctx, false, generation, signal),
     )
+
+  const reportBackgroundDefect = (error: unknown) => {
+    console.error("git-info background task defect", error)
+  }
 
   const refreshInBackground = (ctx: ExtensionContext) => {
-    forkBackground(refreshIfIdle(ctx))
+    void refreshIfIdle(ctx).catch(reportBackgroundDefect)
+  }
+
+  const poll = async (signal: AbortSignal) => {
+    while (await delay(POLL_INTERVAL_MS, signal)) {
+      if (!currentContext) continue
+      try {
+        await refreshIfIdle(currentContext, signal)
+      } catch (error) {
+        if (!signal.aborted) reportBackgroundDefect(error)
+      }
+    }
+  }
+
+  const stopPolling = async () => {
+    const previous = polling
+    polling = undefined
+    if (!previous) return
+    previous.controller.abort()
+    await previous.done
+  }
+
+  const startPolling = () => {
+    const controller = new AbortController()
+    const done = poll(controller.signal)
+    polling = { controller, done }
   }
 
   const stopRefreshListener = pi.events.on(REFRESH_CHANNEL, () => {
@@ -184,17 +216,12 @@ export default function gitInfo(pi: ExtensionAPI) {
   pi.on("session_start", async (_event, ctx) => {
     generation += 1
     queriedPrBranch = null
-
-    const previousPollingFiber = pollingFiber
-    pollingFiber = undefined
-    if (previousPollingFiber) {
-      await getRuntime().runPromise(Fiber.interrupt(previousPollingFiber))
-    }
+    await stopPolling()
 
     // Do not block Pi startup on GitHub/network I/O. The initial refresh publishes
     // state when it completes; polling continues to keep it current afterwards.
     refreshInBackground(ctx)
-    pollingFiber = forkBackground(poll())
+    startPolling()
   })
 
   pi.on("input", (_event, ctx) => {
@@ -210,10 +237,7 @@ export default function gitInfo(pi: ExtensionAPI) {
     stopRefreshListener()
     generation += 1
     currentContext = undefined
-    pollingFiber = undefined
-    const closing = runtime
-    runtime = undefined
-    await closing?.dispose()
+    await stopPolling()
   })
 
   pi.registerCommand("lg", {
@@ -227,10 +251,15 @@ export default function gitInfo(pi: ExtensionAPI) {
         return
       }
 
-      const files = await runEffect(getRuntime(), loadChangedFiles(ctx.cwd), {
-        signal: ctx.signal,
-        interruptMessage: "Loading changed files was cancelled.",
-      })
+      let files
+      try {
+        files = await loadChangedFiles(ctx.cwd, ctx.signal)
+      } catch (error) {
+        if (ctx.signal?.aborted) {
+          throw abortedError("Loading changed files was cancelled.")
+        }
+        throw error
+      }
       if (files === null) {
         ctx.ui.notify("Not a git repository", "warning")
         return
@@ -247,10 +276,14 @@ export default function gitInfo(pi: ExtensionAPI) {
   pi.registerCommand("pr", {
     description: "Refresh git and pull request information",
     handler: async (_args, ctx) => {
-      await runEffect(getRuntime(), refresh(ctx, true), {
-        signal: ctx.signal,
-        interruptMessage: "Git and pull request refresh was cancelled.",
-      })
+      try {
+        await refresh(ctx, true, ctx.signal)
+      } catch (error) {
+        if (ctx.signal?.aborted) {
+          throw abortedError("Git and pull request refresh was cancelled.")
+        }
+        throw error
+      }
       if (!state.isRepository) {
         ctx.ui.notify("Not a git repository", "warning")
       } else if (state.pullRequest) {

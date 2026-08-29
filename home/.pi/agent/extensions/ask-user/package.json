@@ -6,11 +6,8 @@
     "check": "tsc --noEmit -p .",
     "test": "true"
   },
-  "dependencies": {
-    "effect": "catalog:"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@effect/tsgo": "catalog:",
     "typescript": "catalog:"
   }
 }

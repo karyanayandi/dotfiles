@@ -3,12 +3,13 @@ import { readFileSync } from "node:fs"
 import { mkdir, rename, unlink, writeFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { Data, Effect } from "effect"
 
-class ConfigWriteError extends Data.TaggedError("ConfigWriteError")<{
-  readonly message: string
-  readonly cause?: unknown
-}> {}
+class ConfigWriteError extends Error {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options)
+    this.name = "ConfigWriteError"
+  }
+}
 
 export const REASONING_LEVELS = [
   "off",
@@ -79,27 +80,29 @@ export function loadSummaryConfig() {
 
 export function saveSummaryConfig(config: SummaryConfig, signal?: AbortSignal) {
   const tempPath = `${PRIVATE_CONFIG_PATH}.${process.pid}.${randomUUID()}.tmp`
-  const write = Effect.tryPromise({
-    try: async (effectSignal) => {
+  const writeSignal = signal
+    ? AbortSignal.any([signal, AbortSignal.timeout(5_000)])
+    : AbortSignal.timeout(5_000)
+
+  return (async () => {
+    try {
       await mkdir(dirname(PRIVATE_CONFIG_PATH), { recursive: true })
       try {
         await writeFile(tempPath, `${JSON.stringify(config, null, 2)}\n`, {
           encoding: "utf8",
           mode: 0o600,
-          signal: effectSignal,
+          signal: writeSignal,
         })
         await rename(tempPath, PRIVATE_CONFIG_PATH)
       } catch (error) {
         await unlink(tempPath).catch(() => undefined)
         throw error
       }
-    },
-    catch: (cause) =>
-      new ConfigWriteError({
-        message: cause instanceof Error ? cause.message : String(cause),
-        cause,
-      }),
-  }).pipe(Effect.timeout("5 seconds"))
-
-  return Effect.runPromise(write, signal ? { signal } : undefined)
+    } catch (cause) {
+      throw new ConfigWriteError(
+        cause instanceof Error ? cause.message : String(cause),
+        { cause },
+      )
+    }
+  })()
 }

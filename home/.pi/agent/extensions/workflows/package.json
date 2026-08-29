@@ -13,7 +13,6 @@
     "typebox": "catalog:"
   },
   "devDependencies": {
-    "@effect/tsgo": "catalog:",
     "typescript": "catalog:"
   }
 }

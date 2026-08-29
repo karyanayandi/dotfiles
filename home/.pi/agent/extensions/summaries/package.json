@@ -6,11 +6,8 @@
     "check": "tsc --noEmit -p .",
     "test": "node --test --experimental-strip-types *.test.ts"
   },
-  "dependencies": {
-    "effect": "catalog:"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@effect/tsgo": "catalog:",
     "typescript": "catalog:"
   }
 }

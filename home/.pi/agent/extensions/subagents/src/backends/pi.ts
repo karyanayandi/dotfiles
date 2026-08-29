@@ -24,9 +24,11 @@ import {
   SessionManager,
   SettingsManager,
 } from "@earendil-works/pi-coding-agent"
-import type { Cause, Scope } from "effect"
-import { Effect, Queue, Stream } from "effect"
-import type { SubagentBackend, SubagentSession } from "../backend.ts"
+import {
+  AsyncEventQueue,
+  type SubagentBackend,
+  type SubagentSession,
+} from "../backend.ts"
 import type {
   SpawnTask,
   SubagentEvent,
@@ -256,317 +258,301 @@ function boundedError(error: unknown) {
   return (error instanceof Error ? error.message : String(error)).slice(0, 4096)
 }
 
-const makePiSession = (
-  task: SpawnTask,
-): Effect.Effect<SubagentSession, SpawnError, Scope.Scope> =>
-  Effect.gen(function* () {
-    const registry = task.parent.modelRegistry
-    if (!registry) {
-      return yield* new SpawnError({
-        message: "pi backend requires the parent session's model registry.",
-      })
-    }
-
-    const model = yield* Effect.try({
-      try: () =>
-        resolvePiModel(registry, task.model, task.parent.inheritedModel),
-      catch: (error) => new SpawnError({ message: boundedError(error) }),
+async function makePiSession(task: SpawnTask): Promise<SubagentSession> {
+  const registry = task.parent.modelRegistry
+  if (!registry) {
+    throw new SpawnError({
+      message: "pi backend requires the parent session's model registry.",
     })
-    // pi's thinking levels ARE the shared reasoning-effort scale.
-    const thinkingLevel = (task.reasoningEffort ??
-      task.parent.inheritedThinkingLevel) as ThinkingLevel | undefined
+  }
 
-    const session = yield* Effect.tryPromise({
-      try: async () => {
-        const { loader, settingsManager } = await createChildResources(
-          task.cwd,
-          task.parent.projectTrusted,
-        )
-        const { session } = await createAgentSession({
-          cwd: task.cwd,
-          sessionManager: SessionManager.create(task.cwd),
-          settingsManager,
-          resourceLoader: loader,
-          model,
-          thinkingLevel,
-          excludeTools: [...CHILD_EXCLUDED_TOOL_NAMES],
-        })
-        // Start child extension session hooks/resources in headless mode.
-        // A rejection here would otherwise leak the freshly created session:
-        // the scope finalizer that owns cleanup is only registered later.
-        try {
-          await session.bindExtensions({ mode: "print" })
-        } catch (error) {
-          await shutdownAndDisposeChildSession(session)
-          throw error
-        }
-        return session
-      },
-      catch: (error) => new SpawnError({ message: boundedError(error) }),
+  let model: Model<any> | undefined
+  try {
+    model = resolvePiModel(registry, task.model, task.parent.inheritedModel)
+  } catch (error) {
+    throw new SpawnError({ message: boundedError(error) })
+  }
+  // pi's thinking levels ARE the shared reasoning-effort scale.
+  const thinkingLevel = (task.reasoningEffort ??
+    task.parent.inheritedThinkingLevel) as ThinkingLevel | undefined
+
+  let session: AgentSession
+  try {
+    const { loader, settingsManager } = await createChildResources(
+      task.cwd,
+      task.parent.projectTrusted,
+    )
+    const created = await createAgentSession({
+      cwd: task.cwd,
+      sessionManager: SessionManager.create(task.cwd),
+      settingsManager,
+      resourceLoader: loader,
+      model,
+      thinkingLevel,
+      excludeTools: [...CHILD_EXCLUDED_TOOL_NAMES],
     })
-
-    const state = {
-      closed: false,
-      /** prompt() rejection for the active run; folded into RunSettled. */
-      runError: undefined as string | undefined,
-      /** One terminal event per run: lifecycle, prompt-rejection, and abort
-       * fallbacks can all race to settle; the first wins. */
-      settled: false,
+    session = created.session
+    try {
+      await session.bindExtensions({ mode: "print" })
+    } catch (error) {
+      await shutdownAndDisposeChildSession(session)
+      throw error
     }
+  } catch (error) {
+    throw new SpawnError({ message: boundedError(error) })
+  }
 
-    const events = yield* Queue.make<SubagentEvent, Cause.Done>()
-    const emit = (event: SubagentEvent) => {
-      Queue.offerUnsafe(events, event)
+  const state = {
+    closed: false,
+    /** prompt() rejection for the active run; folded into RunSettled. */
+    runError: undefined as string | undefined,
+    /** One terminal event per run: lifecycle, prompt-rejection, and abort
+     * fallbacks can all race to settle; the first wins. */
+    settled: false,
+  }
+
+  const events = new AsyncEventQueue<SubagentEvent>()
+  const emit = (event: SubagentEvent) => events.push(event)
+
+  const toolTimeout = createToolCallTimeoutGuard()
+  toolTimeout.apply(session)
+
+  const activeModel = (): Model<any> | undefined => {
+    const sessionModel = session.model
+    const last = lastAssistantMessage(session)
+    if (!last) return sessionModel
+    if (
+      sessionModel &&
+      (last.provider !== sessionModel.provider ||
+        last.model !== sessionModel.id)
+    ) {
+      // The session changed models after this assistant response.
+      return sessionModel
     }
+    return (
+      registry.find(last.provider, last.responseModel ?? last.model) ??
+      sessionModel
+    )
+  }
 
-    const toolTimeout = createToolCallTimeoutGuard()
-    toolTimeout.apply(session)
-
-    const activeModel = (): Model<any> | undefined => {
-      const sessionModel = session.model
-      const last = lastAssistantMessage(session)
-      if (!last) return sessionModel
-      if (
-        sessionModel &&
-        (last.provider !== sessionModel.provider ||
-          last.model !== sessionModel.id)
-      ) {
-        // The session changed models after this assistant response.
-        return sessionModel
-      }
-      return (
-        registry.find(last.provider, last.responseModel ?? last.model) ??
-        sessionModel
-      )
+  const currentMeta = (): SubagentMeta => {
+    const m = activeModel()
+    return {
+      backend: "pi",
+      modelLabel: m ? `${m.provider}/${m.id}` : undefined,
+      contextWindow: m?.contextWindow,
+      sessionFilePath: session.sessionFile,
     }
+  }
 
-    const currentMeta = (): SubagentMeta => {
-      const m = activeModel()
-      return {
-        backend: "pi",
-        modelLabel: m ? `${m.provider}/${m.id}` : undefined,
-        contextWindow: m?.contextWindow,
-        sessionFilePath: session.sessionFile,
-      }
-    }
+  const emitUsage = () => {
+    const usage = session.getContextUsage()
+    emit({
+      _tag: "UsageChanged",
+      tokens: usage?.tokens ?? undefined,
+      contextWindow: activeModel()?.contextWindow ?? usage?.contextWindow,
+    })
+  }
 
-    const emitUsage = () => {
-      const usage = session.getContextUsage()
-      emit({
-        _tag: "UsageChanged",
-        tokens: usage?.tokens ?? undefined,
-        contextWindow: activeModel()?.contextWindow ?? usage?.contextWindow,
-      })
-    }
-
-    const settle = () => {
-      if (state.settled) return
-      state.settled = true
-      const last = lastAssistantMessage(session)
-      const partialText = finalOutput(session) || undefined
-      if (last?.stopReason === "aborted") {
-        emit({
-          _tag: "RunSettled",
-          outcome: { _tag: "Interrupted", partialText },
-        })
-        return
-      }
-      const errorText =
-        state.runError ??
-        (last?.stopReason === "error"
-          ? (last.errorMessage ?? "Run failed")
-          : undefined)
-      if (errorText !== undefined) {
-        emit({
-          _tag: "RunSettled",
-          outcome: {
-            _tag: "Failed",
-            errorText: boundedError(errorText),
-            partialText,
-          },
-        })
-        return
-      }
+  const settle = () => {
+    if (state.settled) return
+    state.settled = true
+    const last = lastAssistantMessage(session)
+    const partialText = finalOutput(session) || undefined
+    if (last?.stopReason === "aborted") {
       emit({
         _tag: "RunSettled",
-        outcome: { _tag: "Completed", finalText: finalOutput(session) },
+        outcome: { _tag: "Interrupted", partialText },
       })
+      return
     }
+    const errorText =
+      state.runError ??
+      (last?.stopReason === "error"
+        ? (last.errorMessage ?? "Run failed")
+        : undefined)
+    if (errorText !== undefined) {
+      emit({
+        _tag: "RunSettled",
+        outcome: {
+          _tag: "Failed",
+          errorText: boundedError(errorText),
+          partialText,
+        },
+      })
+      return
+    }
+    emit({
+      _tag: "RunSettled",
+      outcome: { _tag: "Completed", finalText: finalOutput(session) },
+    })
+  }
 
-    const handleEvent = (event: AgentSessionEvent) => {
-      if (state.closed) return
-      switch (event.type) {
-        case "agent_start":
-          // Extensions may register tools between runs; guard new ones too.
-          toolTimeout.apply(session)
-          state.settled = false
-          emit({ _tag: "RunStarted" })
-          break
-        case "message_update": {
-          const streamEvent = event.assistantMessageEvent
-          if (streamEvent.type === "text_delta") {
-            emit({
-              _tag: "AssistantDelta",
-              kind: "text",
-              delta: streamEvent.delta,
-            })
-          } else if (streamEvent.type === "thinking_delta") {
-            emit({
-              _tag: "AssistantDelta",
-              kind: "thinking",
-              delta: streamEvent.delta,
-            })
-          }
-          break
+  const handleEvent = (event: AgentSessionEvent) => {
+    if (state.closed) return
+    switch (event.type) {
+      case "agent_start":
+        // Extensions may register tools between runs; guard new ones too.
+        toolTimeout.apply(session)
+        state.settled = false
+        emit({ _tag: "RunStarted" })
+        break
+      case "message_update": {
+        const streamEvent = event.assistantMessageEvent
+        if (streamEvent.type === "text_delta") {
+          emit({
+            _tag: "AssistantDelta",
+            kind: "text",
+            delta: streamEvent.delta,
+          })
+        } else if (streamEvent.type === "thinking_delta") {
+          emit({
+            _tag: "AssistantDelta",
+            kind: "thinking",
+            delta: streamEvent.delta,
+          })
         }
-        case "message_end": {
-          const role = messageRole(event.message)
-          if (role === "user") {
-            const text = userText(event.message as Message)
-            if (text.trim()) emit({ _tag: "UserMessage", text })
-          } else if (role === "assistant") {
-            emit({
-              _tag: "AssistantMessage",
-              parts: assistantParts(event.message as AssistantMessage),
-            })
-            emitUsage()
-            emit({ _tag: "MetaChanged", meta: currentMeta() })
-          }
-          // toolResult messages are covered by tool_execution_end.
-          break
-        }
-        case "tool_execution_start":
-          emit({
-            _tag: "ToolStart",
-            toolId: event.toolCallId,
-            name: event.toolName,
-            argsPreview: safeJson(event.args),
-          })
-          break
-        case "tool_execution_update":
-          emit({
-            _tag: "ToolUpdate",
-            toolId: event.toolCallId,
-            outputPreview: toolPreview(event.partialResult),
-          })
-          break
-        case "tool_execution_end":
-          emit({
-            _tag: "ToolEnd",
-            toolId: event.toolCallId,
-            name: event.toolName,
-            isError: event.isError,
-            outputPreview: toolPreview(event.result),
-          })
-          break
-        case "queue_update":
-          emit({
-            _tag: "QueueChanged",
-            queued: [
-              ...event.steering.map((text) => ({
-                text,
-                kind: "steer" as const,
-              })),
-              ...event.followUp.map((text) => ({
-                text,
-                kind: "follow-up" as const,
-              })),
-            ],
-          })
-          break
-        case "agent_settled":
-          settle()
-          break
+        break
       }
-    }
-    const unsubscribe = session.subscribe(handleEvent)
-
-    yield* Effect.addFinalizer(() =>
-      Effect.promise(async () => {
-        state.closed = true
-        unsubscribe()
-        try {
-          session.clearQueue()
-        } catch {
-          // Continue with abort/dispose.
+      case "message_end": {
+        const role = messageRole(event.message)
+        if (role === "user") {
+          const text = userText(event.message as Message)
+          if (text.trim()) emit({ _tag: "UserMessage", text })
+        } else if (role === "assistant") {
+          emit({
+            _tag: "AssistantMessage",
+            parts: assistantParts(event.message as AssistantMessage),
+          })
+          emitUsage()
+          emit({ _tag: "MetaChanged", meta: currentMeta() })
         }
-        await waitBounded(session.abort(), CHILD_SHUTDOWN_TIMEOUT_MS)
-        await shutdownAndDisposeChildSession(session)
-        Queue.endUnsafe(events)
-      }),
+        // toolResult messages are covered by tool_execution_end.
+        break
+      }
+      case "tool_execution_start":
+        emit({
+          _tag: "ToolStart",
+          toolId: event.toolCallId,
+          name: event.toolName,
+          argsPreview: safeJson(event.args),
+        })
+        break
+      case "tool_execution_update":
+        emit({
+          _tag: "ToolUpdate",
+          toolId: event.toolCallId,
+          outputPreview: toolPreview(event.partialResult),
+        })
+        break
+      case "tool_execution_end":
+        emit({
+          _tag: "ToolEnd",
+          toolId: event.toolCallId,
+          name: event.toolName,
+          isError: event.isError,
+          outputPreview: toolPreview(event.result),
+        })
+        break
+      case "queue_update":
+        emit({
+          _tag: "QueueChanged",
+          queued: [
+            ...event.steering.map((text) => ({
+              text,
+              kind: "steer" as const,
+            })),
+            ...event.followUp.map((text) => ({
+              text,
+              kind: "follow-up" as const,
+            })),
+          ],
+        })
+        break
+      case "agent_settled":
+        settle()
+        break
+    }
+  }
+  const unsubscribe = session.subscribe(handleEvent)
+
+  const dispose = async () => {
+    if (state.closed) return
+    state.closed = true
+    unsubscribe()
+    try {
+      session.clearQueue()
+    } catch {
+      // Continue with abort/dispose.
+    }
+    await waitBounded(session.abort(), CHILD_SHUTDOWN_TIMEOUT_MS)
+    await shutdownAndDisposeChildSession(session)
+    events.close()
+  }
+
+  /** Start a fresh run (v1 manager.run): fire-and-forget, errors -> events. */
+  const startRun = (text: string) => {
+    state.runError = undefined
+    state.settled = false
+    emit({ _tag: "RunStarted" })
+    void session.prompt(text).catch((error) => {
+      state.runError = boundedError(error)
+      // Preflight failures may never start the agent lifecycle, so no
+      // agent_settled will arrive for them.
+      if (!session.isStreaming) settle()
+    })
+  }
+
+  // Session naming is best-effort.
+  try {
+    session.sessionManager.appendSessionInfo(
+      `${task.origin === "btw" ? "btw" : "subagent"}: ${task.title}`,
     )
+  } catch {
+    // Naming does not affect session execution.
+  }
 
-    /** Start a fresh run (v1 manager.run): fire-and-forget, errors -> events. */
-    const startRun = (text: string) => {
-      state.runError = undefined
-      state.settled = false
-      emit({ _tag: "RunStarted" })
-      void session.prompt(text).catch((error) => {
-        state.runError = boundedError(error)
-        // Preflight failures may never start the agent lifecycle, so no
-        // agent_settled will arrive for them.
-        if (!session.isStreaming) settle()
-      })
-    }
+  emit({ _tag: "MetaChanged", meta: currentMeta() })
+  startRun(task.prompt)
 
-    // Session naming is best-effort.
-    yield* Effect.try(() =>
-      session.sessionManager.appendSessionInfo(
-        `${task.origin === "btw" ? "btw" : "subagent"}: ${task.title}`,
-      ),
-    ).pipe(Effect.ignore)
-
-    emit({ _tag: "MetaChanged", meta: currentMeta() })
-    startRun(task.prompt)
-
-    return {
-      meta: Effect.sync(currentMeta),
-      events: Stream.fromQueue(events),
-      send: (text) =>
-        Effect.suspend((): Effect.Effect<void, SendError> => {
-          if (state.closed) {
-            return new SendError({ message: "Subagent session is closed." })
-          }
-          if (session.isStreaming) {
-            // Steer the active run via the SDK's queue; queue_update events
-            // render it, message_end(user) lands it in the transcript. A
-            // rejected steer is a real send failure, not a diagnostic.
-            return Effect.tryPromise({
-              try: () => session.steer(text),
-              catch: (error) => new SendError({ message: boundedError(error) }),
-            }).pipe(Effect.asVoid)
-          }
-          return Effect.sync(() => startRun(text))
-        }),
-      interrupt: Effect.promise(async () => {
-        if (state.closed) return
+  return {
+    meta: currentMeta,
+    events,
+    send: async (text) => {
+      if (state.closed)
+        throw new SendError({ message: "Subagent session is closed." })
+      if (session.isStreaming) {
         try {
-          session.clearQueue()
-        } catch {
-          // Abort regardless.
+          await session.steer(text)
+        } catch (error) {
+          throw new SendError({ message: boundedError(error) })
         }
-        await session.abort().catch(() => undefined)
-        // Only resolve once streaming has actually stopped: reporting the
-        // interrupt as complete while the run keeps working would let the
-        // manager settle a run that is still mutating the workspace. The
-        // manager bounds this effect at 5s and force-disposes on timeout.
-        while (!state.closed && session.isStreaming) {
-          await new Promise((resolve) => setTimeout(resolve, 50))
-        }
-        // No streaming run means no agent_settled will arrive; emit the
-        // terminal event (once) so the run cannot look running forever.
-        if (!state.closed && !state.settled) {
-          state.settled = true
-          emit({ _tag: "RunSettled", outcome: { _tag: "Interrupted" } })
-        }
-      }),
-    } satisfies SubagentSession
-  })
+        return
+      }
+      startRun(text)
+    },
+    interrupt: async () => {
+      if (state.closed) return
+      try {
+        session.clearQueue()
+      } catch {
+        // Abort regardless.
+      }
+      await session.abort().catch(() => undefined)
+      while (!state.closed && session.isStreaming)
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      if (!state.closed && !state.settled) {
+        state.settled = true
+        emit({ _tag: "RunSettled", outcome: { _tag: "Interrupted" } })
+      }
+    },
+    dispose,
+  } satisfies SubagentSession
+}
 
 export const piBackend: SubagentBackend = {
   name: "pi",
   capabilities: { steering: true, modelSelection: true, reasoningEffort: true },
-  // In-process SDK: always available.
-  available: Effect.succeed(true),
+  available: async () => true,
   spawn: makePiSession,
 }

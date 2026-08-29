@@ -7,7 +7,6 @@
  */
 
 import type { ModelRegistry } from "@earendil-works/pi-coding-agent"
-import { Data } from "effect"
 
 export const BACKEND_NAMES = ["pi", "codex"] as const
 export type BackendName = (typeof BACKEND_NAMES)[number]
@@ -231,22 +230,36 @@ export function formatElapsed(snap: SubagentSnapshot) {
 
 // --- Errors -------------------------------------------------------------------
 
-export class SpawnError extends Data.TaggedError("SpawnError")<{
-  readonly message: string
-}> {}
+class SubagentError extends Error {
+  readonly _tag: string
 
-export class BackendUnavailableError extends Data.TaggedError(
-  "BackendUnavailableError",
-)<{
-  readonly message: string
-}> {}
+  constructor(tag: string, { message }: { readonly message: string }) {
+    super(message)
+    this.name = tag
+    this._tag = tag
+  }
+}
 
-export class ConcurrencyLimitError extends Data.TaggedError(
-  "ConcurrencyLimitError",
-)<{
-  readonly message: string
-}> {}
+export class SpawnError extends SubagentError {
+  constructor(details: { readonly message: string }) {
+    super("SpawnError", details)
+  }
+}
 
-export class SendError extends Data.TaggedError("SendError")<{
-  readonly message: string
-}> {}
+export class BackendUnavailableError extends SubagentError {
+  constructor(details: { readonly message: string }) {
+    super("BackendUnavailableError", details)
+  }
+}
+
+export class ConcurrencyLimitError extends SubagentError {
+  constructor(details: { readonly message: string }) {
+    super("ConcurrencyLimitError", details)
+  }
+}
+
+export class SendError extends SubagentError {
+  constructor(details: { readonly message: string }) {
+    super("SendError", details)
+  }
+}

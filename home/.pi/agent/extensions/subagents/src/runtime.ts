@@ -1,52 +1,40 @@
-/**
- * Layer composition and the async entry-point boundary.
- *
- * Everything inside the extension is Effect generators; this module is where
- * tool handlers (plain async functions) run those effects against one shared
- * ManagedRuntime.
- */
+/** Promise entry points for subagent tools. */
 
-import { Cause, Exit, Layer, ManagedRuntime, type Effect } from "effect"
-import { BackendRegistry, type SubagentBackend } from "./backend.ts"
+import type { SubagentBackend } from "./backend.ts"
 import { codexBackend } from "./backends/codex.ts"
 import { piBackend } from "./backends/pi.ts"
 import type { BackendName } from "./domain.ts"
+import { createSubagentManager, type SubagentManagerShape } from "./manager.ts"
 
-const BackendRegistryLive = Layer.sync(BackendRegistry, () => {
-  const backends: SubagentBackend[] = [piBackend, codexBackend]
-  return new Map<BackendName, SubagentBackend>(
-    backends.map((backend) => [backend.name, backend]),
-  )
-})
-
-import { SubagentManagerLive } from "./manager.ts"
-
-const AppLayer = SubagentManagerLive.pipe(Layer.provide(BackendRegistryLive))
-
-export function createSubagentRuntime() {
-  return ManagedRuntime.make(AppLayer)
+export interface SubagentRuntime {
+  readonly manager: SubagentManagerShape
+  dispose(): Promise<void>
 }
 
-export type SubagentRuntime = ReturnType<typeof createSubagentRuntime>
+export function createSubagentRuntime(
+  backends: readonly SubagentBackend[] = [piBackend, codexBackend],
+): SubagentRuntime {
+  const registry = new Map<BackendName, SubagentBackend>(
+    backends.map((backend) => [backend.name, backend]),
+  )
+  const manager = createSubagentManager(registry)
+  return { manager, dispose: () => manager.disposeAll() }
+}
 
-/**
- * Run an effect from an async tool handler. Typed failures and defects are
- * converted to thrown Errors (what pi's tool contract expects); interruption
- * (tool AbortSignal) throws `interruptMessage`.
- */
-export async function runTool<A, E>(
-  runtime: SubagentRuntime,
-  effect: Effect.Effect<A, E>,
+export async function runTool<A>(
+  operation: Promise<A>,
   options: { signal?: AbortSignal; interruptMessage?: string } = {},
 ) {
-  const exit = await runtime.runPromiseExit(
-    effect,
-    options.signal ? { signal: options.signal } : undefined,
-  )
-  if (Exit.isSuccess(exit)) return exit.value
-  if (Cause.hasInterruptsOnly(exit.cause)) {
+  const { signal } = options
+  if (!signal) return operation
+  if (signal.aborted)
     throw new Error(options.interruptMessage ?? "Operation was aborted.")
-  }
-  const [first] = Cause.prettyErrors(exit.cause)
-  throw new Error(first?.message ?? Cause.pretty(exit.cause))
+  return new Promise<A>((resolve, reject) => {
+    const onAbort = () =>
+      reject(new Error(options.interruptMessage ?? "Operation was aborted."))
+    signal.addEventListener("abort", onAbort, { once: true })
+    void operation
+      .then(resolve, reject)
+      .finally(() => signal.removeEventListener("abort", onAbort))
+  })
 }

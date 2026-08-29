@@ -1,36 +1,32 @@
-/**
- * The async entry-point boundary: one ManagedRuntime shared by every tool
- * handler, disposed on session_shutdown (which runs the manager finalizer →
- * disposeAll → every process tree is killed).
- */
+/** Plain Promise boundary for tool handlers. */
 
-import { Cause, Exit, ManagedRuntime, type Effect } from "effect"
-import { TerminalManagerLive } from "./manager.ts"
+import { createTerminalManager, type TerminalManagerShape } from "./manager.ts"
 
-export function createTerminalRuntime() {
-  return ManagedRuntime.make(TerminalManagerLive)
+export interface TerminalRuntime {
+  readonly manager: TerminalManagerShape
+  dispose(): Promise<void>
 }
 
-export type TerminalRuntime = ReturnType<typeof createTerminalRuntime>
+export function createTerminalRuntime(): TerminalRuntime {
+  const manager = createTerminalManager()
+  return { manager, dispose: () => manager.disposeAll() }
+}
 
-/**
- * Run an effect from an async tool handler. Typed failures and defects are
- * converted to thrown Errors (what pi's tool contract expects); interruption
- * (tool AbortSignal) throws `interruptMessage`.
- */
-export async function runTool<A, E>(
-  runtime: TerminalRuntime,
-  effect: Effect.Effect<A, E>,
+export function runTool<A>(
+  operation: Promise<A>,
   options: { signal?: AbortSignal; interruptMessage?: string } = {},
 ) {
-  const exit = await runtime.runPromiseExit(
-    effect,
-    options.signal ? { signal: options.signal } : undefined,
-  )
-  if (Exit.isSuccess(exit)) return exit.value
-  if (Cause.hasInterruptsOnly(exit.cause)) {
-    throw new Error(options.interruptMessage ?? "Operation was aborted.")
+  const { signal, interruptMessage = "Operation was aborted." } = options
+  if (!signal) return operation
+  if (signal.aborted) {
+    void operation.catch(() => {})
+    return Promise.reject(new Error(interruptMessage))
   }
-  const [first] = Cause.prettyErrors(exit.cause)
-  throw new Error(first?.message ?? Cause.pretty(exit.cause))
+  return new Promise<A>((resolve, reject) => {
+    const onAbort = () => reject(new Error(interruptMessage))
+    signal.addEventListener("abort", onAbort, { once: true })
+    void operation
+      .then(resolve, reject)
+      .finally(() => signal.removeEventListener("abort", onAbort))
+  })
 }

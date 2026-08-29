@@ -1,6 +1,5 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { Effect } from "effect"
 import { crawlEffect, type CrawlClient } from "./index.ts"
 
 test("cancels the remote crawl when polling is interrupted", async () => {
@@ -23,11 +22,11 @@ test("cancels the remote crawl when polling is interrupted", async () => {
   }
 
   const controller = new AbortController()
-  const running = Effect.runPromise(
-    crawlEffect(client, "https://example.com", { limit: 1 }),
-    {
-      signal: controller.signal,
-    },
+  const running = crawlEffect(
+    client,
+    "https://example.com",
+    { limit: 1 },
+    controller.signal,
   )
   const interrupted = assert.rejects(running)
 

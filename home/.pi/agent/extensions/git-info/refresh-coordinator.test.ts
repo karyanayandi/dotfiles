@@ -1,48 +1,48 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { Deferred, Effect, Fiber } from "effect"
 import { makeRefreshCoordinator } from "./src/refresh-coordinator.ts"
+
+function deferred() {
+  let resolve: () => void = () => {}
+  const promise = new Promise<void>((done) => {
+    resolve = done
+  })
+  return { promise, resolve }
+}
 
 test("an explicit refresh waits for an active background refresh", async () => {
   const coordinator = makeRefreshCoordinator()
   let state = 0
+  const started = deferred()
+  const release = deferred()
 
-  const result = await Effect.runPromise(
-    Effect.gen(function* () {
-      const started = yield* Deferred.make<void>()
-      const release = yield* Deferred.make<void>()
-      const background = yield* Effect.forkChild(
-        coordinator.run(
-          Effect.gen(function* () {
-            yield* Deferred.succeed(started, undefined)
-            yield* Deferred.await(release)
-            state = 1
-          }),
-        ),
-      )
+  const background = coordinator.run(async () => {
+    started.resolve()
+    await release.promise
+    state = 1
+  })
 
-      yield* Deferred.await(started)
-      yield* coordinator.runIfIdle(
-        Effect.sync(() => {
-          state = 99
-        }),
-      )
+  await started.promise
+  await coordinator.runIfIdle(async () => {
+    state = 99
+  })
 
-      const forced = yield* Effect.forkChild(
-        coordinator.run(
-          Effect.sync(() => {
-            state += 1
-            return state
-          }),
-        ),
-      )
+  const forced = coordinator.run(async () => {
+    state += 1
+    return state
+  })
 
-      yield* Deferred.succeed(release, undefined)
-      yield* Fiber.join(background)
-      return yield* Fiber.join(forced)
-    }),
-  )
-
-  assert.equal(result, 2)
+  release.resolve()
+  await background
+  assert.equal(await forced, 2)
   assert.equal(state, 2)
+})
+
+test("failed refresh does not block later refreshes", async () => {
+  const coordinator = makeRefreshCoordinator()
+
+  await assert.rejects(
+    coordinator.run(async () => Promise.reject(new Error("no"))),
+  )
+  assert.equal(await coordinator.run(async () => 1), 1)
 })

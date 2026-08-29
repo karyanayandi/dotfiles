@@ -17,7 +17,6 @@ import {
   type TUI,
   visibleWidth,
 } from "@earendil-works/pi-tui"
-import { Effect } from "effect"
 
 import {
   addBorderLabels,
@@ -322,41 +321,36 @@ export default function ui(pi: ExtensionAPI) {
     },
   })
 
-  const readGitState = (cwd: string, signal: AbortSignal) =>
-    Effect.gen(function* () {
-      const branchResult = yield* Effect.promise(() =>
-        pi
-          .exec("git", ["branch", "--show-current"], {
-            cwd,
-            signal,
-            timeout: 2_000,
-          })
-          .catch(() => undefined),
-      )
-      if (signal.aborted) return
-      branch =
-        branchResult?.code === 0 && !branchResult.killed
-          ? branchResult.stdout.trim() || undefined
-          : undefined
-      if (!branch) {
-        dirty = undefined
-        return
-      }
-      const statusResult = yield* Effect.promise(() =>
-        pi
-          .exec("git", ["--no-optional-locks", "status", "--porcelain"], {
-            cwd,
-            signal,
-            timeout: 2_000,
-          })
-          .catch(() => undefined),
-      )
-      if (signal.aborted) return
-      dirty =
-        statusResult?.code === 0 && !statusResult.killed
-          ? Boolean(statusResult.stdout.trim())
-          : undefined
-    })
+  const readGitState = async (cwd: string, signal: AbortSignal) => {
+    const branchResult = await pi
+      .exec("git", ["branch", "--show-current"], {
+        cwd,
+        signal,
+        timeout: 2_000,
+      })
+      .catch(() => undefined)
+    if (signal.aborted) return
+    branch =
+      branchResult?.code === 0 && !branchResult.killed
+        ? branchResult.stdout.trim() || undefined
+        : undefined
+    if (!branch) {
+      dirty = undefined
+      return
+    }
+    const statusResult = await pi
+      .exec("git", ["--no-optional-locks", "status", "--porcelain"], {
+        cwd,
+        signal,
+        timeout: 2_000,
+      })
+      .catch(() => undefined)
+    if (signal.aborted) return
+    dirty =
+      statusResult?.code === 0 && !statusResult.killed
+        ? Boolean(statusResult.stdout.trim())
+        : undefined
+  }
 
   const refreshGit = async (cwd: string) => {
     if (stopped) return
@@ -371,7 +365,7 @@ export default function ui(pi: ExtensionAPI) {
     try {
       do {
         refreshPending = false
-        await Effect.runPromise(readGitState(pendingCwd, controller.signal))
+        await readGitState(pendingCwd, controller.signal)
       } while (refreshPending && !controller.signal.aborted)
     } finally {
       refreshingGit = false
