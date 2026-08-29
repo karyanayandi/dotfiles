@@ -51,7 +51,8 @@ Item {
         currentIndex: root.selected
         cellWidth: root.wallpaperGrid ? 160 : 64
         cellHeight: root.wallpaperGrid ? 108 : 56
-        onCurrentIndexChanged: if (currentIndex >= 0 && root.valueGrid) positionViewAtIndex(currentIndex, GridView.Contain)
+        onCurrentIndexChanged: if (currentIndex >= 0 && root.valueGrid)
+            positionViewAtIndex(currentIndex, GridView.Contain)
         delegate: Item {
             required property var modelData
             required property int index
@@ -125,7 +126,9 @@ Item {
                 onClicked: root.activated(index, !!(mouse.modifiers & Qt.ControlModifier))
             }
         }
-        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AsNeeded
+        }
     }
 
     Text {

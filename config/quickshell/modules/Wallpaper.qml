@@ -10,7 +10,12 @@ Variants {
     PanelWindow {
         required property var modelData
         screen: modelData
-        anchors { top: true; bottom: true; left: true; right: true }
+        anchors {
+            top: true
+            bottom: true
+            left: true
+            right: true
+        }
         exclusiveZone: 0
         color: "black"
         WlrLayershell.layer: WlrLayer.Background

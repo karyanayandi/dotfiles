@@ -31,27 +31,27 @@ QtObject {
     property color colBgAlt: g1
     property color colBgSec: g1
     property color colSelected: g6
-    property color colHoverAlpha: Qt.rgba(0x66/255, 0x5c/255, 0x54/255, 0.8)
+    property color colHoverAlpha: Qt.rgba(0x66 / 255, 0x5c / 255, 0x54 / 255, 0.8)
     property color colHoverSolid: g4
     property color colAccent: g2
     property color colUrgent: g11
     property color colCritical: g11
-    property color colBorder: Qt.rgba(0x66/255, 0x5c/255, 0x54/255, 0.45)
-    property color colBorderStrong: Qt.rgba(0x66/255, 0x5c/255, 0x54/255, 0.65)
+    property color colBorder: Qt.rgba(0x66 / 255, 0x5c / 255, 0x54 / 255, 0.45)
+    property color colBorderStrong: Qt.rgba(0x66 / 255, 0x5c / 255, 0x54 / 255, 0.65)
     property color colDndChecked: g10
-    property color colActionBg: Qt.rgba(0xd5/255, 0xc4/255, 0xa1/255, 0.55)
-    property color colShadow: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.45)
-    property color colMeterBg: Qt.rgba(0x50/255, 0x49/255, 0x45/255, 0.9)
+    property color colActionBg: Qt.rgba(0xd5 / 255, 0xc4 / 255, 0xa1 / 255, 0.55)
+    property color colShadow: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, 0.45)
+    property color colMeterBg: Qt.rgba(0x50 / 255, 0x49 / 255, 0x45 / 255, 0.9)
     property color colMeterFg: g5
     property color colMuted: g4
-    property color colBgAlpha095: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.95)
-    property color colBgAlpha085: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.85)
-    property color colBgAlpha078: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.78)
+    property color colBgAlpha095: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, 0.95)
+    property color colBgAlpha085: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, 0.85)
+    property color colBgAlpha078: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, 0.78)
     property string fontFamily: "JetBrainsMono NF"
-    property color colLauncherBg: Qt.rgba(0x1d/255, 0x20/255, 0x21/255, 0.88)
-    property color colLauncherBorder: Qt.rgba(0x7c/255, 0x6f/255, 0x64/255, 0.35)
-    property color colInputBg: Qt.rgba(0x3c/255, 0x38/255, 0x36/255, 0.65)
-    property color colChipBg: Qt.rgba(0x50/255, 0x49/255, 0x45/255, 0.9)
+    property color colLauncherBg: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, 0.88)
+    property color colLauncherBorder: Qt.rgba(0x7c / 255, 0x6f / 255, 0x64 / 255, 0.35)
+    property color colInputBg: Qt.rgba(0x3c / 255, 0x38 / 255, 0x36 / 255, 0.65)
+    property color colChipBg: Qt.rgba(0x50 / 255, 0x49 / 255, 0x45 / 255, 0.9)
     property color colChipActive: g6
     property string fontFallback: "Nerd Font"
     property int fontSize: 15

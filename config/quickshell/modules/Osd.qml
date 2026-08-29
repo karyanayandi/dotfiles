@@ -24,7 +24,9 @@ PanelWindow {
     exclusiveZone: 0
     color: "transparent"
     visible: audio.osdVisible || _osdOpacity > 0.01
-    mask: Region { item: cardWrap }
+    mask: Region {
+        item: cardWrap
+    }
 
     WlrLayershell.namespace: "quickshell-osd"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -46,7 +48,10 @@ PanelWindow {
             }
         }
         Behavior on opacity {
-            NumberAnimation { duration: 260; easing.type: Easing.OutCubic }
+            NumberAnimation {
+                duration: 260
+                easing.type: Easing.OutCubic
+            }
         }
 
         Rectangle {
@@ -90,34 +95,61 @@ PanelWindow {
                     font.pixelSize: 56
                     font.weight: Font.Normal
                     horizontalAlignment: Text.AlignHCenter
-                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 180
+                            easing.type: Easing.OutCubic
+                        }
+                    }
                 }
 
-                Item { width: 1; height: 18 }
+                Item {
+                    width: 1
+                    height: 18
+                }
 
                 Rectangle {
                     id: meter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 144; height: 6; radius: 3
+                    width: 144
+                    height: 6
+                    radius: 3
                     color: Theme.colMeterBg
                     Rectangle {
-                        anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
                         width: parent.width * Math.min(1, win.audio.osdPercent / 100)
                         radius: 3
                         color: win.audio.muted && win.audio.osdKind === "sink" ? Theme.colMuted : Theme.colMeterFg
-                        Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
-                        Behavior on color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
+                        Behavior on width {
+                            NumberAnimation {
+                                duration: 120
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 150
+                                easing.type: Easing.OutCubic
+                            }
+                        }
                     }
                 }
 
-                Item { width: 1; height: 10 }
+                Item {
+                    width: 1
+                    height: 10
+                }
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: {
-                        if (win.audio.osdKind === "mic") return win.audio.muted ? "Microphone muted" : "Microphone"
-                        if (win.audio.muted) return "Muted"
-                        return win.audio.osdPercent + "%"
+                        if (win.audio.osdKind === "mic")
+                            return win.audio.muted ? "Microphone muted" : "Microphone";
+                        if (win.audio.muted)
+                            return "Muted";
+                        return win.audio.osdPercent + "%";
                     }
                     color: Theme.colMuted
                     font.family: Theme.fontFamily

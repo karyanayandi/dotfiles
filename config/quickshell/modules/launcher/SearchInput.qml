@@ -6,13 +6,17 @@ RowLayout {
     id: root
     property string mode: "all"
     signal queryChanged(string query)
-    signal escapePressed()
+    signal escapePressed
     signal selectionMoved(string direction)
     signal selected(bool ctrl)
-    signal cycleWallpaperInterval()
+    signal cycleWallpaperInterval
 
-    function focusInput() { input.forceActiveFocus() }
-    function clear() { input.text = "" }
+    function focusInput() {
+        input.forceActiveFocus();
+    }
+    function clear() {
+        input.text = "";
+    }
 
     Layout.fillWidth: true
     Layout.preferredHeight: Config.launcherInputHeight
@@ -42,27 +46,40 @@ RowLayout {
         focus: true
         onTextChanged: root.queryChanged(text)
         Keys.onPressed: event => {
-            if (root.mode === "wallpaper" && event.key === Qt.Key_B && (event.modifiers & Qt.ControlModifier)) root.cycleWallpaperInterval()
-            else if (event.key === Qt.Key_Escape) root.escapePressed()
-            else if (event.key === Qt.Key_Down) root.selectionMoved("down")
-            else if (event.key === Qt.Key_Up) root.selectionMoved("up")
-            else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && (root.mode === "emoji" || root.mode === "nerd" || root.mode === "wallpaper")) root.selectionMoved(event.key === Qt.Key_Left ? "left" : "right")
-            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) root.selected(!!(event.modifiers & Qt.ControlModifier))
-            else return
-            event.accepted = true
+            if (root.mode === "wallpaper" && event.key === Qt.Key_B && (event.modifiers & Qt.ControlModifier))
+                root.cycleWallpaperInterval();
+            else if (event.key === Qt.Key_Escape)
+                root.escapePressed();
+            else if (event.key === Qt.Key_Down)
+                root.selectionMoved("down");
+            else if (event.key === Qt.Key_Up)
+                root.selectionMoved("up");
+            else if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && (root.mode === "emoji" || root.mode === "nerd" || root.mode === "wallpaper"))
+                root.selectionMoved(event.key === Qt.Key_Left ? "left" : "right");
+            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                root.selected(!!(event.modifiers & Qt.ControlModifier));
+            else
+                return;
+            event.accepted = true;
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             visible: !parent.text.length
             text: {
-                if (root.mode === "clipboard") return "Search clipboard\u2026  (autopaste on Enter, copy on Ctrl+Enter)"
-                if (root.mode === "emoji") return "Search emoji\u2026  (e.g. fire, heart)"
-                if (root.mode === "nerd") return "Search Nerd Fonts\u2026"
-                if (root.mode === "bluetooth") return "Bluetooth devices\u2026"
-                if (root.mode === "power") return "Search power actions\u2026"
-                if (root.mode === "wallpaper") return "Search wallpapers\u2026"
-                return "Search apps, clipboard, emoji, wallpapers\u2026"
+                if (root.mode === "clipboard")
+                    return "Search clipboard\u2026  (autopaste on Enter, copy on Ctrl+Enter)";
+                if (root.mode === "emoji")
+                    return "Search emoji\u2026  (e.g. fire, heart)";
+                if (root.mode === "nerd")
+                    return "Search Nerd Fonts\u2026";
+                if (root.mode === "bluetooth")
+                    return "Bluetooth devices\u2026";
+                if (root.mode === "power")
+                    return "Search power actions\u2026";
+                if (root.mode === "wallpaper")
+                    return "Search wallpapers\u2026";
+                return "Search apps, clipboard, emoji, wallpapers\u2026";
             }
             color: Theme.g19
             font.pixelSize: root.mode === "emoji" ? 18 : 15
@@ -80,8 +97,8 @@ RowLayout {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-                root.clear()
-                root.focusInput()
+                root.clear();
+                root.focusInput();
             }
         }
     }
