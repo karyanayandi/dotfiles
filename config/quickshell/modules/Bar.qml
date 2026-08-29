@@ -5,6 +5,7 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import "bar" as BarParts
+import "../services" as Services
 import ".."
 
 PanelWindow {
@@ -14,6 +15,37 @@ PanelWindow {
     property var theme: Theme
 
     property string submap: ""
+    property string cpuUsage: "CPU --"
+    property string ramUsage: "RAM --"
+    readonly property string bluetoothStatus: {
+        const devices = bluetooth.devices.filter(device => device.connected).map(device => device.name);
+        return devices.length ? devices.join(", ") : "No device connected";
+    }
+
+    Services.BluetoothService {
+        id: bluetooth
+    }
+
+    Process {
+        id: systemUsage
+        command: ["sh", "-c", "{ awk '/^cpu / { idle=$5+$6; total=0; for (i=2; i<=NF; i++) total+=$i; print total, idle }' /proc/stat; sleep 0.1; awk '/^cpu / { idle=$5+$6; total=0; for (i=2; i<=NF; i++) total+=$i; print total, idle }' /proc/stat; } | awk 'NR==1 { total=$1; idle=$2; next } { printf \"CPU %d%%\\n\", 100 - 100 * ($2-idle) / ($1-total) }'; free -h | awk '/^Mem:/ { print \"RAM \" $3 \"/\" $2 }'"]
+        stdout: SplitParser {
+            onRead: data => {
+                data = data.trim();
+                if (data.startsWith("CPU"))
+                    barWin.cpuUsage = data;
+                else if (data.startsWith("RAM"))
+                    barWin.ramUsage = data;
+            }
+        }
+    }
+    Timer {
+        interval: 2000
+        running: cpuMouse.containsMouse
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: systemUsage.running = true
+    }
     Connections {
         target: Hyprland
         function onRawEvent(event) {
@@ -64,7 +96,7 @@ PanelWindow {
             }
 
             Text {
-                text: "󰍛"
+                text: cpuMouse.containsMouse ? barWin.cpuUsage + " · " + barWin.ramUsage : "󰍛"
                 color: Theme.colFg
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSize
@@ -72,9 +104,11 @@ PanelWindow {
                 leftPadding: 10
                 rightPadding: 10
                 MouseArea {
+                    id: cpuMouse
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
+                    onEntered: systemUsage.running = true
                     onClicked: {
                         let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent);
                         p.command = ["ghostty", "-e", "btm"];
@@ -83,7 +117,7 @@ PanelWindow {
                 }
             }
             Text {
-                text: ""
+                text: bluetoothMouse.containsMouse ? barWin.bluetoothStatus : ""
                 color: Theme.colFg
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSize
@@ -91,6 +125,7 @@ PanelWindow {
                 leftPadding: 10
                 rightPadding: 10
                 MouseArea {
+                    id: bluetoothMouse
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
@@ -104,7 +139,7 @@ PanelWindow {
 
             Text {
                 id: volText
-                text: barWin.audio.volumeIcon
+                text: volMa.containsMouse ? Math.round(barWin.audio.vol * 100) + "%" : barWin.audio.volumeIcon
                 color: Theme.colFg
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSize
