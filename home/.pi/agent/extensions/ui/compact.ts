@@ -59,10 +59,19 @@ interface CompactRenderer<TDetails> {
 }
 
 type ToolRender = ToolExecutionComponent["render"]
+type ToolInvalidate = ToolExecutionComponent["invalidate"]
+type ToolUpdateResult = ToolExecutionComponent["updateResult"]
+type ToolSetExpanded = ToolExecutionComponent["setExpanded"]
 
 interface PatchableToolExecutionPrototype {
   render: ToolRender
+  invalidate: ToolInvalidate
+  updateResult: ToolUpdateResult
+  setExpanded: ToolSetExpanded
   __piUiToolSpacingOriginalRender?: ToolRender
+  __piUiToolSpacingOriginalInvalidate?: ToolInvalidate
+  __piUiToolSpacingOriginalUpdateResult?: ToolUpdateResult
+  __piUiToolSpacingOriginalSetExpanded?: ToolSetExpanded
   __piUiToolSpacingPatched?: boolean
   __piUiToolSpacingPatchVersion?: number
   __piUiToolSpacingPatchOwner?: object
@@ -335,7 +344,19 @@ export function installToolSpacing(
   // state has been cleaned up. Restore that wrapper before installing one.
   if (hasPreviousPatch && !isCurrentPatch) {
     prototype.render = previousOriginalRender
+    if (prototype.__piUiToolSpacingOriginalInvalidate) {
+      prototype.invalidate = prototype.__piUiToolSpacingOriginalInvalidate
+    }
+    if (prototype.__piUiToolSpacingOriginalUpdateResult) {
+      prototype.updateResult = prototype.__piUiToolSpacingOriginalUpdateResult
+    }
+    if (prototype.__piUiToolSpacingOriginalSetExpanded) {
+      prototype.setExpanded = prototype.__piUiToolSpacingOriginalSetExpanded
+    }
     delete prototype.__piUiToolSpacingOriginalRender
+    delete prototype.__piUiToolSpacingOriginalInvalidate
+    delete prototype.__piUiToolSpacingOriginalUpdateResult
+    delete prototype.__piUiToolSpacingOriginalSetExpanded
     delete prototype.__piUiToolSpacingPatched
     delete prototype.__piUiToolSpacingPatchVersion
     delete prototype.__piUiToolSpacingPatchOwner
@@ -358,23 +379,73 @@ export function installToolSpacing(
   }
   const originalRender = prototype.__piUiToolSpacingOriginalRender
   if (!originalRender) return () => {}
+  const originalInvalidate = prototype.invalidate
+  const originalUpdateResult = prototype.updateResult
+  const originalSetExpanded = prototype.setExpanded
+  const renderCache = new WeakMap<
+    ToolExecutionComponent,
+    { width: number; lines: string[] }
+  >()
+  const renderState = new WeakMap<
+    ToolExecutionComponent,
+    { settled: boolean; expanded: boolean; hasImages: boolean }
+  >()
 
   const compactRender = function (
     this: ToolExecutionComponent,
     width: number,
   ): string[] {
+    if (!getCompact()) return originalRender.call(this, width)
+    const state = renderState.get(this)
+    const cacheable = state?.settled && !state.expanded && !state.hasImages
+    const cached = cacheable ? renderCache.get(this) : undefined
+    if (cached?.width === width) return cached.lines
+
     const rendered = originalRender.call(this, width)
-    if (!getCompact()) return rendered
     // Any tool (e.g. MCP tools like playwriter with no custom renderer) can
     // surface an unexpected args/result shape when it isn't ready. A throw here
     // runs in the render path and force-closes pi, so fall back to the original
     // renderer instead of crashing. Either way, clamp every line to `width` — a
     // line wider than the terminal makes pi's TUI throw and force-close.
+    let lines: string[]
     try {
-      return clampLines(compactRenderInner.call(this, width, rendered), width)
+      lines = clampLines(compactRenderInner.call(this, width, rendered), width)
     } catch {
-      return clampLines(rendered, width)
+      lines = clampLines(rendered, width)
     }
+    if (cacheable) renderCache.set(this, { width, lines })
+    return lines
+  }
+  const compactInvalidate = function (this: ToolExecutionComponent) {
+    renderCache.delete(this)
+    originalInvalidate.call(this)
+  }
+  const compactUpdateResult: ToolUpdateResult = function (
+    this: ToolExecutionComponent,
+    result,
+    isPartial = false,
+  ) {
+    const previous = renderState.get(this)
+    renderState.set(this, {
+      settled: !isPartial,
+      expanded: previous?.expanded ?? false,
+      hasImages: result.content.some((part) => part.type === "image"),
+    })
+    renderCache.delete(this)
+    originalUpdateResult.call(this, result, isPartial)
+  }
+  const compactSetExpanded: ToolSetExpanded = function (
+    this: ToolExecutionComponent,
+    expanded,
+  ) {
+    const previous = renderState.get(this)
+    renderState.set(this, {
+      settled: previous?.settled ?? false,
+      expanded,
+      hasImages: previous?.hasImages ?? false,
+    })
+    renderCache.delete(this)
+    originalSetExpanded.call(this, expanded)
   }
   const compactRenderInner = function (
     this: ToolExecutionComponent,
@@ -466,13 +537,31 @@ export function installToolSpacing(
     ]
   }
   prototype.render = compactRender
+  prototype.invalidate = compactInvalidate
+  prototype.updateResult = compactUpdateResult
+  prototype.setExpanded = compactSetExpanded
+  prototype.__piUiToolSpacingOriginalInvalidate = originalInvalidate
+  prototype.__piUiToolSpacingOriginalUpdateResult = originalUpdateResult
+  prototype.__piUiToolSpacingOriginalSetExpanded = originalSetExpanded
   prototype.__piUiToolSpacingPatched = true
   prototype.__piUiToolSpacingPatchVersion = TOOL_SPACING_PATCH_VERSION
   prototype.__piUiToolSpacingPatchOwner = TOOL_SPACING_PATCH_OWNER
   return () => {
     if (prototype.render === compactRender) {
       prototype.render = originalRender
+      if (prototype.invalidate === compactInvalidate) {
+        prototype.invalidate = originalInvalidate
+      }
+      if (prototype.updateResult === compactUpdateResult) {
+        prototype.updateResult = originalUpdateResult
+      }
+      if (prototype.setExpanded === compactSetExpanded) {
+        prototype.setExpanded = originalSetExpanded
+      }
       delete prototype.__piUiToolSpacingOriginalRender
+      delete prototype.__piUiToolSpacingOriginalInvalidate
+      delete prototype.__piUiToolSpacingOriginalUpdateResult
+      delete prototype.__piUiToolSpacingOriginalSetExpanded
       delete prototype.__piUiToolSpacingPatched
       delete prototype.__piUiToolSpacingPatchVersion
       delete prototype.__piUiToolSpacingPatchOwner

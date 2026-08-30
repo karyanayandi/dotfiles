@@ -134,6 +134,38 @@ describe("installToolSpacing", () => {
     }
   })
 
+  test("reuses settled compact rows until invalidated", () => {
+    const tool = createTools(() => true).get("ls")
+    const row = new ToolExecutionComponent(
+      "ls",
+      "tool-1",
+      calls.ls,
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      row.setArgsComplete()
+      row.markExecutionStarted()
+      row.updateResult(
+        { content: [{ type: "text", text: "index.ts" }], isError: false },
+        false,
+      )
+
+      const first = row.render(80)
+      expect(row.render(80)).toBe(first)
+      expect(row.render(79)).not.toBe(first)
+
+      const beforeInvalidate = row.render(80)
+      row.invalidate()
+      expect(row.render(80)).not.toBe(beforeInvalidate)
+    } finally {
+      restore()
+    }
+  })
+
   test("does not stack status prefixes when installed more than once", () => {
     const tool = createTools(() => true).get("ls")
     const row = new ToolExecutionComponent(
