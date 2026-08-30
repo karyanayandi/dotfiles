@@ -38,6 +38,7 @@ import {
   truncateHead,
 } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
+import { cacheRenderer } from "@pi/shared/render-cache"
 import { Type } from "typebox"
 import { pick } from "../model-shortcuts/src/picker.ts"
 import { deriveBtwTitle, isModelVisible } from "./src/by-the-way.ts"
@@ -603,22 +604,13 @@ export default function (pi: ExtensionAPI) {
       if (expanded) {
         const md = new Markdown(`${body}`, 0, 0, getMarkdownTheme())
         const container = new Text(header, 0, 0)
-        let cachedWidth: number | undefined
-        let cachedLines: string[] | undefined
-        return {
-          render: (width: number) => {
-            if (cachedWidth === width && cachedLines) return cachedLines
-            cachedWidth = width
-            cachedLines = [...container.render(width), ...md.render(width)]
-            return cachedLines
-          },
-          invalidate: () => {
-            cachedWidth = undefined
-            cachedLines = undefined
+        return cacheRenderer(
+          (width) => [...container.render(width), ...md.render(width)],
+          () => {
             container.invalidate()
             md.invalidate()
           },
-        }
+        )
       }
 
       const previewLines = body.split("\n").slice(0, 8)
@@ -654,22 +646,13 @@ export default function (pi: ExtensionAPI) {
       if (expanded) {
         const md = new Markdown(body, 0, 0, getMarkdownTheme())
         const container = new Text(header, 0, 0)
-        let cachedWidth: number | undefined
-        let cachedLines: string[] | undefined
-        return {
-          render: (width: number) => {
-            if (cachedWidth === width && cachedLines) return cachedLines
-            cachedWidth = width
-            cachedLines = [...container.render(width), ...md.render(width)]
-            return cachedLines
-          },
-          invalidate: () => {
-            cachedWidth = undefined
-            cachedLines = undefined
+        return cacheRenderer(
+          (width) => [...container.render(width), ...md.render(width)],
+          () => {
             container.invalidate()
             md.invalidate()
           },
-        }
+        )
       }
 
       const lines = body.split("\n")

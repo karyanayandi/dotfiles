@@ -7,6 +7,9 @@
     "test": "node --test --experimental-strip-types manager.test.ts result-delivery.test.ts context-usage.test.ts takeover.test.ts by-the-way.test.ts defaults.test.ts",
     "test:live": "node --test --experimental-strip-types codex.test.ts"
   },
+  "dependencies": {
+    "@pi/shared": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "catalog:"
   }

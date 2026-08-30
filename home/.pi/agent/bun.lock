@@ -26,6 +26,9 @@
     },
     "extensions/background-terminals": {
       "name": "background-terminals",
+      "dependencies": {
+        "@pi/shared": "workspace:*",
+      },
       "devDependencies": {
         "typescript": "catalog:",
       },
@@ -88,6 +91,9 @@
     },
     "extensions/subagents": {
       "name": "subagents",
+      "dependencies": {
+        "@pi/shared": "workspace:*",
+      },
       "devDependencies": {
         "typescript": "catalog:",
       },
