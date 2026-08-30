@@ -1,5 +1,5 @@
 /**
- * Background terminals — start long-running shell processes the model can
+ * Background terminals. start long-running shell processes the model can
  * inspect and stop, but never write to (stdin is ignored at the OS level).
  *
  * Tools (for the LLM):
@@ -81,9 +81,9 @@ export default function (pi: ExtensionAPI) {
 
   /** One-line widget directly above the editor, only while ≥1 is running.
    * Called on every manager notification (including per-output-chunk), so it
-   * only touches setWidget when the running count actually changes —
-   * replacing the widget factory hundreds of times a second would churn
-   * component creation for no visible difference. */
+   * only touches setWidget when running count changes. Replacing widget factory
+   * hundreds of times a second would churn component creation for no visible
+   * difference. */
   let widgetRunning = 0
   const updateWidget = (manager: TerminalManagerShape) => {
     if (!ui) return
@@ -129,7 +129,7 @@ export default function (pi: ExtensionAPI) {
             signal: snap.signal,
           },
         },
-        // followUp: queued until the agent has no more tool calls — never
+        // followUp: queued until the agent has no more tool calls. never
         // interrupts a mid-turn stream. triggerTurn: wakes the model
         // immediately iff idle; if busy, the queued follow-up is delivered
         // when the current run settles. Either way exactly one delivery.
@@ -173,7 +173,7 @@ export default function (pi: ExtensionAPI) {
 
   // Drain deferred results when the agent settles: together with the
   // isIdle() fast path above and the Map-keyed delivery (drain clears),
-  // double delivery is structurally impossible — whoever drains first wins.
+  // double delivery is structurally impossible. whoever drains first wins.
   pi.on("agent_settled", flushResults)
 
   // /new, /resume, /fork, /reload, and quit all emit session_shutdown for
@@ -381,7 +381,7 @@ export default function (pi: ExtensionAPI) {
       const content = typeof message.content === "string" ? message.content : ""
       // Remove only the summary line; the Error line (when present) is part
       // of the actual result and must remain visible. The body carries raw
-      // process output — sanitize ANSI/control chars or the transcript smears.
+      // process output. sanitize ANSI/control chars or the transcript smears.
       const body = sanitizeText(content.split("\n").slice(1).join("\n").trim())
 
       if (expanded) {

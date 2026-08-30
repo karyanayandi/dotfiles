@@ -1,8 +1,8 @@
 /**
- * /ps UI — two-stage full-screen overlay over the synchronous
+ * /ps UI. two-stage full-screen overlay over the synchronous
  * TerminalReadModel:
  * - TerminalDashboard: list of all tracked terminals (select, kill, open).
- * - TerminalDetailView: read-only inspector for one terminal — metadata,
+ * - TerminalDetailView: read-only inspector for one terminal. metadata,
  *   stdout/stderr toggle, scrolling, live tail. No input surface: background
  *   terminals have no stdin by design.
  */
@@ -537,7 +537,7 @@ class TerminalDetailView implements Component {
         : theme.fg("dim", `${name} (${formatSize(size)})`)
     lines.push(
       truncateToWidth(
-        `  ${tab("stdout", snap.stdout.totalBytes)}${theme.fg("dim", " | ")}${tab("stderr", snap.stderr.totalBytes)}${theme.fg("dim", "  — t to switch")}`,
+        `  ${tab("stdout", snap.stdout.totalBytes)}${theme.fg("dim", " | ")}${tab("stderr", snap.stderr.totalBytes)}${theme.fg("dim", " . t to switch")}`,
         width,
       ),
     )
@@ -566,7 +566,7 @@ class TerminalDetailView implements Component {
         truncateToWidth(
           theme.fg(
             "dim",
-            `first ${formatSize(buffer.truncatedBytes)} dropped from view — full log: ${buffer.spillPath ?? "(unavailable)"}`,
+            `first ${formatSize(buffer.truncatedBytes)} dropped from view. full log: ${buffer.spillPath ?? "(unavailable)"}`,
           ),
           width,
         ),

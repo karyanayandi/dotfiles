@@ -1,14 +1,13 @@
 ---
 name: background-terminals
 description:
-  Run and manage long-lived shell commands in background terminals. Use for dev
-  servers, watchers, streaming builds, and other commands that should keep
-  running while the agent continues working.
+  Run long-lived shell commands in background terminals. Use for dev servers,
+  watchers, streaming builds, and commands that must continue while agent works.
 ---
 
-# Background Terminals
+# Background terminals
 
-Use `bg_start` for long-running commands; use regular `bash` for quick commands.
+Use `bg_start` for long-running commands. Use `bash` for quick commands.
 
 ## Start
 
@@ -20,18 +19,17 @@ Call `bg_start` with:
 
 Background commands receive no stdin. Never use them for interactive prompts.
 
-After starting, continue useful work instead of polling. The terminal sends one
-completion message when it exits.
+After starting, keep working instead of polling. Terminal sends one completion
+message when it exits.
 
 ## Inspect and stop
 
 - Use `bg_status` only when current output or status is needed.
-- Use `bg_list` to inventory all tracked terminals.
-- Use `bg_kill` when a process is no longer needed or is stuck; termination
-  continues even if the tool wait is aborted.
-- Tell the user they can open `/ps` to inspect live output and kill terminals
-  interactively.
+- Use `bg_list` to list tracked terminals.
+- Use `bg_kill` for unneeded or stuck processes. Termination continues if tool
+  wait is aborted.
+- Tell user to open `/ps` for live output or interactive termination.
 
-Prefer meaningful titles and avoid starting duplicate servers or watchers. Full
-output is captured to spill files; tool and completion output shows a concise
-tail. Terminals are session-scoped and are stopped during shutdown or reload.
+Use distinct titles. Do not start duplicate servers or watchers. Full output
+lands in spill files. Tool and completion output show a short tail. Terminals
+belong to session and stop on shutdown or reload.

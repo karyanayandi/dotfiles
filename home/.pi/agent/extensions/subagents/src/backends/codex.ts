@@ -1,5 +1,5 @@
 /**
- * Codex backend — real implementation over `codex app-server`.
+ * Codex backend. real implementation over `codex app-server`.
  *
  * One scoped app-server process owns one persistent Codex thread. The server
  * speaks LF-delimited JSON-RPC over stdio: initialize, thread/start, and
@@ -200,8 +200,8 @@ function textInput(text: string) {
 /**
  * Parse a `thread/tokenUsage/updated` payload into context occupancy.
  * `tokenUsage.total` accumulates every request in the thread (cached prompt
- * tokens re-counted per request), so it is a cumulative spend counter — not
- * occupancy — and treating it as occupancy pinned the gauge at 100%.
+ * tokens re-counted per request), so it is a cumulative spend counter. not
+ * occupancy. and treating it as occupancy pinned the gauge at 100%.
  * `tokenUsage.last` is the most recent request, whose totalTokens is what
  * codex-rs itself uses as `tokens_in_context_window()`.
  */
@@ -461,7 +461,7 @@ async function makeCodexSession(task: SpawnTask): Promise<SubagentSession> {
           if (turnId) {
             // The run was already settled locally (interrupt fallback or
             // failure), so whatever native turn this response describes is
-            // invisible work — stop it unconditionally.
+            // invisible work. stop it unconditionally.
             ignoredTurnIds.add(turnId)
             void request(
               "turn/interrupt",
@@ -493,7 +493,7 @@ async function makeCodexSession(task: SpawnTask): Promise<SubagentSession> {
         )
         // A timed-out turn/start means a turn may be running that we can
         // never see or interrupt (no turn id). That session cannot be
-        // trusted with further work — kill it; the exit handler reports
+        // trusted with further work. kill it; the exit handler reports
         // the death. Explicit protocol rejections keep the session alive.
         if (errorText.includes("timed out")) {
           void terminateChild(child, () => state.exited)

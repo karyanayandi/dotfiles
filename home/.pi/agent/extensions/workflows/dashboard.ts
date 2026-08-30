@@ -339,9 +339,7 @@ function buildReport(details: WorkflowDetails): string {
       ]
         .filter(Boolean)
         .join(" · ")
-      lines.push(
-        `- **${agent.label}** — ${status}${stats ? ` (${stats})` : ""}`,
-      )
+      lines.push(`- **${agent.label}**. ${status}${stats ? ` (${stats})` : ""}`)
       if (agent.error) lines.push(`  - error: ${agent.error}`)
     }
   }

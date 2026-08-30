@@ -69,7 +69,7 @@ export function buildWorkflowResultMessage(
   const { done, failed } = countStates(details)
   const elapsed = formatElapsed(details.startedAt, details.finishedAt)
   const lines = [
-    `Workflow ${details.name ? `"${details.name}"` : details.runId} ${details.status} — ` +
+    `Workflow ${details.name ? `"${details.name}"` : details.runId} ${details.status}. ` +
       `${done}/${details.agents.length} agents ok${failed ? `, ${failed} failed` : ""} ` +
       `across ${details.phases.length} phase(s) in ${elapsed}.`,
     `Run dir: ${shortenHome(runDir)}`,
@@ -86,7 +86,7 @@ export function buildWorkflowResultMessage(
             : "running"
       lines.push(
         `- [${agent.label}]${agent.phase ? ` (${agent.phase})` : ""} ${status}` +
-          (agent.error ? ` — ${agent.error}` : ""),
+          (agent.error ? `. ${agent.error}` : ""),
       )
     }
   }

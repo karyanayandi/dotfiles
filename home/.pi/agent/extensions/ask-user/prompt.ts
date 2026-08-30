@@ -4,7 +4,7 @@ export const ASK_USER_PARAMETER_DESCRIPTIONS = {
   optionDescription: "Optional one-line description shown below the label",
   question: "The question to ask the user",
   options:
-    "Between 2 and 5 answer options. A free-form 'write my own answer' option is always appended automatically - never include one yourself.",
+    "Provide 2 to 5 answer options. A free-form 'write my own answer' option is added automatically. Do not include it.",
 }
 
 /** Describes the ask_user tool's question shape and dismissible free-form fallback. */
@@ -17,7 +17,7 @@ export const ASK_USER_PROMPT_SNIPPET =
 
 /** Guides the model to use ask_user for enumerable answers and one question at a time. */
 export const ASK_USER_PROMPT_GUIDELINES = [
-  "When asking the user a question whose likely answers can be enumerated, use the ask_user tool instead of asking in plain text.",
+  "Use ask_user when likely answers can be listed. Do not ask in plain text.",
   "Ask one question per ask_user call; ask follow-up questions in subsequent calls.",
 ]
 
@@ -32,11 +32,11 @@ export function buildAskUserResultMessage(
 ) {
   switch (outcome.kind) {
     case "no-ui":
-      return "No interactive UI is available, so the question could not be shown. Ask the user in plain text instead."
+      return "No interactive UI is available. Ask the user in plain text instead."
     case "cancelled":
       return "Cancelled"
     case "dismissed":
-      return "User dismissed the question without answering. Do not assume an answer; proceed accordingly or ask differently."
+      return "User dismissed the question without answering. Do not assume an answer. Continue without one or ask another way."
     case "custom":
       return `User wrote their own answer: ${outcome.answer}`
     case "selected":

@@ -11,7 +11,7 @@
  *   await parallel([() => agent(...), ...], { concurrency? })
  *   args                                          // parsed JSON args passed with the tool call
  *
- * `agent()` always resolves to `{ ok, output, structured?, error? }` — it
+ * `agent()` always resolves to `{ ok, output, structured?, error? }`. it
  * never throws into the script. Scripts branch on `ok` explicitly.
  *
  * Runs are blocking by default (live progress in the tool block). Pass
@@ -236,7 +236,7 @@ function runDetailText(
     ) as WorkflowDetails
     return buildWorkflowResultMessage(parsed, runDir)
   } catch {
-    return `Run ${run.runId} — ${run.status}`
+    return `Run ${run.runId}. ${run.status}`
   }
 }
 
@@ -750,7 +750,7 @@ export default function workflows(pi: ExtensionAPI) {
       if (description) text += `\n  ${theme.fg("dim", description)}`
       for (const phase of meta.phases.slice(0, 8)) {
         text += `\n  ${theme.fg("dim", SQUARE)} ${theme.fg("accent", phase.title)}${
-          phase.detail ? theme.fg("dim", ` — ${phase.detail}`) : ""
+          phase.detail ? theme.fg("dim", `. ${phase.detail}`) : ""
         }`
       }
       return new Text(text, 0, 0)

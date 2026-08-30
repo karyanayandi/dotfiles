@@ -84,7 +84,7 @@ describe("registerCompactTools", () => {
       "ls",
       "read",
     ])
-    // self shell (clean line) in compact layouts, default shell (bg box) otherwise
+    // Compact layouts use self shell. Other layouts use default shell.
     for (const tool of compact.values()) expect(tool.renderShell).toBe("self")
     for (const tool of createTools(() => false).values()) {
       expect(tool.renderShell).toBe("default")
@@ -113,7 +113,7 @@ describe("registerCompactTools", () => {
     expect(call?.render(80)).toBe(lines)
     expect(lines[0]).toContain("read src/index.ts")
     expect(lines[0]).toContain("3 lines")
-    // collapsed (non-expanded) result contributes no extra row
+    // Collapsed result adds no row.
     expect(collapsed?.render(80) ?? []).toEqual([])
     expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(80)
   })
@@ -123,7 +123,7 @@ describe("registerCompactTools", () => {
     const tool = tools.get("read")
     const args = calls.read
     const call = tool?.renderCall?.(args, theme, renderContext(args))
-    // non-compact renderCall delegates to pi's built-in read renderer (a Text)
+    // Non-compact renderCall uses pi's built-in read renderer.
     const lines = call?.render(80) ?? []
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.join("\n")).toContain("read")
@@ -283,7 +283,7 @@ describe("installToolSpacing", () => {
 
     const restore = installToolSpacing(() => false, theme)
     try {
-      // self-rendered compact tool still yields its single content line
+      // Self-rendered compact tool still yields one content line.
       const lines = row.render(80)
       expect(lines.length).toBeGreaterThanOrEqual(1)
       expect(lines[0] ?? "").not.toContain("✓")
@@ -317,7 +317,7 @@ describe("installToolSpacing", () => {
     try {
       for (const width of [8, 12, 24, 3]) {
         const lines = row.render(width)
-        // may wrap onto several rows, but every row fits the terminal width
+        // Rows may wrap, but each fits terminal width.
         expect(lines.length, `width ${width}`).toBeGreaterThanOrEqual(1)
         for (const line of lines) {
           expect(visibleWidth(line), `width ${width}`).toBeLessThanOrEqual(
@@ -325,7 +325,7 @@ describe("installToolSpacing", () => {
           )
         }
       }
-      // long text is preserved (wrapped), not truncated to "…"
+      // Long text wraps instead of truncating to "…".
       const wide = row.render(24).join("\n")
       expect(wide.replace(/\x1b\[[0-9;]*m/g, "")).toContain("registerTool")
       expect(wide).not.toContain("…")
@@ -351,7 +351,7 @@ describe("installToolSpacing", () => {
       { content: [{ type: "text", text: "index.ts" }], isError: false },
       false,
     )
-    // Force the compact path to throw (e.g. a hostile args getter).
+    // Force compact path to throw, as hostile args getter would.
     Object.defineProperty(row, "args", {
       get() {
         throw new Error("boom")
@@ -361,7 +361,7 @@ describe("installToolSpacing", () => {
     const restore = installToolSpacing(() => true, theme)
     try {
       expect(() => row.render(80)).not.toThrow()
-      // falls back to the original renderer's output rather than crashing
+      // Uses original renderer output instead of crashing.
       expect(row.render(80).length).toBeGreaterThanOrEqual(1)
     } finally {
       restore()
@@ -406,10 +406,9 @@ describe("installToolSpacing", () => {
   })
 
   test("truncates rows to width so a padded line can never overflow the terminal", () => {
-    // A tool with renderShell "self" whose renderCall returns a wide Text: the
-    // original renderer's Box pads it to full width, and the compact !isBgShell
-    // branch prepends "  · " — without truncation that overflows the terminal
-    // and force-closes pi (the crash the user hit with playwriter).
+    // Self-shell tool returns wide Text. Original renderer's Box pads it to full
+    // width and compact !isBgShell branch prepends "  · ". Without truncation,
+    // row overflows terminal and force-closes pi.
     const wideTool: any = {
       name: "playwriter_execute",
       label: "playwriter_execute",

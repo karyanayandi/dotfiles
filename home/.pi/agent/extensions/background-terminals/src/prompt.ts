@@ -23,30 +23,30 @@ const RESULT_STDOUT_MAX_LINES = 40
 const RESULT_STDERR_MAX_LINES = 20
 
 export const BG_START_TOOL_DESCRIPTION =
-  "Start a long-running shell command as a background terminal (executed via the platform shell: sh -c on POSIX, cmd.exe /d /s /c on Windows). " +
-  "Fire-and-forget: this returns immediately with an id, and you get a message with the final output when the process exits. " +
-  "The process receives NO stdin (immediate EOF) and there is no way to send input later; interactive commands will not work. Use bg_kill to stop a stuck one. " +
-  `Terminals are session-scoped: they are killed when the session ends or reloads. Output shown to you is tail-truncated (stdout ${formatSize(STATUS_STDOUT_MAX)}, stderr ${formatSize(STATUS_STDERR_MAX)}); the full logs are captured to files and in the /ps viewer. ` +
-  `Max ${MAX_RUNNING} background terminals can run at once.`
+  "Start a long-running shell command in a background terminal. It runs through platform shell: sh -c on POSIX, cmd.exe /d /s /c on Windows. " +
+  "Returns immediately with an id. You receive final output when process exits. " +
+  "Process receives no stdin and cannot receive input later. Interactive commands will not work. Use bg_kill to stop a stuck process. " +
+  `Terminals end when session ends or reloads. Display output is tail-truncated (stdout ${formatSize(STATUS_STDOUT_MAX)}, stderr ${formatSize(STATUS_STDERR_MAX)}). Full logs are saved to files and available in /ps. ` +
+  `At most ${MAX_RUNNING} background terminals run at once.`
 
 export const BG_START_PROMPT_SNIPPET =
-  "Run a long-lived shell command in the background (dev servers, builds, watchers); output is captured and you're notified on exit"
+  "Run a long-lived shell command in background. Captures output and reports exit."
 
 export const BG_START_PROMPT_GUIDELINES = [
-  "Use bg_start for commands expected to run long or indefinitely (servers, watch modes, long builds); use the regular bash tool for quick commands.",
+  "Use bg_start for long or indefinite commands: servers, watch modes, long builds. Use bash for quick commands.",
   "bg_start processes receive no stdin. Never start a command that requires interactive input.",
-  "After bg_start, keep working; the exit result arrives automatically. Use bg_status only when you need current output before continuing.",
+  "Continue after bg_start. Exit result arrives automatically. Use bg_status only for current output.",
 ]
 
 export const BG_START_PARAMETER_DESCRIPTIONS = {
   command:
-    "Shell command line to run in the background (sh -c on POSIX, cmd.exe /d /s /c on Windows). It receives no stdin (EOF immediately); interactive commands will not work.",
+    "Shell command to run in background through sh -c on POSIX or cmd.exe /d /s /c on Windows. Receives no stdin. Interactive commands will not work.",
   title: "Short human-readable name shown in listings and the UI",
   workingDir: "Working directory (default: current working directory)",
 }
 
 export const BG_STATUS_TOOL_DESCRIPTION =
-  "Peek at a background terminal's status and current output (tail-truncated) without blocking. If the terminal already exited, this returns its final state."
+  "Get a background terminal's current status and tail-truncated output without blocking. Returns final state if terminal exited."
 
 export const BG_STATUS_PARAMETER_DESCRIPTIONS = {
   id: 'Terminal id, e.g. "bt-1"',
@@ -56,7 +56,7 @@ export const BG_LIST_TOOL_DESCRIPTION =
   "List all background terminals (running and settled) with pid, elapsed time, exit status, and output sizes."
 
 export const BG_KILL_TOOL_DESCRIPTION =
-  "Stop one or more running background terminals (SIGTERM to the whole process tree, escalating to SIGKILL). Returns each terminal's final state; already-settled ids are reported as such."
+  "Stop running background terminals. Sends SIGTERM to each process tree, then SIGKILL if needed. Returns final state. Reports already-settled ids."
 
 export const BG_KILL_PARAMETER_DESCRIPTIONS = {
   ids: 'Terminal ids to stop, e.g. ["bt-1"]',
@@ -65,8 +65,8 @@ export const BG_KILL_PARAMETER_DESCRIPTIONS = {
 export function buildStartResult(snap: TerminalSnapshot) {
   return (
     `Started background terminal ${snap.id} "${snap.title}" (pid ${snap.pid ?? "?"}, ${snap.cwd}).\n` +
-    `It runs in the background with no stdin. You'll get a message when it exits, ` +
-    `or use bg_status(id: "${snap.id}") to peek, bg_kill to stop it, bg_list to see all.`
+    `Runs in background with no stdin. You receive a message when it exits. ` +
+    `Use bg_status(id: "${snap.id}") for current output, bg_kill to stop it, or bg_list to list terminals.`
   )
 }
 

@@ -117,10 +117,9 @@ function isHorizontalBorder(line: string): boolean {
   return /^─+$/.test(plain) || /^─── [↑↓] \d+ more ─*$/.test(plain)
 }
 
-// pi-tui's editor draws a software caret as reverse-video (\x1b[7m…\x1b[0m).
-// Unlike the hardware cursor, that block is static text that ignores window
-// focus, so you can't tell which terminal has focus. Strip it so the only
-// visible caret is the hardware cursor, which every terminal ghosts on blur.
+// pi-tui's editor draws software caret with reverse video (\x1b[7m…\x1b[0m).
+// Unlike hardware cursor, block is static text and ignores window focus. Strip
+// it so hardware cursor is only visible caret. Terminals ghost it on blur.
 function neutralizeFakeCursor(line: string): string {
   return line.replace(/\u001b\[7m([\s\S]*?)\u001b\[0m/g, "$1")
 }
@@ -203,8 +202,8 @@ export default function ui(pi: ExtensionAPI) {
   let restoreThinkingSelectorLabels: (() => void) | undefined
   let currentModel: ExtensionContext["model"]
 
-  // pi-minimalist message/tool style applies only to minimal and lite layouts.
-  // The getter is read at render time, so /ui layout switches take effect live.
+  // pi-minimalist message and tool style applies only to minimal and lite.
+  // Read getter at render time so `/ui layout` switches apply live.
   const getCompact = () => layout === "minimal" || layout === "lite"
   registerCompactTools(pi, getCompact)
 
@@ -212,8 +211,8 @@ export default function ui(pi: ExtensionAPI) {
 
   const applySessionUI = (ctx: ExtensionContext) => {
     if (layout === "lite") {
-      // lite: rely on the vanilla "Working..." indicator in the response
-      // area instead of drawing a spinner in the footer.
+      // Lite uses built-in "Working..." indicator in response area, not footer
+      // spinner.
       ctx.ui.setFooter((tui, theme) => ({
         dispose() {},
         invalidate() {},
@@ -235,7 +234,7 @@ export default function ui(pi: ExtensionAPI) {
               `${ctx.model?.id ?? "no model"} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
             ),
           )
-          const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "—"]
+          const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "?"]
           if (inputTokens > 0 || outputTokens > 0) {
             parts.push(
               `\u{f062}${fmt(inputTokens)}`, // nf-fa-arrow_up: input
@@ -250,8 +249,8 @@ export default function ui(pi: ExtensionAPI) {
         },
       }))
     } else if (layout === "minimal") {
-      // Minimal replaces pi's footer, so retain extension activity indicators
-      // (subagents, workflows, and similar status producers) in one row.
+      // Minimal replaces pi footer. Keep extension activity indicators in one
+      // row.
       ctx.ui.setFooter(
         (_tui, _theme, footerData) =>
           new MinimalFooter(() => footerData.getExtensionStatuses()),
@@ -437,9 +436,8 @@ export default function ui(pi: ExtensionAPI) {
         super(instance, theme, keybindings, { paddingX: 2 })
         tui = instance
         this.defaultBorderColor = this.borderColor.bind(this)
-        // Rely on the real terminal cursor for position so it ghosts when the
-        // window loses focus (like other TUIs) instead of pi's always-solid
-        // software block cursor. The fake cursor is stripped below.
+        // Use terminal cursor for position. It ghosts on blur, unlike pi's
+        // always-solid software block cursor. Strip fake cursor below.
         instance.setShowHardwareCursor(true)
         if (clearTerminalOnEditorMount) {
           clearTerminalOnEditorMount = false
@@ -450,8 +448,8 @@ export default function ui(pi: ExtensionAPI) {
 
       override render(width: number): string[] {
         if (layout === "off" || layout === "lite") {
-          // Reset borderColor: a prior minimal render leaves it as () => "",
-          // which would make super.render draw invisible borders here.
+          // Reset borderColor. Minimal render leaves it as () => "", which
+          // would make super.render draw invisible borders.
           this.borderColor = this.defaultBorderColor
           this.setPaddingX(1)
           return super.render(width).map(neutralizeFakeCursor)
@@ -479,7 +477,7 @@ export default function ui(pi: ExtensionAPI) {
             line = pad + indicator + " " + line.slice(i)
             lines[firstContent] = truncateToWidth(line, width, "", true)
           }
-          // Add a blank top margin and drop the bottom border.
+          // Add blank top margin. Drop bottom border.
           const body = lines.filter((line) => line !== "")
           const info = truncateToWidth(
             `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,

@@ -23,7 +23,7 @@ test("head chunks are evicted past the cap and accounted as truncated", () => {
   assert.equal(view.truncatedBytes, 4)
 })
 
-test("a single chunk larger than the cap is trimmed to its tail — retention stays bounded", () => {
+test("a single chunk larger than the cap is trimmed to its tail. retention stays bounded", () => {
   const buf = new OutputBuffer(4)
   buf.push("0123456789")
   // Only the newest cap-worth of bytes is retained; the head is truncated.

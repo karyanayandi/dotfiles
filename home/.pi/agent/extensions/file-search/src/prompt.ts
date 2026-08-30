@@ -1,13 +1,13 @@
 /** Model-facing text for the fd and rg tools. */
 
 export const FD_TOOL_DESCRIPTION =
-  "Find files and directories by name with fd. Respects .gitignore by default. Results are limited to 1000 entries unless a higher limit is given; output is limited to 2000 lines or 50KB, and complete truncated output is saved to a temporary file."
+  "Find files and directories by name with fd. Respects .gitignore by default. Results default to 1000 entries. Output is limited to 2000 lines or 50KB. Truncated output is saved to a temporary file."
 
 export const FD_PROMPT_SNIPPET =
   "Find files and directories by name with fd (fast, gitignore-aware)."
 
 export const FD_PROMPT_GUIDELINES = [
-  "Use fd as the primary tool for discovering files and directories by name, extension, or glob instead of bash with find or ls -R.",
+  "Use fd to find files and directories by name, extension, or glob. Do not use bash with find or ls -R.",
   "Use rg instead of fd when searching file contents rather than file names.",
   "Keep using bash for complex multi-step workflows that pipe or post-process file listings.",
 ]
@@ -25,7 +25,7 @@ export const FD_PARAMETER_DESCRIPTIONS = {
 }
 
 export const RG_TOOL_DESCRIPTION =
-  "Search file contents with ripgrep. Uses smart-case matching, respects .gitignore by default, and returns at most 100 matches per file unless a different limit is given. Output is limited to 2000 lines or 50KB; complete truncated output is saved to a temporary file."
+  "Search file contents with ripgrep. Uses smart-case matching and respects .gitignore by default. Returns at most 100 matches per file unless given another limit. Output is limited to 2000 lines or 50KB. Truncated output is saved to a temporary file."
 
 export const RG_PROMPT_SNIPPET =
   "Search file contents with ripgrep (fast regex content search)."
@@ -34,7 +34,7 @@ export const RG_PROMPT_GUIDELINES = [
   "Use rg as the primary tool for searching file contents instead of bash with grep.",
   "Use fd instead of rg when looking for files by name rather than content.",
   "Set fixed_strings on rg when searching for literal code snippets containing regex metacharacters.",
-  "Keep using bash for complex multi-step workflows that combine searching with other commands.",
+  "Use bash for complex multi-step workflows that combine searching with other commands.",
 ]
 
 export const RG_PARAMETER_DESCRIPTIONS = {

@@ -60,7 +60,7 @@ export function installNotifications(binaries: readonly ResolvedBinary[]) {
     .filter((binary) => binary.source === "installed")
     .map(
       (binary) =>
-        `file-search: no system ${binary.tool} found — downloaded ${binary.tool} ${binary.version ?? ""}`.trimEnd() +
+        `file-search: no system ${binary.tool} found. downloaded ${binary.tool} ${binary.version ?? ""}`.trimEnd() +
         ` to ${repositoryBinDir()}`,
     )
 }

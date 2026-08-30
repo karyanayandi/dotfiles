@@ -1,5 +1,5 @@
 /**
- * Subagents — spawn background subagents on one of three backends
+ * Subagents. spawn background subagents on one of three backends
  * (pi, Codex) unified behind one promise-based interface.
  *
  * Tools (for the parent LLM):

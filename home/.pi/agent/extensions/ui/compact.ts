@@ -27,10 +27,9 @@ const COMPACT_INDENT = "  "
 // Long call text wraps to the next line instead of being truncated.
 const CALL_GUTTER = COMPACT_INDENT.length + 2 // "  " + "✓ " = 4
 
-// Layout-conditional port of https://github.com/zackerydev/pi-minimalist-ui.
-// Everything here renders the compact single-line style only when `getCompact()`
-// is true (minimal/lite). In full/off layouts it transparently delegates back to
-// pi's built-in renderers, so the current style is preserved.
+// Layout-dependent port of https://github.com/zackerydev/pi-minimalist-ui.
+// This renders compact single-line style only when `getCompact()` is true
+// (minimal/lite). Full/off layouts use pi's built-in renderers.
 
 const unsafeTerminalCharacters =
   /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g
@@ -84,10 +83,9 @@ function getToolExecutionPrototype() {
   return ToolExecutionComponent.prototype as unknown as PatchableToolExecutionPrototype
 }
 
-// The workspace ships two typebox builds (pi bundles 1.3.7, the root catalog
-// resolves 1.3.11), so their `Static<T>` types are mutually unassignable. The
-// original tool renderers are therefore captured with loose `any` signatures —
-// the parameter types are compatible both directions, so no cast is needed.
+// Workspace has two typebox builds: pi bundles 1.3.7 and root catalog resolves
+// 1.3.11. Their `Static<T>` types cannot assign to each other, so original tool
+// renderers use loose `any` signatures. Parameter types work both ways.
 type FallbackCall = (
   args: any,
   theme: Theme,
@@ -179,7 +177,7 @@ function renderLine(
 ): string {
   let text = `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", compactText(call.subject))}`
   if (call.meta) text += theme.fg("muted", ` ${compactText(call.meta, "")}`)
-  if (summary) text += theme.fg("muted", ` — ${compactText(summary, "")}`)
+  if (summary) text += theme.fg("muted", `. ${compactText(summary, "")}`)
   return text
 }
 
@@ -194,8 +192,8 @@ function registerCompactTool(
   const originalResult: FallbackResult | undefined = original.renderResult
   pi.registerTool({
     ...original,
-    // read at render time so compact tools render through the clean self-shell in
-    // minimal/lite but keep pi's background box in full/off (current style intact).
+    // Read at render time. Minimal/lite tools use self-shell. Full/off tools
+    // keep pi's background box.
     get renderShell(): "self" | "default" {
       return getCompact() ? "self" : "default"
     },
@@ -352,8 +350,8 @@ export function installToolSpacing(
     prototype.__piUiToolSpacingPatchOwner === TOOL_SPACING_PATCH_OWNER
   let restoredStalePatch = false
 
-  // Session reloads can load a fresh copy of this module before old patch
-  // state has been cleaned up. Restore that wrapper before installing one.
+  // A session reload can load this module before old patch state is cleaned up.
+  // Restore old wrapper before installing this one.
   if (hasPreviousPatch && !isCurrentPatch) {
     prototype.render = previousOriginalRender
     if (prototype.__piUiToolSpacingOriginalInvalidate) {
@@ -375,8 +373,8 @@ export function installToolSpacing(
     restoredStalePatch = true
   }
 
-  // Multiple UI extension instances may share one prototype. Keep one wrapper;
-  // stacking it is what turns one status icon into a row of check marks.
+  // UI extension instances may share one prototype. Keep one wrapper. Stacking
+  // wrappers turns one status icon into a row of check marks.
   if (
     !restoredStalePatch &&
     prototype.__piUiToolSpacingPatched &&
@@ -414,11 +412,10 @@ export function installToolSpacing(
     if (cached?.width === width) return cached.lines
 
     const rendered = originalRender.call(this, width)
-    // Any tool (e.g. MCP tools like playwriter with no custom renderer) can
-    // surface an unexpected args/result shape when it isn't ready. A throw here
-    // runs in the render path and force-closes pi, so fall back to the original
-    // renderer instead of crashing. Either way, clamp every line to `width` — a
-    // line wider than the terminal makes pi's TUI throw and force-close.
+    // Tools without custom renderers, such as playwriter, may expose unexpected
+    // args or result shapes before they are ready. A throw in render force-closes
+    // pi, so use original renderer on error. Clamp lines to `width`, because a
+    // wider line makes pi's TUI throw and force-close.
     let lines: string[]
     try {
       lines = clampLines(compactRenderInner.call(this, width, rendered), width)
@@ -496,10 +493,9 @@ export function installToolSpacing(
     const content = rendered.filter((line) => line !== "")
     if (content.length === 0) return []
 
-    // Compact (re-registered) tools use renderShell "self" and emit a clean
-    // single colored line. fd/rg, Task* and other custom tools keep pi's default
-    // shell, where a Box wraps each line in full-width background padding — strip
-    // that before collapsing so the row reads like a compact tool row.
+    // Re-registered compact tools use renderShell "self" and emit one colored
+    // line. fd/rg, Task*, and other custom tools use pi's default shell, where a
+    // Box adds full-width background padding. Strip padding before collapsing.
     const isBgShell = self.getRenderShell() !== "self"
     const lines = isBgShell
       ? content
@@ -508,8 +504,8 @@ export function installToolSpacing(
       : content
     if (lines.length === 0) return []
 
-    // Tools with no custom renderCall fall back to a bare-name line. For those
-    // (all Task* tools) append a compact args digest so the row stays useful.
+    // Tools without custom renderCall fall back to bare-name line. Append an
+    // args digest for Task* tools.
     const bareName = self.toolName ? sanitizeTerminalText(self.toolName) : ""
     const firstPlain = plainTerminalText(lines[0] ?? "").trim()
     const args =
@@ -613,9 +609,8 @@ function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
   return `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", language)}${meta ? ` ${meta}` : ""}`
 }
 
-// Clamp every rendered line to `width`. pi's TUI throws (and force-closes) if
-// any line exceeds the terminal width, so the compact renderer must never emit
-// a wider line — regardless of a tool's renderShell or Box padding.
+// Clamp every rendered line to `width`. pi's TUI throws and force-closes when
+// line exceeds terminal width, regardless of renderShell or Box padding.
 function clampLines(lines: string[], width: number): string[] {
   return lines.map((line) => truncateToWidth(line, width, "…"))
 }

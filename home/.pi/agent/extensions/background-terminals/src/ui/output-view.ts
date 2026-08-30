@@ -1,7 +1,7 @@
 /**
  * Output rendering for the /ps detail view: turns a captured stream's text
- * into sanitized, wrapped display lines. Sanitization happens here — at
- * render time, never at capture time — because raw ANSI/control characters
+ * into sanitized, wrapped display lines. Sanitization happens here. at
+ * render time, never at capture time. because raw ANSI/control characters
  * desync the TUI renderer and smear the overlay.
  */
 

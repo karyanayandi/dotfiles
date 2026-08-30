@@ -1,5 +1,5 @@
 /**
- * OutputBuffer — bounded in-memory capture of one process stream.
+ * OutputBuffer. bounded in-memory capture of one process stream.
  *
  * Newest output is always retained; when the retained size exceeds the cap,
  * whole chunks are evicted from the head and counted in `truncatedBytes`.
