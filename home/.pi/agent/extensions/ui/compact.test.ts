@@ -1,5 +1,7 @@
 import { describe, expect, test, vi } from "vitest"
+import type { AssistantMessage } from "@earendil-works/pi-ai"
 import {
+  AssistantMessageComponent,
   initTheme,
   ToolExecutionComponent,
   type Theme,
@@ -44,6 +46,24 @@ function renderContext(args: unknown, state: Record<string, unknown> = {}) {
     state,
     toolCallId: "tool-1",
   }
+}
+
+const assistantMessage: AssistantMessage = {
+  role: "assistant",
+  content: [{ type: "text", text: "hello" }],
+  api: "openai-responses",
+  provider: "test",
+  model: "test",
+  usage: {
+    input: 0,
+    output: 0,
+    cacheRead: 0,
+    cacheWrite: 0,
+    totalTokens: 0,
+    cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+  },
+  stopReason: "stop",
+  timestamp: 0,
 }
 
 const calls: Record<string, unknown> = {
@@ -111,9 +131,35 @@ describe("registerCompactTools", () => {
 })
 
 describe("installCompactMessages", () => {
+  test("hides only the compact thinking-level label", () => {
+    const restore = installCompactMessages(theme, () => true)
+    try {
+      const label = new Text("\u001b[2mThinking level: medium\u001b[0m", 0, 0)
+      const body = new Text(`${"x".repeat(256)} Thinking level: medium`, 0, 0)
+      expect(label.render(80)).toEqual([])
+      expect(body.render(80).length).toBeGreaterThan(0)
+    } finally {
+      restore()
+    }
+  })
+
   test("reuses compact user message rendering until invalidated", () => {
     const restore = installCompactMessages(theme, () => true)
     const message = new UserMessageComponent("hello")
+    try {
+      const first = message.render(80)
+      expect(message.render(80)).toBe(first)
+
+      message.invalidate()
+      expect(message.render(80)).not.toBe(first)
+    } finally {
+      restore()
+    }
+  })
+
+  test("reuses finalized assistant rendering until invalidated", () => {
+    const restore = installCompactMessages(theme, () => true)
+    const message = new AssistantMessageComponent(assistantMessage)
     try {
       const first = message.render(80)
       expect(message.render(80)).toBe(first)

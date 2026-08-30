@@ -25,6 +25,8 @@ class RecapCard {
   private readonly data: RecapEntryData
   private readonly theme: Theme
   private readonly expanded: boolean
+  private cachedWidth?: number
+  private cachedLines?: string[]
 
   constructor(data: RecapEntryData, theme: Theme, expanded: boolean) {
     this.data = data
@@ -33,6 +35,8 @@ class RecapCard {
   }
 
   render(width: number) {
+    if (this.cachedWidth === width && this.cachedLines) return this.cachedLines
+
     const box = new Box(1, 1, (text) => this.theme.bg("customMessageBg", text))
     const title =
       this.theme.fg("accent", "✦ ") +
@@ -54,10 +58,15 @@ class RecapCard {
       const source = `${this.data.provider}/${this.data.model} · ${this.data.reasoning}${this.data.fallback ? " · local fallback" : ""}`
       box.addChild(new Text(this.theme.fg("dim", source), 0, 1))
     }
-    return box.render(width)
+    this.cachedWidth = width
+    this.cachedLines = box.render(width)
+    return this.cachedLines
   }
 
-  invalidate() {}
+  invalidate() {
+    this.cachedWidth = undefined
+    this.cachedLines = undefined
+  }
 }
 
 export function renderRecap(

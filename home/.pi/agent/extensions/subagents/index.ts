@@ -603,12 +603,18 @@ export default function (pi: ExtensionAPI) {
       if (expanded) {
         const md = new Markdown(`${body}`, 0, 0, getMarkdownTheme())
         const container = new Text(header, 0, 0)
+        let cachedWidth: number | undefined
+        let cachedLines: string[] | undefined
         return {
-          render: (width: number) => [
-            ...container.render(width),
-            ...md.render(width),
-          ],
+          render: (width: number) => {
+            if (cachedWidth === width && cachedLines) return cachedLines
+            cachedWidth = width
+            cachedLines = [...container.render(width), ...md.render(width)]
+            return cachedLines
+          },
           invalidate: () => {
+            cachedWidth = undefined
+            cachedLines = undefined
             container.invalidate()
             md.invalidate()
           },
@@ -648,12 +654,18 @@ export default function (pi: ExtensionAPI) {
       if (expanded) {
         const md = new Markdown(body, 0, 0, getMarkdownTheme())
         const container = new Text(header, 0, 0)
+        let cachedWidth: number | undefined
+        let cachedLines: string[] | undefined
         return {
-          render: (width: number) => [
-            ...container.render(width),
-            ...md.render(width),
-          ],
+          render: (width: number) => {
+            if (cachedWidth === width && cachedLines) return cachedLines
+            cachedWidth = width
+            cachedLines = [...container.render(width), ...md.render(width)]
+            return cachedLines
+          },
           invalidate: () => {
+            cachedWidth = undefined
+            cachedLines = undefined
             container.invalidate()
             md.invalidate()
           },

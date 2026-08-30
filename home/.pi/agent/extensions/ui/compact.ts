@@ -659,7 +659,8 @@ export function installCompactMessages(
   const compactTextRender = function (this: Text, width: number): string[] {
     if (!getCompact()) return originalTextRender.call(this, width)
     const { text } = this as unknown as TextState
-    if (plainTerminalText(text).startsWith("Thinking level: ")) return []
+    if (plainTerminalText(text.slice(0, 128)).startsWith("Thinking level: "))
+      return []
     return originalTextRender.call(this, width)
   }
   Text.prototype.render = compactTextRender
@@ -692,11 +693,28 @@ export function installCompactMessages(
   UserMessageComponent.prototype.invalidate = compactUserInvalidate
 
   const originalAssistantRender = AssistantMessageComponent.prototype.render
+  const originalAssistantInvalidate =
+    AssistantMessageComponent.prototype.invalidate
+  const originalAssistantUpdateContent =
+    AssistantMessageComponent.prototype.updateContent
+  const compactAssistantLines = new WeakMap<
+    AssistantMessageComponent,
+    { width: number; lines: string[] }
+  >()
+  const compactAssistantState = new WeakMap<
+    AssistantMessageComponent,
+    { streaming: boolean }
+  >()
   const compactAssistantRender = function (
     this: AssistantMessageComponent,
     width: number,
   ): string[] {
     if (!getCompact()) return originalAssistantRender.call(this, width)
+    const state = compactAssistantState.get(this)
+    const cached =
+      state?.streaming === false ? compactAssistantLines.get(this) : undefined
+    if (cached?.width === width) return cached.lines
+
     const { hiddenThinkingLabel, hideThinkingBlock, lastMessage } =
       this as unknown as AssistantMessageState
     const hasToolCalls =
@@ -709,30 +727,55 @@ export function installCompactMessages(
       lastMessage?.content.some(
         (part) => part.type === "text" && part.text?.trim(),
       ) ?? false
+    let lines: string[]
     if (
       hasToolCalls &&
       hasThinking &&
       !hasText &&
       hideThinkingBlock &&
       !hiddenThinkingLabel
-    )
-      return []
-    if (lastMessage?.stopReason !== "aborted" || hasToolCalls) {
-      return originalAssistantRender.call(this, width)
+    ) {
+      lines = []
+    } else if (lastMessage?.stopReason !== "aborted" || hasToolCalls) {
+      lines = originalAssistantRender.call(this, width)
+    } else {
+      const message =
+        lastMessage.errorMessage &&
+        lastMessage.errorMessage !== "Request was aborted"
+          ? lastMessage.errorMessage
+          : "Operation aborted"
+      lines = new Text(
+        theme.fg("error", sanitizeMessageText(message)),
+        0,
+        0,
+      ).render(width)
     }
 
-    const message =
-      lastMessage.errorMessage &&
-      lastMessage.errorMessage !== "Request was aborted"
-        ? lastMessage.errorMessage
-        : "Operation aborted"
-    return new Text(
-      theme.fg("error", sanitizeMessageText(message)),
-      0,
-      0,
-    ).render(width)
+    const cacheable =
+      state?.streaming === false ||
+      (state === undefined && lastMessage?.stopReason !== "pending")
+    if (cacheable) compactAssistantLines.set(this, { width, lines })
+    return lines
   }
+  const compactAssistantInvalidate = function (
+    this: AssistantMessageComponent,
+  ) {
+    compactAssistantLines.delete(this)
+    originalAssistantInvalidate.call(this)
+  }
+  const compactAssistantUpdateContent: AssistantMessageComponent["updateContent"] =
+    function (this: AssistantMessageComponent, message, isStreaming) {
+      const previous = compactAssistantState.get(this)
+      compactAssistantState.set(this, {
+        streaming: isStreaming ?? previous?.streaming ?? false,
+      })
+      compactAssistantLines.delete(this)
+      originalAssistantUpdateContent.call(this, message, isStreaming)
+    }
   AssistantMessageComponent.prototype.render = compactAssistantRender
+  AssistantMessageComponent.prototype.invalidate = compactAssistantInvalidate
+  AssistantMessageComponent.prototype.updateContent =
+    compactAssistantUpdateContent
 
   return () => {
     if (Text.prototype.render === compactTextRender) {
@@ -746,6 +789,20 @@ export function installCompactMessages(
     }
     if (AssistantMessageComponent.prototype.render === compactAssistantRender) {
       AssistantMessageComponent.prototype.render = originalAssistantRender
+    }
+    if (
+      AssistantMessageComponent.prototype.invalidate ===
+      compactAssistantInvalidate
+    ) {
+      AssistantMessageComponent.prototype.invalidate =
+        originalAssistantInvalidate
+    }
+    if (
+      AssistantMessageComponent.prototype.updateContent ===
+      compactAssistantUpdateContent
+    ) {
+      AssistantMessageComponent.prototype.updateContent =
+        originalAssistantUpdateContent
     }
   }
 }
