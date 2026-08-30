@@ -101,19 +101,31 @@ type FallbackResult = (
 ) => Component | undefined
 
 class SingleLine implements Component {
+  private cachedWidth?: number
+  private cachedLines?: string[]
+
   constructor(private text: string) {}
 
   setText(text: string): void {
+    if (text === this.text) return
     this.text = text
+    this.invalidate()
   }
 
   render(width: number): string[] {
-    return width > 0
-      ? wrapTextWithAnsi(this.text, Math.max(1, width - CALL_GUTTER))
-      : []
+    if (this.cachedWidth === width && this.cachedLines) return this.cachedLines
+    this.cachedWidth = width
+    this.cachedLines =
+      width > 0
+        ? wrapTextWithAnsi(this.text, Math.max(1, width - CALL_GUTTER))
+        : []
+    return this.cachedLines
   }
 
-  invalidate(): void {}
+  invalidate(): void {
+    this.cachedWidth = undefined
+    this.cachedLines = undefined
+  }
 }
 
 function compactText(value: unknown, fallback = "…"): string {
@@ -653,19 +665,31 @@ export function installCompactMessages(
   Text.prototype.render = compactTextRender
 
   const originalUserRender = UserMessageComponent.prototype.render
+  const originalUserInvalidate = UserMessageComponent.prototype.invalidate
+  const compactUserMessages = new WeakMap<UserMessageComponent, Text>()
   const compactUserRender = function (
     this: UserMessageComponent,
     width: number,
   ): string[] {
     if (!getCompact()) return originalUserRender.call(this, width)
     const { text } = this as unknown as UserMessageState
-    const content = theme.fg(
-      "dim",
-      `${COMPACT_INDENT}› ${sanitizeMessageText(text)}`,
-    )
-    return new Text(content, 0, 0).render(width)
+    let message = compactUserMessages.get(this)
+    if (!message) {
+      const content = theme.fg(
+        "dim",
+        `${COMPACT_INDENT}› ${sanitizeMessageText(text)}`,
+      )
+      message = new Text(content, 0, 0)
+      compactUserMessages.set(this, message)
+    }
+    return message.render(width)
+  }
+  const compactUserInvalidate = function (this: UserMessageComponent) {
+    compactUserMessages.delete(this)
+    originalUserInvalidate.call(this)
   }
   UserMessageComponent.prototype.render = compactUserRender
+  UserMessageComponent.prototype.invalidate = compactUserInvalidate
 
   const originalAssistantRender = AssistantMessageComponent.prototype.render
   const compactAssistantRender = function (
@@ -716,6 +740,9 @@ export function installCompactMessages(
     }
     if (UserMessageComponent.prototype.render === compactUserRender) {
       UserMessageComponent.prototype.render = originalUserRender
+    }
+    if (UserMessageComponent.prototype.invalidate === compactUserInvalidate) {
+      UserMessageComponent.prototype.invalidate = originalUserInvalidate
     }
     if (AssistantMessageComponent.prototype.render === compactAssistantRender) {
       AssistantMessageComponent.prototype.render = originalAssistantRender

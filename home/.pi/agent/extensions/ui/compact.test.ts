@@ -3,10 +3,15 @@ import {
   initTheme,
   ToolExecutionComponent,
   type Theme,
+  UserMessageComponent,
 } from "@earendil-works/pi-coding-agent"
 import { type TUI, visibleWidth, Text } from "@earendil-works/pi-tui"
 
-import { installToolSpacing, registerCompactTools } from "./compact.js"
+import {
+  installCompactMessages,
+  installToolSpacing,
+  registerCompactTools,
+} from "./compact.js"
 
 initTheme("dark")
 
@@ -85,6 +90,7 @@ describe("registerCompactTools", () => {
 
     const lines = call?.render(80) ?? []
     expect(lines).toHaveLength(1)
+    expect(call?.render(80)).toBe(lines)
     expect(lines[0]).toContain("read src/index.ts")
     expect(lines[0]).toContain("3 lines")
     // collapsed (non-expanded) result contributes no extra row
@@ -101,6 +107,22 @@ describe("registerCompactTools", () => {
     const lines = call?.render(80) ?? []
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.join("\n")).toContain("read")
+  })
+})
+
+describe("installCompactMessages", () => {
+  test("reuses compact user message rendering until invalidated", () => {
+    const restore = installCompactMessages(theme, () => true)
+    const message = new UserMessageComponent("hello")
+    try {
+      const first = message.render(80)
+      expect(message.render(80)).toBe(first)
+
+      message.invalidate()
+      expect(message.render(80)).not.toBe(first)
+    } finally {
+      restore()
+    }
   })
 })
 
