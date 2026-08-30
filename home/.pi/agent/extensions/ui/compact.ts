@@ -455,8 +455,9 @@ export function installToolSpacing(
     // pair (or keep the call line), then wrap to width so long rows continue
     // onto the next line.
     const single =
+      formatCodeToolCall(bareName, self.args, theme) ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
-      (args ? ` ${args}` : "")
+        (args ? ` ${args}` : "")
     const contentWidth = Math.max(1, width - COMPACT_INDENT.length - 2)
     const wrapped = wrapTextWithAnsi(single, contentWidth)
     return [
@@ -483,6 +484,7 @@ function compactArgs(args: unknown, theme: Theme): string {
   if (!args || typeof args !== "object" || Array.isArray(args)) return ""
   const parts: string[] = []
   for (const [key, value] of Object.entries(args as Record<string, unknown>)) {
+    if (key === "code" || key === "language") continue
     if (value === undefined || value === null || value === "") continue
     const val =
       typeof value === "string"
@@ -500,6 +502,14 @@ function compactArgs(args: unknown, theme: Theme): string {
     )
   }
   return parts.join(" ")
+}
+
+function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) return undefined
+  const { code, language } = args as Record<string, unknown>
+  if (typeof code !== "string" || typeof language !== "string") return undefined
+  const meta = compactArgs(args, theme)
+  return `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", language)}${meta ? ` ${meta}` : ""}`
 }
 
 // Clamp every rendered line to `width`. pi's TUI throws (and force-closes) if

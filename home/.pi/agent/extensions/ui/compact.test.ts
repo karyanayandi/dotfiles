@@ -268,6 +268,43 @@ describe("installToolSpacing", () => {
     }
   })
 
+  test("shows code tools with code-block marker instead of fence marker", () => {
+    const tool: any = {
+      name: "ctx_execute",
+      label: "ctx_execute",
+      description: "run code",
+      parameters: {},
+      renderShell: "default",
+      renderCall: () => new Text("ctx_execute · ```python", 0, 0),
+      async execute() {
+        return { content: [], details: undefined }
+      },
+    }
+    const row = new ToolExecutionComponent(
+      "ctx_execute",
+      "tool-1",
+      { language: "python", code: "print('hello')", cwd: "/tmp/project" },
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      const text = row
+        .render(120)
+        .join("\n")
+        .replace(/\x1b\[[0-9;]*m/g, "")
+      expect(text).toContain("</> python")
+      expect(text).not.toContain("```")
+      expect(text).not.toContain("print('hello')")
+    } finally {
+      restore()
+    }
+  })
+
   test("truncates rows to width so a padded line can never overflow the terminal", () => {
     // A tool with renderShell "self" whose renderCall returns a wide Text: the
     // original renderer's Box pads it to full width, and the compact !isBgShell
