@@ -57,6 +57,7 @@ local servers = {
   "taplo",
   "templ",
   "templ",
+  "tsc",
   "vue_ls",
   "yamlls",
   -- "nil_ls",

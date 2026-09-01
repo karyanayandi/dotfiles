@@ -35,9 +35,8 @@ M.servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  -- "ts_ls",
+  "tsc",
   "vue_ls",
-  -- "tsgo", -- installs the native TS binary used by the `tsc` LSP server
   "yamlls",
 }
 
