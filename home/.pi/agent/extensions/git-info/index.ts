@@ -67,7 +67,19 @@ export default function gitInfo(pi: ExtensionAPI) {
   let generation = 0
   let queriedPrBranch: string | null = null
   const refreshCoordinator = makeRefreshCoordinator()
-  const publish = () => pi.events.emit(GIT_INFO_CHANNEL, { ...state })
+  const publish = () => {
+    pi.events.emit(GIT_INFO_CHANNEL, { ...state })
+    if (!currentContext) return
+
+    currentContext.ui.setStatus(
+      "worktrunk",
+      state.isRepository &&
+        state.branch &&
+        !["main", "master"].includes(state.branch)
+        ? currentContext.ui.theme.fg("accent", `branch: ${state.branch}`)
+        : undefined,
+    )
+  }
   const run = (
     command: string,
     args: string[],
@@ -236,6 +248,7 @@ export default function gitInfo(pi: ExtensionAPI) {
   pi.on("session_shutdown", async () => {
     stopRefreshListener()
     generation += 1
+    currentContext?.ui.setStatus("worktrunk", undefined)
     currentContext = undefined
     await stopPolling()
   })
