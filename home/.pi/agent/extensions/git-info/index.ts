@@ -76,7 +76,8 @@ export default function gitInfo(pi: ExtensionAPI) {
       state.isRepository &&
         state.branch &&
         !["main", "master"].includes(state.branch)
-        ? currentContext.ui.theme.fg("accent", `branch: ${state.branch}`)
+        ? currentContext.ui.theme.fg("text", "branch:") +
+            currentContext.ui.theme.fg("muted", ` ${state.branch}`)
         : undefined,
     )
   }
