@@ -3,6 +3,7 @@ import {
   loadShortcuts,
   saveShortcuts,
   thinkingLevels,
+  thinkingLevelsAfter,
   type ShortcutConfig,
 } from "./src/config.ts"
 import { pick } from "./src/picker.ts"
@@ -30,7 +31,32 @@ function describeTarget({ model, thinkingLevel }: ShortcutConfig) {
   return `${model} · thinking:${thinkingLevel ?? "default"}`
 }
 
+function changeThinkingLevel(pi: ExtensionAPI, direction: -1 | 1) {
+  const current = pi.getThinkingLevel()
+
+  for (const candidate of thinkingLevelsAfter(current, direction)) {
+    pi.setThinkingLevel(candidate)
+    const selected = pi.getThinkingLevel()
+    if (selected !== current) return selected
+  }
+
+  return current
+}
+
 export default function modelShortcuts(pi: ExtensionAPI) {
+  for (const [shortcut, direction] of [
+    ["ctrl+,", -1],
+    ["ctrl+.", 1],
+  ] as const) {
+    pi.registerShortcut(shortcut, {
+      description: `${direction === -1 ? "Lower" : "Raise"} thinking level`,
+      handler: async (ctx) => {
+        const level = changeThinkingLevel(pi, direction)
+        ctx.ui.notify(`Thinking level: ${level}`, "info")
+      },
+    })
+  }
+
   pi.registerCommand("model-shortcuts", {
     description: "Configure model keyboard shortcuts",
     handler: async (_args, ctx) => {

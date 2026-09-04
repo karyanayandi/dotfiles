@@ -16,6 +16,13 @@ export const thinkingLevels = [
 
 export type ThinkingLevel = (typeof thinkingLevels)[number]
 
+export function thinkingLevelsAfter(current: ThinkingLevel, direction: -1 | 1) {
+  const index = thinkingLevels.indexOf(current)
+  return direction === 1
+    ? thinkingLevels.slice(index + 1)
+    : thinkingLevels.slice(0, index).reverse()
+}
+
 export interface ShortcutConfig {
   model: string
   thinkingLevel?: ThinkingLevel

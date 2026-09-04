@@ -1,6 +1,11 @@
 import { deepStrictEqual, throws } from "node:assert"
 import { test } from "node:test"
-import { parseShortcuts } from "./config.ts"
+import { parseShortcuts, thinkingLevelsAfter } from "./config.ts"
+
+test("lists thinking levels in either direction", () => {
+  deepStrictEqual(thinkingLevelsAfter("medium", -1), ["low", "minimal", "off"])
+  deepStrictEqual(thinkingLevelsAfter("medium", 1), ["high", "xhigh", "max"])
+})
 
 test("parses shortcut thinking levels and legacy model strings", () => {
   deepStrictEqual(
