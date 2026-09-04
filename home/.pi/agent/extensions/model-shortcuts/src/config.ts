@@ -16,11 +16,16 @@ export const thinkingLevels = [
 
 export type ThinkingLevel = (typeof thinkingLevels)[number]
 
-export function thinkingLevelsAfter(current: ThinkingLevel, direction: -1 | 1) {
-  const index = thinkingLevels.indexOf(current)
-  return direction === 1
-    ? thinkingLevels.slice(index + 1)
-    : thinkingLevels.slice(0, index).reverse()
+export function nextThinkingLevel(
+  levels: readonly ThinkingLevel[],
+  current: ThinkingLevel,
+  direction: -1 | 1,
+) {
+  if (levels.length === 0) return current
+
+  const index = levels.indexOf(current)
+  const start = index === -1 ? (direction === 1 ? -1 : 0) : index
+  return levels[(start + direction + levels.length) % levels.length]
 }
 
 export interface ShortcutConfig {

@@ -1,10 +1,15 @@
 import { deepStrictEqual, throws } from "node:assert"
 import { test } from "node:test"
-import { parseShortcuts, thinkingLevelsAfter } from "./config.ts"
+import { nextThinkingLevel, parseShortcuts } from "./config.ts"
 
-test("lists thinking levels in either direction", () => {
-  deepStrictEqual(thinkingLevelsAfter("medium", -1), ["low", "minimal", "off"])
-  deepStrictEqual(thinkingLevelsAfter("medium", 1), ["high", "xhigh", "max"])
+test("cycles through model-supported thinking levels", () => {
+  const extended = ["minimal", "low", "medium", "high", "xhigh", "max"] as const
+  const limited = ["low", "high"] as const
+
+  deepStrictEqual(nextThinkingLevel(extended, "max", 1), "minimal")
+  deepStrictEqual(nextThinkingLevel(extended, "minimal", -1), "max")
+  deepStrictEqual(nextThinkingLevel(limited, "low", 1), "high")
+  deepStrictEqual(nextThinkingLevel(limited, "high", 1), "low")
 })
 
 test("parses shortcut thinking levels and legacy model strings", () => {

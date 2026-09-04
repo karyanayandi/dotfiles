@@ -1,10 +1,12 @@
+import { getSupportedThinkingLevels } from "@earendil-works/pi-ai"
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
 import {
   loadShortcuts,
+  nextThinkingLevel,
   saveShortcuts,
   thinkingLevels,
-  thinkingLevelsAfter,
   type ShortcutConfig,
+  type ThinkingLevel,
 } from "./src/config.ts"
 import { pick } from "./src/picker.ts"
 
@@ -31,16 +33,19 @@ function describeTarget({ model, thinkingLevel }: ShortcutConfig) {
   return `${model} · thinking:${thinkingLevel ?? "default"}`
 }
 
-function changeThinkingLevel(pi: ExtensionAPI, direction: -1 | 1) {
-  const current = pi.getThinkingLevel()
-
-  for (const candidate of thinkingLevelsAfter(current, direction)) {
-    pi.setThinkingLevel(candidate)
-    const selected = pi.getThinkingLevel()
-    if (selected !== current) return selected
-  }
-
-  return current
+function changeThinkingLevel(
+  pi: ExtensionAPI,
+  levels: readonly ThinkingLevel[],
+  direction: -1 | 1,
+) {
+  const thinkingLevels = levels.filter((level) => level !== "off")
+  const next = nextThinkingLevel(
+    thinkingLevels.length > 0 ? thinkingLevels : levels,
+    pi.getThinkingLevel(),
+    direction,
+  )
+  pi.setThinkingLevel(next)
+  return pi.getThinkingLevel()
 }
 
 export default function modelShortcuts(pi: ExtensionAPI) {
@@ -51,7 +56,12 @@ export default function modelShortcuts(pi: ExtensionAPI) {
     pi.registerShortcut(shortcut, {
       description: `${direction === -1 ? "Lower" : "Raise"} thinking level`,
       handler: async (ctx) => {
-        const level = changeThinkingLevel(pi, direction)
+        if (!ctx.model) return
+        const level = changeThinkingLevel(
+          pi,
+          getSupportedThinkingLevels(ctx.model),
+          direction,
+        )
         ctx.ui.notify(`Thinking level: ${level}`, "info")
       },
     })
