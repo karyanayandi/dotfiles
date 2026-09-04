@@ -231,6 +231,7 @@ function assistantParts(msg: AssistantMessage): TranscriptPart[] {
         toolId: part.id,
         name: part.name,
         argsPreview: safeJson(part.arguments),
+        displayArgs: part.name === "edit" ? part.arguments : undefined,
       })
     }
   }
@@ -452,6 +453,7 @@ async function makePiSession(task: SpawnTask): Promise<SubagentSession> {
           name: event.toolName,
           isError: event.isError,
           outputPreview: toolPreview(event.result),
+          displayResult: event.toolName === "edit" ? event.result : undefined,
         })
         break
       case "queue_update":

@@ -87,6 +87,8 @@ export type TranscriptPart =
       readonly toolId: string
       readonly name: string
       readonly argsPreview?: string
+      /** Backend-native arguments retained for optional takeover renderers. */
+      readonly displayArgs?: unknown
     }
 
 export type TranscriptItem =
@@ -101,6 +103,8 @@ export type TranscriptItem =
       readonly name: string
       readonly isError: boolean
       readonly outputPreview?: string
+      /** Backend-native result retained for optional takeover renderers. */
+      readonly displayResult?: unknown
     }
 
 export interface LiveToolState {
@@ -129,10 +133,9 @@ export type RunOutcome =
   | { readonly _tag: "Interrupted"; readonly partialText?: string }
 
 /**
- * Normalized activity stream. Previews (`argsPreview`, `outputPreview`) are
- * pre-flattened single-line strings because the UI only ever renders one
- * sanitized line, which keeps three different native tool-result shapes out
- * of the interface.
+ * Normalized activity stream. Previews (`argsPreview`, `outputPreview`) stay
+ * flattened for the fallback UI; optional display payloads let an installed
+ * renderer handle richer tool output without coupling backend shapes.
  */
 export type SubagentEvent =
   // lifecycle (a session can run multiple turns via send())
@@ -166,6 +169,7 @@ export type SubagentEvent =
       readonly name: string
       readonly isError: boolean
       readonly outputPreview?: string
+      readonly displayResult?: unknown
     }
   // bookkeeping
   | {

@@ -10,11 +10,48 @@ import {
   visibleWidth,
   wrapTextWithAnsi,
 } from "@earendil-works/pi-tui"
-import type { SubagentSnapshot, TranscriptItem } from "../domain.ts"
+import type {
+  SubagentSnapshot,
+  TranscriptItem,
+  TranscriptPart,
+} from "../domain.ts"
 
 const ANSI_PATTERN =
   // eslint-disable-next-line no-control-regex
   /[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PR-TZcf-nq-uy=><~]))/g
+
+export interface SubagentTranscriptToolRenderRequest {
+  readonly call: Extract<TranscriptPart, { type: "toolCall" }>
+  readonly result?: Extract<TranscriptItem, { kind: "toolResult" }>
+  readonly snapshot: SubagentSnapshot
+  readonly width: number
+  readonly theme: Theme
+}
+
+export type SubagentTranscriptToolRenderer = (
+  request: SubagentTranscriptToolRenderRequest,
+) => string[] | undefined
+
+const transcriptToolRendererKey = Symbol.for(
+  "pi-subagents.transcriptToolRenderer.v1",
+)
+
+type GlobalWithTranscriptToolRenderer = typeof globalThis & {
+  [transcriptToolRendererKey]?: SubagentTranscriptToolRenderer
+}
+
+function renderTranscriptTool(request: SubagentTranscriptToolRenderRequest) {
+  const renderer = (globalThis as GlobalWithTranscriptToolRenderer)[
+    transcriptToolRendererKey
+  ]
+  if (!renderer) return undefined
+  try {
+    const lines = renderer(request)
+    return lines?.map((line) => truncateToWidth(line, request.width))
+  } catch {
+    return undefined
+  }
+}
 
 /**
  * Strip raw ANSI codes, expand tabs, and drop control chars. Terminal-expanded
@@ -73,6 +110,9 @@ function renderAssistantItem(
   item: Extract<TranscriptItem, { kind: "assistant" }>,
   width: number,
   out: string[],
+  snapshot: SubagentSnapshot,
+  results: ReadonlyMap<string, Extract<TranscriptItem, { kind: "toolResult" }>>,
+  renderedResults: Set<string>,
 ) {
   for (const part of item.parts) {
     if (part.type === "text") {
@@ -87,6 +127,19 @@ function renderAssistantItem(
         out,
       )
     } else if (part.type === "toolCall") {
+      const result = results.get(part.toolId)
+      const rendered = renderTranscriptTool({
+        call: part,
+        result,
+        snapshot,
+        width,
+        theme,
+      })
+      if (rendered !== undefined) {
+        out.push(...rendered)
+        if (result) renderedResults.add(part.toolId)
+        continue
+      }
       const preview = part.argsPreview ? sanitizeText(part.argsPreview) : ""
       const line =
         theme.fg("muted", "→ ") +
@@ -122,14 +175,30 @@ export function buildTranscriptLines(
   theme: Theme,
 ): string[] {
   const out: string[] = []
+  const results = new Map<
+    string,
+    Extract<TranscriptItem, { kind: "toolResult" }>
+  >()
+  for (const item of snap.transcript) {
+    if (item.kind === "toolResult") results.set(item.toolId, item)
+  }
+  const renderedResults = new Set<string>()
 
   for (const item of snap.transcript) {
     const before = out.length
     if (item.kind === "user") {
       renderUserText(theme, item.text, width, out)
     } else if (item.kind === "assistant") {
-      renderAssistantItem(theme, item, width, out)
-    } else {
+      renderAssistantItem(
+        theme,
+        item,
+        width,
+        out,
+        snap,
+        results,
+        renderedResults,
+      )
+    } else if (!renderedResults.has(item.toolId)) {
       renderToolResultItem(theme, item, width, out)
     }
     if (out.length > before) out.push("")

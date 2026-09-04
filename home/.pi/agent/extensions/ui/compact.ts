@@ -15,6 +15,7 @@ import {
   type ToolRenderResultOptions,
 } from "@earendil-works/pi-coding-agent"
 import {
+  Box,
   Container,
   Text,
   truncateToWidth,
@@ -648,6 +649,142 @@ function clampLines(lines: string[], width: number): string[] {
   return lines.map((line) => truncateToWidth(line, width, "…"))
 }
 
+interface SubagentTranscriptToolRenderRequest {
+  readonly call: {
+    readonly type: "toolCall"
+    readonly toolId: string
+    readonly name: string
+    readonly displayArgs?: unknown
+  }
+  readonly result?: {
+    readonly kind: "toolResult"
+    readonly isError: boolean
+    readonly displayResult?: unknown
+  }
+  readonly snapshot: { readonly cwd: string }
+  readonly width: number
+  readonly theme: Theme
+}
+
+type SubagentTranscriptToolRenderer = (
+  request: SubagentTranscriptToolRenderRequest,
+) => string[] | undefined
+
+interface ToolDisplayRenderContext {
+  readonly args: unknown
+  readonly state: Record<string, unknown>
+  readonly lastComponent: Component | undefined
+  readonly invalidate: () => void
+  readonly toolCallId: string
+  readonly cwd: string
+  readonly executionStarted: boolean
+  readonly argsComplete: boolean
+  readonly isPartial: boolean
+  readonly expanded: boolean
+  readonly showImages: boolean
+  readonly isError: boolean
+}
+
+interface ToolDisplayDefinition {
+  readonly renderCall?: (
+    args: unknown,
+    theme: Theme,
+    context: ToolDisplayRenderContext,
+  ) => Component
+  readonly renderResult?: (
+    result: unknown,
+    options: ToolRenderResultOptions,
+    theme: Theme,
+    context: ToolDisplayRenderContext,
+  ) => Component
+}
+
+interface ToolDisplayApi {
+  readonly version: 1
+  readonly decorateTool: (
+    tool: Record<string, unknown>,
+    adapter?: Record<string, unknown>,
+  ) => ToolDisplayDefinition
+}
+
+const toolDisplayApiKey = Symbol.for("pi-tool-display.api.v1")
+const subagentTranscriptToolRendererKey = Symbol.for(
+  "pi-subagents.transcriptToolRenderer.v1",
+)
+
+type GlobalWithToolRenderers = typeof globalThis & {
+  [toolDisplayApiKey]?: ToolDisplayApi
+  [subagentTranscriptToolRendererKey]?: SubagentTranscriptToolRenderer
+}
+
+function createSubagentTranscriptToolRenderer(getMinimal: () => boolean) {
+  let cache = new WeakMap<object, Component>()
+
+  return {
+    render(request: SubagentTranscriptToolRenderRequest) {
+      const { call, result, snapshot, theme, width } = request
+      if (
+        !getMinimal() ||
+        call.name !== "edit" ||
+        call.displayArgs === undefined ||
+        result?.displayResult === undefined
+      )
+        return undefined
+
+      const api = (globalThis as GlobalWithToolRenderers)[toolDisplayApiKey]
+      if (api?.version !== 1) return undefined
+
+      const cacheKey =
+        result.displayResult !== null &&
+        typeof result.displayResult === "object"
+          ? result.displayResult
+          : undefined
+      let component = cacheKey ? cache.get(cacheKey) : undefined
+      if (!component) {
+        const tool = api.decorateTool(
+          { name: "edit" },
+          { kind: "edit", overrideExistingRenderers: true },
+        )
+        if (!tool.renderCall || !tool.renderResult) return undefined
+
+        const state: Record<string, unknown> = {}
+        const context: ToolDisplayRenderContext = {
+          args: call.displayArgs,
+          state,
+          lastComponent: undefined,
+          invalidate: () => {},
+          toolCallId: call.toolId,
+          cwd: snapshot.cwd,
+          executionStarted: true,
+          argsComplete: true,
+          isPartial: false,
+          expanded: false,
+          showImages: false,
+          isError: result.isError,
+        }
+        const background = result.isError ? "toolErrorBg" : "toolSuccessBg"
+        const box = new Box(1, 1, (text) => theme.bg(background, text))
+        box.addChild(tool.renderCall(call.displayArgs, theme, context))
+        box.addChild(
+          tool.renderResult(
+            result.displayResult,
+            { expanded: false, isPartial: false },
+            theme,
+            context,
+          ),
+        )
+        component = box
+        if (cacheKey) cache.set(cacheKey, component)
+      }
+
+      return clampLines(component.render(width), width)
+    },
+    invalidate() {
+      cache = new WeakMap()
+    },
+  }
+}
+
 function compactTakeoverTool(
   value: string,
   output: string | undefined,
@@ -688,6 +825,7 @@ export function compactSubagentTakeover(
     const plain = plainTerminalText(line).trim()
     if (!plain) {
       paragraph = undefined
+      if (line) body.push(line)
       continue
     }
     if (plain.startsWith("> ")) {
@@ -767,6 +905,14 @@ export function installMinimalCustomUi(
   ui: ExtensionUIContext,
   getMinimal: () => boolean,
 ) {
+  const globalWithRenderers = globalThis as GlobalWithToolRenderers
+  const editRenderer = createSubagentTranscriptToolRenderer(getMinimal)
+  const previousTranscriptRenderer =
+    globalWithRenderers[subagentTranscriptToolRendererKey]
+  const transcriptRenderer: SubagentTranscriptToolRenderer = (request) =>
+    editRenderer.render(request) ?? previousTranscriptRenderer?.(request)
+  globalWithRenderers[subagentTranscriptToolRendererKey] = transcriptRenderer
+
   const originalCustom = ui.custom
   const custom: ExtensionUIContext["custom"] = (factory, options) =>
     originalCustom(
@@ -776,8 +922,13 @@ export function installMinimalCustomUi(
             if (!getMinimal() || component.constructor.name !== "TakeoverView")
               return component
             const render = component.render.bind(component)
+            const invalidate = component.invalidate.bind(component)
             component.render = (width) =>
               compactSubagentTakeover(render(width), width, theme)
+            component.invalidate = () => {
+              editRenderer.invalidate()
+              invalidate()
+            }
             return component
           },
         ),
@@ -786,6 +937,15 @@ export function installMinimalCustomUi(
   ui.custom = custom
   return () => {
     if (ui.custom === custom) ui.custom = originalCustom
+    if (
+      globalWithRenderers[subagentTranscriptToolRendererKey] ===
+      transcriptRenderer
+    ) {
+      if (previousTranscriptRenderer)
+        globalWithRenderers[subagentTranscriptToolRendererKey] =
+          previousTranscriptRenderer
+      else delete globalWithRenderers[subagentTranscriptToolRendererKey]
+    }
   }
 }
 

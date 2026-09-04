@@ -387,6 +387,7 @@ export function createSubagentManager(
           outputPreview: event.outputPreview
             ? boundedTranscriptText(event.outputPreview)
             : undefined,
+          displayResult: event.displayResult,
         })
         break
       case "QueueChanged":

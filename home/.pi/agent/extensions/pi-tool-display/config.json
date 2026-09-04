@@ -9,12 +9,38 @@
     "edit": true,
     "write": true
   },
-  "customToolOverrides": {},
+  "customToolOverrides": {
+    "subagent_spawn": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "opencode"
+    },
+    "subagent_wait": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "hidden"
+    },
+    "subagent_cancel": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "hidden"
+    },
+    "subagent_check": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "hidden"
+    },
+    "subagent_list": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "hidden"
+    }
+  },
   "enableNativeUserMessageBox": false,
   "readOutputMode": "hidden",
   "searchOutputMode": "hidden",
   "mcpOutputMode": "hidden",
-  "previewLines": 8,
+  "previewLines": 6,
   "expandedPreviewMaxLines": 4000,
   "bashOutputMode": "opencode",
   "bashCollapsedLines": 10,

@@ -4,6 +4,7 @@ import {
   AssistantMessageComponent,
   initTheme,
   ToolExecutionComponent,
+  type ExtensionUIContext,
   type Theme,
   UserMessageComponent,
 } from "@earendil-works/pi-coding-agent"
@@ -12,6 +13,7 @@ import { type TUI, visibleWidth, Text } from "@earendil-works/pi-tui"
 import {
   compactSubagentTakeover,
   installCompactMessages,
+  installMinimalCustomUi,
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
@@ -19,6 +21,7 @@ import {
 initTheme("dark")
 
 const theme = {
+  bg: (_color: string, text: string) => text,
   bold: (text: string) => text,
   fg: (_color: string, text: string) => text,
   italic: (text: string) => text,
@@ -161,6 +164,81 @@ describe("compactSubagentTakeover", () => {
     expect(transcript).not.toContain("~ Thinking")
     expect(transcript).toContain('  ✓ fd {"path":"/tmp"} · /tmp/example.ts')
     expect(transcript).not.toContain("output:")
+  })
+})
+
+describe("installMinimalCustomUi", () => {
+  test("renders completed edits through pi-tool-display only in minimal", () => {
+    const apiKey = Symbol.for("pi-tool-display.api.v1")
+    const rendererKey = Symbol.for("pi-subagents.transcriptToolRenderer.v1")
+    const previousApi = Reflect.get(globalThis, apiKey)
+    const decorateTool = vi.fn(() => ({
+      renderCall: () => new Text("pi-display edit demo.ts", 0, 0),
+      renderResult: () => new Text("pi-display diff +1 -1", 0, 0),
+    }))
+    Reflect.set(globalThis, apiKey, { version: 1, decorateTool })
+
+    let minimal = true
+    const ui = { custom: vi.fn() } as unknown as ExtensionUIContext
+    const restore = installMinimalCustomUi(ui, () => minimal)
+    const renderer = Reflect.get(globalThis, rendererKey) as
+      | ((request: {
+          call: {
+            type: "toolCall"
+            toolId: string
+            name: string
+            displayArgs: unknown
+          }
+          result: {
+            kind: "toolResult"
+            isError: boolean
+            displayResult: unknown
+          }
+          snapshot: { cwd: string }
+          width: number
+          theme: Theme
+        }) => string[] | undefined)
+      | undefined
+    const displayResult = { details: { diff: "+new" } }
+    const bg = vi.fn((_color: string, text: string) => text)
+    const displayTheme = { ...theme, bg } as unknown as Theme
+    const request = {
+      call: {
+        type: "toolCall" as const,
+        toolId: "tool-1",
+        name: "edit",
+        displayArgs: { path: "demo.ts" },
+      },
+      result: {
+        kind: "toolResult" as const,
+        isError: false,
+        displayResult,
+      },
+      snapshot: { cwd: "/tmp/project" },
+      width: 80,
+      theme: displayTheme,
+    }
+
+    try {
+      expect(
+        renderer?.(request)
+          ?.map((line) => line.trim())
+          .filter(Boolean),
+      ).toEqual(["pi-display edit demo.ts", "pi-display diff +1 -1"])
+      expect(
+        renderer?.(request)
+          ?.map((line) => line.trim())
+          .filter(Boolean),
+      ).toEqual(["pi-display edit demo.ts", "pi-display diff +1 -1"])
+      expect(decorateTool).toHaveBeenCalledTimes(1)
+      expect(bg).toHaveBeenCalledWith("toolSuccessBg", expect.any(String))
+      minimal = false
+      expect(renderer?.(request)).toBeUndefined()
+    } finally {
+      restore()
+      if (previousApi === undefined) Reflect.deleteProperty(globalThis, apiKey)
+      else Reflect.set(globalThis, apiKey, previousApi)
+    }
   })
 })
 
