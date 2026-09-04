@@ -22,13 +22,13 @@ test("toolSchema emits pi-compatible JSON Schema", () => {
     enum: ["web", "news"],
     type: "string",
   })
-  assert.equal(schema["~unsafe"], null)
+  // Must stay free of provider-rejected marker keys (Codex 500s on "~unsafe").
+  assert.ok(!("~unsafe" in schema))
 })
 
 test("unsafeSchema preserves caller JSON Schema", () => {
   assert.deepEqual(unsafeSchema({ type: "string", minLength: 1 }), {
     type: "string",
     minLength: 1,
-    "~unsafe": null,
   })
 })
