@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs"
 import { mkdtemp, writeFile } from "node:fs/promises"
 import { homedir, tmpdir } from "node:os"
 import { join } from "node:path"
-import { StringEnum } from "@earendil-works/pi-ai"
 import {
   DEFAULT_MAX_BYTES,
   DEFAULT_MAX_LINES,
@@ -13,7 +12,8 @@ import {
   type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent"
 import { Firecrawl, type CrawlJob, type CrawlOptions } from "firecrawl"
-import { Type } from "typebox"
+import * as v from "valibot"
+import { toolSchema } from "../shared/schema.ts"
 import {
   CRAWL_PARAMETER_DESCRIPTIONS,
   CRAWL_PROMPT_GUIDELINES,
@@ -252,24 +252,29 @@ export default function firecrawlTools(pi: ExtensionAPI) {
     description: SEARCH_TOOL_DESCRIPTION,
     promptSnippet: SEARCH_PROMPT_SNIPPET,
     promptGuidelines: SEARCH_PROMPT_GUIDELINES,
-    parameters: Type.Object({
-      query: Type.String({
-        description: SEARCH_PARAMETER_DESCRIPTIONS.query,
+    parameters: toolSchema(
+      v.object({
+        query: v.pipe(
+          v.string(),
+          v.description(SEARCH_PARAMETER_DESCRIPTIONS.query),
+        ),
+        limit: v.optional(
+          v.pipe(
+            v.number(),
+            v.minValue(1),
+            v.maxValue(20),
+            v.description(SEARCH_PARAMETER_DESCRIPTIONS.limit),
+          ),
+        ),
+        source: v.optional(v.picklist(["web", "news", "images"])),
+        scrapeResults: v.optional(
+          v.pipe(
+            v.boolean(),
+            v.description(SEARCH_PARAMETER_DESCRIPTIONS.scrapeResults),
+          ),
+        ),
       }),
-      limit: Type.Optional(
-        Type.Number({
-          description: SEARCH_PARAMETER_DESCRIPTIONS.limit,
-          minimum: 1,
-          maximum: 20,
-        }),
-      ),
-      source: Type.Optional(StringEnum(["web", "news", "images"] as const)),
-      scrapeResults: Type.Optional(
-        Type.Boolean({
-          description: SEARCH_PARAMETER_DESCRIPTIONS.scrapeResults,
-        }),
-      ),
-    }),
+    ),
     execute: (_toolCallId, params, signal, onUpdate) =>
       runFirecrawl(
         "search",
@@ -299,55 +304,68 @@ export default function firecrawlTools(pi: ExtensionAPI) {
     description: CRAWL_TOOL_DESCRIPTION,
     promptSnippet: CRAWL_PROMPT_SNIPPET,
     promptGuidelines: CRAWL_PROMPT_GUIDELINES,
-    parameters: Type.Object({
-      url: Type.String({ description: CRAWL_PARAMETER_DESCRIPTIONS.url }),
-      limit: Type.Optional(
-        Type.Number({
-          description: CRAWL_PARAMETER_DESCRIPTIONS.limit,
-          minimum: 1,
-          maximum: 100,
-        }),
-      ),
-      maxDiscoveryDepth: Type.Optional(
-        Type.Number({
-          description: CRAWL_PARAMETER_DESCRIPTIONS.maxDiscoveryDepth,
-          minimum: 0,
-        }),
-      ),
-      includePaths: Type.Optional(
-        Type.Array(Type.String(), {
-          description: CRAWL_PARAMETER_DESCRIPTIONS.includePaths,
-        }),
-      ),
-      excludePaths: Type.Optional(
-        Type.Array(Type.String(), {
-          description: CRAWL_PARAMETER_DESCRIPTIONS.excludePaths,
-        }),
-      ),
-      crawlEntireDomain: Type.Optional(
-        Type.Boolean({
-          description: CRAWL_PARAMETER_DESCRIPTIONS.crawlEntireDomain,
-        }),
-      ),
-      allowSubdomains: Type.Optional(
-        Type.Boolean({
-          description: CRAWL_PARAMETER_DESCRIPTIONS.allowSubdomains,
-        }),
-      ),
-      sitemap: Type.Optional(StringEnum(["include", "skip", "only"] as const)),
-      onlyMainContent: Type.Optional(
-        Type.Boolean({
-          description: CRAWL_PARAMETER_DESCRIPTIONS.onlyMainContent,
-        }),
-      ),
-      timeout: Type.Optional(
-        Type.Number({
-          description: CRAWL_PARAMETER_DESCRIPTIONS.timeout,
-          minimum: 1,
-          maximum: 600,
-        }),
-      ),
-    }),
+    parameters: toolSchema(
+      v.object({
+        url: v.pipe(
+          v.string(),
+          v.description(CRAWL_PARAMETER_DESCRIPTIONS.url),
+        ),
+        limit: v.optional(
+          v.pipe(
+            v.number(),
+            v.minValue(1),
+            v.maxValue(100),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.limit),
+          ),
+        ),
+        maxDiscoveryDepth: v.optional(
+          v.pipe(
+            v.number(),
+            v.minValue(0),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.maxDiscoveryDepth),
+          ),
+        ),
+        includePaths: v.optional(
+          v.pipe(
+            v.array(v.string()),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.includePaths),
+          ),
+        ),
+        excludePaths: v.optional(
+          v.pipe(
+            v.array(v.string()),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.excludePaths),
+          ),
+        ),
+        crawlEntireDomain: v.optional(
+          v.pipe(
+            v.boolean(),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.crawlEntireDomain),
+          ),
+        ),
+        allowSubdomains: v.optional(
+          v.pipe(
+            v.boolean(),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.allowSubdomains),
+          ),
+        ),
+        sitemap: v.optional(v.picklist(["include", "skip", "only"])),
+        onlyMainContent: v.optional(
+          v.pipe(
+            v.boolean(),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.onlyMainContent),
+          ),
+        ),
+        timeout: v.optional(
+          v.pipe(
+            v.number(),
+            v.minValue(1),
+            v.maxValue(600),
+            v.description(CRAWL_PARAMETER_DESCRIPTIONS.timeout),
+          ),
+        ),
+      }),
+    ),
     execute: (_toolCallId, params, signal, onUpdate) =>
       runFirecrawl(
         "crawl",
@@ -385,33 +403,42 @@ export default function firecrawlTools(pi: ExtensionAPI) {
     description: SCRAPE_TOOL_DESCRIPTION,
     promptSnippet: SCRAPE_PROMPT_SNIPPET,
     promptGuidelines: SCRAPE_PROMPT_GUIDELINES,
-    parameters: Type.Object({
-      url: Type.String({ description: SCRAPE_PARAMETER_DESCRIPTIONS.url }),
-      onlyMainContent: Type.Optional(
-        Type.Boolean({
-          description: SCRAPE_PARAMETER_DESCRIPTIONS.onlyMainContent,
-        }),
-      ),
-      waitFor: Type.Optional(
-        Type.Number({
-          description: SCRAPE_PARAMETER_DESCRIPTIONS.waitFor,
-          minimum: 0,
-          maximum: 60_000,
-        }),
-      ),
-      timeout: Type.Optional(
-        Type.Number({
-          description: SCRAPE_PARAMETER_DESCRIPTIONS.timeout,
-          minimum: 1,
-          maximum: 120_000,
-        }),
-      ),
-      includeMetadata: Type.Optional(
-        Type.Boolean({
-          description: SCRAPE_PARAMETER_DESCRIPTIONS.includeMetadata,
-        }),
-      ),
-    }),
+    parameters: toolSchema(
+      v.object({
+        url: v.pipe(
+          v.string(),
+          v.description(SCRAPE_PARAMETER_DESCRIPTIONS.url),
+        ),
+        onlyMainContent: v.optional(
+          v.pipe(
+            v.boolean(),
+            v.description(SCRAPE_PARAMETER_DESCRIPTIONS.onlyMainContent),
+          ),
+        ),
+        waitFor: v.optional(
+          v.pipe(
+            v.number(),
+            v.minValue(0),
+            v.maxValue(60_000),
+            v.description(SCRAPE_PARAMETER_DESCRIPTIONS.waitFor),
+          ),
+        ),
+        timeout: v.optional(
+          v.pipe(
+            v.number(),
+            v.minValue(1),
+            v.maxValue(120_000),
+            v.description(SCRAPE_PARAMETER_DESCRIPTIONS.timeout),
+          ),
+        ),
+        includeMetadata: v.optional(
+          v.pipe(
+            v.boolean(),
+            v.description(SCRAPE_PARAMETER_DESCRIPTIONS.includeMetadata),
+          ),
+        ),
+      }),
+    ),
     execute: (_toolCallId, params, signal, onUpdate) =>
       runFirecrawl(
         "scrape",

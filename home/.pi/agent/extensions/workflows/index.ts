@@ -32,8 +32,9 @@ import {
   type ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
 import { Container, Markdown, Spacer, Text } from "@earendil-works/pi-tui"
-import { Type, type Static } from "typebox"
 import { formatActivityStatus } from "@pi/shared/activity-status"
+import { toolSchema } from "@pi/shared/schema"
+import * as v from "valibot"
 import { createWorkflowPersistence, persistWorkflowJson } from "./artifacts.ts"
 import { RunController } from "./controller.ts"
 import { sessionWorkflowRunIds, showWorkflowDashboard } from "./dashboard.ts"
@@ -107,23 +108,24 @@ interface AgentCallOptions {
   effort?: unknown
 }
 
-const WorkflowParams = Type.Object({
-  script: Type.String({
-    description: WORKFLOW_PARAMETER_DESCRIPTIONS.script,
-  }),
-  args: Type.Optional(
-    Type.String({
-      description: WORKFLOW_PARAMETER_DESCRIPTIONS.args,
-    }),
+const WorkflowSchema = v.object({
+  script: v.pipe(
+    v.string(),
+    v.description(WORKFLOW_PARAMETER_DESCRIPTIONS.script),
   ),
-  background: Type.Optional(
-    Type.Boolean({
-      description: WORKFLOW_PARAMETER_DESCRIPTIONS.background,
-    }),
+  args: v.optional(
+    v.pipe(v.string(), v.description(WORKFLOW_PARAMETER_DESCRIPTIONS.args)),
+  ),
+  background: v.optional(
+    v.pipe(
+      v.boolean(),
+      v.description(WORKFLOW_PARAMETER_DESCRIPTIONS.background),
+    ),
   ),
 })
+const WorkflowParams = toolSchema(WorkflowSchema)
 
-type WorkflowInput = Static<typeof WorkflowParams>
+type WorkflowInput = v.InferOutput<typeof WorkflowSchema>
 
 function errorText(error: unknown): string {
   return (error instanceof Error ? error.message : String(error)).slice(

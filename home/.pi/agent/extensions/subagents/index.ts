@@ -21,7 +21,6 @@
 
 import * as fs from "node:fs"
 import * as path from "node:path"
-import { StringEnum } from "@earendil-works/pi-ai"
 import type {
   ExtensionAPI,
   ExtensionCommandContext,
@@ -39,7 +38,8 @@ import {
 } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
 import { cacheRenderer } from "@pi/shared/render-cache"
-import { Type } from "typebox"
+import { toolSchema } from "@pi/shared/schema"
+import * as v from "valibot"
 import { pick } from "../model-shortcuts/src/picker.ts"
 import { deriveBtwTitle, isModelVisible } from "./src/by-the-way.ts"
 import { loadSubagentDefaults, saveSubagentDefaults } from "./src/defaults.ts"
@@ -267,34 +267,44 @@ export default function (pi: ExtensionAPI) {
     description: SUBAGENT_SPAWN_TOOL_DESCRIPTION,
     promptSnippet: SUBAGENT_SPAWN_PROMPT_SNIPPET,
     promptGuidelines: SUBAGENT_SPAWN_PROMPT_GUIDELINES,
-    parameters: Type.Object({
-      prompt: Type.String({
-        description: SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.prompt,
+    parameters: toolSchema(
+      v.object({
+        prompt: v.pipe(
+          v.string(),
+          v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.prompt),
+        ),
+        name: v.pipe(
+          v.string(),
+          v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.name),
+        ),
+        harness: v.optional(
+          v.pipe(
+            v.picklist(BACKEND_NAMES),
+            v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.harness),
+          ),
+        ),
+        working_dir: v.optional(
+          v.pipe(
+            v.string(),
+            v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.workingDir),
+          ),
+        ),
+        model: v.optional(
+          v.pipe(
+            v.string(),
+            v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.model),
+          ),
+        ),
+        reasoning_effort: v.optional(
+          v.pipe(
+            v.picklist(REASONING_EFFORTS),
+            v.description(
+              SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.reasoningEffort,
+            ),
+          ),
+        ),
       }),
-      name: Type.String({
-        description: SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.name,
-      }),
-      harness: Type.Optional(
-        StringEnum(BACKEND_NAMES, {
-          description: SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.harness,
-        }),
-      ),
-      working_dir: Type.Optional(
-        Type.String({
-          description: SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.workingDir,
-        }),
-      ),
-      model: Type.Optional(
-        Type.String({
-          description: SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.model,
-        }),
-      ),
-      reasoning_effort: Type.Optional(
-        StringEnum(REASONING_EFFORTS, {
-          description: SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.reasoningEffort,
-        }),
-      ),
-    }),
+    ),
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const manager = await getManager()
       const defaults = loadSubagentDefaults()
@@ -365,12 +375,15 @@ export default function (pi: ExtensionAPI) {
     name: "subagent_wait",
     label: "Wait for Subagents",
     description: SUBAGENT_WAIT_TOOL_DESCRIPTION,
-    parameters: Type.Object({
-      ids: Type.Array(Type.String(), {
-        maxItems: 64,
-        description: SUBAGENT_WAIT_PARAMETER_DESCRIPTIONS.ids,
+    parameters: toolSchema(
+      v.object({
+        ids: v.pipe(
+          v.array(v.string()),
+          v.maxLength(64),
+          v.description(SUBAGENT_WAIT_PARAMETER_DESCRIPTIONS.ids),
+        ),
       }),
-    }),
+    ),
     async execute(_toolCallId, params, signal, onUpdate) {
       const manager = await getManager()
       const ids = [...new Set(params.ids)]
@@ -461,11 +474,14 @@ export default function (pi: ExtensionAPI) {
     name: "subagent_cancel",
     label: "Cancel Subagents",
     description: SUBAGENT_CANCEL_TOOL_DESCRIPTION,
-    parameters: Type.Object({
-      ids: Type.Array(Type.String(), {
-        description: SUBAGENT_CANCEL_PARAMETER_DESCRIPTIONS.ids,
+    parameters: toolSchema(
+      v.object({
+        ids: v.pipe(
+          v.array(v.string()),
+          v.description(SUBAGENT_CANCEL_PARAMETER_DESCRIPTIONS.ids),
+        ),
       }),
-    }),
+    ),
     async execute(_toolCallId, params, signal) {
       const manager = await getManager()
       const ids = [...new Set(params.ids)]
@@ -513,11 +529,14 @@ export default function (pi: ExtensionAPI) {
     name: "subagent_check",
     label: "Check Subagent",
     description: SUBAGENT_CHECK_TOOL_DESCRIPTION,
-    parameters: Type.Object({
-      id: Type.String({
-        description: SUBAGENT_CHECK_PARAMETER_DESCRIPTIONS.id,
+    parameters: toolSchema(
+      v.object({
+        id: v.pipe(
+          v.string(),
+          v.description(SUBAGENT_CHECK_PARAMETER_DESCRIPTIONS.id),
+        ),
       }),
-    }),
+    ),
     async execute(_toolCallId, params) {
       const manager = await getManager()
       const snap = manager.view.get(params.id)
@@ -554,7 +573,7 @@ export default function (pi: ExtensionAPI) {
     name: "subagent_list",
     label: "List Subagents",
     description: SUBAGENT_LIST_TOOL_DESCRIPTION,
-    parameters: Type.Object({}),
+    parameters: toolSchema(v.object({})),
     async execute() {
       const manager = await getManager()
       const subs = manager.view.list().filter(isModelVisible)

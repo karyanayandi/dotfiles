@@ -23,13 +23,14 @@ import {
   type ExtensionContext,
   type ToolDefinition,
 } from "@earendil-works/pi-coding-agent"
-import { Type, type TSchema } from "typebox"
+import type { JsonSchema } from "@valibot/to-json-schema"
 import {
   bindChildSessionExtensions,
   childToolPolicy,
   createChildResources,
   shutdownAndDisposeChildSession,
 } from "@pi/shared/child-session"
+import { unsafeSchema } from "@pi/shared/schema"
 import { createToolCallTimeoutGuard } from "@pi/shared/tool-call-timeout"
 import { emptyUsage, type AgentUsage, type TranscriptEntry } from "./model.ts"
 import {
@@ -131,7 +132,7 @@ export function guardWorkflowChildTools(
   })
 }
 
-function isJsonSchema(value: unknown): value is TSchema {
+function isJsonSchema(value: unknown): value is JsonSchema {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false
   const seen = new WeakSet<object>()
   let nodes = 0
@@ -162,11 +163,11 @@ function isJsonSchema(value: unknown): value is TSchema {
 }
 
 /** Preserve the caller's full JSON Schema instead of lossy keyword conversion. */
-function jsonSchemaToTypebox(schema: unknown): TSchema {
+function structuredOutputSchema(schema: unknown) {
   if (!isJsonSchema(schema)) {
     throw new Error("structured output schema must be a bounded JSON object")
   }
-  return Type.Unsafe(schema)
+  return unsafeSchema(schema)
 }
 
 /**
@@ -181,7 +182,7 @@ function makeStructuredOutputTool(
     name: "structured_output",
     label: "Structured Output",
     description: STRUCTURED_OUTPUT_TOOL_DESCRIPTION,
-    parameters: jsonSchemaToTypebox(schema),
+    parameters: structuredOutputSchema(schema),
     async execute(_toolCallId, params) {
       capture(params)
       return {

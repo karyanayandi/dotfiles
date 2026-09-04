@@ -27,7 +27,8 @@ import type {
 import { getMarkdownTheme } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
 import { cacheRenderer } from "@pi/shared/render-cache"
-import { Type } from "typebox"
+import { toolSchema } from "@pi/shared/schema"
+import * as v from "valibot"
 import type { TerminalSnapshot } from "./src/domain.ts"
 import type { TerminalManagerShape } from "./src/manager.ts"
 import {
@@ -207,19 +208,24 @@ export default function (pi: ExtensionAPI) {
     description: BG_START_TOOL_DESCRIPTION,
     promptSnippet: BG_START_PROMPT_SNIPPET,
     promptGuidelines: BG_START_PROMPT_GUIDELINES,
-    parameters: Type.Object({
-      command: Type.String({
-        description: BG_START_PARAMETER_DESCRIPTIONS.command,
+    parameters: toolSchema(
+      v.object({
+        command: v.pipe(
+          v.string(),
+          v.description(BG_START_PARAMETER_DESCRIPTIONS.command),
+        ),
+        title: v.pipe(
+          v.string(),
+          v.description(BG_START_PARAMETER_DESCRIPTIONS.title),
+        ),
+        working_dir: v.optional(
+          v.pipe(
+            v.string(),
+            v.description(BG_START_PARAMETER_DESCRIPTIONS.workingDir),
+          ),
+        ),
       }),
-      title: Type.String({
-        description: BG_START_PARAMETER_DESCRIPTIONS.title,
-      }),
-      working_dir: Type.Optional(
-        Type.String({
-          description: BG_START_PARAMETER_DESCRIPTIONS.workingDir,
-        }),
-      ),
-    }),
+    ),
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       const manager = await getManager()
 
@@ -248,9 +254,14 @@ export default function (pi: ExtensionAPI) {
     name: "bg_status",
     label: "Check Background Terminal",
     description: BG_STATUS_TOOL_DESCRIPTION,
-    parameters: Type.Object({
-      id: Type.String({ description: BG_STATUS_PARAMETER_DESCRIPTIONS.id }),
-    }),
+    parameters: toolSchema(
+      v.object({
+        id: v.pipe(
+          v.string(),
+          v.description(BG_STATUS_PARAMETER_DESCRIPTIONS.id),
+        ),
+      }),
+    ),
     async execute(_toolCallId, params) {
       const manager = await getManager()
       const snap = manager.view.get(params.id)
@@ -282,7 +293,7 @@ export default function (pi: ExtensionAPI) {
     name: "bg_list",
     label: "List Background Terminals",
     description: BG_LIST_TOOL_DESCRIPTION,
-    parameters: Type.Object({}),
+    parameters: toolSchema(v.object({})),
     async execute() {
       const manager = await getManager()
       const terminals = manager.view.list()
@@ -308,11 +319,14 @@ export default function (pi: ExtensionAPI) {
     name: "bg_kill",
     label: "Kill Background Terminals",
     description: BG_KILL_TOOL_DESCRIPTION,
-    parameters: Type.Object({
-      ids: Type.Array(Type.String(), {
-        description: BG_KILL_PARAMETER_DESCRIPTIONS.ids,
+    parameters: toolSchema(
+      v.object({
+        ids: v.pipe(
+          v.array(v.string()),
+          v.description(BG_KILL_PARAMETER_DESCRIPTIONS.ids),
+        ),
       }),
-    }),
+    ),
     async execute(_toolCallId, params, signal) {
       const manager = await getManager()
       const ids = [...new Set(params.ids)]

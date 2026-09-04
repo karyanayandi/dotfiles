@@ -12,7 +12,8 @@ import {
   SettingsManager,
   type SessionShutdownEvent,
 } from "@earendil-works/pi-coding-agent"
-import { Type } from "typebox"
+import * as v from "valibot"
+import { toolSchema } from "./schema.ts"
 import {
   bindChildSessionExtensions,
   CHILD_EXCLUDED_TOOL_NAMES,
@@ -59,7 +60,7 @@ test("child denylist keeps extension and workflow structured tools available", a
               name,
               label: name,
               description: name,
-              parameters: Type.Object({}),
+              parameters: toolSchema(v.object({})),
               async execute() {
                 return {
                   content: [{ type: "text", text: "ok" }],
@@ -77,7 +78,7 @@ test("child denylist keeps extension and workflow structured tools available", a
       name: "structured_output",
       label: "Structured Output",
       description: "fixture structured result",
-      parameters: Type.Object({ value: Type.String() }),
+      parameters: toolSchema(v.object({ value: v.string() })),
       async execute(_id, params) {
         return {
           content: [{ type: "text", text: params.value }],

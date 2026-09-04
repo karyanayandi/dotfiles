@@ -16,7 +16,8 @@ import {
   Text,
   truncateToWidth,
 } from "@earendil-works/pi-tui"
-import { Type, type Static } from "typebox"
+import * as v from "valibot"
+import { toolSchema } from "../shared/schema.ts"
 import {
   ASK_USER_PARAMETER_DESCRIPTIONS,
   ASK_USER_PROMPT_GUIDELINES,
@@ -28,29 +29,34 @@ import {
 const MIN_OPTIONS = 2
 const MAX_OPTIONS = 5
 
-const OptionSchema = Type.Object({
-  label: Type.String({
-    description: ASK_USER_PARAMETER_DESCRIPTIONS.optionLabel,
-  }),
-  description: Type.Optional(
-    Type.String({
-      description: ASK_USER_PARAMETER_DESCRIPTIONS.optionDescription,
-    }),
+const OptionSchema = v.object({
+  label: v.pipe(
+    v.string(),
+    v.description(ASK_USER_PARAMETER_DESCRIPTIONS.optionLabel),
+  ),
+  description: v.optional(
+    v.pipe(
+      v.string(),
+      v.description(ASK_USER_PARAMETER_DESCRIPTIONS.optionDescription),
+    ),
   ),
 })
 
-const AskUserParams = Type.Object({
-  question: Type.String({
-    description: ASK_USER_PARAMETER_DESCRIPTIONS.question,
-  }),
-  options: Type.Array(OptionSchema, {
-    minItems: MIN_OPTIONS,
-    maxItems: MAX_OPTIONS,
-    description: ASK_USER_PARAMETER_DESCRIPTIONS.options,
-  }),
+const AskUserSchema = v.object({
+  question: v.pipe(
+    v.string(),
+    v.description(ASK_USER_PARAMETER_DESCRIPTIONS.question),
+  ),
+  options: v.pipe(
+    v.array(OptionSchema),
+    v.minLength(MIN_OPTIONS),
+    v.maxLength(MAX_OPTIONS),
+    v.description(ASK_USER_PARAMETER_DESCRIPTIONS.options),
+  ),
 })
+const AskUserParams = toolSchema(AskUserSchema)
 
-export type AskUserInput = Static<typeof AskUserParams>
+export type AskUserInput = v.InferOutput<typeof AskUserSchema>
 
 interface AskUserDetails {
   question: string

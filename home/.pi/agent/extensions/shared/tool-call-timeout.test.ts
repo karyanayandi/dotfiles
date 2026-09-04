@@ -1,7 +1,8 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 import type { ToolDefinition } from "@earendil-works/pi-coding-agent"
-import { Type } from "typebox"
+import * as v from "valibot"
+import { toolSchema } from "./schema.ts"
 import {
   createToolCallTimeoutGuard,
   runWithToolCallTimeout,
@@ -60,7 +61,7 @@ test("the guard wraps each definition once and can discover later tools", () => 
     name,
     label: name,
     description: name,
-    parameters: Type.Object({}),
+    parameters: toolSchema(v.object({})),
     async execute() {
       return { content: [{ type: "text", text: "done" }], details: {} }
     },

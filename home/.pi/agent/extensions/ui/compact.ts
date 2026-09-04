@@ -83,9 +83,6 @@ function getToolExecutionPrototype() {
   return ToolExecutionComponent.prototype as unknown as PatchableToolExecutionPrototype
 }
 
-// Workspace has two typebox builds: pi bundles 1.3.7 and root catalog resolves
-// 1.3.11. Their `Static<T>` types cannot assign to each other, so original tool
-// renderers use loose `any` signatures. Parameter types work both ways.
 type FallbackCall = (
   args: any,
   theme: Theme,

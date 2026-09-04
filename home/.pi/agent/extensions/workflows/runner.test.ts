@@ -5,7 +5,8 @@ import type {
   AgentSessionEventListener,
   ToolDefinition,
 } from "@earendil-works/pi-coding-agent"
-import { Type } from "typebox"
+import { toolSchema } from "@pi/shared/schema"
+import * as v from "valibot"
 import {
   createFirstResponseWatchdog,
   guardWorkflowChildTools,
@@ -221,7 +222,7 @@ test("workflow children guard structured, normal, and dynamically registered too
     name: "structured_output",
     label: "Structured Output",
     description: "fixture",
-    parameters: Type.Object({}),
+    parameters: toolSchema(v.object({})),
     async execute() {
       return structuredResult
     },
@@ -249,7 +250,7 @@ test("workflow children guard structured, normal, and dynamically registered too
     name: "dynamic_fixture",
     label: "Dynamic Fixture",
     description: "fixture",
-    parameters: Type.Object({}),
+    parameters: toolSchema(v.object({})),
     async execute(
       _toolCallId: string,
       _params: Record<string, never>,

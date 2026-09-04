@@ -5,9 +5,9 @@ import type {
   ExtensionAPI,
   ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
-import { StringEnum } from "@earendil-works/pi-ai"
 import { Text } from "@earendil-works/pi-tui"
-import { Type } from "typebox"
+import * as v from "valibot"
+import { toolSchema } from "../shared/schema.ts"
 import {
   buildFdArgs,
   buildRgArgs,
@@ -371,79 +371,78 @@ function expandedPreview(
   return text
 }
 
+function described<TSchema extends v.GenericSchema>(
+  schema: TSchema,
+  description: string,
+) {
+  return v.pipe(schema, v.description(description))
+}
+
+function boundedInteger(minimum: number, maximum: number, description: string) {
+  return described(
+    v.pipe(v.number(), v.integer(), v.minValue(minimum), v.maxValue(maximum)),
+    description,
+  )
+}
+
 function fdParameters() {
-  return Type.Object({
-    pattern: Type.Optional(
-      Type.String({ description: FD_PARAMETER_DESCRIPTIONS.pattern }),
-    ),
-    path: Type.Optional(
-      Type.String({ description: FD_PARAMETER_DESCRIPTIONS.path }),
-    ),
-    type: Type.Optional(
-      StringEnum(["file", "directory", "symlink"] as const, {
-        description: FD_PARAMETER_DESCRIPTIONS.type,
-      }),
-    ),
-    extension: Type.Optional(
-      Type.String({ description: FD_PARAMETER_DESCRIPTIONS.extension }),
-    ),
-    glob: Type.Optional(
-      Type.Boolean({ description: FD_PARAMETER_DESCRIPTIONS.glob }),
-    ),
-    hidden: Type.Optional(
-      Type.Boolean({ description: FD_PARAMETER_DESCRIPTIONS.hidden }),
-    ),
-    max_depth: Type.Optional(
-      Type.Integer({
-        description: FD_PARAMETER_DESCRIPTIONS.max_depth,
-        minimum: 1,
-        maximum: FD_MAX_DEPTH_LIMIT,
-      }),
-    ),
-    limit: Type.Optional(
-      Type.Integer({
-        description: FD_PARAMETER_DESCRIPTIONS.limit,
-        minimum: 1,
-        maximum: FD_MAX_LIMIT,
-      }),
-    ),
-  })
+  return toolSchema(
+    v.object({
+      pattern: v.optional(
+        described(v.string(), FD_PARAMETER_DESCRIPTIONS.pattern),
+      ),
+      path: v.optional(described(v.string(), FD_PARAMETER_DESCRIPTIONS.path)),
+      type: v.optional(
+        described(
+          v.picklist(["file", "directory", "symlink"]),
+          FD_PARAMETER_DESCRIPTIONS.type,
+        ),
+      ),
+      extension: v.optional(
+        described(v.string(), FD_PARAMETER_DESCRIPTIONS.extension),
+      ),
+      glob: v.optional(described(v.boolean(), FD_PARAMETER_DESCRIPTIONS.glob)),
+      hidden: v.optional(
+        described(v.boolean(), FD_PARAMETER_DESCRIPTIONS.hidden),
+      ),
+      max_depth: v.optional(
+        boundedInteger(
+          1,
+          FD_MAX_DEPTH_LIMIT,
+          FD_PARAMETER_DESCRIPTIONS.max_depth,
+        ),
+      ),
+      limit: v.optional(
+        boundedInteger(1, FD_MAX_LIMIT, FD_PARAMETER_DESCRIPTIONS.limit),
+      ),
+    }),
+  )
 }
 
 function rgParameters() {
-  return Type.Object({
-    pattern: Type.String({ description: RG_PARAMETER_DESCRIPTIONS.pattern }),
-    path: Type.Optional(
-      Type.String({ description: RG_PARAMETER_DESCRIPTIONS.path }),
-    ),
-    glob: Type.Optional(
-      Type.String({ description: RG_PARAMETER_DESCRIPTIONS.glob }),
-    ),
-    file_type: Type.Optional(
-      Type.String({ description: RG_PARAMETER_DESCRIPTIONS.file_type }),
-    ),
-    case_sensitive: Type.Optional(
-      Type.Boolean({ description: RG_PARAMETER_DESCRIPTIONS.case_sensitive }),
-    ),
-    fixed_strings: Type.Optional(
-      Type.Boolean({ description: RG_PARAMETER_DESCRIPTIONS.fixed_strings }),
-    ),
-    hidden: Type.Optional(
-      Type.Boolean({ description: RG_PARAMETER_DESCRIPTIONS.hidden }),
-    ),
-    context: Type.Optional(
-      Type.Integer({
-        description: RG_PARAMETER_DESCRIPTIONS.context,
-        minimum: 0,
-        maximum: RG_MAX_CONTEXT,
-      }),
-    ),
-    limit: Type.Optional(
-      Type.Integer({
-        description: RG_PARAMETER_DESCRIPTIONS.limit,
-        minimum: 1,
-        maximum: RG_MAX_COUNT_LIMIT,
-      }),
-    ),
-  })
+  return toolSchema(
+    v.object({
+      pattern: described(v.string(), RG_PARAMETER_DESCRIPTIONS.pattern),
+      path: v.optional(described(v.string(), RG_PARAMETER_DESCRIPTIONS.path)),
+      glob: v.optional(described(v.string(), RG_PARAMETER_DESCRIPTIONS.glob)),
+      file_type: v.optional(
+        described(v.string(), RG_PARAMETER_DESCRIPTIONS.file_type),
+      ),
+      case_sensitive: v.optional(
+        described(v.boolean(), RG_PARAMETER_DESCRIPTIONS.case_sensitive),
+      ),
+      fixed_strings: v.optional(
+        described(v.boolean(), RG_PARAMETER_DESCRIPTIONS.fixed_strings),
+      ),
+      hidden: v.optional(
+        described(v.boolean(), RG_PARAMETER_DESCRIPTIONS.hidden),
+      ),
+      context: v.optional(
+        boundedInteger(0, RG_MAX_CONTEXT, RG_PARAMETER_DESCRIPTIONS.context),
+      ),
+      limit: v.optional(
+        boundedInteger(1, RG_MAX_COUNT_LIMIT, RG_PARAMETER_DESCRIPTIONS.limit),
+      ),
+    }),
+  )
 }
