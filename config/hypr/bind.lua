@@ -1,6 +1,6 @@
 -- ~/.config/hypr/bind.lua
 
-local terminal = "foot"
+local terminal = "ghostty"
 local fileManager = "nemo"
 local browser = "helium-browser"
 local mainMod = "SUPER"
