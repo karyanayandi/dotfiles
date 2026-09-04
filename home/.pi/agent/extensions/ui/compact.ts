@@ -8,6 +8,7 @@ import {
   createReadToolDefinition,
   type AgentToolResult,
   type ExtensionAPI,
+  type ExtensionUIContext,
   type Theme,
   ToolExecutionComponent,
   type ToolDefinition,
@@ -337,6 +338,7 @@ export function registerCompactTools(
 export function installToolSpacing(
   getCompact: () => boolean,
   theme: Theme,
+  getMinimal: () => boolean = getCompact,
 ): () => void {
   const prototype = getToolExecutionPrototype()
   const previousOriginalRender = prototype.__piUiToolSpacingOriginalRender
@@ -531,6 +533,9 @@ export function installToolSpacing(
     // pair (or keep the call line), then wrap to width so long rows continue
     // onto the next line.
     const single =
+      (getMinimal()
+        ? formatSubagentToolCall(bareName, self.args, theme)
+        : undefined) ??
       formatCodeToolCall(bareName, self.args, theme) ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
         (args ? ` ${args}` : "")
@@ -598,6 +603,37 @@ function compactArgs(args: unknown, theme: Theme): string {
   return parts.join(" ")
 }
 
+function formatSubagentToolCall(name: string, args: unknown, theme: Theme) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) return undefined
+  const input = args as Record<string, unknown>
+  const ids = Array.isArray(input.ids)
+    ? input.ids.filter((id): id is string => typeof id === "string").join(", ")
+    : ""
+
+  switch (name) {
+    case "subagent_spawn":
+      return renderLine(
+        name,
+        withMeta(
+          compactText(input.name, "subagent"),
+          [input.harness, input.model, input.reasoning_effort]
+            .filter((value): value is string => typeof value === "string")
+            .join(" · ") || undefined,
+        ),
+        theme,
+      )
+    case "subagent_wait":
+    case "subagent_cancel":
+      return renderLine(name, { subject: compactText(ids) }, theme)
+    case "subagent_check":
+      return renderLine(name, { subject: compactText(input.id) }, theme)
+    case "subagent_list":
+      return theme.fg("toolTitle", theme.bold(name))
+    default:
+      return undefined
+  }
+}
+
 function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
   if (!args || typeof args !== "object" || Array.isArray(args)) return undefined
   const { code, language } = args as Record<string, unknown>
@@ -610,6 +646,147 @@ function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
 // line exceeds terminal width, regardless of renderShell or Box padding.
 function clampLines(lines: string[], width: number): string[] {
   return lines.map((line) => truncateToWidth(line, width, "…"))
+}
+
+function compactTakeoverTool(
+  value: string,
+  output: string | undefined,
+  status: "done" | "error" | "running",
+  width: number,
+  theme: Theme,
+) {
+  const [name = "", ...args] = value.split(/\s+/)
+  const marker =
+    status === "error"
+      ? theme.fg("error", "✕")
+      : status === "done"
+        ? theme.fg("success", "✓")
+        : theme.fg("muted", "·")
+  let text = theme.fg("toolTitle", theme.bold(name))
+  if (args.length > 0) text += ` ${theme.fg("accent", args.join(" "))}`
+  if (output) text += theme.fg("muted", ` · ${output}`)
+  return truncateToWidth(`${COMPACT_INDENT}${marker} ${text}`, width, "…")
+}
+
+export function compactSubagentTakeover(
+  lines: string[],
+  width: number,
+  theme: Theme,
+) {
+  const border = "─".repeat(Math.max(1, width))
+  const borders = lines
+    .map((line, index) => (plainTerminalText(line) === border ? index : -1))
+    .filter((index) => index >= 0)
+  const start = (borders[1] ?? -1) + 1
+  const end = borders[2]
+  if (start <= 0 || end === undefined || end <= start) return lines
+
+  const body: string[] = []
+  const pending: Array<{ index: number; value: string }> = []
+  let paragraph: "thinking" | "user" | undefined
+  for (const line of lines.slice(start, end)) {
+    const plain = plainTerminalText(line).trim()
+    if (!plain) {
+      paragraph = undefined
+      continue
+    }
+    if (plain.startsWith("> ")) {
+      paragraph = "user"
+      body.push(theme.fg("dim", `${COMPACT_INDENT}› ${plain.slice(2)}`))
+      continue
+    }
+    if (plain.startsWith("~ ")) {
+      paragraph = "thinking"
+      body.push(
+        `${COMPACT_INDENT}${theme.fg("muted", theme.italic(plain.slice(2)))}`,
+      )
+      continue
+    }
+    if (plain.startsWith("→ ") || /^(?:output|error):/.test(plain)) {
+      paragraph = undefined
+    }
+    if (paragraph) {
+      body.push(
+        theme.fg(
+          paragraph === "user" ? "dim" : "muted",
+          `${COMPACT_INDENT.repeat(2)}${paragraph === "thinking" ? theme.italic(plain) : plain}`,
+        ),
+      )
+      continue
+    }
+    if (plain.startsWith("→ ")) {
+      const value = plain.slice(2)
+      pending.push({ index: body.length, value })
+      body.push(compactTakeoverTool(value, undefined, "running", width, theme))
+      continue
+    }
+    const result = /^(output|error):\s*(.*)$/.exec(plain)
+    if (result) {
+      const call = pending.shift()
+      const status = result[1] === "error" ? "error" : "done"
+      if (call) {
+        body[call.index] = compactTakeoverTool(
+          call.value,
+          result[2],
+          status,
+          width,
+          theme,
+        )
+      } else {
+        body.push(
+          compactTakeoverTool("output", result[2], status, width, theme),
+        )
+      }
+      continue
+    }
+    const live = /^(\S+)(?:\s+·\s+)(running|done|error)(?:\s+·\s+(.*))?$/.exec(
+      plain,
+    )
+    if (live) {
+      const status =
+        live[2] === "done" ? "done" : live[2] === "error" ? "error" : "running"
+      body.push(compactTakeoverTool(live[1], live[3], status, width, theme))
+      continue
+    }
+    body.push(line)
+  }
+
+  const height = end - start
+  const visible = body.slice(-height)
+  return [
+    ...lines.slice(0, start),
+    ...visible,
+    ...Array.from({ length: height - visible.length }, () => ""),
+    ...lines.slice(end),
+  ]
+}
+
+// Keep subagent takeover styling owned by this extension: wrap its custom UI
+// instance rather than coupling the subagents extension to a layout setting.
+export function installMinimalCustomUi(
+  ui: ExtensionUIContext,
+  getMinimal: () => boolean,
+) {
+  const originalCustom = ui.custom
+  const custom: ExtensionUIContext["custom"] = (factory, options) =>
+    originalCustom(
+      (tui, theme, keybindings, done) =>
+        Promise.resolve(factory(tui, theme, keybindings, done)).then(
+          (component) => {
+            if (!getMinimal() || component.constructor.name !== "TakeoverView")
+              return component
+            const render = component.render.bind(component)
+            component.render = (width) =>
+              compactSubagentTakeover(render(width), width, theme)
+            return component
+          },
+        ),
+      options,
+    )
+  ui.custom = custom
+  return () => {
+    if (ui.custom === custom) ui.custom = originalCustom
+  }
 }
 
 // --- compact message rendering ---

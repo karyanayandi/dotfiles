@@ -10,6 +10,7 @@ import {
 import { type TUI, visibleWidth, Text } from "@earendil-works/pi-tui"
 
 import {
+  compactSubagentTakeover,
   installCompactMessages,
   installToolSpacing,
   registerCompactTools,
@@ -20,6 +21,7 @@ initTheme("dark")
 const theme = {
   bold: (text: string) => text,
   fg: (_color: string, text: string) => text,
+  italic: (text: string) => text,
 } as unknown as Theme
 
 const tui = { requestRender: vi.fn() } as unknown as TUI
@@ -127,6 +129,38 @@ describe("registerCompactTools", () => {
     const lines = call?.render(80) ?? []
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.join("\n")).toContain("read")
+  })
+})
+
+describe("compactSubagentTakeover", () => {
+  test("uses minimal transcript rows without changing overlay chrome", () => {
+    const border = "─".repeat(80)
+    const lines = [
+      border,
+      "header",
+      border,
+      "> Read-only demo",
+      "~ Thinking: listing files",
+      '→ fd {"path":"/tmp"}',
+      "",
+      "  output: /tmp/example.ts",
+      "",
+      border,
+      "input",
+      "hints",
+      border,
+    ]
+
+    const compact = compactSubagentTakeover(lines, 80, theme)
+    const transcript = compact.slice(3, 9).join("\n")
+
+    expect(compact).toHaveLength(lines.length)
+    expect(compact.slice(0, 3)).toEqual(lines.slice(0, 3))
+    expect(transcript).toContain("  › Read-only demo")
+    expect(transcript).toContain("  Thinking: listing files")
+    expect(transcript).not.toContain("~ Thinking")
+    expect(transcript).toContain('  ✓ fd {"path":"/tmp"} · /tmp/example.ts')
+    expect(transcript).not.toContain("output:")
   })
 })
 
@@ -366,6 +400,57 @@ describe("installToolSpacing", () => {
     } finally {
       restore()
     }
+  })
+
+  test("formats subagent calls only in minimal layout", () => {
+    const args = {
+      prompt: "Review every file and report possible bugs",
+      name: "bug review",
+      harness: "pi",
+      reasoning_effort: "high",
+    }
+    const render = (minimal: boolean) => {
+      const tool: any = {
+        name: "subagent_spawn",
+        label: "Spawn Subagent",
+        description: "spawn",
+        parameters: {},
+        async execute() {
+          return { content: [], details: undefined }
+        },
+      }
+      const row = new ToolExecutionComponent(
+        "subagent_spawn",
+        "tool-1",
+        args,
+        {},
+        tool,
+        tui,
+        "/tmp/example",
+      )
+      row.setArgsComplete()
+      row.markExecutionStarted()
+      const restore = installToolSpacing(
+        () => true,
+        theme,
+        () => minimal,
+      )
+      try {
+        return row
+          .render(120)
+          .join("\n")
+          .replace(/\x1b\[[0-9;]*m/g, "")
+      } finally {
+        restore()
+      }
+    }
+
+    const minimal = render(true)
+    expect(minimal).toContain("subagent_spawn bug review pi · high")
+    expect(minimal).not.toContain(args.prompt)
+
+    const lite = render(false)
+    expect(lite).toContain(args.prompt)
   })
 
   test("shows code tools with code-block marker instead of fence marker", () => {

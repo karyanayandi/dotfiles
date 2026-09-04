@@ -27,6 +27,7 @@ import {
 } from "./layout.js"
 import {
   installCompactMessages,
+  installMinimalCustomUi,
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
@@ -198,6 +199,7 @@ export default function ui(pi: ExtensionAPI) {
   let outputTokens = 0
   let tokensDirty = true
   let restoreCompactMessages: (() => void) | undefined
+  let restoreMinimalCustomUi: (() => void) | undefined
   let restoreToolSpacing: (() => void) | undefined
   let restoreThinkingSelectorLabels: (() => void) | undefined
   let currentModel: ExtensionContext["model"]
@@ -205,6 +207,7 @@ export default function ui(pi: ExtensionAPI) {
   // pi-minimalist message and tool style applies only to minimal and lite.
   // Read getter at render time so `/ui layout` switches apply live.
   const getCompact = () => layout === "minimal" || layout === "lite"
+  const getMinimal = () => layout === "minimal"
   registerCompactTools(pi, getCompact)
 
   const fmt = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`)
@@ -420,9 +423,15 @@ export default function ui(pi: ExtensionAPI) {
     tokensDirty = true
     applySessionUI(ctx)
     restoreCompactMessages?.()
+    restoreMinimalCustomUi?.()
     restoreToolSpacing?.()
     restoreCompactMessages = installCompactMessages(ctx.ui.theme, getCompact)
-    restoreToolSpacing = installToolSpacing(getCompact, ctx.ui.theme)
+    restoreMinimalCustomUi = installMinimalCustomUi(ctx.ui, getMinimal)
+    restoreToolSpacing = installToolSpacing(
+      getCompact,
+      ctx.ui.theme,
+      getMinimal,
+    )
     if (getCompact()) ctx.ui.setHiddenThinkingLabel("")
     void refreshGit(ctx.cwd)
 
@@ -556,6 +565,8 @@ export default function ui(pi: ExtensionAPI) {
     stopped = true
     restoreCompactMessages?.()
     restoreCompactMessages = undefined
+    restoreMinimalCustomUi?.()
+    restoreMinimalCustomUi = undefined
     restoreToolSpacing?.()
     restoreToolSpacing = undefined
     restoreThinkingSelectorLabels?.()
