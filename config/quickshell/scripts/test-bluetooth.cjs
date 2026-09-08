@@ -1,0 +1,22 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const source = fs.readFileSync(path.join(__dirname, '../services/BluetoothService.qml'), 'utf8');
+const body = source.match(/onStreamFinished: \{([\s\S]*?root\.devices = next;)/)[1];
+const refresh = new Function('text', 'root', body);
+const root = { devices: [] };
+const first = 'Device AA:BB Speaker\nDevice CC:DD Keyboard\n---\nDevice AA:BB Speaker\n';
+refresh(first, root);
+assert.equal(root.devices.length, 2);
+assert.equal(root.devices[0].connected, true);
+assert.equal(root.devices[1].connected, false);
+const snapshot = root.devices;
+refresh('Device CC:DD Keyboard\nDevice AA:BB Speaker\n---\nDevice AA:BB Speaker\n', root);
+assert.equal(root.devices, snapshot, 'Unchanged polling must preserve model identity');
+refresh('Device AA:BB Speaker\n---\n', root);
+assert.equal(root.devices.length, 1);
+assert.equal(root.devices[0].connected, false);
+refresh('---\n', root);
+assert.deepEqual(root.devices, []);
+console.log('Bluetooth snapshot checks passed');

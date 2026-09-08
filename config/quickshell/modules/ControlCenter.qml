@@ -97,6 +97,7 @@ Item {
     component SettingButton: Button {
         id: button
         Layout.fillWidth: true
+        Layout.preferredWidth: 0
         property string detail: ""
         implicitHeight: Math.max(52, contentItem.implicitHeight + 24)
         font.family: Theme.fontUi
@@ -122,6 +123,7 @@ Item {
                 Layout.fillWidth: true
                 visible: button.detail !== ""
                 text: button.detail
+                Layout.preferredWidth: 0
                 font.family: Theme.fontUi
                 font.pixelSize: 12
                 color: Theme.colFgDim
@@ -253,6 +255,7 @@ Item {
                         }
                         Slider {
                             id: volume
+                            implicitHeight: 36
                             Layout.fillWidth: true
                             from: 0
                             to: 1
@@ -283,8 +286,8 @@ Item {
                             handle: Rectangle {
                                 x: volume.leftPadding + volume.visualPosition * (volume.availableWidth - width)
                                 y: volume.topPadding + volume.availableHeight / 2 - height / 2
-                                width: 22
-                                height: 22
+                                implicitWidth: 22
+                                implicitHeight: 22
                                 radius: 11
                                 color: volume.pressed ? Theme.g6 : Theme.colFg
                                 border.width: volume.visualFocus ? 3 : 0
