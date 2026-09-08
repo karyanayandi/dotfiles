@@ -1,162 +1,72 @@
-import Quickshell
-import Quickshell.Wayland
-import QtQuick
-import QtQuick.Window
 import ".."
+import QtQuick
+import QtQuick.Layouts
 
-PanelWindow {
-    id: win
+Item {
+    id: root
+
     required property var audio
-    property var theme: Theme
 
-    property real _osdOpacity: audio.osdVisible ? 1 : 0
-    Behavior on _osdOpacity {
-        NumberAnimation {
-            duration: win.audio.osdVisible ? 360 : 220
-            easing.type: win.audio.osdVisible ? Easing.OutCubic : Easing.InCubic
-        }
-    }
+    implicitWidth: 400
+    implicitHeight: 76
 
-    anchors.top: true
-    margins.top: Math.round((Screen.height / 2) - 88)
-    implicitWidth: Config.osdWidth
-    implicitHeight: Config.osdHeight
-    exclusiveZone: 0
-    color: "transparent"
-    visible: audio.osdVisible || _osdOpacity > 0.01
-    mask: Region {
-        item: cardWrap
-    }
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: 16
+        spacing: 16
 
-    WlrLayershell.namespace: "quickshell-osd"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-    Item {
-        id: cardWrap
-        anchors.centerIn: parent
-        width: Config.osdWidth
-        height: Config.osdHeight
-        opacity: win._osdOpacity
-        scale: 0.86 + win._osdOpacity * 0.14
-        transformOrigin: Item.Center
-        Behavior on scale {
-            NumberAnimation {
-                duration: win.audio.osdVisible ? 420 : 200
-                easing.type: win.audio.osdVisible ? Easing.OutBack : Easing.InCubic
-                easing.overshoot: 1.12
-            }
-        }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 260
-                easing.type: Easing.OutCubic
-            }
+        Text {
+            text: root.audio.osdIcon
+            color: root.audio.muted ? Theme.colMuted : Theme.colFg
+            font.family: Theme.fontFamily
+            font.pixelSize: 30
+            Layout.preferredWidth: 36
+            horizontalAlignment: Text.AlignHCenter
         }
 
-        Rectangle {
-            anchors.fill: card
-            anchors.topMargin: 2
-            radius: card.radius
-            color: Theme.colShadow
-            z: -1
-        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 10
 
-        Rectangle {
-            id: card
-            anchors.fill: parent
-            radius: Config.osdRadius
-            color: Theme.colBgAlpha078
-            border.color: Theme.colBorder
-            border.width: 1
-
-            Rectangle {
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: 1
-                radius: parent.radius
-                color: Theme.colBorderStrong
-                opacity: 0.9
-            }
-
-            Column {
-                anchors.centerIn: parent
-                spacing: 0
-                width: parent.width
+            RowLayout {
+                Layout.fillWidth: true
 
                 Text {
-                    id: glyph
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: win.audio.osdIcon
+                    text: root.audio.osdKind === "mic" ? (root.audio.muted ? "Microphone muted" : "Microphone") : (root.audio.muted ? "Muted" : "Volume")
                     color: Theme.colFg
-                    opacity: win.audio.muted && win.audio.osdKind === "sink" ? 0.55 : 1.0
-                    font.family: Theme.fontFamily
-                    font.pixelSize: 56
-                    font.weight: Font.Normal
-                    horizontalAlignment: Text.AlignHCenter
-                    Behavior on opacity {
+                    font.family: Theme.fontUi
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: root.audio.osdPercent + "%"
+                    color: Theme.colMuted
+                    font.family: Theme.fontUi
+                    font.pixelSize: 13
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 6
+                radius: 3
+                color: Theme.colMeterBg
+
+                Rectangle {
+                    width: parent.width * Math.max(0, Math.min(1, root.audio.osdPercent / 100))
+                    height: parent.height
+                    radius: parent.radius
+                    color: root.audio.muted ? Theme.colMuted : Theme.colMeterFg
+
+                    Behavior on width {
                         NumberAnimation {
-                            duration: 180
+                            duration: Config.animFast
                             easing.type: Easing.OutCubic
                         }
                     }
-                }
-
-                Item {
-                    width: 1
-                    height: 18
-                }
-
-                Rectangle {
-                    id: meter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: 144
-                    height: 6
-                    radius: 3
-                    color: Theme.colMeterBg
-                    Rectangle {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        width: parent.width * Math.min(1, win.audio.osdPercent / 100)
-                        radius: 3
-                        color: win.audio.muted && win.audio.osdKind === "sink" ? Theme.colMuted : Theme.colMeterFg
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 120
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: 150
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-                    }
-                }
-
-                Item {
-                    width: 1
-                    height: 10
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: {
-                        if (win.audio.osdKind === "mic")
-                            return win.audio.muted ? "Microphone muted" : "Microphone";
-                        if (win.audio.muted)
-                            return "Muted";
-                        return win.audio.osdPercent + "%";
-                    }
-                    color: Theme.colMuted
-                    font.family: Theme.fontFamily
-                    font.pixelSize: 11
-                    font.weight: Font.Medium
-                    font.letterSpacing: 0.3
-                    horizontalAlignment: Text.AlignHCenter
                 }
             }
         }

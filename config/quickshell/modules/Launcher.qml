@@ -1,17 +1,17 @@
 import ".."
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
 import "launcher" as LauncherParts
 
-PanelWindow {
+Item {
     id: win
 
     property bool visibleLauncher: false
+    readonly property string mode: model.mode
     required property var wallpaper
-    property real _opacity: visibleLauncher ? 1 : 0
+    implicitWidth: Config.launcherWidth
+    implicitHeight: 480
 
     function open(mode) {
         const selectedMode = mode || "all";
@@ -23,23 +23,17 @@ PanelWindow {
         input.clear();
         Qt.callLater(() => {
             if (model.mode === "wallpaper") {
-                const current = model.results.findIndex((item) => {
+                const current = model.results.findIndex(item => {
                     return item.path === win.wallpaper.current;
                 });
                 if (current >= 0)
                     model.selected = current;
-
             }
             input.focusInput();
         });
     }
 
-    visible: visibleLauncher || _opacity > 0.01
-    color: "transparent"
-    exclusiveZone: 0
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-launcher"
-    WlrLayershell.keyboardFocus: visibleLauncher ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    visible: visibleLauncher
     onVisibleLauncherChanged: {
         if (visibleLauncher) {
             Qt.callLater(() => {
@@ -48,7 +42,6 @@ PanelWindow {
             model.refreshApps();
             if (model.mode === "bluetooth")
                 model.refreshBluetooth();
-
         }
     }
 
@@ -82,76 +75,28 @@ PanelWindow {
         }
     }
 
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        color: Qt.rgba(Theme.colBg.r, Theme.colBg.g, Theme.colBg.b, visibleLauncher ? 0.34 : 0)
-        opacity: win._opacity
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: win.visibleLauncher
-            onClicked: win.visibleLauncher = false
-        }
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Config.animNormal
-                easing.type: Easing.OutCubic
-            }
-
-        }
-
-    }
-
     Item {
         id: cardWrap
 
-        width: Math.min(Config.launcherWidth, parent.width - 48)
-        scale: 0.985 + win._opacity * 0.015
-        opacity: win._opacity
-        implicitHeight: card.implicitHeight
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.fill: parent
 
         Rectangle {
             id: card
 
-            width: parent.width
-            implicitHeight: column.implicitHeight + 2
-            radius: Config.launcherRadius
-            color: Theme.colLauncherBg
-            border.color: Theme.colLauncherBorder
-            border.width: 1
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.topMargin: 6
-                radius: parent.radius
-                color: Theme.colShadow
-                opacity: 0.55
-                z: -1
-            }
+            anchors.fill: parent
+            color: "transparent"
 
             ColumnLayout {
                 id: column
 
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
+                anchors.fill: parent
                 spacing: 0
 
                 LauncherParts.SearchInput {
                     id: input
 
                     mode: model.mode
-                    onQueryChanged: (query) => {
+                    onQueryChanged: query => {
                         model.query = query;
                         model.selected = 0;
                     }
@@ -165,12 +110,12 @@ PanelWindow {
                             win.visibleLauncher = false;
                         }
                     }
-                    onSelectionMoved: (direction) => {
+                    onSelectionMoved: direction => {
                         const count = model.results.length;
                         const gridMode = model.mode === "emoji" || model.mode === "nerd" || model.mode === "wallpaper";
                         if (!gridMode) {
                             model.selected = Math.max(0, Math.min(model.selected + (direction === "up" ? -1 : 1), count - 1));
-                            return ;
+                            return;
                         }
                         const columns = results.gridColumns;
                         const selected = model.selected;
@@ -185,7 +130,7 @@ PanelWindow {
                             next += columns;
                         model.selected = next;
                     }
-                    onSelected: (ctrl) => {
+                    onSelected: ctrl => {
                         return model.triggerSelected(ctrl);
                     }
                     onCycleWallpaperInterval: win.wallpaper.cycleInterval()
@@ -193,7 +138,7 @@ PanelWindow {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 1
+                    Layout.preferredHeight: 1
                     color: Theme.colBorder
                     opacity: 0.9
                 }
@@ -202,11 +147,11 @@ PanelWindow {
                     id: results
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Math.max(0, Math.min(360, win.height - 240))
+                    Layout.fillHeight: true
                     model: model.results
                     selected: model.selected
                     emptyText: model.mode === "clipboard" ? "No clipboard history yet — copy something" : model.mode === "bluetooth" ? "No devices — press Scan" : "No results"
-                    onSelectionRequested: (index) => {
+                    onSelectionRequested: index => {
                         return model.selected = index;
                     }
                     onActivated: (index, ctrl) => {
@@ -216,28 +161,13 @@ PanelWindow {
                 }
 
                 LauncherParts.Footer {
+                    id: footer
                     mode: model.mode
                     bluetooth: model.bluetooth
                     clipboard: model.clipboard
                     wallpaper: win.wallpaper
                 }
-
             }
-
         }
-
     }
-
-    mask: Region {
-        item: cardWrap
-    }
-
-    Behavior on _opacity {
-        NumberAnimation {
-            duration: Config.animNormal
-            easing.type: Easing.OutCubic
-        }
-
-    }
-
 }

@@ -16,20 +16,12 @@ ShellRoot {
     Modules.Wallpaper {
         wallpaper: wallpaper
     }
-    Modules.Bar {
+    Modules.Island {
         audio: audio
         notifs: notifs
-    }
-    Modules.Launcher {
         wallpaper: wallpaper
     }
-    Modules.Osd {
-        audio: audio
-    }
     Modules.NotificationPopups {
-        notifs: notifs
-    }
-    Modules.NotificationCenter {
         notifs: notifs
     }
 }

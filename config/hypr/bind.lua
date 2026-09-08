@@ -25,6 +25,7 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float { action = "toggle" })
 
 -- Launcher
 hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd "qs ipc call launcher toggle apps")
+hl.bind(mainMod .. " + ALT + S", hl.dsp.exec_cmd "qs ipc call controls toggle")
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd "qs ipc call launcher toggle clipboard")
 hl.bind(mainMod .. " + ALT + E", hl.dsp.exec_cmd "qs ipc call launcher open emoji")
 hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call launcher open nerd")

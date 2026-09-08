@@ -1,5 +1,5 @@
-import QtQuick
 pragma Singleton
+import QtQuick
 
 QtObject {
     // layout
@@ -27,6 +27,8 @@ QtObject {
     property int launcherMaxHeight: 560
     property int launcherRadius: 20
     property int launcherInputHeight: 68
+    // Disable island geometry transitions for reduced-motion setups.
+    property bool reducedMotion: false
     // animations (ms)
     property int animFast: 120
     property int animNormal: 200

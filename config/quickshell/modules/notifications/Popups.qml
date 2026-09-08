@@ -1,139 +1,106 @@
 import "../.."
 import "../../components" as Comp
+import QtQml.Models
 import QtQuick
-import QtQuick.Layouts
-import Quickshell
 import Quickshell.Services.Notifications
-import Quickshell.Wayland
 
-PanelWindow {
-    id: win
+Item {
+    id: root
 
     required property var notifs
-    property var theme: Theme
+    readonly property var latest: notifs.popups.length ? notifs.popups[notifs.popups.length - 1] : null
+
+    // Keep surviving timer delegates when the service replaces its popup array.
+    function syncTimers() {
+        const popups = notifs.popups;
+        for (let i = pending.count - 1; i >= 0; --i) {
+            if (popups.indexOf(pending.get(i).notification) === -1)
+                pending.remove(i);
+        }
+        for (const notification of popups) {
+            let found = false;
+            for (let i = 0; i < pending.count; ++i) {
+                if (pending.get(i).notification === notification) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                pending.append({
+                    "notification": notification
+                });
+        }
+    }
 
     implicitWidth: Config.popupWidth
-    implicitHeight: list.implicitHeight
-    exclusiveZone: 0
-    color: "transparent"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-notifs"
-    visible: notifs.popups.length > 0 && !notifs.controlCenterVisible
+    implicitHeight: latest ? Math.min(260, card.implicitHeight) : 0
+    clip: true
+    Component.onCompleted: syncTimers()
+    onNotifsChanged: syncTimers()
+    onLatestChanged: viewport.contentY = 0
 
-    anchors {
-        top: true
-        right: true
-    }
-
-    margins {
-        top: 16
-        right: 16
-    }
-
-    ColumnLayout {
-        id: list
-
-        anchors.top: parent.top
-        anchors.right: parent.right
-        width: Config.popupWidth
-        spacing: 0
-
-        Repeater {
-            model: win.notifs.popups
-
-            delegate: Rectangle {
-                id: row
-
-                required property var modelData
-                property var notif: modelData
-                property real _enter: 0
-
-                Layout.fillWidth: true
-                implicitHeight: bg.implicitHeight
-                color: "transparent"
-                Layout.bottomMargin: 10
-                opacity: _enter
-                Component.onCompleted: {
-                    _enter = 1;
-                }
-
-                Rectangle {
-                    id: bg
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    implicitHeight: card.implicitHeight
-                    radius: 24
-                    color: "transparent"
-                    border.color: row.notif.urgency === NotificationUrgency.Critical ? Theme.colCritical : Theme.colBorder
-                    border.width: 0
-
-                    Timer {
-                        id: ttl
-
-                        interval: {
-                            if (row.notif.urgency === NotificationUrgency.Low)
-                                return Config.popupTtlLow;
-
-                            if (row.notif.urgency === NotificationUrgency.Critical)
-                                return Config.popupTtlCritical;
-
-                            if (row.notif.expireTimeout > 0)
-                                return row.notif.expireTimeout;
-
-                            return Config.popupTtlNormal;
-                        }
-                        running: true
-                        onTriggered: win.notifs.removePopup(row.notif)
-                    }
-
-                    HoverHandler {
-                        id: popupHover
-
-                        onHoveredChanged: {
-                            if (hovered)
-                                ttl.stop();
-                            else
-                                ttl.restart();
-                        }
-                    }
-
-                    Comp.NotificationCard {
-                        id: card
-
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        notification: row.notif
-                        imgSize: 32
-                        cardRadius: 20
-                        cardBg: Theme.colBg
-                        onCloseRequested: win.notifs.removePopup(row.notif)
-                    }
-
-                }
-
-                transform: Translate {
-                    x: (1 - row._enter) * 12
-                }
-
-                Behavior on _enter {
-                    NumberAnimation {
-                        duration: Config.animNormal
-                        easing.type: Easing.OutCubic
-                    }
-
-                }
-
-            }
-
+    Connections {
+        function onPopupsChanged() {
+            root.syncTimers();
         }
 
+        target: root.notifs
     }
 
-    mask: Region {
-        item: list
+    ListModel {
+        id: pending
     }
 
+    Instantiator {
+        model: pending
+
+        delegate: Timer {
+            required property var notification
+
+            interval: {
+                if (notification.urgency === NotificationUrgency.Low)
+                    return Config.popupTtlLow;
+
+                if (notification.urgency === NotificationUrgency.Critical)
+                    return Config.popupTtlCritical;
+
+                if (notification.expireTimeout > 0)
+                    return notification.expireTimeout;
+
+                return Config.popupTtlNormal;
+            }
+            running: !(root.visible && root.latest === notification && popupHover.hovered)
+            onTriggered: root.notifs.removePopup(notification)
+        }
+    }
+
+    Flickable {
+        id: viewport
+
+        anchors.fill: parent
+        contentWidth: width
+        contentHeight: card.implicitHeight
+        boundsBehavior: Flickable.StopAtBounds
+        flickableDirection: Flickable.VerticalFlick
+        clip: true
+
+        Comp.NotificationCard {
+            id: card
+
+            width: viewport.width
+            height: implicitHeight
+            notification: root.latest
+            visible: root.latest !== null
+            imgSize: 32
+            cardRadius: 20
+            cardBg: Theme.colBg
+            onCloseRequested: root.notifs.removePopup(root.latest)
+        }
+
+        HoverHandler {
+            id: popupHover
+
+            enabled: root.visible && root.latest !== null
+        }
+    }
 }

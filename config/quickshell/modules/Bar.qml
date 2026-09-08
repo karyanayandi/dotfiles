@@ -1,5 +1,3 @@
-import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
@@ -8,10 +6,14 @@ import "bar" as BarParts
 import "../services" as Services
 import ".."
 
-PanelWindow {
+Item {
     id: barWin
     required property var audio
     required property var notifs
+    required property var controls
+    signal launcherRequested(string mode)
+    implicitWidth: bar.implicitWidth
+    implicitHeight: Config.barHeight
     property var theme: Theme
 
     property string submap: ""
@@ -54,29 +56,11 @@ PanelWindow {
         }
     }
 
-    anchors {
-        bottom: true
-        left: true
-        right: true
-    }
-    implicitHeight: Config.barExclusiveZone
-    exclusiveZone: Config.barExclusiveZone
-    color: "transparent"
-    WlrLayershell.namespace: "quickshell"
-    WlrLayershell.layer: WlrLayer.Top
-
     Rectangle {
         id: bar
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Config.barBottomMargin
+        anchors.fill: parent
         implicitWidth: Math.max(Config.barMinWidth, Math.min(Config.barMaxWidth, barContent.implicitWidth + 32))
-        width: implicitWidth
-        height: Config.barHeight
-        radius: Config.barRadius
-        color: Theme.colBgAlpha085
-        border.color: Theme.colBorder
-        border.width: 1
+        color: "transparent"
 
         RowLayout {
             id: barContent
@@ -130,9 +114,7 @@ PanelWindow {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent);
-                        p.command = ["ghostty", "-e", "bluetui"];
-                        p.running = true;
+                        barWin.launcherRequested("bluetooth");
                     }
                 }
             }
@@ -163,9 +145,7 @@ PanelWindow {
                         if (mouse.button === Qt.MiddleButton)
                             barWin.audio.volMuteToggle();
                         else {
-                            let p = Qt.createQmlObject('import Quickshell.Io; Process {}', parent);
-                            p.command = ["ghostty", "-e", "wiremix"];
-                            p.running = true;
+                            barWin.controls.opened = !barWin.controls.opened;
                         }
                     }
                     onWheel: w => {

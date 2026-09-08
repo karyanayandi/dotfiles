@@ -32,6 +32,7 @@ Item {
         highlightMoveVelocity: -1
 
         highlight: Rectangle {
+            width: list.width
             radius: 10
             color: Theme.g1
             border.color: Theme.colBorder
@@ -40,14 +41,13 @@ Item {
 
         delegate: ResultItem {
             selectedIndex: root.selected
-            onHovered: (index) => {
+            onHovered: index => {
                 return root.selectionRequested(index);
             }
             onActivated: (index, ctrl) => {
                 return root.activated(index, ctrl);
             }
         }
-
     }
 
     GridView {
@@ -114,7 +114,6 @@ Item {
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                     }
-
                 }
 
                 Rectangle {
@@ -125,7 +124,6 @@ Item {
                     border.color: Theme.g6
                     border.width: 3
                 }
-
             }
 
             Text {
@@ -146,7 +144,6 @@ Item {
                 onEntered: root.selectionRequested(index)
                 onClicked: root.activated(index, !!(mouse.modifiers & Qt.ControlModifier))
             }
-
         }
 
         ScrollBar.vertical: ScrollBar {
@@ -160,7 +157,6 @@ Item {
                 opacity: scrollBar.active ? 0.8 : 0.4
             }
         }
-
     }
 
     Text {
@@ -171,5 +167,4 @@ Item {
         font.family: Theme.fontUi
         font.pixelSize: 14
     }
-
 }
