@@ -1,98 +1,164 @@
-import Quickshell.Services.Notifications
-import QtQuick
-import QtQuick.Layouts
 import ".."
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Services.Notifications
 
 Rectangle {
     id: root
+
     required property var notification
     property int imgSize: 40
     property int cardRadius: 16
-    property color cardBg: Theme.colBgAlt
+    property color cardBg: Theme.g16
     property bool showClose: true
-    signal closeRequested()
+    property var filteredActions: notification ? notification.actions.filter((a) => {
+        return a.identifier !== "activate" && a.text !== "Activate";
+    }) : []
 
-    property var filteredActions: notification ? notification.actions.filter(a => a.identifier !== "activate" && a.text !== "Activate") : []
+    signal closeRequested()
 
     radius: cardRadius
     color: cardBg
-    border.color: notification && notification.urgency === NotificationUrgency.Critical ? Theme.colCritical : "transparent"
-    border.width: notification && notification.urgency === NotificationUrgency.Critical ? 1 : 0
-    implicitHeight: inner.implicitHeight + 16
-
-    Rectangle {
-        visible: root.showClose
-        anchors.top: parent.top; anchors.right: parent.right
-        anchors.topMargin: 3; anchors.rightMargin: 3
-        width: 26; height: 26; radius: 7
-        color: clsMa.containsMouse ? Theme.g2 : "transparent"
-        Text { anchors.centerIn: parent; text: "✕"; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 11 }
-        MouseArea { id: clsMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.closeRequested() }
-    }
+    border.color: notification && notification.urgency === NotificationUrgency.Critical ? Theme.colCritical : Theme.colBorder
+    border.width: 1
+    implicitHeight: inner.implicitHeight + 32
 
     ColumnLayout {
         id: inner
-        anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
-        anchors.margins: 8
-        spacing: 4
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 16
+        spacing: 10
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.leftMargin: 6; Layout.rightMargin: 6; Layout.topMargin: 6; Layout.bottomMargin: 6
-            spacing: 0
+            spacing: 10
+
             Image {
-                property string _src: root.notification ? (root.notification.image !== "" ? root.notification.image : root.notification.appIcon) : ""
-                visible: _src !== "" && (_src.indexOf("/") !== -1 || _src.indexOf("file:") === 0)
-                source: _src
-                Layout.preferredWidth: visible ? root.imgSize : 0
-                Layout.preferredHeight: visible ? root.imgSize : 0
-                Layout.rightMargin: visible ? 12 : 0
-                fillMode: Image.PreserveAspectCrop
-                onStatusChanged: if (status === Image.Error) visible = false
+                readonly property string icon: root.notification ? (root.notification.image || root.notification.appIcon || "") : ""
+
+                source: !icon ? "" : icon.indexOf("/") !== -1 ? icon : Quickshell.iconPath(icon, "dialog-information")
+                visible: status === Image.Ready
+                Layout.preferredWidth: root.imgSize
+                Layout.preferredHeight: root.imgSize
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
             }
-            ColumnLayout {
-                Layout.fillWidth: true; spacing: 2
-                Layout.rightMargin: 26
-                Text {
-                    text: root.notification ? (root.notification.summary || root.notification.appName || "Notification") : ""
-                    color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 15; font.weight: Font.DemiBold
-                    wrapMode: Text.Wrap; Layout.fillWidth: true; elide: Text.ElideRight
-                }
-                Text {
-                    visible: root.notification ? root.notification.body !== "" : false
-                    text: root.notification ? root.notification.body : ""
-                    color: Theme.colFg; linkColor: Theme.g9; font.family: Theme.fontFamily; font.pixelSize: 13; opacity: 0.95
-                    wrapMode: Text.Wrap; Layout.fillWidth: true; maximumLineCount: 6; lineHeight: 1.15
-                }
-                Text {
-                    visible: root.notification ? (root.notification.appName !== "" && root.notification.summary !== "") : false
-                    text: root.notification ? root.notification.appName : ""
-                    color: Theme.g4; font.family: Theme.fontFamily; font.pixelSize: 11
-                    Layout.fillWidth: true; elide: Text.ElideRight
-                }
+
+            Text {
+                text: root.notification ? root.notification.appName || "Notification" : ""
+                textFormat: Text.PlainText
+                color: Theme.colFgDim
+                font.family: Theme.fontUi
+                font.pixelSize: 12
+                font.weight: Font.Medium
+                Layout.fillWidth: true
+                elide: Text.ElideRight
             }
+
+            Button {
+                id: closeButton
+
+                visible: root.showClose
+                Layout.preferredWidth: 32
+                Layout.preferredHeight: 32
+                Accessible.name: "Dismiss notification"
+                onClicked: root.closeRequested()
+
+                background: Rectangle {
+                    radius: 10
+                    color: closeButton.down ? Theme.g2 : closeButton.hovered ? Theme.g1 : "transparent"
+                    border.width: closeButton.visualFocus ? 1 : 0
+                    border.color: Theme.g7
+                }
+
+                contentItem: Text {
+                    text: "✕"
+                    color: Theme.colFgDim
+                    font.pixelSize: 13
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+            }
+
         }
 
-        RowLayout {
+        Text {
+            text: root.notification ? root.notification.summary || "Notification" : ""
+            textFormat: Text.PlainText
+            color: Theme.colFg
+            font.family: Theme.fontUi
+            font.pixelSize: 16
+            font.weight: Font.DemiBold
+            wrapMode: Text.Wrap
+            maximumLineCount: 3
+            elide: Text.ElideRight
+            Layout.fillWidth: true
+        }
+
+        Text {
+            visible: text.length > 0
+            text: root.notification ? root.notification.body : ""
+            color: Theme.colFgDim
+            linkColor: Theme.g9
+            font.family: Theme.fontUi
+            font.pixelSize: 14
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+            maximumLineCount: 6
+            elide: Text.ElideRight
+            lineHeight: 1.2
+        }
+
+        ColumnLayout {
             visible: root.filteredActions.length > 0
             Layout.fillWidth: true
+            Layout.topMargin: 2
             spacing: 6
-            Layout.preferredHeight: 38
+
             Repeater {
                 model: root.filteredActions
-                delegate: Rectangle {
+
+                delegate: Button {
+                    id: actionButton
+
                     required property var modelData
-                    Layout.fillWidth: true; Layout.fillHeight: true
-                    Layout.leftMargin: 6
-                    Layout.rightMargin: index === root.filteredActions.length - 1 ? 6 : 0
-                    Layout.topMargin: 6; Layout.bottomMargin: 6
-                    radius: 12
-                    color: aMa.containsMouse ? Theme.colSelected : Theme.colActionBg
-                    Behavior on color { ColorAnimation { duration: 200 } }
-                    Text { anchors.centerIn: parent; text: modelData.text; color: Theme.colFg; font.family: Theme.fontFamily; font.pixelSize: 13; elide: Text.ElideRight }
-                    MouseArea { id: aMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: modelData.invoke() }
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 36
+                    text: modelData.text
+                    onClicked: modelData.invoke()
+
+                    background: Rectangle {
+                        radius: 10
+                        color: actionButton.down ? Theme.g3 : actionButton.hovered ? Theme.g2 : Theme.g1
+                        border.width: actionButton.visualFocus ? 1 : 0
+                        border.color: Theme.g7
+                    }
+
+                    contentItem: Text {
+                        text: actionButton.text
+                        textFormat: Text.PlainText
+                        color: Theme.colFg
+                        font.family: Theme.fontUi
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
+                    }
+
                 }
+
             }
+
         }
+
     }
+
 }
