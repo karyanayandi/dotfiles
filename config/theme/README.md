@@ -2,6 +2,16 @@
 
 `~/.local/bin/wallpaper-theme` renders colors, then refreshes running consumers.
 
+- GTK3 alternates generated `matugen-dark` themes through GSettings after each
+  render. Colors belong to the named theme, not the startup-only user CSS.
+  Log out/in once to drop the old `GTK_THEME` override and cached user CSS.
+  GTK4/libadwaita still uses generated user CSS and needs an app restart;
+  there is no universal external CSS-reload API. X11 apps also need a desktop
+  settings bridge that forwards GSettings to XSettings.
+- Qt5/Qt6 apps using qt5ct/qt6ct reload about 3 seconds after a temporary entry
+  is created and removed in their config directory. Touching a symlinked config
+  target does not notify this directory watcher.
+  Apps using another platform theme or their own palette are not covered.
 - Ghostty reloads its app config with `SIGUSR2`, so new windows also inherit the
   new palette. Only processes with a registered signal handler receive it.
 - Foot and Ghostty receive OSC palette, foreground, background, cursor and

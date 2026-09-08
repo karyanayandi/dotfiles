@@ -29,6 +29,29 @@ exec 9>"$cache_home/theme/generate.lock"
 flock 9
 matugen --config "$config_home/theme/config.toml" --mode dark --source-color-index 0 image "$(realpath -- "$image")"
 
+# qt5ct/qt6ct watch the directory, not symlinked config/palette targets.
+# Creating then removing a temporary entry triggers their 3-second reload timer.
+for version in 5 6; do
+  qt_dir="$config_home/qt${version}ct"
+  if [[ -f $qt_dir/qt${version}ct.conf ]]; then
+    notification=$(mktemp "$qt_dir/.matugen-reload.XXXXXX")
+    rm -- "$notification"
+  fi
+done
+
+# GTK's user gtk.css is loaded only once. Named themes reload on a settings change.
+# Alternate names once per generation, avoiding a visible fallback-theme flash.
+if command -v gsettings >/dev/null; then
+  current=$(gsettings get org.gnome.desktop.interface gtk-theme)
+  theme=matugen-dark
+  [[ $current != "'matugen-dark'" ]] || theme=matugen-dark-alt
+  theme_dir="${XDG_DATA_HOME:-$HOME/.local/share}/themes/$theme/gtk-3.0"
+  mkdir -p "$theme_dir"
+  printf '@import url("file:///usr/share/themes/adw-gtk3-dark/gtk-3.0/gtk.css");\n' >"$theme_dir/gtk.css"
+  cat "$config_home/gtk-3.0/colors.css" >>"$theme_dir/gtk.css"
+  gsettings set org.gnome.desktop.interface gtk-theme "$theme"
+fi
+
 if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
   THEME_NAME=matugen bash "$HOME/.tmux/theme/theme.tmux"
 fi

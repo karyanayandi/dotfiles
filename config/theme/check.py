@@ -174,11 +174,27 @@ def check():
         signal_stub = bindir / "pkill"
         signal_stub.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/signal-args"\n')
         signal_stub.chmod(0o755)
+        settings_stub = bindir / "gsettings"
+        settings_stub.write_text(
+            '#!/bin/sh\nif [ "$1" = get ]; then\n'
+            '  printf "\x27%s\x27\\n" "$(cat "$HOME/gtk-theme" 2>/dev/null)"\n'
+            'else\n  printf "%s" "$4" > "$HOME/gtk-theme"\nfi\n'
+        )
+        settings_stub.chmod(0o755)
+        qt_configs = [home / f".config/qt{v}ct/qt{v}ct.conf" for v in (5, 6)]
+        for qt_config in qt_configs:
+            # Match the deployed symlinks: touching the target must not count.
+            target = home / qt_config.name
+            target.write_text("[Appearance]\ncustom_palette=true\n")
+            qt_config.symlink_to(target)
+            os.utime(target, (1, 1))
+            os.utime(qt_config.parent, (1, 1))
         env = {
             **os.environ,
             "HOME": str(home),
             "XDG_CONFIG_HOME": str(home / ".config"),
             "XDG_CACHE_HOME": str(home / ".cache"),
+            "XDG_DATA_HOME": str(home / ".local/share"),
             "PATH": str(bindir) + os.pathsep + os.environ["PATH"],
         }
         env.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
@@ -191,6 +207,17 @@ def check():
         runner = ROOT / "home/.local/bin/wallpaper-theme"
         subprocess.run([str(runner), str(image)], env=env, check=True)
         assert (home / "args").read_text().splitlines()[-1] == str(image)
+        assert (home / "gtk-theme").read_text() == "matugen-dark"
+        theme_css = home / ".local/share/themes/matugen-dark/gtk-3.0/gtk.css"
+        assert theme_css.read_text().endswith(
+            (home / ".config/gtk-3.0/colors.css").read_text()
+        )
+        for qt_config in qt_configs:
+            assert qt_config.is_symlink()
+            assert qt_config.stat().st_mtime == 1
+            assert qt_config.parent.stat().st_mtime > 1
+            assert not list(qt_config.parent.glob(".matugen-reload.*"))
+            assert qt_config.read_text() == "[Appearance]\ncustom_palette=true\n"
         assert (home / "signal-args").read_text().splitlines() == [
             "--require-handler",
             "--signal",
@@ -204,6 +231,7 @@ def check():
         store.parent.mkdir(parents=True)
         store.write_text(json.dumps({"wallpaper": str(image), "interval": 0}))
         subprocess.run([str(runner)], env=env, check=True)
+        assert (home / "gtk-theme").read_text() == "matugen-dark-alt"
         failed = subprocess.run(
             [str(runner), str(image)], env={**env, "FAIL": "7"}, check=False
         )

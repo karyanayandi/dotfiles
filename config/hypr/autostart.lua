@@ -20,7 +20,6 @@ hl.on("hyprland.start", function()
   hl.exec_cmd "gsettings set org.gnome.desktop.interface icon-theme 'Tela-grey-dark'"
   hl.exec_cmd "gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Ice'"
   hl.exec_cmd "gsettings set org.gnome.desktop.interface font-name 'Adwaita Sans 11'"
-  hl.exec_cmd "gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'"
 
   -- Export Wayland env to the systemd/D-Bus user session so portals start cleanly
   hl.exec_cmd "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
