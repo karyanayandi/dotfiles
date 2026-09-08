@@ -30,8 +30,8 @@ export interface SummaryConfig {
 }
 
 export const DEFAULT_SUMMARY_CONFIG: SummaryConfig = {
-  provider: "github-copilot",
-  model: "claude-haiku-4.5",
+  provider: "openai-codex",
+  model: "gpt-5.6-luna",
   reasoning: "off",
 }
 
