@@ -19,6 +19,13 @@ sh ./setup/zram.sh
 cd ~/.config/dotfiles/home && stow .
 cd ~/.config/dotfiles/config && stow .
 
+# Seed generated includes before apps start; future wallpaper changes regenerate them.
+if [ -f "${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/wallpaper" ]; then
+  "$HOME/.local/bin/wallpaper-theme"
+else
+  "$HOME/.local/bin/wallpaper-theme" "$HOME/.config/dotfiles/wallpapers/arch-linux.png"
+fi
+
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
 mkdr -p ~/Pictures/Screenshots/mpv

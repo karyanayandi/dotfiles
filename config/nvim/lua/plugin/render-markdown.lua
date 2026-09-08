@@ -88,8 +88,6 @@ return {
     },
   },
   config = function()
-    -- local colors = require("aurora.colors").load()
-    -- vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = colors.highlight })
-    vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#252931" })
+    vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = require("base16-colorscheme").colors.base01 })
   end,
 }

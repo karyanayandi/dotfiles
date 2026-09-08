@@ -19,3 +19,18 @@ config/opencode/plugins/
 /.pi/
 **/.pi/tasks/
 .pi-subagents/
+.ruff_cache/
+
+# Wallpaper-derived output (also applies when Stow folds theme/ into ~/.config).
+config/theme/generated/
+config/quickshell/colors.json
+config/hypr/colors.lua
+config/hypr/hyprlock-colors.conf
+config/niri/colors.kdl
+config/gtk-2.0/gtkrc
+config/gtk-3.0/colors.css
+config/gtk-4.0/colors.css
+config/qt5ct/colors-generated.conf
+config/qt6ct/colors-generated.conf
+config/swaylock/config-generated
+config/opencode/themes/matugen.json

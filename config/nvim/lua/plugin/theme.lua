@@ -1,9 +1,9 @@
 return {
   {
     "RRethy/base16-nvim",
-    priority = 10,
+    priority = 1000,
     config = function()
-      vim.cmd "colorscheme base16-gruvbox-dark-hard"
+      require("config.theme").apply()
       local hl = vim.api.nvim_set_hl
       hl(0, "NeotestPassed", { link = "DiagnosticOk" })
       hl(0, "NeotestFailed", { link = "DiagnosticError" })

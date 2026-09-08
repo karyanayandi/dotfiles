@@ -1,0 +1,27 @@
+layout {
+    background-color "{{ colors.surface.dark.hex }}"
+    focus-ring {
+        active-color "{{ colors.primary.dark.hex }}"
+        inactive-color "{{ colors.outline_variant.dark.hex }}"
+        urgent-color "{{ colors.error.dark.hex }}"
+    }
+    border {
+        active-color "{{ colors.primary.dark.hex }}"
+        inactive-color "{{ colors.outline_variant.dark.hex }}"
+        urgent-color "{{ colors.error.dark.hex }}"
+    }
+    insert-hint { color "{{ colors.primary.dark.hex }}80"; }
+    shadow { color "{{ colors.shadow.dark.hex }}77"; }
+    tab-indicator {
+        active-color "{{ colors.primary.dark.hex }}"
+        inactive-color "{{ colors.surface_container_high.dark.hex }}"
+        urgent-color "{{ colors.error.dark.hex }}"
+    }
+}
+recent-windows {
+    highlight {
+        active-color "{{ colors.primary.dark.hex }}"
+        urgent-color "{{ colors.error.dark.hex }}"
+    }
+}
+overview { backdrop-color "{{ colors.surface.dark.hex }}"; }

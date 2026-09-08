@@ -15,10 +15,6 @@ hl.config {
     gaps_in = 8,
     gaps_out = 16,
     border_size = 3,
-    col = {
-      active_border = "rgba(189,174,147,1)",
-      -- inactive_border = "rgba(124,111,100,1)",
-    },
     resize_on_border = true,
     allow_tearing = true,
     layout = "scrolling",
@@ -42,7 +38,6 @@ hl.config {
       enabled = true,
       range = 4,
       render_power = 3,
-      color = "rgba(1a1a1aee)",
     },
 
     blur = {
@@ -92,3 +87,6 @@ require "env"
 require "layout"
 require "misc"
 require "windowrule"
+
+-- Generated colors only; use Hyprland's module loader like the modules above.
+require "colors"

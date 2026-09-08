@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
+import ".."
 
 Variants {
     id: root
@@ -17,7 +18,7 @@ Variants {
             right: true
         }
         exclusiveZone: 0
-        color: "black"
+        color: Theme.colBg
         WlrLayershell.layer: WlrLayer.Background
         WlrLayershell.namespace: "quickshell-wallpaper"
         WlrLayershell.exclusionMode: ExclusionMode.Ignore

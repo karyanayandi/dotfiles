@@ -61,6 +61,7 @@ yay -S --needed \
   lua \
   luarocks \
   mise \
+  matugen \
   mpv \
   nemo \
   nemo-fileroller \

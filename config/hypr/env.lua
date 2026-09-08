@@ -1,6 +1,8 @@
 hl.env("GTK_THEME", "adw-gtk3-dark")
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
 hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("GTK2_RC_FILES", "/etc/gtk-2.0/gtkrc:" .. os.getenv("HOME") .. "/.gtkrc-2.0:" .. os.getenv("HOME") .. "/.config/gtk-2.0/gtkrc")

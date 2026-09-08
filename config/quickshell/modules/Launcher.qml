@@ -91,7 +91,7 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(29 / 255, 32 / 255, 33 / 255, visibleLauncher ? 0.34 : 0)
+        color: Qt.rgba(Theme.colBg.r, Theme.colBg.g, Theme.colBg.b, visibleLauncher ? 0.34 : 0)
         opacity: win._opacity
 
         MouseArea {

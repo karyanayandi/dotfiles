@@ -1,0 +1,23 @@
+<* include "lazydocker-base" *>
+  theme:
+    activeBorderColor:
+      - "{{colors.primary.default.hex}}"
+      - bold
+    inactiveBorderColor:
+      - "{{colors.on_surface_variant.default.hex}}"
+    optionsTextColor:
+      - "{{colors.secondary.default.hex}}"
+    selectedLineBgColor:
+      - "{{colors.surface_container_high.default.hex}}"
+    cherryPickedCommitBgColor:
+      - "{{colors.surface_container.default.hex}}"
+    cherryPickedCommitFgColor:
+      - "{{colors.primary.default.hex}}"
+    unstagedChangesColor:
+      - "{{colors.error.default.hex}}"
+    defaultFgColor:
+      - "{{colors.on_surface.default.hex}}"
+    searchingActiveBorderColor:
+      - "{{colors.tertiary.default.hex}}"
+  authorColors:
+    "*": "{{colors.secondary.default.hex}}"

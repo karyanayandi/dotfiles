@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Generate app colors. Quickshell owns displaying and remembering the wallpaper.
+set -euo pipefail
+
+config_home=${XDG_CONFIG_HOME:-$HOME/.config}
+cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
+if (($# > 1)); then
+  echo 'Usage: wallpaper-theme [IMAGE]' >&2
+  exit 2
+fi
+image=${1:-}
+if [[ -z $image ]]; then
+  store=$cache_home/quickshell/wallpaper
+  if [[ -f $store ]]; then
+    image=$(jq -r 'if type == "object" then .wallpaper // empty else empty end' "$store" 2>/dev/null || head -n 1 "$store")
+  fi
+fi
+if [[ ! -f $image ]]; then
+  echo 'wallpaper-theme: supply an existing wallpaper image, or select one in Quickshell.' >&2
+  exit 1
+fi
+command -v matugen >/dev/null || {
+  echo 'wallpaper-theme: install matugen first (sudo pacman -S matugen).' >&2
+  exit 1
+}
+mkdir -p "$cache_home/theme"
+# Serialize generation so two wallpaper changes cannot interleave output files.
+exec 9>"$cache_home/theme/generate.lock"
+flock 9
+matugen --config "$config_home/theme/config.toml" --mode dark --source-color-index 0 image "$(realpath -- "$image")"
+
+if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
+  THEME_NAME=matugen bash "$HOME/.tmux/theme/theme.tmux"
+fi
+
+# Reload supported consumers without restarting terminals, shells, or lock screens.
+if command -v fish >/dev/null; then
+  fish --no-config -c 'set -U wallpaper_theme_generation (date +%s%N)'
+fi
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && command -v hyprctl >/dev/null; then
+  hyprctl reload >/dev/null || echo 'wallpaper-theme: Hyprland reload failed.' >&2
+fi

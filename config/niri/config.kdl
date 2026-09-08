@@ -33,23 +33,17 @@ layout {
     focus-ring {
         on
         width 3 
-        active-color "#bdae93"
-        urgent-color "#fb4934"
     }
 
     border {
         off
         width 4
-        active-color "#bdae93"
-        inactive-color "#7c6f64"
-        urgent-color "#fb4934"
     }
 
     shadow {
         softness 30
         spread 5
         offset x=0 y=5
-        color "#0007"
     }
 
     struts {}
@@ -71,7 +65,7 @@ spawn-sh-at-startup "export SSH_AUTH_SOCK"
 spawn-sh-at-startup "$(gnome-keyring-daemon --start)"
 spawn-sh-at-startup "gnome-keyring-daemon --start"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'"
-spawn-sh-at-startup "gsettings set org.gnome.desktop.interface 'Tela-grey-dark'"
+spawn-sh-at-startup "gsettings set org.gnome.desktop.interface icon-theme 'Tela-grey-dark'"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Ice'"
 spawn-sh-at-startup "gsettings set org.gnome.desktop.interface font-name 'Adwaita Sans 11'"
 
@@ -371,3 +365,10 @@ debug {
 // workspace "8"
 // workspace "9"
 // workspace "10"
+
+include "colors.kdl"
+
+environment {
+    QT_QPA_PLATFORMTHEME "qt6ct"
+    GTK2_RC_FILES "/etc/gtk-2.0/gtkrc:/home/karyana/.gtkrc-2.0:/home/karyana/.config/gtk-2.0/gtkrc"
+}

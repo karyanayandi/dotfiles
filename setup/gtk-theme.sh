@@ -1,16 +1,6 @@
 #!/bin/bash
+# Matugen supplies gtk.css; use a GTK theme that accepts these color overrides.
+set -e
 
-paru -S \
-  gnome-theme-extra \
-  gtk-engine-murrine \
-  sassc
-
-mkdir -p ~/tmp
-cd ~/tmp
-
-git clone https://github.com/Fausto-Korpsvart/Gruvbox-GTK-Theme
-
-cd Gruvbox-GTK-Theme/themes
-sh ./install.sh -c dark -t grey -l
-
-rm -rf ~/tmp
+gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'

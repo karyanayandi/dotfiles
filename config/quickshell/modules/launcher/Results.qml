@@ -150,7 +150,15 @@ Item {
         }
 
         ScrollBar.vertical: ScrollBar {
+            id: scrollBar
             policy: ScrollBar.AsNeeded
+            contentItem: Rectangle {
+                implicitWidth: 6
+                implicitHeight: 24
+                radius: 3
+                color: scrollBar.pressed ? Theme.g7 : Theme.colMuted
+                opacity: scrollBar.active ? 0.8 : 0.4
+            }
         }
 
     }

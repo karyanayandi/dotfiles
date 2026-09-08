@@ -1,0 +1,23 @@
+{
+  "g0": "{{ colors.surface.dark.hex }}",
+  "g1": "{{ colors.surface_container.dark.hex }}",
+  "g2": "{{ colors.surface_container_high.dark.hex }}",
+  "g3": "{{ colors.surface_container_highest.dark.hex }}",
+  "g4": "{{ colors.on_surface_variant.dark.hex }}",
+  "g5": "{{ colors.on_surface.dark.hex }}",
+  "g6": "{{ colors.primary.dark.hex }}",
+  "g7": "{{ colors.primary.dark.hex }}",
+  "g8": "{{ colors.secondary.dark.hex }}",
+  "g9": "{{ colors.tertiary.dark.hex }}",
+  "g10": "{{ colors.secondary.dark.hex }}",
+  "g11": "{{ colors.error.dark.hex }}",
+  "g12": "{{ colors.tertiary.dark.hex }}",
+  "g13": "{{ colors.tertiary.dark.hex }}",
+  "g14": "{{ colors.primary.dark.hex }}",
+  "g15": "{{ colors.secondary.dark.hex }}",
+  "g16": "{{ colors.surface_container_low.dark.hex }}",
+  "g17": "{{ colors.outline_variant.dark.hex }}",
+  "g18": "{{ colors.outline.dark.hex }}",
+  "g19": "{{ colors.on_surface_variant.dark.hex }}",
+  "g20": "{{ colors.on_surface.dark.hex }}"
+}

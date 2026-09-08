@@ -1,0 +1,33 @@
+<* include "bottom-base" *>
+[styles.tables]
+headers = { color = "{{colors.on_surface.default.hex}}" }
+
+[styles.cpu]
+all_entry = "{{colors.on_surface.default.hex}}"
+avg_entry = "{{colors.error.default.hex}}"
+core_colors = ["{{colors.error.default.hex}}", "{{colors.tertiary.default.hex}}", "{{colors.tertiary.default.hex}}", "{{colors.primary.default.hex}}", "{{colors.secondary.default.hex}}", "{{colors.primary.default.hex}}"]
+
+[styles.memory]
+ram = "{{colors.primary.default.hex}}"
+swap = "{{colors.tertiary.default.hex}}"
+gpu = ["{{colors.primary.default.hex}}", "{{colors.tertiary.default.hex}}", "{{colors.error.default.hex}}", "{{colors.tertiary.default.hex}}", "{{colors.tertiary.default.hex}}", "{{colors.primary.default.hex}}"]
+arc = "{{colors.secondary.default.hex}}"
+
+[styles.network]
+rx = "{{colors.primary.default.hex}}"
+tx = "{{colors.error.default.hex}}"
+
+[styles.widgets]
+widget_title = "{{colors.on_surface.default.hex}}"
+border = "{{colors.surface_container_high.default.hex}}"
+selected_border = "{{colors.primary.default.hex}}"
+text = "{{colors.on_surface.default.hex}}"
+selected_text = { fg = "{{colors.background.default.hex}}", bg = "{{colors.primary.default.hex}}" }
+
+[styles.graphs]
+graph_color = "{{colors.on_surface_variant.default.hex}}"
+
+[styles.battery]
+high = "{{colors.primary.default.hex}}"
+medium = "{{colors.tertiary.default.hex}}"
+low = "{{colors.error.default.hex}}"

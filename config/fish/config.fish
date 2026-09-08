@@ -1,7 +1,7 @@
 set fish_greeting ''
 
+wallpaper_cli_reload
 starship init fish | source
-export STARSHIP_CONFIG=/home/karyana/.config/starship/starship.toml
 
 # mise
 mise activate fish | source
@@ -26,9 +26,7 @@ export LC_PAPER=en_US.utf8
 export LC_TELEPHONE=en_US.utf8
 export LC_TIME=en_US.utf8
 
-set -gx LS_COLORS (vivid generate ~/.config/dotfiles/config/vivid/colors.yaml)
 export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
-
 
 ## Aliases
 alias .. "cd .."
@@ -69,12 +67,12 @@ alias lzd lazydocker
 alias lzg lazygit
 alias oc "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
 alias opencode "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
-alias os "openspec"
+alias os openspec
 alias pac "sudo pacman -S"
 alias pi "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi"
 alias pkglist "paru -Qe"
-alias pn "pnpm"
-alias px "pnpx"
+alias pn pnpm
+alias px pnpx
 alias r "paru -Rns"
 alias refresh "refresh-mirror && yay -Syyu && vp upgrade && mise upgrade && bun update -g && npm update -g && pi update && pi update --extensions && bunx skills update && rustup update"
 alias refresh-mirror "sudo reflector --latest 5 --protocol https --country 'Singapore' --sort rate --save /etc/pacman.d/mirrorlist"
@@ -94,7 +92,7 @@ alias vim nvim
 alias vis "sudo nvim"
 alias vr "vp run"
 alias x exit
-alias yay "paru"
+alias yay paru
 alias yz yazi
 alias countline "rg --files | xargs wc -l | sort -n"
 

@@ -26,7 +26,8 @@
   ],
   "quietStartup": true,
   "showHardwareCursor": true,
-  "theme": "gruvbox-dark-hard",
+  "theme": "matugen",
+  "themes": ["~/.cache/theme/pi/matugen.json"],
   "treeFilterMode": "all",
   "terminal": {
     "showTerminalProgress": false

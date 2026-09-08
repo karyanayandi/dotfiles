@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Wallpaper colors",
+  "version": "1.0.0",
+  "theme": {
+    "colors": {
+      "frame": [{{colors.surface.dark.red}}, {{colors.surface.dark.green}}, {{colors.surface.dark.blue}}],
+      "toolbar": [{{colors.surface_container.dark.red}}, {{colors.surface_container.dark.green}}, {{colors.surface_container.dark.blue}}],
+      "tab_text": [{{colors.on_surface.dark.red}}, {{colors.on_surface.dark.green}}, {{colors.on_surface.dark.blue}}],
+      "tab_background_text": [{{colors.on_surface_variant.dark.red}}, {{colors.on_surface_variant.dark.green}}, {{colors.on_surface_variant.dark.blue}}],
+      "bookmark_text": [{{colors.on_surface.dark.red}}, {{colors.on_surface.dark.green}}, {{colors.on_surface.dark.blue}}],
+      "ntp_background": [{{colors.surface.dark.red}}, {{colors.surface.dark.green}}, {{colors.surface.dark.blue}}],
+      "ntp_text": [{{colors.on_surface.dark.red}}, {{colors.on_surface.dark.green}}, {{colors.on_surface.dark.blue}}],
+      "toolbar_button_icon": [{{colors.primary.dark.red}}, {{colors.primary.dark.green}}, {{colors.primary.dark.blue}}],
+      "omnibox_background": [{{colors.surface_container_high.dark.red}}, {{colors.surface_container_high.dark.green}}, {{colors.surface_container_high.dark.blue}}],
+      "omnibox_text": [{{colors.on_surface.dark.red}}, {{colors.on_surface.dark.green}}, {{colors.on_surface.dark.blue}}]
+    }
+  }
+}

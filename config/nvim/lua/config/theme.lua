@@ -86,4 +86,15 @@ end, {
   desc = "Switch Neovim theme",
 })
 
+-- Keep the existing base16 plugin and its integrations; only replace its palette.
+function M.apply()
+  local path = vim.fn.expand "~/.config/theme/generated/nvim.lua"
+  if vim.fn.filereadable(path) == 1 then
+    require("base16-colorscheme").setup(dofile(path))
+    vim.g.colors_name = "matugen"
+  else
+    vim.cmd "colorscheme base16-default-dark"
+  end
+end
+
 return M

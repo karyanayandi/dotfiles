@@ -39,4 +39,9 @@ case $SELECTED_THEME in
   ;;
 esac
 
+# Keep built-in palette as fallback until Matugen has run once.
+if [[ "$SELECTED_THEME" == "matugen" && -f "$HOME/.cache/theme/tmux.sh" ]]; then
+  source "$HOME/.cache/theme/tmux.sh"
+fi
+
 RESET="#\[fg=${THEME[foreground]},bg=${THEME[background]},nobold,noitalics,nounderscore,nodim\]"

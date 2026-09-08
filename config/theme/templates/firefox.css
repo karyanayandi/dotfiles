@@ -1,0 +1,17 @@
+/* Import this generated file from your profile's chrome/userChrome.css. */
+:root {
+  --lwt-accent-color: {{colors.surface.dark.hex}} !important;
+  --lwt-text-color: {{colors.on_surface.dark.hex}} !important;
+  --toolbar-bgcolor: {{colors.surface_container.dark.hex}} !important;
+  --toolbar-color: {{colors.on_surface.dark.hex}} !important;
+  --toolbar-field-background-color: {{colors.surface_container_high.dark.hex}} !important;
+  --toolbar-field-color: {{colors.on_surface.dark.hex}} !important;
+  --toolbar-field-focus-border-color: {{colors.primary.dark.hex}} !important;
+  --tab-selected-bgcolor: {{colors.secondary_container.dark.hex}} !important;
+  --tab-selected-textcolor: {{colors.on_secondary_container.dark.hex}} !important;
+  --lwt-sidebar-background-color: {{colors.surface.dark.hex}} !important;
+  --lwt-sidebar-text-color: {{colors.on_surface.dark.hex}} !important;
+  --focus-outline-color: {{colors.primary.dark.hex}} !important;
+  --urlbarView-highlight-background: {{colors.primary_container.dark.hex}} !important;
+  --urlbarView-highlight-color: {{colors.on_primary_container.dark.hex}} !important;
+}
