@@ -1,4 +1,3 @@
-
 local icons = require "config.icons"
 
 return {
@@ -41,30 +40,98 @@ return {
     callout = {
       note = { raw = "[!NOTE]", rendered = icons.markdown.callouts.Note .. " Note", highlight = "RenderMarkdownInfo" },
       tip = { raw = "[!TIP]", rendered = icons.markdown.callouts.Tip .. " Tip", highlight = "RenderMarkdownSuccess" },
-      important = { raw = "[!IMPORTANT]", rendered = icons.markdown.callouts.Important .. " Important", highlight = "RenderMarkdownHint" },
-      warning = { raw = "[!WARNING]", rendered = icons.markdown.callouts.Warning .. " Warning", highlight = "RenderMarkdownWarn" },
-      caution = { raw = "[!CAUTION]", rendered = icons.markdown.callouts.Caution .. " Caution", highlight = "RenderMarkdownError" },
-      abstract = { raw = "[!ABSTRACT]", rendered = icons.markdown.callouts.Abstract .. " Abstract", highlight = "RenderMarkdownInfo" },
-      summary = { raw = "[!SUMMARY]", rendered = icons.markdown.callouts.Summary .. " Summary", highlight = "RenderMarkdownInfo" },
+      important = {
+        raw = "[!IMPORTANT]",
+        rendered = icons.markdown.callouts.Important .. " Important",
+        highlight = "RenderMarkdownHint",
+      },
+      warning = {
+        raw = "[!WARNING]",
+        rendered = icons.markdown.callouts.Warning .. " Warning",
+        highlight = "RenderMarkdownWarn",
+      },
+      caution = {
+        raw = "[!CAUTION]",
+        rendered = icons.markdown.callouts.Caution .. " Caution",
+        highlight = "RenderMarkdownError",
+      },
+      abstract = {
+        raw = "[!ABSTRACT]",
+        rendered = icons.markdown.callouts.Abstract .. " Abstract",
+        highlight = "RenderMarkdownInfo",
+      },
+      summary = {
+        raw = "[!SUMMARY]",
+        rendered = icons.markdown.callouts.Summary .. " Summary",
+        highlight = "RenderMarkdownInfo",
+      },
       tldr = { raw = "[!TLDR]", rendered = icons.markdown.callouts.Tldr .. " Tldr", highlight = "RenderMarkdownInfo" },
       info = { raw = "[!INFO]", rendered = icons.markdown.callouts.Info .. " Info", highlight = "RenderMarkdownInfo" },
       todo = { raw = "[!TODO]", rendered = icons.markdown.callouts.Todo .. " Todo", highlight = "RenderMarkdownInfo" },
-      hint = { raw = "[!HINT]", rendered = icons.markdown.callouts.Hint .. " Hint", highlight = "RenderMarkdownSuccess" },
-      success = { raw = "[!SUCCESS]", rendered = icons.markdown.callouts.Success .. " Success", highlight = "RenderMarkdownSuccess" },
-      check = { raw = "[!CHECK]", rendered = icons.markdown.callouts.Check .. " Check", highlight = "RenderMarkdownSuccess" },
-      done = { raw = "[!DONE]", rendered = icons.markdown.callouts.Done .. " Done", highlight = "RenderMarkdownSuccess" },
-      question = { raw = "[!QUESTION]", rendered = icons.markdown.callouts.Question .. " Question", highlight = "RenderMarkdownWarn" },
+      hint = {
+        raw = "[!HINT]",
+        rendered = icons.markdown.callouts.Hint .. " Hint",
+        highlight = "RenderMarkdownSuccess",
+      },
+      success = {
+        raw = "[!SUCCESS]",
+        rendered = icons.markdown.callouts.Success .. " Success",
+        highlight = "RenderMarkdownSuccess",
+      },
+      check = {
+        raw = "[!CHECK]",
+        rendered = icons.markdown.callouts.Check .. " Check",
+        highlight = "RenderMarkdownSuccess",
+      },
+      done = {
+        raw = "[!DONE]",
+        rendered = icons.markdown.callouts.Done .. " Done",
+        highlight = "RenderMarkdownSuccess",
+      },
+      question = {
+        raw = "[!QUESTION]",
+        rendered = icons.markdown.callouts.Question .. " Question",
+        highlight = "RenderMarkdownWarn",
+      },
       help = { raw = "[!HELP]", rendered = icons.markdown.callouts.Help .. " Help", highlight = "RenderMarkdownWarn" },
       faq = { raw = "[!FAQ]", rendered = icons.markdown.callouts.Faq .. " Faq", highlight = "RenderMarkdownWarn" },
-      attention = { raw = "[!ATTENTION]", rendered = icons.markdown.callouts.Attention .. " Attention", highlight = "RenderMarkdownWarn" },
-      failure = { raw = "[!FAILURE]", rendered = icons.markdown.callouts.Failure .. " Failure", highlight = "RenderMarkdownError" },
+      attention = {
+        raw = "[!ATTENTION]",
+        rendered = icons.markdown.callouts.Attention .. " Attention",
+        highlight = "RenderMarkdownWarn",
+      },
+      failure = {
+        raw = "[!FAILURE]",
+        rendered = icons.markdown.callouts.Failure .. " Failure",
+        highlight = "RenderMarkdownError",
+      },
       fail = { raw = "[!FAIL]", rendered = icons.markdown.callouts.Fail .. " Fail", highlight = "RenderMarkdownError" },
-      missing = { raw = "[!MISSING]", rendered = icons.markdown.callouts.Missing .. " Missing", highlight = "RenderMarkdownError" },
-      danger = { raw = "[!DANGER]", rendered = icons.markdown.callouts.Danger .. " Danger", highlight = "RenderMarkdownError" },
-      error = { raw = "[!ERROR]", rendered = icons.markdown.callouts.Error .. " Error", highlight = "RenderMarkdownError" },
+      missing = {
+        raw = "[!MISSING]",
+        rendered = icons.markdown.callouts.Missing .. " Missing",
+        highlight = "RenderMarkdownError",
+      },
+      danger = {
+        raw = "[!DANGER]",
+        rendered = icons.markdown.callouts.Danger .. " Danger",
+        highlight = "RenderMarkdownError",
+      },
+      error = {
+        raw = "[!ERROR]",
+        rendered = icons.markdown.callouts.Error .. " Error",
+        highlight = "RenderMarkdownError",
+      },
       bug = { raw = "[!BUG]", rendered = icons.markdown.callouts.Bug .. " Bug", highlight = "RenderMarkdownError" },
-      example = { raw = "[!EXAMPLE]", rendered = icons.markdown.callouts.Example .. " Example", highlight = "RenderMarkdownHint" },
-      quote = { raw = "[!QUOTE]", rendered = icons.markdown.callouts.Quote .. " Quote", highlight = "RenderMarkdownQuote" },
+      example = {
+        raw = "[!EXAMPLE]",
+        rendered = icons.markdown.callouts.Example .. " Example",
+        highlight = "RenderMarkdownHint",
+      },
+      quote = {
+        raw = "[!QUOTE]",
+        rendered = icons.markdown.callouts.Quote .. " Quote",
+        highlight = "RenderMarkdownQuote",
+      },
       cite = { raw = "[!CITE]", rendered = icons.markdown.callouts.Cite .. " Cite", highlight = "RenderMarkdownQuote" },
     },
     overrides = {
@@ -88,6 +155,13 @@ return {
     },
   },
   config = function()
-    vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = require("base16-colorscheme").colors.base01 })
+    local function apply_colors()
+      vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = require("base16-colorscheme").colors.base01 })
+    end
+    apply_colors()
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = vim.api.nvim_create_augroup("WallpaperMarkdown", { clear = true }),
+      callback = apply_colors,
+    })
   end,
 }

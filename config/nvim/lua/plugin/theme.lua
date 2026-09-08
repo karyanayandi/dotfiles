@@ -4,6 +4,7 @@ return {
     priority = 1000,
     config = function()
       require("config.theme").apply()
+      require("config.theme").watch()
       local hl = vim.api.nvim_set_hl
       hl(0, "NeotestPassed", { link = "DiagnosticOk" })
       hl(0, "NeotestFailed", { link = "DiagnosticError" })

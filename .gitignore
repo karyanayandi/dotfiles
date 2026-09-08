@@ -34,3 +34,5 @@ config/qt5ct/colors-generated.conf
 config/qt6ct/colors-generated.conf
 config/swaylock/config-generated
 config/opencode/themes/matugen.json
+
+home/.pi/agent/themes/matugen.json

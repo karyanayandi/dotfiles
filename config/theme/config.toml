@@ -112,7 +112,7 @@ output_path = "~/.config/theme/generated/nvim.lua"
 
 [templates.pi]
 input_path = '~/.config/theme/templates/pi.json'
-output_path = '~/.cache/theme/pi/matugen.json'
+output_path = '~/.pi/agent/themes/matugen.json'
 
 [templates.opencode]
 input_path = '~/.config/theme/templates/opencode.json'

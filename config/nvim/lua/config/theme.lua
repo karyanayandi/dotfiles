@@ -1,5 +1,6 @@
-
 local M = {}
+local palette_path = vim.fn.expand "~/.config/theme/generated/nvim.lua"
+local watcher
 
 --- Discover available themes by scanning themes directory
 --- @return table list of theme names
@@ -88,13 +89,41 @@ end, {
 
 -- Keep the existing base16 plugin and its integrations; only replace its palette.
 function M.apply()
-  local path = vim.fn.expand "~/.config/theme/generated/nvim.lua"
-  if vim.fn.filereadable(path) == 1 then
-    require("base16-colorscheme").setup(dofile(path))
+  if vim.fn.filereadable(palette_path) == 1 then
+    require("base16-colorscheme").setup(dofile(palette_path))
     vim.g.colors_name = "matugen"
+    vim.api.nvim_exec_autocmds("ColorScheme", { pattern = "matugen" })
   else
     vim.cmd "colorscheme base16-default-dark"
   end
+end
+
+-- Poll the pathname so replacing the file does not detach the watcher.
+function M.watch()
+  if watcher then
+    return
+  end
+  watcher = assert(vim.uv.new_fs_poll())
+  watcher:start(
+    palette_path,
+    250,
+    vim.schedule_wrap(function(err)
+      if err then
+        return -- Keep the current palette while a replacement file is absent.
+      end
+      local ok, message = pcall(M.apply)
+      if not ok then
+        vim.notify("Wallpaper palette reload failed: " .. tostring(message), vim.log.levels.WARN)
+      end
+    end)
+  )
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    once = true,
+    callback = function()
+      watcher:stop()
+      watcher:close()
+    end,
+  })
 end
 
 return M

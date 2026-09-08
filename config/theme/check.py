@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Render every template in a temporary home, never touching live app configs."""
 
-import fcntl
 import json
 import os
 import pty
@@ -9,9 +8,9 @@ import runpy
 import select
 import shlex
 import shutil
+import signal
 import subprocess
 import tempfile
-import termios
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -28,7 +27,18 @@ def check_prompt(home, env):
         'format = "[THEME>](red)"\npalette = "test"\n[palettes.test]\nred = "#123456"\n'
     )
     source = shlex.quote(str(ROOT / "config/fish/functions/wallpaper_cli_reload.fish"))
-    master, slave = pty.openpty()
+    pid, master = pty.fork()
+    if pid == 0:
+        os.execvpe(
+            "fish",
+            [
+                "fish",
+                "--interactive",
+                "--init-command",
+                f"source {source}; wallpaper_cli_reload; starship init fish | source",
+            ],
+            {**env, "TERM": "xterm-256color", "COLORTERM": "truecolor"},
+        )
 
     def wait_for(color):
         received = b""
@@ -45,39 +55,19 @@ def check_prompt(home, env):
         raise AssertionError(f"Prompt did not repaint: {received!r}")
 
     try:
-        with subprocess.Popen(
-            [
-                "fish",
-                "--interactive",
-                "--init-command",
-                f"source {source}; wallpaper_cli_reload; starship init fish | source",
-            ],
-            stdin=slave,
-            stdout=slave,
-            stderr=slave,
-            env={**env, "TERM": "xterm-256color", "COLORTERM": "truecolor"},
-            start_new_session=True,
-            preexec_fn=lambda: fcntl.ioctl(0, termios.TIOCSCTTY, 0),
-        ) as shell:
-            try:
-                wait_for(b"38;2;18;52;86")
-                config.write_text(config.read_text().replace("#123456", "#654321"))
-                subprocess.run(
-                    [
-                        "fish",
-                        "-c",
-                        "set -U wallpaper_theme_generation prompt-test",
-                    ],
-                    env=env,
-                    check=True,
-                )
-                # No keypress: the idle prompt must repaint from the variable event.
-                wait_for(b"38;2;101;67;33")
-            finally:
-                shell.terminate()
+        wait_for(b"38;2;18;52;86")
+        config.write_text(config.read_text().replace("#123456", "#654321"))
+        subprocess.run(
+            ["fish", "-c", "set -U wallpaper_theme_generation prompt-test"],
+            env=env,
+            check=True,
+        )
+        # No keypress: the idle prompt must repaint from the variable event.
+        wait_for(b"38;2;101;67;33")
     finally:
+        os.kill(pid, signal.SIGTERM)
+        os.waitpid(pid, 0)
         os.close(master)
-        os.close(slave)
 
 
 def check():
@@ -85,6 +75,8 @@ def check():
     if not binary:
         raise SystemExit("Install matugen, or add its binary directory to PATH.")
     config = tomllib.loads((THEME / "config.toml").read_text())
+    # Pi's native watcher ignores externally registered theme paths.
+    assert config["templates"]["pi"]["output_path"] == "~/.pi/agent/themes/matugen.json"
     with tempfile.TemporaryDirectory(prefix="wallpaper-theme-test-") as directory:
         home = Path(directory)
         entries = ["[config]"]
@@ -224,7 +216,7 @@ def check():
         )
         assert missing.returncode != 0
     print(
-        f"PASS: {len(outputs)} templates render and change palettes; structured output parses; runner handles restore, spaces, and failure."
+        f"PASS: {len(outputs)} palettes render; terminal PTY delivery and runner pass; available Fish/Starship idle-repaint check passes."
     )
 
 
