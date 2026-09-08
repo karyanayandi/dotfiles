@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import "../services" as Services
 import ".."
 
 Item {
@@ -13,6 +14,46 @@ Item {
     required property var notifs
     property bool opened: false
     property bool networkAvailable: false
+    property date now: new Date()
+    property string cpuUsage: "CPU --"
+    property string ramUsage: "RAM --"
+    readonly property string bluetoothStatus: {
+        const devices = bluetooth.devices.filter(device => device.connected).map(device => device.name);
+        return devices.length ? devices.join(", ") : "No device connected";
+    }
+
+    Services.BluetoothService {
+        id: bluetooth
+    }
+
+    Process {
+        id: systemUsage
+        command: ["sh", "-c", "{ awk '/^cpu / { idle=$5+$6; total=0; for (i=2; i<=NF; i++) total+=$i; print total, idle }' /proc/stat; sleep 0.1; awk '/^cpu / { idle=$5+$6; total=0; for (i=2; i<=NF; i++) total+=$i; print total, idle }' /proc/stat; } | awk 'NR==1 { total=$1; idle=$2; next } { printf \"CPU %d%%\\n\", 100 - 100 * ($2-idle) / ($1-total) }'; free -h | awk '/^Mem:/ { print \"RAM \" $3 \"/\" $2 }'"]
+        stdout: SplitParser {
+            onRead: data => {
+                data = data.trim();
+                if (data.startsWith("CPU"))
+                    win.cpuUsage = data;
+                else if (data.startsWith("RAM"))
+                    win.ramUsage = data;
+            }
+        }
+    }
+    Timer {
+        interval: 2000
+        running: win.opened
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: systemUsage.running = true
+    }
+
+    Timer {
+        interval: 1000
+        running: win.opened
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: win.now = new Date()
+    }
     signal launcherRequested(string mode)
 
     visible: opened
@@ -56,23 +97,37 @@ Item {
     component SettingButton: Button {
         id: button
         Layout.fillWidth: true
-        implicitHeight: 52
+        property string detail: ""
+        implicitHeight: Math.max(52, contentItem.implicitHeight + 24)
         font.family: Theme.fontUi
         font.pixelSize: 14
-        Accessible.name: text
+        Accessible.name: detail ? text + ", " + detail : text
         background: Rectangle {
             radius: 14
             color: button.down ? Theme.g2 : button.checked ? Theme.colActionBg : button.hovered ? Theme.g2 : Theme.colBgAlt
             border.width: button.visualFocus ? 2 : 1
             border.color: button.visualFocus ? Theme.colFg : Theme.colBorder
         }
-        contentItem: Text {
-            text: button.text
-            font: button.font
-            color: button.enabled ? Theme.colFg : Theme.colFgDim
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
+        contentItem: ColumnLayout {
+            spacing: 4
+            Text {
+                Layout.fillWidth: true
+                text: button.text
+                font: button.font
+                color: button.enabled ? Theme.colFg : Theme.colFgDim
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+            }
+            Text {
+                Layout.fillWidth: true
+                visible: button.detail !== ""
+                text: button.detail
+                font.family: Theme.fontUi
+                font.pixelSize: 12
+                color: Theme.colFgDim
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+            }
         }
     }
 
@@ -113,6 +168,15 @@ Item {
                     }
                 }
 
+                Text {
+                    Layout.fillWidth: true
+                    text: Qt.formatDateTime(win.now, "HH:mm · dddd, dd MMMM")
+                    wrapMode: Text.WordWrap
+                    color: Theme.colFgDim
+                    font.family: Theme.fontUi
+                    font.pixelSize: 13
+                }
+
                 GridLayout {
                     Layout.fillWidth: true
                     columns: 2
@@ -128,7 +192,8 @@ Item {
                         }
                     }
                     SettingButton {
-                        text: "Bluetooth settings ↗"
+                        text: "Bluetooth ↗"
+                        detail: win.bluetoothStatus
                         onClicked: {
                             win.launcherRequested("bluetooth");
                         }
@@ -145,6 +210,15 @@ Item {
                         checkable: true
                         checked: win.audio.muted
                         onClicked: win.audio.volMuteToggle()
+                    }
+                }
+
+                SettingButton {
+                    text: "System monitor ↗"
+                    detail: win.cpuUsage + " · " + win.ramUsage
+                    onClicked: {
+                        Quickshell.execDetached(["ghostty", "-e", "btm"]);
+                        win.opened = false;
                     }
                 }
 
