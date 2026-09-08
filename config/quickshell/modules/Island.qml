@@ -36,7 +36,7 @@ PanelWindow {
     implicitHeight: screen ? screen.height : 800
     exclusiveZone: Config.barExclusiveZone
     color: "transparent"
-    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.layer: interactive ? WlrLayer.Overlay : WlrLayer.Top
     WlrLayershell.namespace: "quickshell"
     WlrLayershell.keyboardFocus: interactive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
