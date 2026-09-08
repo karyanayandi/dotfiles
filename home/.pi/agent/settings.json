@@ -1,6 +1,6 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "gpt-5.6-terra",
+  "defaultModel": "gpt-6-astra",
   "defaultProjectTrust": "always",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "medium",
@@ -36,6 +36,7 @@
   },
   "tuiMode": "fullscreen",
   "modelThinkingLevels": {
+    "openai-codex/gpt-6-astra": "light",
     "openai-codex/gpt-5.6-terra": "medium",
     "openai-codex/gpt-5.6-sol": "medium",
     "openai-codex/gpt-5.6-luna": "max"
