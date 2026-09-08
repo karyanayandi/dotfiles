@@ -16,6 +16,7 @@ yay -S --needed \
   chafa \
   cmake \
   codebase-memory-mcp-bin \
+  codex-desktop-git \
   cowsay \
   deno \
   distrobox \
@@ -60,8 +61,8 @@ yay -S --needed \
   lsof \
   lua \
   luarocks \
-  mise \
   matugen \
+  mise \
   mpv \
   nemo \
   nemo-fileroller \
