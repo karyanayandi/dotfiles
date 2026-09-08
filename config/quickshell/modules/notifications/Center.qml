@@ -92,7 +92,8 @@ PanelWindow {
                         }
 
                         contentItem: Text {
-                            text: "✕"
+                            text: "\uf00d"
+                            font.family: Theme.fontFamily
                             color: Theme.colFgDim
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
@@ -243,6 +244,8 @@ PanelWindow {
                             }
 
                             delegate: ColumnLayout {
+                                id: group
+
                                 required property var modelData
                                 property var grp: modelData
                                 property bool collapsed: false
@@ -286,27 +289,29 @@ PanelWindow {
                                         opacity: 0.8
                                     }
 
-                                    Rectangle {
-                                        visible: grp.notifications.length > 1
-                                        Layout.preferredWidth: 28
-                                        Layout.preferredHeight: 28
-                                        radius: 7
-                                        color: cMa.pressed ? Theme.g2 : cMa.containsMouse ? Theme.g1 : "transparent"
+                                    Button {
+                                        id: collapseButton
 
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: collapsed ? "▸" : "▾"
-                                            color: Theme.colFg
-                                            font.pixelSize: 13
+                                        visible: grp.notifications.length > 1
+                                        Layout.preferredWidth: 32
+                                        Layout.preferredHeight: 32
+                                        Accessible.name: group.collapsed ? "Expand notifications" : "Collapse notifications"
+                                        onClicked: group.collapsed = !group.collapsed
+
+                                        background: Rectangle {
+                                            radius: 10
+                                            color: collapseButton.down ? Theme.g2 : collapseButton.hovered ? Theme.g1 : "transparent"
+                                            border.width: collapseButton.visualFocus ? 1 : 0
+                                            border.color: Theme.g7
                                         }
 
-                                        MouseArea {
-                                            id: cMa
-
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: collapsed = !collapsed
+                                        contentItem: Text {
+                                            text: group.collapsed ? "\uf078" : "\uf077"
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: 13
+                                            color: Theme.colFgDim
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
                                         }
 
                                     }
@@ -319,7 +324,8 @@ PanelWindow {
 
                                         Text {
                                             anchors.centerIn: parent
-                                            text: "✕"
+                                            text: "\uf00d"
+                                            font.family: Theme.fontFamily
                                             color: Theme.colFg
                                             font.pixelSize: 13
                                         }
@@ -351,8 +357,28 @@ PanelWindow {
                                             property var notif: modelData
 
                                             Layout.fillWidth: true
-                                            implicitHeight: card.implicitHeight + 4
+                                            implicitHeight: card.implicitHeight + 4 + (group.collapsed ? Math.min(2, group.grp.notifications.length - 1) * 7 : 0)
                                             Layout.topMargin: 4
+
+                                            Repeater {
+                                                model: group.collapsed ? Math.min(2, group.grp.notifications.length - 1) : 0
+
+                                                delegate: Rectangle {
+                                                    required property int index
+                                                    readonly property int depth: index + 1
+
+                                                    x: depth * 7
+                                                    y: depth * 7
+                                                    width: parent.width - depth * 14
+                                                    height: card.implicitHeight
+                                                    radius: card.cardRadius
+                                                    color: depth === 1 ? Theme.g1 : Theme.g2
+                                                    border.color: Theme.colBorderStrong
+                                                    border.width: 1
+                                                    z: -depth
+                                                }
+
+                                            }
 
                                             Comp.NotificationCard {
                                                 id: card
@@ -375,7 +401,7 @@ PanelWindow {
                                         font.family: Theme.fontUi
                                         font.pixelSize: 13
                                         Layout.leftMargin: 4
-                                        Layout.topMargin: 2
+                                        Layout.topMargin: 6
                                     }
 
                                 }

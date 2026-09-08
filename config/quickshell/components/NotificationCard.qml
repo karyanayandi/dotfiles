@@ -77,7 +77,8 @@ Rectangle {
                 }
 
                 contentItem: Text {
-                    text: "✕"
+                    text: "\uf00d"
+                    font.family: Theme.fontFamily
                     color: Theme.colFgDim
                     font.pixelSize: 13
                     horizontalAlignment: Text.AlignHCenter
