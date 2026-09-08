@@ -48,7 +48,6 @@ def check_prompt(home, env):
         with subprocess.Popen(
             [
                 "fish",
-                "--no-config",
                 "--interactive",
                 "--init-command",
                 f"source {source}; wallpaper_cli_reload; starship init fish | source",
@@ -66,7 +65,6 @@ def check_prompt(home, env):
                 subprocess.run(
                     [
                         "fish",
-                        "--no-config",
                         "-c",
                         "set -U wallpaper_theme_generation prompt-test",
                     ],
