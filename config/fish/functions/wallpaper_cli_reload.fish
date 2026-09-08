@@ -13,4 +13,8 @@ function wallpaper_cli_reload --on-variable wallpaper_theme_generation --descrip
     if test -f "$generated/starship.toml"
         set -gx STARSHIP_CONFIG "$generated/starship.toml"
     end
+    # Universal-variable events can arrive while the reader is idle.
+    if status is-interactive; and test "$argv[1]" = VARIABLE
+        commandline -f repaint
+    end
 end

@@ -27,7 +27,6 @@ Item {
             "wallpaper": root.current,
             "interval": root.rotationInterval
         }));
-        store.writeFile();
     }
 
     function setWallpaper(path) {

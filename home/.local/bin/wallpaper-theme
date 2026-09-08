@@ -33,6 +33,12 @@ if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
   THEME_NAME=matugen bash "$HOME/.tmux/theme/theme.tmux"
 fi
 
+# Ghostty caches config for future windows. Only signal processes with a handler.
+pkill --require-handler --signal USR2 --euid "$UID" --exact ghostty || true
+
+# Update the outer terminal PTYs directly, including those hosting tmux.
+python3 "$config_home/theme/terminal.py"
+
 # Reload supported consumers without restarting terminals, shells, or lock screens.
 if command -v fish >/dev/null; then
   fish --no-config -c 'set -U wallpaper_theme_generation (date +%s%N)'
