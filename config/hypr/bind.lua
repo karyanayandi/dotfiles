@@ -48,6 +48,7 @@ hl.bind(mainMod .. " + ALT + P", hl.dsp.exec_cmd "~/.local/bin/color-picker.sh")
 hl.bind("Print", hl.dsp.exec_cmd "~/.local/bin/screenshot.sh")
 
 -- Notifications
+hl.bind(mainMod .. " + ALT + M", hl.dsp.exec_cmd "qs ipc call notificationStacks toggle")
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd "qs ipc call notifications toggle")
 hl.bind(mainMod .. " + CTRL + N", hl.dsp.exec_cmd "qs ipc call notifications clear")
 

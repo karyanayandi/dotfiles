@@ -3,12 +3,35 @@ import "../../components" as Comp
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell.Io
 
 Item {
     id: win
+    objectName: "notificationCenter"
 
     required property var notifs
     property var theme: Theme
+
+    function toggleStacks() {
+        let expand = false;
+        for (let i = 0; i < groups.count; i++) {
+            const group = groups.itemAt(i);
+            if (group && group.grp.notifications.length > 1 && group.collapsed)
+                expand = true;
+        }
+        for (let i = 0; i < groups.count; i++) {
+            const group = groups.itemAt(i);
+            if (group)
+                group.collapsed = !expand;
+        }
+    }
+
+    IpcHandler {
+        target: "notificationStacks"
+        function toggle() {
+            win.toggleStacks();
+        }
+    }
 
     visible: notifs.controlCenterVisible
     implicitWidth: Config.centerWidth
@@ -191,6 +214,7 @@ Item {
                 }
 
                 Repeater {
+                    id: groups
                     model: {
                         let _ = win.notifs.notifCount;
                         return win.notifs.grouped();
@@ -198,10 +222,11 @@ Item {
 
                     delegate: ColumnLayout {
                         id: group
+                        objectName: "notificationStack"
 
                         required property var modelData
                         property var grp: modelData
-                        property bool collapsed: false
+                        property bool collapsed: true
 
                         Layout.fillWidth: true
                         spacing: 0
@@ -259,7 +284,7 @@ Item {
                                 }
 
                                 contentItem: Text {
-                                    text: group.collapsed ? "\uf078" : "\uf077"
+                                    text: group.collapsed ? "\uf077" : "\uf078"
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 13
                                     color: Theme.colFgDim
