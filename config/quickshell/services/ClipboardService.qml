@@ -25,7 +25,6 @@ Item {
 
     function save() {
         store.setText(JSON.stringify(root.history.slice(0, root.maxSize)));
-        store.writeFile();
     }
 
     readonly property string imgDir: "/home/karyana/.cache/quickshell/clip-img"

@@ -26,7 +26,8 @@ Item {
         visible: root.model.length > 0 && !root.valueGrid
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        model: root.model
+        // Keep JS objects out of Qt's QVariant delegate conversion path.
+        model: root.valueGrid ? 0 : root.model.length
         currentIndex: root.selected
         highlightMoveDuration: 0
         highlightMoveVelocity: -1
@@ -40,6 +41,7 @@ Item {
         }
 
         delegate: ResultItem {
+            modelData: root.model[index] || {}
             selectedIndex: root.selected
             onHovered: index => {
                 return root.selectionRequested(index);
@@ -60,7 +62,7 @@ Item {
         visible: root.valueGrid
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        model: root.model
+        model: root.valueGrid ? root.model.length : 0
         currentIndex: root.selected
         cellWidth: root.wallpaperGrid ? 160 : 64
         cellHeight: root.wallpaperGrid ? 108 : 56
@@ -71,8 +73,8 @@ Item {
         }
 
         delegate: Item {
-            required property var modelData
             required property int index
+            readonly property var modelData: root.model[index] || {}
 
             width: grid.cellWidth
             height: grid.cellHeight
