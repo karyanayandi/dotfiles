@@ -51,7 +51,10 @@ const GPT_THINKING_LABELS: Record<string, string> = {
 }
 
 function isCodexGpt(model: ThinkingModel | undefined) {
-  return model?.provider === "openai-codex" && model.id.startsWith("gpt-5.6-")
+  return (
+    model?.provider === "openai-codex" &&
+    (model.id.startsWith("gpt-5.6-") || model.id === "gpt-6-astra")
+  )
 }
 
 export function displayThinkingLevel(
