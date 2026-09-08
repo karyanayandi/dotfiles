@@ -1,15 +1,17 @@
+import "../.."
 import QtQuick
 import QtQuick.Controls
-import "../.."
 
 Item {
     id: root
+
     property var model: []
     property int selected: 0
     property string emptyText: "No results"
     readonly property bool wallpaperGrid: root.model.length > 0 && root.model[0].kind === "wallpaper"
     readonly property bool valueGrid: root.model.length > 0 && (root.model[0].kind === "emoji" || root.model[0].kind === "nerd" || root.wallpaperGrid)
     readonly property int gridColumns: Math.max(1, Math.floor(grid.width / grid.cellWidth))
+
     signal selectionRequested(int index)
     signal activated(int index, bool ctrl)
 
@@ -17,29 +19,40 @@ Item {
 
     ListView {
         id: list
+
         anchors.fill: parent
+        anchors.margins: 8
+        spacing: 4
         visible: root.model.length > 0 && !root.valueGrid
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         model: root.model
         currentIndex: root.selected
-        highlightMoveDuration: 140
+        highlightMoveDuration: 0
         highlightMoveVelocity: -1
+
         highlight: Rectangle {
             radius: 10
-            color: Theme.colHoverAlpha
+            color: Theme.g1
             border.color: Theme.colBorder
             border.width: 1
         }
+
         delegate: ResultItem {
             selectedIndex: root.selected
-            onHovered: index => root.selectionRequested(index)
-            onActivated: (index, ctrl) => root.activated(index, ctrl)
+            onHovered: (index) => {
+                return root.selectionRequested(index);
+            }
+            onActivated: (index, ctrl) => {
+                return root.activated(index, ctrl);
+            }
         }
+
     }
 
     GridView {
         id: grid
+
         width: Math.floor(parent.width / cellWidth) * cellWidth
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
@@ -51,11 +64,16 @@ Item {
         currentIndex: root.selected
         cellWidth: root.wallpaperGrid ? 160 : 64
         cellHeight: root.wallpaperGrid ? 108 : 56
-        onCurrentIndexChanged: if (currentIndex >= 0 && root.valueGrid)
-            positionViewAtIndex(currentIndex, GridView.Contain)
+        onCurrentIndexChanged: {
+            if (currentIndex >= 0 && root.valueGrid) {
+                positionViewAtIndex(currentIndex, GridView.Contain);
+            }
+        }
+
         delegate: Item {
             required property var modelData
             required property int index
+
             width: grid.cellWidth
             height: grid.cellHeight
 
@@ -84,6 +102,7 @@ Item {
                     anchors.bottom: parent.bottom
                     height: 28
                     color: Theme.colBgAlpha078
+
                     Text {
                         anchors.fill: parent
                         anchors.leftMargin: 8
@@ -95,6 +114,7 @@ Item {
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                     }
+
                 }
 
                 Rectangle {
@@ -105,6 +125,7 @@ Item {
                     border.color: Theme.g6
                     border.width: 3
                 }
+
             }
 
             Text {
@@ -125,10 +146,13 @@ Item {
                 onEntered: root.selectionRequested(index)
                 onClicked: root.activated(index, !!(mouse.modifiers & Qt.ControlModifier))
             }
+
         }
+
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AsNeeded
         }
+
     }
 
     Text {
@@ -136,7 +160,8 @@ Item {
         visible: root.model.length === 0
         text: root.emptyText
         color: Theme.g19
-        font.family: Theme.fontFamily
-        font.pixelSize: 12
+        font.family: Theme.fontUi
+        font.pixelSize: 14
     }
+
 }

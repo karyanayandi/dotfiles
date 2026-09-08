@@ -1,27 +1,30 @@
+import "../.."
 import QtQuick
 import QtQuick.Layouts
-import "../.."
 
 RowLayout {
     id: root
+
     property string mode: "all"
+
     signal queryChanged(string query)
-    signal escapePressed
+    signal escapePressed()
     signal selectionMoved(string direction)
     signal selected(bool ctrl)
-    signal cycleWallpaperInterval
+    signal cycleWallpaperInterval()
 
     function focusInput() {
         input.forceActiveFocus();
     }
+
     function clear() {
         input.text = "";
     }
 
     Layout.fillWidth: true
     Layout.preferredHeight: Config.launcherInputHeight
-    Layout.leftMargin: 16
-    Layout.rightMargin: 16
+    Layout.leftMargin: 20
+    Layout.rightMargin: 20
     spacing: 12
 
     Text {
@@ -34,18 +37,19 @@ RowLayout {
 
     TextInput {
         id: input
+
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
         color: Theme.colFg
         selectionColor: Theme.colSelected
         selectedTextColor: Theme.colBg
-        font.family: Theme.fontFamily
-        font.pixelSize: 17
+        font.family: Theme.fontUi
+        font.pixelSize: 20
         font.weight: Font.Normal
         clip: true
         focus: true
         onTextChanged: root.queryChanged(text)
-        Keys.onPressed: event => {
+        Keys.onPressed: (event) => {
             if (root.mode === "wallpaper" && event.key === Qt.Key_B && (event.modifiers & Qt.ControlModifier))
                 root.cycleWallpaperInterval();
             else if (event.key === Qt.Key_Escape)
@@ -59,7 +63,7 @@ RowLayout {
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                 root.selected(!!(event.modifiers & Qt.ControlModifier));
             else
-                return;
+                return ;
             event.accepted = true;
         }
 
@@ -68,32 +72,51 @@ RowLayout {
             visible: !parent.text.length
             text: {
                 if (root.mode === "clipboard")
-                    return "Search clipboard\u2026  (autopaste on Enter, copy on Ctrl+Enter)";
+                    return "Search clipboard\u2026";
+
                 if (root.mode === "emoji")
                     return "Search emoji\u2026  (e.g. fire, heart)";
+
                 if (root.mode === "nerd")
                     return "Search Nerd Fonts\u2026";
+
                 if (root.mode === "bluetooth")
                     return "Bluetooth devices\u2026";
+
                 if (root.mode === "power")
                     return "Search power actions\u2026";
+
                 if (root.mode === "wallpaper")
                     return "Search wallpapers\u2026";
+
                 return "Search apps, clipboard, emoji, wallpapers\u2026";
             }
             color: Theme.g19
-            font.pixelSize: root.mode === "emoji" ? 18 : 15
+            font.family: Theme.fontUi
+            font.pixelSize: 17
         }
+
     }
 
-    Text {
+    Rectangle {
+        implicitWidth: 32
+        implicitHeight: 32
+        radius: 8
+        color: clearMouse.pressed ? Theme.g2 : clearMouse.containsMouse ? Theme.g1 : "transparent"
         visible: input.text.length > 0
-        text: "\u2715"
-        color: Theme.colMuted
-        font.family: Theme.fontFamily
-        font.pixelSize: 14
         Layout.alignment: Qt.AlignVCenter
+
+        Text {
+            anchors.centerIn: parent
+            text: "\u2715"
+            color: Theme.colFgDim
+            font.pixelSize: 14
+        }
+
         MouseArea {
+            id: clearMouse
+
+            hoverEnabled: true
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
@@ -101,15 +124,17 @@ RowLayout {
                 root.focusInput();
             }
         }
+
     }
 
     Text {
         visible: !input.text.length
         text: "esc"
-        color: Qt.rgba(0x7c / 255, 0x6f / 255, 0x64 / 255, 0.9)
+        color: Theme.colFgDim
         font.family: Theme.fontFamily
         font.pixelSize: 10
         Layout.alignment: Qt.AlignVCenter
+
         Rectangle {
             anchors.centerIn: parent
             width: parent.width + 10
@@ -120,5 +145,7 @@ RowLayout {
             border.color: Theme.colBorder
             border.width: 1
         }
+
     }
+
 }

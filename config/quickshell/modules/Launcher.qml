@@ -1,15 +1,17 @@
+import ".."
+import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import QtQuick
-import QtQuick.Layouts
 import "launcher" as LauncherParts
-import ".."
 
 PanelWindow {
     id: win
+
     property bool visibleLauncher: false
     required property var wallpaper
+    property real _opacity: visibleLauncher ? 1 : 0
 
     function open(mode) {
         const selectedMode = mode || "all";
@@ -21,32 +23,57 @@ PanelWindow {
         input.clear();
         Qt.callLater(() => {
             if (model.mode === "wallpaper") {
-                const current = model.results.findIndex(item => item.path === win.wallpaper.current);
+                const current = model.results.findIndex((item) => {
+                    return item.path === win.wallpaper.current;
+                });
                 if (current >= 0)
                     model.selected = current;
+
             }
             input.focusInput();
         });
     }
 
+    visible: visibleLauncher || _opacity > 0.01
+    color: "transparent"
+    exclusiveZone: 0
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.namespace: "quickshell-launcher"
+    WlrLayershell.keyboardFocus: visibleLauncher ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    onVisibleLauncherChanged: {
+        if (visibleLauncher) {
+            Qt.callLater(() => {
+                return input.focusInput();
+            });
+            model.refreshApps();
+            if (model.mode === "bluetooth")
+                model.refreshBluetooth();
+
+        }
+    }
+
     IpcHandler {
-        target: "launcher"
         function toggle(arg: string) {
             if (win.visibleLauncher)
                 win.visibleLauncher = false;
             else
                 win.open(arg || "all");
         }
+
         function open(arg: string) {
             win.open(arg);
         }
+
         function close() {
             win.visibleLauncher = false;
         }
+
+        target: "launcher"
     }
 
     LauncherParts.LauncherModel {
         id: model
+
         wallpaper: win.wallpaper
         onCloseRequested: win.visibleLauncher = false
         onSourceOpened: {
@@ -55,70 +82,47 @@ PanelWindow {
         }
     }
 
-    visible: visibleLauncher || _opacity > 0.01
-    color: "transparent"
     anchors {
         top: true
         bottom: true
         left: true
         right: true
     }
-    exclusiveZone: 0
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-launcher"
-    WlrLayershell.keyboardFocus: visibleLauncher ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    mask: Region {
-        item: cardWrap
-    }
-
-    property real _opacity: visibleLauncher ? 1 : 0
-    Behavior on _opacity {
-        NumberAnimation {
-            duration: 220
-            easing.type: Easing.OutCubic
-        }
-    }
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(0x1d / 255, 0x20 / 255, 0x21 / 255, visibleLauncher ? 0.34 : 0)
+        color: Qt.rgba(29 / 255, 32 / 255, 33 / 255, visibleLauncher ? 0.34 : 0)
         opacity: win._opacity
-        Behavior on color {
-            ColorAnimation {
-                duration: 220
-                easing.type: Easing.OutCubic
-            }
-        }
+
         MouseArea {
             anchors.fill: parent
             enabled: win.visibleLauncher
             onClicked: win.visibleLauncher = false
         }
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Config.animNormal
+                easing.type: Easing.OutCubic
+            }
+
+        }
+
     }
 
     Item {
         id: cardWrap
+
         width: Math.min(Config.launcherWidth, parent.width - 48)
-        scale: 0.96 + win._opacity * 0.04
+        scale: 0.985 + win._opacity * 0.015
         opacity: win._opacity
         implicitHeight: card.implicitHeight
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        Behavior on scale {
-            NumberAnimation {
-                duration: 260
-                easing.type: Easing.OutCubic
-            }
-        }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutCubic
-            }
-        }
 
         Rectangle {
             id: card
+
             width: parent.width
             implicitHeight: column.implicitHeight + 2
             radius: Config.launcherRadius
@@ -137,6 +141,7 @@ PanelWindow {
 
             ColumnLayout {
                 id: column
+
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
@@ -144,8 +149,9 @@ PanelWindow {
 
                 LauncherParts.SearchInput {
                     id: input
+
                     mode: model.mode
-                    onQueryChanged: query => {
+                    onQueryChanged: (query) => {
                         model.query = query;
                         model.selected = 0;
                     }
@@ -159,14 +165,13 @@ PanelWindow {
                             win.visibleLauncher = false;
                         }
                     }
-                    onSelectionMoved: direction => {
+                    onSelectionMoved: (direction) => {
                         const count = model.results.length;
                         const gridMode = model.mode === "emoji" || model.mode === "nerd" || model.mode === "wallpaper";
                         if (!gridMode) {
                             model.selected = Math.max(0, Math.min(model.selected + (direction === "up" ? -1 : 1), count - 1));
-                            return;
+                            return ;
                         }
-
                         const columns = results.gridColumns;
                         const selected = model.selected;
                         let next = selected;
@@ -180,7 +185,9 @@ PanelWindow {
                             next += columns;
                         model.selected = next;
                     }
-                    onSelected: ctrl => model.triggerSelected(ctrl)
+                    onSelected: (ctrl) => {
+                        return model.triggerSelected(ctrl);
+                    }
                     onCycleWallpaperInterval: win.wallpaper.cycleInterval()
                 }
 
@@ -193,12 +200,15 @@ PanelWindow {
 
                 LauncherParts.Results {
                     id: results
+
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 360
+                    Layout.preferredHeight: Math.max(0, Math.min(360, win.height - 240))
                     model: model.results
                     selected: model.selected
                     emptyText: model.mode === "clipboard" ? "No clipboard history yet — copy something" : model.mode === "bluetooth" ? "No devices — press Scan" : "No results"
-                    onSelectionRequested: index => model.selected = index
+                    onSelectionRequested: (index) => {
+                        return model.selected = index;
+                    }
                     onActivated: (index, ctrl) => {
                         model.selected = index;
                         model.triggerSelected(ctrl);
@@ -211,14 +221,23 @@ PanelWindow {
                     clipboard: model.clipboard
                     wallpaper: win.wallpaper
                 }
+
             }
+
         }
+
     }
 
-    onVisibleLauncherChanged: if (visibleLauncher) {
-        Qt.callLater(() => input.focusInput());
-        model.refreshApps();
-        if (model.mode === "bluetooth")
-            model.refreshBluetooth();
+    mask: Region {
+        item: cardWrap
     }
+
+    Behavior on _opacity {
+        NumberAnimation {
+            duration: Config.animNormal
+            easing.type: Easing.OutCubic
+        }
+
+    }
+
 }
