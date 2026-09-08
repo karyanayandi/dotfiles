@@ -8,9 +8,9 @@ PanelWindow {
 
     required property var notifs
 
-    anchors.bottom: true
+    anchors.top: true
     anchors.right: true
-    margins.bottom: 18
+    margins.top: 18
     margins.right: 18
     implicitWidth: Math.min(Config.popupWidth, screen ? screen.width - 36 : Config.popupWidth)
     implicitHeight: popups.implicitHeight
