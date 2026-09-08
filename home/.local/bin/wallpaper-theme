@@ -41,7 +41,7 @@ python3 "$config_home/theme/terminal.py"
 
 # Reload supported consumers without restarting terminals, shells, or lock screens.
 if command -v fish >/dev/null; then
-  fish --no-config -c 'set -U wallpaper_theme_generation (date +%s%N)'
+  fish -c 'set -U wallpaper_theme_generation (date +%s%N)'
 fi
 if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && command -v hyprctl >/dev/null; then
   hyprctl reload >/dev/null || echo 'wallpaper-theme: Hyprland reload failed.' >&2

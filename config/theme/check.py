@@ -35,7 +35,11 @@ def check_prompt(home, env):
         deadline = time.monotonic() + 8
         while time.monotonic() < deadline:
             if select.select([master], [], [], 0.1)[0]:
-                received += os.read(master, 65536)
+                chunk = os.read(master, 65536)
+                received += chunk
+                if b"\x1b[0c" in chunk:
+                    # Answer Fish's startup terminal query, not a user keypress.
+                    os.write(master, b"\x1b[?1;2c")
                 if color in received:
                     return
         raise AssertionError(f"Prompt did not repaint: {received!r}")
