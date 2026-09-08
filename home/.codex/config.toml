@@ -1,28 +1,28 @@
-model = "gpt-5.6-sol"
-model_reasoning_effort = "medium"
+model = "gpt-6-astra"
+model_reasoning_effort = "low"
 [desktop]
 followUpQueueMode = "queue"
 appearanceTheme = "dark"
-appearanceDarkCodeThemeId = "gruvbox"
+appearanceDarkCodeThemeId = "codex"
 reduced-motion-preference = "on"
 
 [desktop.appearanceDarkChromeTheme]
-accent = "#458588"
+accent = "#0169cc"
+accentSource = "chatgpt"
 contrast = 60
-ink = "#ebdbb2"
+ink = "#fcfcfc"
 opaqueWindows = false
-surface = "#282828"
+surface = "#111111"
 
 [desktop.appearanceDarkChromeTheme.fonts]
 code = "JetbrainsMono NFM"
 
 [desktop.appearanceDarkChromeTheme.semanticColors]
-diffAdded = "#ebdbb2"
-diffRemoved = "#cc241d"
-skill = "#b16286"
+diffAdded = "#00a240"
+diffRemoved = "#e02e2a"
+skill = "#b06dff"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-09-08T10:38:05Z"
 source_type = "local"
 source = "/home/karyana/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
@@ -55,32 +55,37 @@ enabled = true
 [plugins."sites@openai-bundled"]
 enabled = true
 
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
 [features]
 js_repl = false
 
 [mcp_servers.node_repl]
 args = []
-command = "/opt/codex-app-linux-beta/resources/cua_node/bin/node_repl"
+command = "/opt/codex-desktop/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/opt/codex-app-linux-beta/resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex"
+NODE_REPL_NODE_MODULE_DIRS = "/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex:/opt/codex-desktop/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/karyana/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,8785b5437d98636c3002d3d7e64b98db79c3b66870b1bd3d18dea953a99b1562"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
-NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
-BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "public-beta"
-BROWSER_USE_CODEX_APP_VERSION = "26.727.40816"
-CODEX_CLI_PATH = "/opt/codex-app-linux-beta/resources/codex"
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.901.51231"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.901.51231/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/opt/codex-desktop/resources/codex"
 
 [shell_environment_policy.set]
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,8785b5437d98636c3002d3d7e64b98db79c3b66870b1bd3d18dea953a99b1562"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex"
 
 [projects."/home/karyana/Codes/projects/shopin"]
 trust_level = "trusted"
