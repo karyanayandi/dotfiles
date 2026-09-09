@@ -2,7 +2,7 @@
 
 local terminal = "ghostty"
 local fileManager = "nemo"
-local browser = "helium-browser"
+local browser = "google-chrome-stable"
 local mainMod = "SUPER"
 
 -- Apps

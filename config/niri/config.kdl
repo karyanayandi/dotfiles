@@ -177,7 +177,7 @@ binds {
     Mod+Alt+P hotkey-overlay-title="Color Picker" {spawn-sh "~/.local/bin/color-picker.sh"; }
     Mod+Shift+N hotkey-overlay-title="Open Notification" {spawn-sh "qs ipc call notifications toggle"; }
     Mod+Alt+N hotkey-overlay-title="Clear All Notification" {spawn-sh "qs ipc call notifications clear"; }
-    Mod+B hotkey-overlay-title="Open Browser" { spawn "/usr/bin/helium-browser"; }
+    Mod+B hotkey-overlay-title="Open Browser" { spawn "/usr/bin/google-chrome-stable"; }
 
     Mod+E hotkey-overlay-title="Open File Manager" { spawn "/usr/bin/nemo"; }
 
