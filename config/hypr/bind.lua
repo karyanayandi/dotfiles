@@ -17,10 +17,7 @@ hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd "hyprlock")
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen { mode = "fullscreen" })
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen { mode = "maximized", action = "toggle" })
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
-hl.bind(
-  mainMod .. " + ALT + Q",
-  hl.dsp.exec_cmd "command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"
-)
+hl.bind(mainMod .. " + ALT + Q", hl.dsp.exec_cmd 'loginctl terminate-session "$XDG_SESSION_ID"')
 hl.bind(mainMod .. " + V", hl.dsp.window.float { action = "toggle" })
 
 -- Launcher

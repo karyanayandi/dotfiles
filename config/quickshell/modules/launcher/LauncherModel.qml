@@ -101,9 +101,9 @@ Item {
                 },
                 {
                     title: "Logout",
-                    subtitle: "exit Hyprland",
+                    subtitle: "end current session",
                     icon: "\u{f08b}",
-                    cmd: "hyprctl dispatch exit"
+                    cmd: "loginctl terminate-session \"$XDG_SESSION_ID\""
                 },
                 {
                     title: "Suspend",
