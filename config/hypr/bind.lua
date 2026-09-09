@@ -11,7 +11,7 @@ hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.exec_cmd "foot")
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + SHIFT + Space", hl.dsp.exec_cmd "qs ipc call launcher open apps")
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
-hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd "hyprlock")
+hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd "qs ipc call lockscreen lock")
 
 -- Window state
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen { mode = "fullscreen" })

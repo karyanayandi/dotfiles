@@ -1,5 +1,0 @@
-timeout 300 'swaylock'
-timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"'
-timeout 600 'systemctl suspend-then-hibernate'
-before-sleep 'swaylock'
-after-resume 'swaymsg "output * power on"'

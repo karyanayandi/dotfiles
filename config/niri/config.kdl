@@ -60,7 +60,6 @@ layer-rule {
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
 
-spawn-sh-at-startup "swayidle -w"
 spawn-sh-at-startup "export SSH_AUTH_SOCK"
 spawn-sh-at-startup "$(gnome-keyring-daemon --start)"
 spawn-sh-at-startup "gnome-keyring-daemon --start"
@@ -170,7 +169,7 @@ binds {
     Mod+Shift+T hotkey-overlay-title="Open a Terminal: foot" { spawn "foot"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn "qs" "ipc" "call" "lockscreen" "lock"; }
     Mod+G hotkey-overlay-title="Start Screen Recording" { spawn-sh "~/.local/bin/screen-record.sh"; }
     Mod+Shift+G hotkey-overlay-title="Stop Screen Recording" { spawn-sh "~/.local/bin/stop-screen-record.sh"; }
     Mod+Alt+G hotkey-overlay-title="Start Area Screen Recording" { spawn-sh "~/.local/bin/screen-record-area.sh"; }

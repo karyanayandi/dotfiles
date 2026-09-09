@@ -1,7 +1,14 @@
-pragma Singleton
 import QtQuick
+pragma Singleton
 
 QtObject {
+    // Lock after five idle minutes. Zero disables automatic locking.
+    property int lockTimeout: 300
+    property int lockDisplayOffTimeout: 600
+    // Opt in to automatic suspend; manual/lid sleep still locks through logind.
+    property int lockSuspendTimeout: 0
+    // Arch's system-local-login supports the system authentication stack.
+    property string lockPamService: "system-local-login"
     // layout
     property int barHeight: 42
     property int barMinWidth: 400

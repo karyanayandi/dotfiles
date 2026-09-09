@@ -95,9 +95,9 @@ Item {
             results = results.concat([
                 {
                     title: "Lock",
-                    subtitle: "hyprlock",
+                    subtitle: "Quickshell lock screen",
                     icon: "\u{f023}",
-                    cmd: "hyprlock"
+                    cmd: "qs ipc call lockscreen lock"
                 },
                 {
                     title: "Logout",

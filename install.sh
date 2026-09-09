@@ -42,7 +42,6 @@ yay -S --needed \
   gzip \
   helium-bin \
   hyprcursor \
-  hyprlock \
   hyprpicker \
   imv \
   inxi \
@@ -83,6 +82,8 @@ yay -S --needed \
   pfetch \
   podman-compose \
   polkit-gnome \
+  python-dbus \
+  python-gobject \
   python-pip \
   python-pipx \
   qt5ct \
