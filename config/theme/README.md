@@ -5,9 +5,12 @@
 - GTK3 alternates generated `matugen-dark` themes through GSettings after each
   render. Colors belong to the named theme, not the startup-only user CSS.
   Log out/in once to drop the old `GTK_THEME` override and cached user CSS.
-  GTK4/libadwaita still uses generated user CSS and needs an app restart;
-  there is no universal external CSS-reload API. X11 apps also need a desktop
-  settings bridge that forwards GSettings to XSettings.
+  GTK4 uses generated user CSS and needs an app restart. The named-theme
+  experiment did not work reliably in Pavucontrol; live reload is unresolved.
+  X11 apps also need a desktop settings bridge that forwards GSettings to XSettings.
+- Set `QT_QPA_PLATFORMTHEME=qt5ct` for both Qt versions. Qt6ct also registers
+  the `qt5ct` key; `qt6ct;qt5ct` falls back to the default palette here.
+  Log out/in after changing this variable so launchers and apps inherit it.
 - Qt5/Qt6 apps using qt5ct/qt6ct reload about 3 seconds after a temporary entry
   is created and removed in their config directory. Touching a symlinked config
   target does not notify this directory watcher.

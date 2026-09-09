@@ -368,6 +368,6 @@ debug {
 include "colors.kdl"
 
 environment {
-    QT_QPA_PLATFORMTHEME "qt6ct;qt5ct"
+    QT_QPA_PLATFORMTHEME "qt5ct"
     GTK2_RC_FILES "/etc/gtk-2.0/gtkrc:/home/karyana/.gtkrc-2.0:/home/karyana/.config/gtk-2.0/gtkrc"
 }

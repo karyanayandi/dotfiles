@@ -117,3 +117,41 @@
   --root-fg-color: {{ colors.on_surface.dark.hex }};
   --window-outline-color: {{ colors.outline_variant.dark.hex }};
 }
+
+/* Plain GTK4 uses hard-coded Default colors, unlike libadwaita. */
+window.background {
+  color: @window_fg_color;
+  background-color: @window_bg_color;
+}
+
+headerbar {
+  color: @headerbar_fg_color;
+  background-color: @headerbar_bg_color;
+  background-image: none;
+}
+
+.view, list, textview > text, entry, spinbutton, dropdown > button, notebook > stack {
+  color: @view_fg_color;
+  background-color: @view_bg_color;
+}
+
+button, notebook > header {
+  color: @window_fg_color;
+  background-color: @headerbar_bg_color;
+  background-image: none;
+}
+
+button:hover {
+  background-color: @card_bg_color;
+}
+
+button:checked, button.suggested-action, selection, row:selected,
+scale highlight, progressbar progress, switch:checked, check:checked, radio:checked {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  background-image: none;
+}
+
+notebook > header > tabs > tab:checked {
+  box-shadow: inset 0 -3px @accent_bg_color;
+}
