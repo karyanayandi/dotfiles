@@ -18,6 +18,12 @@ with tempfile.TemporaryDirectory() as tmp:
     config.mkdir(parents=True)
     for name in ("Theme.qml", "Config.qml", "qmldir"):
         shutil.copyfile(root / name, config / name)
+    (config / "modules/panels").mkdir(parents=True)
+    for name in ("PanelButton.qml", "PanelTextField.qml", "PanelComboBox.qml", "PanelSpinBox.qml"):
+        shutil.copyfile(root / "modules/panels" / name, config / "modules/panels" / name)
+    (config / "components").mkdir()
+    shutil.copyfile(root / "components/IconLabel.qml", config / "components/IconLabel.qml")
+    (config / "components/qmldir").write_text("IconLabel 1.0 IconLabel.qml\n")
     (config / "services").mkdir()
     shutil.copyfile(root / "services/WallpaperService.qml", config / "services/WallpaperService.qml")
     (home / ".config/dotfiles/wallpapers").mkdir(parents=True)
@@ -52,6 +58,7 @@ with tempfile.TemporaryDirectory() as tmp:
 import Quickshell
 import "."
 import "services"
+import "modules/panels" as Panels
 
 ShellRoot {
     id: root
@@ -61,6 +68,28 @@ ShellRoot {
     Component.onCompleted: Qt.callLater(() => {
         wallpaper.setWallpaper("/test-wallpaper.png");
         wallpaper.cycleInterval();
+        stepper.value = 2;
+        stepper.increase();
+        if (stepper.value !== 3) throw new Error("Stepper increment failed");
+        stepper.decrease();
+        if (stepper.value !== 2) throw new Error("Stepper decrement failed");
+        stepper.value = 0;
+        stepper.decrease();
+        if (stepper.value !== 0) throw new Error("Stepper lower bound failed");
+        stepper.value = 10;
+        stepper.increase();
+        if (stepper.value !== 10) throw new Error("Stepper upper bound failed");
+        stepper.contentItem.text = "4";
+        stepper.contentItem.editingFinished();
+        if (stepper.value !== 4) throw new Error("Stepper typed input failed");
+        stepper.contentItem.text = "";
+        stepper.contentItem.editingFinished();
+        if (stepper.value !== 4 || stepper.contentItem.text !== stepper.displayText)
+            throw new Error("Stepper invalid input was not restored");
+        stepper.increase();
+        if (stepper.value !== 5 || stepper.contentItem.text !== stepper.displayText)
+            throw new Error("Stepper display did not follow buttons after editing");
+        console.log("PASS stepper editing and bounds");
         root.saved = true;
     })
     readonly property var expected: EXPECTED
@@ -84,6 +113,11 @@ ShellRoot {
         id: label
         color: Theme.colFg
     }
+    Panels.PanelTextField { id: field; leadingGlyph: "X" }
+    Panels.PanelComboBox { id: select; model: ["Test"] }
+    Panels.PanelButton { id: button; text: "Test" }
+    Panels.PanelButton { id: primary; text: "Capture"; tone: "primary" }
+    Panels.PanelSpinBox { id: stepper; from: 0; to: 10 }
 
     function alpha(hex, opacity) {
         const color = Qt.color(hex);
@@ -105,7 +139,15 @@ ShellRoot {
                 || !Qt.colorEqual(chip.color, root.alpha(p.g2, 0.9))
                 || !Qt.colorEqual(label.color, p.g5)
                 || !Qt.colorEqual(Theme.colChipActive, p.g6)
-                || !Qt.colorEqual(Theme.colInputBg, root.alpha(p.g1, 0.65)))
+                || !Qt.colorEqual(Theme.colInputBg, root.alpha(p.g1, 0.65))
+                || !Qt.colorEqual(field.color, p.g5)
+                || !Qt.colorEqual(field.background.color, root.alpha(p.g1, 0.65))
+                || !Qt.colorEqual(select.background.color, root.alpha(p.g1, 0.65))
+                || !Qt.colorEqual(button.contentItem.color, p.g5)
+                || !Qt.colorEqual(primary.background.color, p.g6)
+                || !Qt.colorEqual(primary.contentItem.color, p.g0)
+                || !Qt.colorEqual(stepper.background.color, root.alpha(p.g1, 0.65))
+                || !Qt.colorEqual(stepper.contentItem.color, p.g5))
                 return;
             console.log("PASS stage " + root.stage + " launcher=" + card.color
                 + " border=" + card.border.color + " selection=" + selection.color);

@@ -28,8 +28,7 @@ hl.on("hyprland.start", function()
   -- This works around xdg-desktop-portal-hyprland v1.4.0 spinning CPU on reload/resume.
   hl.exec_cmd "sh ~/.config/hypr/restart-portals.sh"
 
-  -- Polkit agent
-  hl.exec_cmd "systemctl --user start --now hyprpolkitagent.service"
+  -- Quickshell's island owns Polkit authentication. Keep hyprpolkitagent installed as fallback.
 
   -- 9router
   -- hl.exec_cmd "if ! kill -0 $(cat /tmp/9router.pid 2>/dev/null) 2>/dev/null; then nohup 9router --skip-update >/tmp/9router.log 2>&1 & echo $! >/tmp/9router.pid; fi"

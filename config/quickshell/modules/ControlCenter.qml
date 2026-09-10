@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import "../services" as Services
+import "../components" as Extras
 import ".."
 
 Item {
@@ -55,6 +56,7 @@ Item {
         onTriggered: win.now = new Date()
     }
     signal launcherRequested(string mode)
+    signal panelRequested(string panel)
 
     visible: opened
     implicitWidth: 380
@@ -65,7 +67,10 @@ Item {
     onOpenedChanged: {
         if (opened) {
             notifs.controlCenterVisible = false;
-            Qt.callLater(() => closeButton.forceActiveFocus());
+            Qt.callLater(() => {
+                if (win.enabled && win.opened)
+                    closeButton.forceActiveFocus();
+            });
         }
     }
 
@@ -80,7 +85,8 @@ Item {
     IpcHandler {
         target: "controls"
         function toggle() {
-            win.opened = !win.opened;
+            if (win.enabled)
+                win.opened = !win.opened;
         }
     }
 
@@ -99,6 +105,7 @@ Item {
         Layout.fillWidth: true
         Layout.preferredWidth: 0
         property string detail: ""
+        property string glyph: ""
         implicitHeight: Math.max(52, contentItem.implicitHeight + 24)
         font.family: Theme.fontUi
         font.pixelSize: 14
@@ -111,13 +118,13 @@ Item {
         }
         contentItem: ColumnLayout {
             spacing: 4
-            Text {
+            Extras.IconLabel {
                 Layout.fillWidth: true
+                icon: button.glyph
                 text: button.text
                 font: button.font
                 color: button.enabled ? Theme.colFg : Theme.colFgDim
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
+                wrap: true
             }
             Text {
                 Layout.fillWidth: true
@@ -151,6 +158,12 @@ Item {
                 RowLayout {
                     Layout.fillWidth: true
                     Text {
+                        text: "\uf1de"
+                        color: Theme.colFg
+                        font.family: Theme.fontFamily
+                        font.pixelSize: 22
+                    }
+                    Text {
                         Layout.fillWidth: true
                         text: "Control center"
                         color: Theme.colFg
@@ -164,7 +177,7 @@ Item {
                         Layout.fillWidth: false
                         Layout.preferredWidth: 40
                         implicitHeight: 40
-                        text: "×"
+                        glyph: "\uf00d"
                         Accessible.name: "Close control center"
                         onClicked: win.opened = false
                     }
@@ -186,7 +199,8 @@ Item {
                     rowSpacing: 10
 
                     SettingButton {
-                        text: win.networkAvailable ? "Network status ↗" : "Network · Unavailable"
+                        text: "Network"
+                        glyph: "\uf1eb"
                         enabled: win.networkAvailable
                         onClicked: {
                             Quickshell.execDetached(["ghostty", "--wait-after-command=true", "-e", "networkctl", "--no-pager", "status", "--all"]);
@@ -194,20 +208,23 @@ Item {
                         }
                     }
                     SettingButton {
-                        text: "Bluetooth ↗"
+                        text: "Bluetooth"
+                        glyph: "\uf293"
                         detail: win.bluetoothStatus
                         onClicked: {
                             win.launcherRequested("bluetooth");
                         }
                     }
                     SettingButton {
-                        text: win.notifs.doNotDisturb ? "Do not disturb · On" : "Do not disturb · Off"
+                        text: "Do not disturb"
+                        glyph: "\uf1f6"
                         checkable: true
                         checked: win.notifs.doNotDisturb
                         onClicked: win.notifs.toggleDnd()
                     }
                     SettingButton {
-                        text: win.audio.muted ? "Sound · Muted" : "Sound · On"
+                        text: win.audio.muted ? "Muted" : "Sound"
+                        glyph: win.audio.muted ? "\uf026" : "\uf028"
                         enabled: !!win.audio.sink?.audio
                         checkable: true
                         checked: win.audio.muted
@@ -216,7 +233,8 @@ Item {
                 }
 
                 SettingButton {
-                    text: "System monitor ↗"
+                    text: "System monitor"
+                    glyph: "\uf085"
                     detail: win.cpuUsage + " · " + win.ramUsage
                     onClicked: {
                         Quickshell.execDetached(["ghostty", "-e", "btm"]);
@@ -306,11 +324,51 @@ Item {
                 }
 
                 SettingButton {
-                    text: "Audio devices and mixer ↗"
-                    onClicked: {
-                        Quickshell.execDetached(["ghostty", "-e", "wiremix"]);
-                        win.opened = false;
+                    text: "Audio mixer"
+                    glyph: "\uf1de"
+                    onClicked: win.panelRequested("audio")
+                }
+
+                GridLayout {
+                    Layout.fillWidth: true
+                    columns: 2
+                    columnSpacing: 10
+                    rowSpacing: 10
+
+                    SettingButton {
+                        text: "Capture"
+                        glyph: "\uf030"
+                        onClicked: win.panelRequested("capture")
                     }
+                    SettingButton {
+                        text: "Media"
+                        glyph: "\uf001"
+                        onClicked: win.panelRequested("media")
+                    }
+                    SettingButton {
+                        text: "Displays"
+                        glyph: "\uf108"
+                        onClicked: win.panelRequested("displays")
+                    }
+                    SettingButton {
+                        text: "Calendar"
+                        glyph: "\uf073"
+                        onClicked: win.panelRequested("calendar")
+                    }
+                    SettingButton {
+                        text: "Color picker"
+                        glyph: "\uf1fb"
+                        onClicked: win.panelRequested("color")
+                    }
+                }
+
+                Extras.RemovableDrives {
+                    Layout.fillWidth: true
+                    active: win.opened
+                }
+                Extras.CodexLimits {
+                    Layout.fillWidth: true
+                    active: win.opened
                 }
             }
         }

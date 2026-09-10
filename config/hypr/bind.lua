@@ -29,6 +29,10 @@ hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd "qs ipc call launcher open nerd
 hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd "qs ipc call launcher open bluetooth")
 hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd "qs ipc call launcher open wallpaper")
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd "qs ipc call launcher open power")
+hl.bind(mainMod .. " + ALT + A", hl.dsp.exec_cmd "qs ipc call audioMixer toggle")
+hl.bind(mainMod .. " + ALT + Y", hl.dsp.exec_cmd "qs ipc call mediaPanel toggle")
+hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd "qs ipc call calendarPanel toggle")
+hl.bind(mainMod .. " + ALT + D", hl.dsp.exec_cmd "qs ipc call displays toggle")
 
 -- Dwindle layout extras
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo { action = "toggle" })
@@ -38,11 +42,13 @@ hl.bind(mainMod .. " + SHIFT + S", function()
 end)
 
 -- Screen recording / screenshots
-hl.bind(mainMod .. " + G", hl.dsp.exec_cmd "~/.local/bin/screen-record.sh")
-hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd "~/.local/bin/stop-screen-record.sh")
-hl.bind(mainMod .. " + ALT + G", hl.dsp.exec_cmd "~/.local/bin/screen-record-area.sh")
-hl.bind(mainMod .. " + ALT + P", hl.dsp.exec_cmd "~/.local/bin/color-picker.sh")
-hl.bind("Print", hl.dsp.exec_cmd "~/.local/bin/screenshot.sh")
+hl.bind(mainMod .. " + G", hl.dsp.exec_cmd "qs ipc call capture open record")
+hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd "qs ipc call capture stop")
+hl.bind(mainMod .. " + ALT + G", hl.dsp.exec_cmd "qs ipc call capture open record-area")
+hl.bind(mainMod .. " + ALT + P", hl.dsp.exec_cmd "qs ipc call colorPicker open")
+hl.bind("Print", hl.dsp.exec_cmd "qs ipc call capture open area")
+hl.bind("CTRL + Print", hl.dsp.exec_cmd "qs ipc call capture open screen")
+hl.bind("ALT + Print", hl.dsp.exec_cmd "qs ipc call capture open window")
 
 -- Notifications
 hl.bind(mainMod .. " + ALT + M", hl.dsp.exec_cmd "qs ipc call notificationStacks toggle")

@@ -1,2 +1,6 @@
 Card 1.0 Card.qml
 NotificationCard 1.0 NotificationCard.qml
+IconLabel 1.0 IconLabel.qml
+ControlAction 1.0 ControlAction.qml
+RemovableDrives 1.0 RemovableDrives.qml
+CodexLimits 1.0 CodexLimits.qml

@@ -57,7 +57,7 @@ layer-rule {
     match namespace="quickshell"
     opacity 0.99
 }
-spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+// Quickshell's island owns Polkit authentication.
 
 
 spawn-sh-at-startup "export SSH_AUTH_SOCK"
@@ -170,12 +170,12 @@ binds {
     Mod+Return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn "qs" "ipc" "call" "lockscreen" "lock"; }
-    Mod+G hotkey-overlay-title="Start Screen Recording" { spawn-sh "~/.local/bin/screen-record.sh"; }
-    Mod+Shift+G hotkey-overlay-title="Stop Screen Recording" { spawn-sh "~/.local/bin/stop-screen-record.sh"; }
-    Mod+Alt+G hotkey-overlay-title="Start Area Screen Recording" { spawn-sh "~/.local/bin/screen-record-area.sh"; }
-    Mod+Alt+P hotkey-overlay-title="Color Picker" {spawn-sh "~/.local/bin/color-picker.sh"; }
+    Mod+G repeat=false hotkey-overlay-title="Recording Panel" { spawn "qs" "ipc" "call" "capture" "open" "record"; }
+    Mod+Shift+G repeat=false hotkey-overlay-title="Stop Recording" { spawn "qs" "ipc" "call" "capture" "stop"; }
+    Mod+Alt+G repeat=false hotkey-overlay-title="Area Recording" { spawn "qs" "ipc" "call" "capture" "open" "record-area"; }
+    Mod+Alt+P repeat=false hotkey-overlay-title="Color Picker" { spawn "qs" "ipc" "call" "colorPicker" "open"; }
     Mod+Shift+N hotkey-overlay-title="Open Notification" {spawn-sh "qs ipc call notifications toggle"; }
-    Mod+Alt+N hotkey-overlay-title="Clear All Notification" {spawn-sh "qs ipc call notifications clear"; }
+    Mod+Ctrl+N hotkey-overlay-title="Clear All Notification" {spawn-sh "qs ipc call notifications clear"; }
     Mod+B hotkey-overlay-title="Open Browser" { spawn "/usr/bin/google-chrome-stable"; }
 
     Mod+E hotkey-overlay-title="Open File Manager" { spawn "/usr/bin/nemo"; }
@@ -189,6 +189,10 @@ binds {
     Mod+Alt+N hotkey-overlay-title="Nerd Font Picker" { spawn-sh "qs ipc call launcher open nerd"; }
     Mod+Alt+B hotkey-overlay-title="Bluetooth Manager" { spawn-sh "qs ipc call launcher open bluetooth"; }
     Mod+Alt+W hotkey-overlay-title="Wallpaper Picker" { spawn-sh "qs ipc call launcher open wallpaper"; }
+    Mod+Alt+A repeat=false hotkey-overlay-title="Audio Mixer" { spawn "qs" "ipc" "call" "audioMixer" "toggle"; }
+    Mod+Alt+Y repeat=false hotkey-overlay-title="Media Panel" { spawn "qs" "ipc" "call" "mediaPanel" "toggle"; }
+    Mod+Alt+C repeat=false hotkey-overlay-title="Calendar" { spawn "qs" "ipc" "call" "calendarPanel" "toggle"; }
+    Mod+Alt+D repeat=false hotkey-overlay-title="Display Settings" { spawn "qs" "ipc" "call" "displays" "toggle"; }
 
     Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 
@@ -337,9 +341,9 @@ binds {
 
     Mod+W { toggle-column-tabbed-display; }
 
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Print repeat=false { spawn "qs" "ipc" "call" "capture" "open" "area"; }
+    Ctrl+Print repeat=false { spawn "qs" "ipc" "call" "capture" "open" "screen"; }
+    Alt+Print repeat=false { spawn "qs" "ipc" "call" "capture" "open" "window"; }
 
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
 

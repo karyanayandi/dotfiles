@@ -20,10 +20,13 @@ config/opencode/plugins/
 **/.pi/tasks/
 .pi-subagents/
 .ruff_cache/
+__pycache__/
 
 # Wallpaper-derived output (also applies when Stow folds theme/ into ~/.config).
 config/theme/generated/
 config/quickshell/colors.json
+# Machine-specific monitor layout, written only by Keep and save.
+config/quickshell/displays.lua
 config/hypr/colors.lua
 config/hypr/hyprlock-colors.conf
 config/niri/colors.kdl

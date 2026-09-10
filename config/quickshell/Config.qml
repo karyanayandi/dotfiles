@@ -1,5 +1,5 @@
-import QtQuick
 pragma Singleton
+import QtQuick
 
 QtObject {
     // Lock after five idle minutes. Zero disables automatic locking.
@@ -9,6 +9,8 @@ QtObject {
     property int lockSuspendTimeout: 0
     // Arch's system-local-login supports the system authentication stack.
     property string lockPamService: "system-local-login"
+    // Set false before starting a fallback agent such as hyprpolkitagent.
+    property bool polkitAgentEnabled: true
     // layout
     property int barHeight: 42
     property int barMinWidth: 400

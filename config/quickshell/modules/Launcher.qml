@@ -14,6 +14,8 @@ Item {
     implicitHeight: 480
 
     function open(mode) {
+        if (!enabled)
+            return;
         const selectedMode = mode || "all";
         model.mode = selectedMode === "apps" ? "all" : selectedMode;
         model.pinnedMode = selectedMode !== "apps" && selectedMode !== "all";
@@ -22,6 +24,8 @@ Item {
         visibleLauncher = true;
         input.clear();
         Qt.callLater(() => {
+            if (!win.enabled || !win.visibleLauncher)
+                return;
             if (model.mode === "wallpaper") {
                 const current = model.results.findIndex(item => {
                     return item.path === win.wallpaper.current;
@@ -37,7 +41,8 @@ Item {
     onVisibleLauncherChanged: {
         if (visibleLauncher) {
             Qt.callLater(() => {
-                return input.focusInput();
+                if (win.enabled && win.visibleLauncher)
+                    input.focusInput();
             });
             model.refreshApps();
             if (model.mode === "bluetooth")

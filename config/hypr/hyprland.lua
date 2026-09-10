@@ -9,6 +9,15 @@ hl.monitor {
   scale = "auto",
 }
 
+-- Layout explicitly saved from Quickshell's display panel.
+local config_home = os.getenv "XDG_CONFIG_HOME" or (os.getenv "HOME" .. "/.config")
+local display_layout = config_home .. "/quickshell/displays.lua"
+local display_file = io.open(display_layout, "r")
+if display_file then
+  display_file:close()
+  dofile(display_layout)
+end
+
 -- General settings
 hl.config {
   general = {
