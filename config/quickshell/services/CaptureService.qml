@@ -25,8 +25,16 @@ Scope {
     ]
     property double startedAt: 0
     property int elapsed: 0
+    property bool hasResult: false
 
     signal reveal(string panel)
+    signal feedback(string text, bool failed)
+
+    function result(text, failed) {
+        message = text;
+        hasResult = true;
+        feedback(text, failed);
+    }
 
     function request(action, options) {
         if (!ready || busy)
@@ -40,6 +48,7 @@ Scope {
         payload.selection = Theme.colAccent.toString() + "55";
         root.action = action;
         busy = true;
+        hasResult = false;
         message = action === "capabilities" ? "Checking tools…" : "Working…";
         worker.write(JSON.stringify(payload) + "\n");
         return true;
@@ -82,16 +91,16 @@ Scope {
             break;
         case "saved":
             savedPath = data.path;
-            message = "Saved " + data.path.split("/").pop();
+            result("Saved " + data.path.split("/").pop(), false);
             break;
         case "copied":
-            message = "Copied to clipboard.";
+            result("Copied to clipboard", false);
             break;
         case "cancelled":
             message = "Selection cancelled.";
             break;
         case "error":
-            message = "Error: " + data.message;
+            result(data.message, true);
             break;
         case "idle":
             busy = false;
@@ -120,7 +129,7 @@ Scope {
             root.ready = false;
             root.busy = false;
             root.recording = false;
-            root.message = "Capture service exited (" + code + "). Reload the shell to restart.";
+            root.result("Capture service exited (" + code + "). Reload the shell to restart.", true);
             root.reveal("capture");
         }
 
@@ -129,7 +138,7 @@ Scope {
                 try {
                     root.receive(JSON.parse(data));
                 } catch (error) {
-                    root.message = "Capture protocol error: " + error;
+                    root.result("Capture protocol error: " + error, true);
                 }
             }
         }

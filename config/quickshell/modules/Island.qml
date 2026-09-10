@@ -92,6 +92,9 @@ PanelWindow {
 
     mask: Region {
         item: win.interactive ? backdrop : island
+        Region {
+            item: feedback.visible ? feedback : null
+        }
     }
 
     onPanelRequested: name => openPanel(name)
@@ -110,6 +113,7 @@ PanelWindow {
     Services.CaptureService {
         id: captureService
 
+        onFeedback: (text, failed) => feedback.show(text, failed)
         onRecordingChanged: {
             if (recording)
                 win.captureHidden = false;
@@ -211,6 +215,15 @@ PanelWindow {
         }
 
         target: win.notifs
+    }
+    CaptureFeedback {
+        id: feedback
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: Math.max(12, island.y - height - 12)
+        width: Math.min(420, win.width - 24)
+        z: 2
+        visible: opacity > 0 && !auth.active
     }
     Rectangle {
         id: island

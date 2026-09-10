@@ -28,6 +28,7 @@ CaptureSurface {
         color: root.service.hex || Theme.colBgAlt
         radius: 12
     }
+
     RowLayout {
         Layout.fillWidth: true
 
@@ -40,6 +41,7 @@ CaptureSurface {
             selectByMouse: true
             text: root.service.hex
         }
+
         Panels.PanelButton {
             Accessible.name: "Copy HEX"
             ToolTip.delay: 500
@@ -47,12 +49,12 @@ CaptureSurface {
             ToolTip.visible: hovered || activeFocus
             enabled: Boolean(root.service.ready && !root.service.busy && root.service.hex !== "" && root.service.tools["wl-copy"])
             glyph: "\uf0c5"
-
             onClicked: root.service.request("copy-color", {
                 "text": root.service.hex
             })
         }
     }
+
     RowLayout {
         Layout.fillWidth: true
 
@@ -65,6 +67,7 @@ CaptureSurface {
             selectByMouse: true
             text: root.rgb
         }
+
         Panels.PanelButton {
             Accessible.name: "Copy RGB"
             ToolTip.delay: 500
@@ -72,32 +75,32 @@ CaptureSurface {
             ToolTip.visible: hovered || activeFocus
             enabled: Boolean(root.service.ready && !root.service.busy && root.service.hex !== "" && root.service.tools["wl-copy"])
             glyph: "\uf0c5"
-
             onClicked: root.service.request("copy-color", {
                 "text": root.rgb
             })
         }
     }
+
     Label {
         Accessible.name: text
         Layout.fillWidth: true
-        text: root.service.ready && !root.service.tools.hyprpicker ? "Install hyprpicker to pick colors." : root.service.message
+        text: root.service.ready && !root.service.tools.hyprpicker ? "Install hyprpicker to pick colors." : root.service.hasResult ? "" : root.service.message
         visible: text !== ""
         wrapMode: Text.WordWrap
     }
+
     RowLayout {
         Panels.PanelButton {
             enabled: Boolean(root.service.ready && !root.service.busy && root.service.tools.hyprpicker)
             glyph: "\uf1fb"
             text: "Pick pixel"
-
             onClicked: root.pickRequested()
         }
+
         Panels.PanelButton {
             glyph: "\uf00d"
             text: "Cancel"
             visible: root.service.busy
-
             onClicked: root.service.stop()
         }
     }

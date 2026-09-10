@@ -221,7 +221,7 @@ CaptureSurface {
         Accessible.name: text
         Accessible.role: Accessible.StaticText
         Layout.fillWidth: true
-        text: root.service.message
+        text: root.service.hasResult ? "" : root.service.message
         visible: text !== ""
         wrapMode: Text.WrapAnywhere
     }
