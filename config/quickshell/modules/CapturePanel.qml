@@ -13,6 +13,10 @@ CaptureSurface {
     property string selectedMode: "area"
     required property var service
     property bool video: false
+    property bool expanded: false
+    property bool configuring: false
+    readonly property bool editing: !video && service.preview !== "" && !configuring
+    fillBody: editing
 
     signal captureRequested(string action, var options)
 
@@ -26,11 +30,20 @@ CaptureSurface {
             video = false;
             selectedMode = ["screen", "window", "area"].includes(mode) ? mode : "area";
         }
+        configuring = true;
         opened = true;
     }
 
     icon: "\uf030"
-    title: "Capture"
+    title: editing ? "Edit screenshot" : video ? "Record screen" : "Take screenshot"
+
+    Connections {
+        target: root.service
+        function onPreviewChanged() {
+            if (root.service.preview !== "")
+                root.configuring = false;
+        }
+    }
 
     footer: RowLayout {
         id: actions
@@ -42,6 +55,13 @@ CaptureSurface {
         spacing: 10
 
         Panels.PanelButton {
+            visible: root.editing
+            text: root.expanded ? "Compact" : "Expand"
+            glyph: root.expanded ? "\uf066" : "\uf065"
+            Accessible.name: root.expanded ? "Use compact editor" : "Expand editor to screen"
+            onClicked: root.expanded = !root.expanded
+        }
+        Panels.PanelButton {
             Accessible.name: root.video ? "Start recording" : "Take screenshot"
             Layout.fillWidth: !actions.hasPreview
             enabled: Boolean(root.service.ready && !root.service.busy && (root.selectedMode === "window" ? root.service.windowSupported : root.service.tools.slurp && (root.video ? root.service.tools["wf-recorder"] : root.service.tools.grim)))
@@ -52,10 +72,16 @@ CaptureSurface {
             tone: actions.hasPreview ? "neutral" : "primary"
             visible: !actions.recordingBusy
 
-            onClicked: root.captureRequested(root.video ? "record" : "screenshot", {
-                "mode": root.selectedMode,
-                "audio": audio.currentValue || ""
-            })
+            onClicked: {
+                if (root.editing) {
+                    root.configuring = true;
+                    return;
+                }
+                root.captureRequested(root.video ? "record" : "screenshot", {
+                    "mode": root.selectedMode,
+                    "audio": audio.currentValue || ""
+                });
+            }
         }
         Panels.PanelButton {
             Layout.fillWidth: true
@@ -84,7 +110,7 @@ CaptureSurface {
             enabled: !root.service.busy && root.service.ready
             glyph: "\uf0c7"
             implicitHeight: 48
-            implicitWidth: 48
+            text: "Save PNG"
             visible: actions.hasPreview
 
             onClicked: root.service.request("save")
@@ -93,6 +119,7 @@ CaptureSurface {
 
     RowLayout {
         Layout.fillWidth: true
+        visible: !root.editing && !root.service.recording
 
         TabBar {
             id: tabs
@@ -155,22 +182,47 @@ CaptureSurface {
                 }
             }
         }
-        Label {
-            Accessible.name: "Recording, " + root.service.elapsed + " seconds"
-            Layout.fillWidth: true
-            color: Theme.colUrgent
-            horizontalAlignment: Text.AlignRight
-            text: root.service.recording ? "● REC  " + Math.floor(root.service.elapsed / 60) + ":" + String(root.service.elapsed % 60).padStart(2, "0") : ""
-            visible: root.service.recording
+    }
+    Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: 156
+        radius: 16
+        color: Theme.colInputBg
+        visible: root.service.recording
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: 12
+            Label {
+                Layout.alignment: Qt.AlignHCenter
+                text: "● Recording"
+                color: Theme.colUrgent
+            }
+            Label {
+                Layout.alignment: Qt.AlignHCenter
+                Accessible.name: "Recording, " + root.service.elapsed + " seconds"
+                text: Math.floor(root.service.elapsed / 60) + ":" + String(root.service.elapsed % 60).padStart(2, "0")
+                font.pixelSize: 36
+                font.family: Theme.fontUi
+                color: Theme.colFg
+            }
+            Label {
+                text: "You can close this panel. Recording will continue."
+                color: Theme.colFgDim
+            }
         }
     }
     RowLayout {
+        Layout.fillWidth: true
+        visible: !root.editing && !root.service.recording
         Repeater {
             model: root.video ? ["screen", "area"] : ["screen", "window", "area"]
 
             Panels.PanelButton {
                 required property string modelData
 
+                Layout.fillWidth: true
+                implicitHeight: 64
                 Accessible.name: text + " capture"
                 autoExclusive: true
                 checkable: true
@@ -187,14 +239,14 @@ CaptureSurface {
         Layout.fillWidth: true
         color: Theme.colFgDim
         text: "Window capture requires Hyprland, hyprctl, slurp and grim."
-        visible: !root.video && !root.service.windowSupported
+        visible: !root.editing && !root.video && !root.service.windowSupported
         wrapMode: Text.WordWrap
     }
     Label {
         Layout.fillWidth: true
         color: Theme.colFgDim
         text: root.selectedMode === "screen" ? "Click a monitor to capture its entire screen. No area selection." : "Drag to select the area to capture."
-        visible: root.selectedMode !== "window"
+        visible: !root.editing && !root.service.recording && root.selectedMode !== "window"
         wrapMode: Text.WordWrap
     }
     Panels.PanelComboBox {
@@ -207,7 +259,7 @@ CaptureSurface {
         model: root.service.sources
         textRole: "description"
         valueRole: "name"
-        visible: root.video
+        visible: root.video && !root.service.recording
     }
     Label {
         Layout.fillWidth: true
@@ -216,13 +268,31 @@ CaptureSurface {
         visible: root.video && audio.currentValue !== "" && audio.currentIndex > 0
         wrapMode: Text.WordWrap
     }
+    RowLayout {
+        Layout.fillWidth: true
+        visible: root.configuring && !root.video && root.service.preview !== ""
+
+        Label {
+            Layout.fillWidth: true
+            text: root.editing ? "Annotate, crop, then copy or save." : "Your current screenshot is still available."
+            color: Theme.colFgDim
+            wrapMode: Text.WordWrap
+        }
+        Panels.PanelButton {
+            visible: !root.editing && !root.service.recording
+            text: "Back to editor"
+            onClicked: root.configuring = false
+        }
+    }
     CaptureEditor {
         id: editor
 
         Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.minimumHeight: 240
         Layout.preferredHeight: editor.preferredHeight
         service: root.service
-        visible: !root.video && root.service.preview !== ""
+        visible: root.editing
     }
     Label {
         Accessible.name: text

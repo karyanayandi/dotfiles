@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import ".." as Modules
 
 TestCase {
     id: test
@@ -14,6 +15,13 @@ TestCase {
         property bool ready: true
         property bool busy: false
         property bool canUndo: false
+        property bool recording: false
+        property bool windowSupported: true
+        property int elapsed: 0
+        property string action: ""
+        property string message: ""
+        property bool hasResult: false
+        property var sources: []
         property var tools: ({
                 magick: true
             })
@@ -36,7 +44,57 @@ TestCase {
         service: service
     }
 
+    Modules.CapturePanel {
+        id: panel
+        width: 1100
+        height: 800
+        opened: false
+        service: service
+    }
+
+    function test_workspace() {
+        panel.opened = true;
+        wait(50);
+        verify(panel.editing);
+        const image = findChild(panel, "annotationPreview");
+        verify(image.width > 640);
+        verify(image.height > 250);
+        const save = findChild(panel, "captureStart");
+        verify(save.mapToItem(panel, 0, save.height).y <= panel.height);
+        verify(!panel.expanded);
+        panel.width = 960;
+        panel.height = 760;
+        wait(50);
+        verify(image.height > 250);
+        verify(save.mapToItem(panel, 0, save.height).y <= panel.height);
+        panel.configuring = true;
+        verify(!panel.editing);
+        panel.configuring = false;
+        panel.video = true;
+        verify(!panel.editing);
+        panel.video = false;
+        panel.opened = false;
+    }
+
+    function test_zoom() {
+        const image = findChild(editor, "annotationPreview");
+        const width = image.width;
+        editor.zoom = 2;
+        wait(20);
+        compare(image.width, width * 2);
+        const point = editor.pixelPoint(image.width / 2, image.height / 2);
+        compare(point.x, 100);
+        compare(point.y, 50);
+        editor.tool = "pan";
+        verify(findChild(editor, "annotationViewport").interactive);
+        verify(!findChild(editor, "annotationCanvas").enabled);
+        editor.zoom = 1 / editor.fitScale;
+        wait(20);
+        compare(image.width, 200);
+    }
+
     function init() {
+        editor.zoom = 1;
         service.busy = false;
         service.requestData = null;
         editor.tool = "rectangle";

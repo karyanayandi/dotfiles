@@ -19,8 +19,8 @@ PanelWindow {
 
     visible: opened && !blocked
     color: "transparent"
-    implicitWidth: 640
-    implicitHeight: Math.min(screen ? screen.height - 40 : 760, panel.implicitHeight)
+    implicitWidth: Math.min(screen ? screen.width - 48 : 1200, panel.editing ? (panel.expanded ? (screen ? screen.width - 48 : 1200) : 960) : 600)
+    implicitHeight: panel.editing ? Math.min(screen ? screen.height - 48 : 800, panel.expanded ? (screen ? screen.height - 48 : 800) : 760) : Math.min(screen ? screen.height - 40 : 760, panel.implicitHeight)
     exclusiveZone: 0
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell-capture"
@@ -38,8 +38,11 @@ PanelWindow {
         border.width: 1
 
         Flickable {
+            id: viewport
+
             anchors.fill: parent
-            contentHeight: panel.implicitHeight
+            contentHeight: panel.editing ? height : panel.implicitHeight
+            interactive: !panel.editing
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
@@ -47,7 +50,7 @@ PanelWindow {
                 id: panel
 
                 width: parent.width
-                height: implicitHeight
+                height: editing ? viewport.height : implicitHeight
                 service: root.service
                 onCaptureRequested: (action, options) => {
                     return root.captureRequested(action, options);

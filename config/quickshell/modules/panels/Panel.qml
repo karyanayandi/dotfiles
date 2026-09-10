@@ -10,6 +10,7 @@ Item {
     default property alias body: content.data
     readonly property real bodyHeight: content.implicitHeight + (footerContent.visible ? footerContent.implicitHeight + 16 : 0)
     property alias footer: footerContent.data
+    property bool fillBody: false
     property string icon: ""
     property string ipcTarget: ""
     property bool opened: false
@@ -18,25 +19,25 @@ Item {
     implicitHeight: bodyHeight + 96
     implicitWidth: 440
     visible: opened
-
     // Island owns window, material, and interruptible geometry transitions.
     onOpenedChanged: {
-        if (opened) {
+        if (opened)
             Qt.callLater(() => {
                 if (root.enabled && root.opened)
                     closeButton.forceActiveFocus();
             });
-        }
     }
 
     IpcHandler {
         function close() {
             root.opened = false;
         }
+
         function open() {
             if (root.enabled)
                 root.opened = true;
         }
+
         function toggle() {
             if (root.enabled)
                 root.opened = !root.opened;
@@ -45,11 +46,11 @@ Item {
         enabled: root.ipcTarget !== ""
         target: root.ipcTarget
     }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 16
-
         Keys.onEscapePressed: root.opened = false
 
         RowLayout {
@@ -63,6 +64,7 @@ Item {
                 text: root.icon
                 visible: root.icon !== ""
             }
+
             Text {
                 Layout.fillWidth: true
                 color: Theme.colFg
@@ -71,15 +73,16 @@ Item {
                 font.pixelSize: 22
                 text: root.title
             }
+
             PanelButton {
                 id: closeButton
 
                 Accessible.name: "Close " + root.title
                 glyph: "\uf00d"
-
                 onClicked: root.opened = false
             }
         }
+
         Pane {
             id: bodyPane
 
@@ -97,16 +100,17 @@ Item {
             palette.window: Theme.colBg
             palette.windowText: Theme.colFg
 
-            background: Item {
-            }
-
             ColumnLayout {
                 id: content
 
                 spacing: 12
                 width: bodyPane.availableWidth
+                height: root.fillBody ? bodyPane.availableHeight : implicitHeight
             }
+
+            background: Item {}
         }
+
         ColumnLayout {
             id: footerContent
 

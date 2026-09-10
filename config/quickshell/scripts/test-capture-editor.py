@@ -30,7 +30,8 @@ ShellRoot {
                     t.init();
                     t.test_draw({tool: tool});
                 }
-                for (const name of ["test_text", "test_busyBlocksDrawing", "test_failureClearsStroke"]) {
+                for (const name of ["test_text", "test_busyBlocksDrawing", "test_failureClearsStroke", "test_zoom", "test_workspace"]) {
+                    console.log("Running", name);
                     t.init();
                     t[name]();
                 }
@@ -55,4 +56,4 @@ ShellRoot {
     output = result.stdout + result.stderr
     assert result.returncode == 0 and "PASS native annotation UI" in output, output
     assert "FAIL" not in output and "ERROR" not in output, output
-    print("PASS native annotation UI: marker, arrow, text, busy guard, failed edit")
+    print("PASS native annotation UI: drawing, text, busy guard, failed edit, zoom, workspace")

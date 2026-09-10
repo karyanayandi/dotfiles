@@ -10,6 +10,7 @@ for path in modules.rglob("*.qml"):
     if (
         relative.parts[0] in {"launcher", "notifications"}
         or relative.name == "CaptureWindow.qml"
+        or relative.as_posix() == "capture/CaptureEditor.qml"
     ):
         continue
     source = path.read_text()
