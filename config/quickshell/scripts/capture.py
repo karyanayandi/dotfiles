@@ -3,6 +3,7 @@
 
 import fcntl
 import json
+import math
 import os
 import re
 import shutil
@@ -105,7 +106,7 @@ class Capture:
             if re.fullmatch(r"#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?", color):
                 args += [flag, color]
         args += ["-o", "-f", "%o"] if screen else ["-f", "%x,%y %wx%h"]
-        if rectangles is not None:
+        if screen or rectangles is not None:
             args += ["-r"]
         selected = self.run(args, data=rectangles, selector=True)
         if not selected:
@@ -275,28 +276,121 @@ class Capture:
             raise ValueError("Rectangle is outside the screenshot")
         path = Path(self.temp.name) / f"preview-{time.time_ns()}.png"
         args = ["magick", str(self.preview)]
-        if request.get("operation") == "crop":
+        operation = request.get("operation")
+        if operation == "crop":
             args += ["-crop", f"{w}x{h}+{x}+{y}", "+repage"]
-        elif request.get("operation") == "rectangle":
+        elif operation in ("rectangle", "marker", "arrow", "text"):
             color = request.get("color", "")
-            if not re.fullmatch(r"#[0-9a-fA-F]{6}", color):
+            if not isinstance(color, str) or not re.fullmatch(
+                r"#[0-9a-fA-F]{6}", color
+            ):
                 raise ValueError("Invalid annotation color")
-            args += [
-                "-fill",
-                "none",
-                "-stroke",
-                color,
-                "-strokewidth",
-                "3",
-                "-draw",
-                f"rectangle {x},{y} {x + w - 1},{y + h - 1}",
-            ]
+            if operation == "text":
+                text = request.get("text")
+                size = request.get("fontSize")
+                if (
+                    not isinstance(text, str)
+                    or not 1 <= len(text) <= 500
+                    or "\x00" in text
+                    or any(0xD800 <= ord(char) <= 0xDFFF for char in text)
+                ):
+                    raise ValueError(
+                        "Text must contain 1..500 valid characters without NUL"
+                    )
+                if type(size) is not int or not 8 <= size <= 144:
+                    raise ValueError("Font size must be an integer from 8 to 144")
+                # -annotate interprets properties, entities, escapes and @files.
+                # Escape those, including leading whitespace, without using MVG text.
+                escapes = {
+                    "\\": r"\\",
+                    "%": r"\%",
+                    "&": r"\&",
+                    "@": r"\@",
+                    "\n": r"\n",
+                    "\r": r"\r",
+                }
+                literal = "".join(
+                    escapes.get(char, "\\" + char if char.isspace() else char)
+                    for char in text
+                )
+                args += [
+                    "-font",
+                    "DejaVu-Sans",
+                    "-pointsize",
+                    str(size),
+                    "-fill",
+                    color,
+                    "-stroke",
+                    "none",
+                    "-gravity",
+                    "NorthWest",
+                    "-annotate",
+                    f"+{x}+{y}",
+                    literal,
+                ]
+            else:
+                # Preserve old rectangle requests; new strokes require explicit width.
+                stroke = request.get(
+                    "strokeWidth", 3 if operation == "rectangle" else None
+                )
+                if type(stroke) is not int or not 1 <= stroke <= 64:
+                    raise ValueError("Stroke width must be an integer from 1 to 64")
+                if operation == "rectangle":
+                    draw = f"rectangle {x},{y} {x + w - 1},{y + h - 1}"
+                else:
+                    points = request.get("points")
+                    if (
+                        not isinstance(points, list)
+                        or not 2 <= len(points) <= 4096
+                        or any(
+                            not isinstance(point, list)
+                            or len(point) != 2
+                            or any(type(value) is not int for value in point)
+                            or not 0 <= point[0] < width
+                            or not 0 <= point[1] < height
+                            for point in points
+                        )
+                    ):
+                        raise ValueError(
+                            "Points must be 2..4096 [x,y] integer pairs inside the screenshot"
+                        )
+                    if operation == "marker":
+                        draw = "polyline " + " ".join(f"{px},{py}" for px, py in points)
+                    else:
+                        ax, ay = points[0]
+                        bx, by = points[-1]
+                        draw = f"line {ax},{ay} {bx},{by}"
+                        length = math.hypot(bx - ax, by - ay)
+                        if length:
+                            ux, uy = (bx - ax) / length, (by - ay) / length
+                            head = min(length, max(8, stroke * 3))
+                            left = (
+                                bx - head * ux - head * uy / 2,
+                                by - head * uy + head * ux / 2,
+                            )
+                            right = (
+                                bx - head * ux + head * uy / 2,
+                                by - head * uy - head * ux / 2,
+                            )
+                            draw += f" polyline {left[0]},{left[1]} {bx},{by} {right[0]},{right[1]}"
+                args += [
+                    "-fill",
+                    "none",
+                    "-stroke",
+                    color,
+                    "-strokewidth",
+                    str(stroke),
+                    "-draw",
+                    "stroke-linecap round stroke-linejoin round " + draw,
+                ]
         else:
             raise ValueError("Unknown edit operation")
         try:
             self.run(args + [str(path)], timeout=15)
             if not self.png_ready(path):
                 raise RuntimeError("Image edit did not produce a complete PNG")
+            if self.cancel.is_set():
+                raise Cancelled()
             self.history.append(self.preview)
             # ponytail: keep 20 bitmap undo steps; use vector edits if memory becomes an issue.
             if len(self.history) > 20:

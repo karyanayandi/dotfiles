@@ -1,6 +1,6 @@
 # Quickshell island
 
-All desktop panels live in `modules/Island.qml`. No extra panel windows. Shared controls use `Theme.qml`, Nerd Font glyphs, keyboard focus rings, and the existing Matugen palette. `Config.reducedMotion` disables island geometry animation.
+Desktop panels live in `modules/Island.qml`, except capture controls in `modules/CaptureWindow.qml`. Capture hides only its own window, so screenshots and recordings can include the launcher. Shared controls use `Theme.qml`, Nerd Font glyphs, keyboard focus rings, and the existing Matugen palette. `Config.reducedMotion` disables island geometry animation.
 
 ## Shortcuts
 
@@ -27,12 +27,12 @@ Tab/Shift+Tab navigate; Space activates buttons; Escape closes. Calendar arrows 
 
 ## Features and boundaries
 
-Menus and dropdowns use full content height without scrolling. Launcher results and notifications still scroll. Oversized non-scrolling menus can extend beyond the screen.
+Menus and dropdowns use full content height without scrolling. Launcher results, notifications, and the separate capture editor scroll. Oversized non-scrolling menus can extend beyond the screen.
 
 - Audio uses PipeWire device/stream volume, mute, and default input/output selection. Media uses MPRIS and capability-gates transport and seeking.
 - Calendar browses dates. No event sync or calendar account required.
-- Capture has Screenshot/Recording tabs and a fixed action footer. Screenshot captures screen, visible window region, or area. Drag preview to select a crop or rectangle annotation; Exact bounds supplies keyboard-accessible pixel controls. Undo retains 20 edits. Freehand, text annotations, and window-only video are not implemented.
-- Recording accepts screen/area and one audio source, including monitor or microphone sources. No audio by default. Bar shows elapsed recording time. Stop sends SIGINT only to the owned recorder and waits for finalization. Shell reload also finalizes recording; unsaved screenshot previews are temporary.
+- Capture has Screenshot/Recording tabs and an action footer. Screenshot captures screen, visible window region, or area. Drag preview to select a crop or rectangle annotation; Exact bounds supplies keyboard-accessible pixel controls. Undo retains 20 edits. Native editing provides freehand markers, arrows, text, color and stroke width. Drag to draw; release applies through ImageMagick. For keyboard placement, use Exact bounds and Draw from bounds or Add text. Copy and Save include edits; Undo restores the previous bitmap. Window-only video is not implemented.
+- Recording accepts screen/area and one audio source, including monitor or microphone sources. No audio by default. Screen mode selects a whole monitor with one click; Area mode uses drag selection. Bar shows elapsed recording time only while recording. Click it to stop. Stop sends SIGINT only to the owned recorder and waits for finalization. Shell reload also finalizes recording; unsaved screenshot previews are temporary.
 - Clipboard copies allow wl-copy's background selection owner to outlive the request without holding its completion pipes open.
 - PNGs save under the XDG Pictures directory's `Screenshots`; videos under XDG Videos `Records`. Nothing overwrites existing files. Image/color copy happens only on explicit action.
 - Color picker exposes HEX and RGB. Sample swatch intentionally shows the sampled color; its surrounding UI follows Matugen.
@@ -55,13 +55,15 @@ Never intentionally run both agents. Successful-password authentication still ne
 
 ## Backends
 
-Quickshell 0.3.1 with PipeWire, MPRIS, and Polkit modules; Python 3; UDisks2 and python-gobject; grim, slurp, wf-recorder, hyprpicker, wl-copy, pactl, and ImageMagick. Missing tools show an error rather than running an unrelated app. Codex CLI is optional. Display settings require the active Hyprland Lua API. Niri-specific paths were not live-tested.
+Quickshell 0.3.1 with PipeWire, MPRIS, and Polkit modules; Python 3; UDisks2 and python-gobject; grim, slurp, wf-recorder, hyprpicker, wl-copy, pactl, ImageMagick. Missing tools show an error rather than running an unrelated app. Codex CLI is optional. Display settings require the active Hyprland Lua API. Niri-specific paths were not live-tested.
 
 ## Checks
 
 Run from repository root:
 
 ```sh
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-capture.py
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-capture-editor.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-menu-layouts.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-capture.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-control-extras.py

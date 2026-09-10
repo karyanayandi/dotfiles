@@ -14,6 +14,7 @@ PanelWindow {
     property string captureAction: ""
     property bool captureHidden: false
     property var captureOptions: ({})
+    readonly property bool captureSelecting: captureDelay.running || (captureService.busy && !captureService.recording && (captureService.action === "screenshot" || captureService.action === "record"))
     readonly property string extraView: Object.keys(panels).find(name => panels[name].opened) || ""
     readonly property bool interactive: auth.active || launcher.visibleLauncher || controls.opened || notifs.controlCenterVisible || extraView !== ""
     required property var notifs
@@ -30,7 +31,6 @@ PanelWindow {
             media: media,
             calendar: calendar,
             displays: displays,
-            capture: capture,
             color: colorPicker
         })
     property bool polkitAgentEnabled: Config.polkitAgentEnabled
@@ -65,24 +65,30 @@ PanelWindow {
     function openPanel(name) {
         if (auth.active)
             return;
+        if (name === "capture") {
+            if (captureService.recording)
+                capture.video = true;
+            capture.opened = true;
+            return;
+        }
         const panel = panels[name];
         if (panel) {
-            if (name === "capture" && captureService.recording)
-                capture.video = true;
             panel.opened = true;
         }
     }
     function startCapture(action, options) {
         if (auth.active || !captureService.ready || captureService.busy)
             return;
-        activate("");
+        capture.opened = false;
+        if (action === "pick")
+            activate("");
         captureAction = action;
         captureOptions = options;
-        captureHidden = true;
+        captureHidden = action === "pick";
         captureDelay.restart();
     }
 
-    WlrLayershell.keyboardFocus: interactive ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: auth.active || (interactive && !capture.opened && !captureSelecting) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     WlrLayershell.layer: interactive ? WlrLayer.Overlay : WlrLayer.Top
     WlrLayershell.namespace: "quickshell"
     color: "transparent"
@@ -91,9 +97,9 @@ PanelWindow {
     visible: !captureHidden
 
     mask: Region {
-        item: win.interactive ? backdrop : island
+        item: auth.active ? backdrop : win.captureSelecting ? null : win.interactive && !capture.opened ? backdrop : island
         Region {
-            item: feedback.visible ? feedback : null
+            item: feedback.visible && !win.captureSelecting ? feedback : null
         }
     }
 
@@ -102,7 +108,7 @@ PanelWindow {
     Timer {
         id: captureDelay
 
-        // Let the compositor unmap the entire island before sampling any pixels.
+        // Let the compositor unmap capture controls before sampling pixels.
         interval: 80
 
         onTriggered: {
@@ -122,6 +128,13 @@ PanelWindow {
             win.captureHidden = false;
             win.openPanel(panel);
         }
+    }
+    CaptureWindow {
+        id: capture
+
+        service: captureService
+        blocked: auth.active
+        onCaptureRequested: (action, options) => win.startCapture(action, options)
     }
     IpcHandler {
         function close() {
@@ -199,7 +212,7 @@ PanelWindow {
         id: backdrop
 
         anchors.fill: parent
-        enabled: win.interactive && !auth.active
+        enabled: win.interactive && !auth.active && !capture.opened && !win.captureSelecting
 
         onClicked: win.dismiss()
     }
@@ -311,7 +324,8 @@ PanelWindow {
                             win.activate("controls");
                     }
                     onPanelRequested: panel => {
-                        win.dismiss();
+                        if (panel !== "capture")
+                            win.dismiss();
                         win.panelRequested(panel);
                     }
                 }
@@ -338,17 +352,6 @@ PanelWindow {
 
                     onOpenedChanged: if (opened)
                         win.activate("calendar")
-                }
-                CapturePanel {
-                    id: capture
-
-                    anchors.fill: parent
-                    service: captureService
-
-                    onCaptureRequested: (action, options) => win.startCapture(action, options)
-                    onCloseRequested: opened = false
-                    onOpenedChanged: if (opened)
-                        win.activate("capture")
                 }
                 ColorPickerPanel {
                     id: colorPicker

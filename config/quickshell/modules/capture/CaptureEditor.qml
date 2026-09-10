@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import "../.."
 import "../panels" as Panels
 import QtQuick
@@ -9,7 +10,19 @@ ColumnLayout {
 
     required property var service
     property point dragStart: Qt.point(0, 0)
-    readonly property real preferredHeight: 340 + (exactBounds.checked ? boundsGrid.implicitHeight + 12 : 0)
+    property string tool: "rectangle"
+    property string ink: "#ef4444"
+    property var points: []
+    readonly property real preferredHeight: 480 + (tool === "text" ? 52 : 0) + (exactBounds.checked ? boundsGrid.implicitHeight + 12 : 0)
+
+    function appendPoint(x, y) {
+        const point = pixelPoint(x, y);
+        if (tool === "arrow")
+            points = [points[0], [point.x, point.y]];
+        else if (points.length < 4096)
+            points.push([point.x, point.y]);
+        stroke.requestPaint();
+    }
 
     function pixelPoint(x, y) {
         return Qt.point(Math.max(0, Math.min(preview.sourceSize.width - 1, Math.floor((x - (preview.width - preview.paintedWidth) / 2) * preview.sourceSize.width / preview.paintedWidth))), Math.max(0, Math.min(preview.sourceSize.height - 1, Math.floor((y - (preview.height - preview.paintedHeight) / 2) * preview.sourceSize.height / preview.paintedHeight))));
@@ -30,12 +43,120 @@ ColumnLayout {
             "y": yInput.value,
             "width": widthInput.value,
             "height": heightInput.value,
-            "color": Theme.colChipActive.toString()
+            "color": ink,
+            "points": points,
+            "strokeWidth": sizeInput.value,
+            "fontSize": fontSize.value,
+            "text": annotationText.text
         });
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        enabled: root.service.ready && !root.service.busy && !!root.service.tools.magick
+
+        Repeater {
+            model: ["rectangle", "marker", "arrow", "text"]
+
+            Panels.PanelButton {
+                required property string modelData
+                Layout.fillWidth: true
+                text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
+                checkable: true
+                checked: root.tool === modelData
+                onClicked: {
+                    root.tool = modelData;
+                    root.points = [];
+                    stroke.requestPaint();
+                }
+            }
+        }
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        enabled: !root.service.busy
+        visible: !!root.service.tools.magick
+        spacing: 8
+
+        Repeater {
+            model: ["#ef4444", "#facc15", "#22c55e", "#3b82f6", "#ffffff", "#111111"]
+
+            AbstractButton {
+                id: swatch
+                required property string modelData
+                Accessible.name: "Ink " + modelData
+                Accessible.role: Accessible.RadioButton
+                checkable: true
+                checked: root.ink === modelData
+                implicitWidth: 30
+                implicitHeight: 34
+                onClicked: root.ink = modelData
+                background: Rectangle {
+                    anchors.centerIn: parent
+                    width: swatch.down ? 22 : 26
+                    height: width
+                    radius: width / 2
+                    color: swatch.modelData
+                    border.width: swatch.checked || swatch.visualFocus ? 3 : 1
+                    border.color: swatch.checked || swatch.visualFocus ? Theme.colFg : Theme.colBorder
+                    Text {
+                        anchors.centerIn: parent
+                        text: swatch.checked ? "✓" : ""
+                        color: swatch.modelData === "#111111" || swatch.modelData === "#3b82f6" ? "white" : "black"
+                    }
+                }
+            }
+        }
+        Label {
+            text: "Width"
+            color: Theme.colFgDim
+        }
+        Panels.PanelSpinBox {
+            id: sizeInput
+            Accessible.name: "Stroke width in pixels"
+            from: 1
+            to: 64
+            value: 6
+            Layout.fillWidth: true
+        }
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        visible: root.tool === "text"
+        enabled: !root.service.busy
+
+        Panels.PanelTextField {
+            id: annotationText
+            objectName: "annotationText"
+            Layout.fillWidth: true
+            Accessible.name: "Annotation text"
+            placeholderText: "Text to place on screenshot"
+            maximumLength: 500
+        }
+        Panels.PanelSpinBox {
+            id: fontSize
+            Accessible.name: "Text size in pixels"
+            from: 8
+            to: 144
+            value: 28
+        }
+    }
+
+    Connections {
+        target: root.service
+        function onFeedback(text, failed) {
+            if (failed) {
+                root.points = [];
+                stroke.requestPaint();
+            }
+        }
     }
 
     Image {
         id: preview
+        objectName: "annotationPreview"
 
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -43,11 +164,15 @@ ColumnLayout {
         fillMode: Image.PreserveAspectFit
         cache: false
         asynchronous: true
+        retainWhileLoading: true
+        clip: true
         Accessible.role: Accessible.Graphic
         Accessible.name: "Screenshot preview"
-        Accessible.description: "Drag to select. Use Exact bounds for keyboard editing."
+        Accessible.description: "Drag to draw or select. Click to place text. Exact bounds provides keyboard positioning."
         onStatusChanged: {
             if (status === Image.Ready) {
+                root.points = [];
+                stroke.requestPaint();
                 xInput.value = 0;
                 yInput.value = 0;
                 widthInput.value = sourceSize.width;
@@ -56,7 +181,7 @@ ColumnLayout {
         }
 
         Rectangle {
-            visible: preview.status === Image.Ready && !!root.service.tools.magick
+            visible: preview.status === Image.Ready && !!root.service.tools.magick && (root.tool === "rectangle" || root.tool === "text")
             x: (preview.width - preview.paintedWidth) / 2 + xInput.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width)
             y: (preview.height - preview.paintedHeight) / 2 + yInput.value * preview.paintedHeight / Math.max(1, preview.sourceSize.height)
             width: widthInput.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width)
@@ -66,17 +191,88 @@ ColumnLayout {
             border.color: Theme.colChipActive
         }
 
+        Text {
+            visible: root.tool === "text" && preview.status === Image.Ready
+            x: (preview.width - preview.paintedWidth) / 2 + xInput.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width)
+            y: (preview.height - preview.paintedHeight) / 2 + yInput.value * preview.paintedHeight / Math.max(1, preview.sourceSize.height)
+            text: annotationText.text
+            textFormat: Text.PlainText
+            color: root.ink
+            font.family: "DejaVu Sans"
+            font.pixelSize: Math.max(1, fontSize.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width))
+        }
+
+        Canvas {
+            id: stroke
+            anchors.fill: parent
+            visible: root.points.length > 0
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+            onPaint: {
+                const ctx = getContext("2d");
+                ctx.reset();
+                if (root.points.length < 2 || preview.paintedWidth <= 0)
+                    return;
+                ctx.translate((preview.width - preview.paintedWidth) / 2, (preview.height - preview.paintedHeight) / 2);
+                ctx.scale(preview.paintedWidth / preview.sourceSize.width, preview.paintedHeight / preview.sourceSize.height);
+                ctx.strokeStyle = root.ink;
+                ctx.lineWidth = sizeInput.value;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.beginPath();
+                ctx.moveTo(root.points[0][0], root.points[0][1]);
+                for (let i = 1; i < root.points.length; i++)
+                    ctx.lineTo(root.points[i][0], root.points[i][1]);
+                if (root.tool === "arrow") {
+                    const first = root.points[0];
+                    const last = root.points[root.points.length - 1];
+                    const length = Math.hypot(last[0] - first[0], last[1] - first[1]);
+                    if (length > 0) {
+                        const ux = (last[0] - first[0]) / length;
+                        const uy = (last[1] - first[1]) / length;
+                        const head = Math.min(length, Math.max(8, sizeInput.value * 3));
+                        for (const side of [-1, 1]) {
+                            ctx.moveTo(last[0], last[1]);
+                            ctx.lineTo(last[0] - head * ux + side * head * uy / 2, last[1] - head * uy - side * head * ux / 2);
+                        }
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
         MouseArea {
             anchors.fill: parent
+            objectName: "annotationCanvas"
             enabled: preview.status === Image.Ready && !!root.service.tools.magick && !root.service.busy
             cursorShape: Qt.CrossCursor
+            preventStealing: true
             onPressed: mouse => {
                 root.dragStart = root.pixelPoint(mouse.x, mouse.y);
                 root.selectTo(mouse.x, mouse.y);
+                root.points = [[root.dragStart.x, root.dragStart.y]];
+                stroke.requestPaint();
             }
             onPositionChanged: mouse => {
-                if (pressed)
+                if (!pressed)
+                    return;
+                if (root.tool === "marker" || root.tool === "arrow")
+                    root.appendPoint(mouse.x, mouse.y);
+                else
                     root.selectTo(mouse.x, mouse.y);
+            }
+            onReleased: mouse => {
+                if (root.tool === "marker" || root.tool === "arrow") {
+                    root.appendPoint(mouse.x, mouse.y);
+                    root.apply(root.tool);
+                } else {
+                    root.points = [];
+                    stroke.requestPaint();
+                }
+            }
+            onCanceled: {
+                root.points = [];
+                stroke.requestPaint();
             }
         }
     }
@@ -84,7 +280,7 @@ ColumnLayout {
     Label {
         Layout.fillWidth: true
         wrapMode: Text.WordWrap
-        text: root.service.tools.magick ? "Drag to select" : "Install ImageMagick to crop or mark rectangles."
+        text: !root.service.tools.magick ? "Install ImageMagick to edit screenshots." : root.tool === "text" ? "Click to place text, then Add text. Undo restores the previous image." : root.tool === "rectangle" ? "Drag to select, then Crop or Mark." : "Drag to draw. Release to apply. Undo restores the previous image."
         color: Theme.colFgDim
     }
 
@@ -185,15 +381,27 @@ ColumnLayout {
         enabled: root.service.ready && !root.service.busy && preview.status === Image.Ready
 
         Panels.PanelButton {
+            visible: root.tool === "rectangle"
             text: "Crop"
             glyph: "\uf125"
             onClicked: root.apply("crop")
         }
 
         Panels.PanelButton {
+            visible: root.tool === "rectangle"
             text: "Mark"
             glyph: "\uf096"
             onClicked: root.apply("rectangle")
+        }
+
+        Panels.PanelButton {
+            text: root.tool === "text" ? "Add text" : "Draw from bounds"
+            visible: root.tool !== "rectangle"
+            enabled: root.tool !== "text" || annotationText.text.trim() !== ""
+            onClicked: {
+                root.points = [[xInput.value, yInput.value], [xInput.value + widthInput.value - 1, yInput.value + heightInput.value - 1]];
+                root.apply(root.tool);
+            }
         }
 
         Panels.PanelButton {

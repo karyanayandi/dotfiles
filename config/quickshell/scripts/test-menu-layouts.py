@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Keep scrolling confined to launcher results and notifications."""
+"""Keep scrolling confined to results, notifications, and the capture editor."""
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 modules = Path(__file__).resolve().parents[1] / "modules"
 for path in modules.rglob("*.qml"):
     relative = path.relative_to(modules)
-    if relative.parts[0] in {"launcher", "notifications"}:
+    if (
+        relative.parts[0] in {"launcher", "notifications"}
+        or relative.name == "CaptureWindow.qml"
+    ):
         continue
     source = path.read_text()
     assert not re.search(
@@ -27,7 +30,9 @@ for name in (
 
 assert "ScrollBar.AsNeeded" in (modules / "launcher/Results.qml").read_text()
 assert "Flickable {" in (modules / "notifications/Center.qml").read_text()
-print("PASS menus use content height; scrolling stays in launcher and notifications")
+print(
+    "PASS menus use content height; scrolling stays in launcher, notifications, and capture"
+)
 
 # Empty drive section must not stop discovery when control center is open.
 drives = (modules.parent / "components/RemovableDrives.qml").read_text()

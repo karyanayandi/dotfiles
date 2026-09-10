@@ -190,6 +190,13 @@ CaptureSurface {
         visible: !root.video && !root.service.windowSupported
         wrapMode: Text.WordWrap
     }
+    Label {
+        Layout.fillWidth: true
+        color: Theme.colFgDim
+        text: root.selectedMode === "screen" ? "Click a monitor to capture its entire screen. No area selection." : "Drag to select the area to capture."
+        visible: root.selectedMode !== "window"
+        wrapMode: Text.WordWrap
+    }
     Panels.PanelComboBox {
         id: audio
 

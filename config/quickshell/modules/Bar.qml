@@ -26,6 +26,7 @@ Item {
         function onRawEvent(event) {
             if (event.name === "submap")
                 barWin.submap = event.data;
+
         }
 
         target: Hyprland
@@ -76,11 +77,11 @@ Item {
                     id: cpuMouse
 
                     hoverEnabled: true
-
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: barWin.controls.opened = !barWin.controls.opened
                 }
+
             }
 
             Text {
@@ -103,13 +104,13 @@ Item {
                     id: bluetoothMouse
 
                     hoverEnabled: true
-
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         barWin.launcherRequested("bluetooth");
                     }
                 }
+
             }
 
             Text {
@@ -135,17 +136,16 @@ Item {
                     id: volMa
 
                     hoverEnabled: true
-
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-                    onClicked: mouse => {
+                    onClicked: (mouse) => {
                         if (mouse.button === Qt.MiddleButton)
                             barWin.audio.volMuteToggle();
                         else
                             barWin.panelRequested("audio");
                     }
-                    onWheel: w => {
+                    onWheel: (w) => {
                         if (w.angleDelta.y > 0)
                             barWin.audio.volRaise();
                         else if (w.angleDelta.y < 0)
@@ -158,7 +158,9 @@ Item {
                         duration: 100
                         easing.type: Easing.OutCubic
                     }
+
                 }
+
             }
 
             Item {
@@ -204,7 +206,7 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onClicked: mouse => {
+                    onClicked: (mouse) => {
                         if (mouse.button === Qt.RightButton)
                             barWin.notifs.toggleDnd();
                         else
@@ -217,7 +219,9 @@ Item {
                         duration: 100
                         easing.type: Easing.OutCubic
                     }
+
                 }
+
             }
 
             AbstractButton {
@@ -227,8 +231,8 @@ Item {
                 visible: barWin.capture.recording
                 implicitWidth: contentItem.implicitWidth + 16
                 implicitHeight: 30
-                Accessible.name: "Recording for " + barWin.capture.elapsed + " seconds. Open recording controls"
-                onClicked: barWin.panelRequested("capture")
+                Accessible.name: "Recording for " + barWin.capture.elapsed + " seconds. Stop recording"
+                onClicked: barWin.capture.stop()
 
                 contentItem: Extras.IconLabel {
                     icon: "\uf111"
@@ -242,11 +246,15 @@ Item {
                     border.width: recordingButton.visualFocus ? 2 : 0
                     border.color: Theme.colFg
                 }
+
             }
 
             BarParts.Clock {
                 onClicked: barWin.panelRequested("calendar")
             }
+
         }
+
     }
+
 }
