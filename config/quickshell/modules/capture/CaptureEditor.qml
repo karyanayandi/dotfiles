@@ -11,6 +11,8 @@ ColumnLayout {
     required property var service
     property point dragStart: Qt.point(0, 0)
     property string tool: "rectangle"
+    property bool textPlaced: false
+    property bool textPending: false
     property real zoom: 1
     readonly property real fitScale: preview.sourceSize.width > 0 && preview.sourceSize.height > 0 ? Math.min(viewport.width / preview.sourceSize.width, viewport.height / preview.sourceSize.height) : 1
     property string ink: "#ef4444"
@@ -39,7 +41,9 @@ ColumnLayout {
     }
 
     function apply(operation) {
-        service.request("edit", {
+        if (operation === "text" && (!textPlaced || annotationText.text.trim() === ""))
+            return;
+        const accepted = service.request("edit", {
             "operation": operation,
             "x": xInput.value,
             "y": yInput.value,
@@ -51,6 +55,8 @@ ColumnLayout {
             "fontSize": fontSize.value,
             "text": annotationText.text
         });
+        if (accepted && operation === "text")
+            textPending = true;
     }
 
     RowLayout {
@@ -62,6 +68,7 @@ ColumnLayout {
 
             Panels.PanelButton {
                 required property string modelData
+                objectName: "annotationTool_" + modelData
                 Layout.fillWidth: true
                 text: modelData === "rectangle" ? "Select" : modelData === "pan" ? "Move" : modelData.charAt(0).toUpperCase() + modelData.slice(1)
                 checkable: true
@@ -134,8 +141,13 @@ ColumnLayout {
             objectName: "annotationText"
             Layout.fillWidth: true
             Accessible.name: "Annotation text"
-            placeholderText: "Text to place on screenshot"
+            enabled: root.textPlaced
+            placeholderText: root.textPlaced ? "Type text, then press Enter" : "Drag on the image to place text first"
             maximumLength: 500
+            onAccepted: {
+                if (root.service.ready && !root.service.busy && !root.textPending)
+                    root.apply("text");
+            }
         }
         Panels.PanelSpinBox {
             id: fontSize
@@ -148,8 +160,16 @@ ColumnLayout {
 
     Connections {
         target: root.service
+        function onPreviewChanged() {
+            if (root.textPending) {
+                annotationText.clear();
+                root.textPlaced = false;
+                root.textPending = false;
+            }
+        }
         function onFeedback(text, failed) {
             if (failed) {
+                root.textPending = false;
                 root.points = [];
                 stroke.requestPaint();
             }
@@ -206,7 +226,7 @@ ColumnLayout {
                 }
 
                 Rectangle {
-                    visible: preview.status === Image.Ready && !!root.service.tools.magick && (root.tool === "rectangle" || root.tool === "text")
+                    visible: preview.status === Image.Ready && !!root.service.tools.magick && (root.tool === "rectangle" || (root.tool === "text" && (root.textPlaced || drawingArea.pressed)))
                     x: (preview.width - preview.paintedWidth) / 2 + xInput.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width)
                     y: (preview.height - preview.paintedHeight) / 2 + yInput.value * preview.paintedHeight / Math.max(1, preview.sourceSize.height)
                     width: widthInput.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width)
@@ -217,7 +237,7 @@ ColumnLayout {
                 }
 
                 Text {
-                    visible: root.tool === "text" && preview.status === Image.Ready
+                    visible: root.tool === "text" && root.textPlaced && preview.status === Image.Ready
                     x: (preview.width - preview.paintedWidth) / 2 + xInput.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width)
                     y: (preview.height - preview.paintedHeight) / 2 + yInput.value * preview.paintedHeight / Math.max(1, preview.sourceSize.height)
                     text: annotationText.text
@@ -267,6 +287,7 @@ ColumnLayout {
                 }
 
                 MouseArea {
+                    id: drawingArea
                     anchors.fill: parent
                     objectName: "annotationCanvas"
                     enabled: preview.status === Image.Ready && !!root.service.tools.magick && !root.service.busy && root.tool !== "pan"
@@ -297,6 +318,10 @@ ColumnLayout {
                         } else {
                             root.points = [];
                             stroke.requestPaint();
+                            if (root.tool === "text") {
+                                root.textPlaced = true;
+                                annotationText.forceActiveFocus(Qt.OtherFocusReason);
+                            }
                         }
                     }
                     onCanceled: {
@@ -360,7 +385,7 @@ ColumnLayout {
     Label {
         Layout.fillWidth: true
         wrapMode: Text.WordWrap
-        text: !root.service.tools.magick ? "Install ImageMagick to edit screenshots." : root.tool === "pan" ? "Drag to move around the zoomed image." : root.tool === "text" ? "Click to place text, then Add text. Undo restores the previous image." : root.tool === "rectangle" ? "Drag to select, then Crop or Mark." : "Drag to draw. Release to apply. Undo restores the previous image."
+        text: !root.service.tools.magick ? "Install ImageMagick to edit screenshots." : root.tool === "pan" ? "Drag to move around the zoomed image." : root.tool === "text" ? (root.textPlaced ? "Type your text, then press Enter or Add text. Drag again to move it before adding." : "Drag on the image to place a new text label. Each added label stays on the screenshot.") : root.tool === "rectangle" ? "Drag to select, then Crop or Mark." : "Drag to draw. Release to apply. Undo restores the previous image."
         color: Theme.colFgDim
     }
 
@@ -464,9 +489,10 @@ ColumnLayout {
         }
 
         Panels.PanelButton {
+            objectName: "applyAnnotation"
             text: root.tool === "text" ? "Add text" : "Draw from bounds"
             visible: root.tool !== "rectangle" && root.tool !== "pan"
-            enabled: root.tool !== "text" || annotationText.text.trim() !== ""
+            enabled: root.tool !== "text" || (root.textPlaced && !root.textPending && annotationText.text.trim() !== "")
             onClicked: {
                 root.points = [[xInput.value, yInput.value], [xInput.value + widthInput.value - 1, yInput.value + heightInput.value - 1]];
                 root.apply(root.tool);

@@ -133,11 +133,35 @@ TestCase {
     }
 
     function test_text() {
-        editor.tool = "text";
-        findChild(editor, "annotationText").text = "Literal <text>";
-        editor.apply("text");
-        compare(service.requestData.options.text, "Literal <text>");
-        compare(service.requestData.options.fontSize, 28);
+        mouseClick(findChild(editor, "annotationTool_text"));
+        const field = findChild(editor, "annotationText");
+        const canvas = findChild(editor, "annotationCanvas");
+        verify(!field.enabled);
+        for (let i = 0; i < 2; i++) {
+            const x = canvas.width * (0.1 + i * 0.4);
+            const y = canvas.height * 0.2;
+            const location = editor.pixelPoint(x, y);
+            mouseDrag(canvas, x, y, canvas.width * 0.1, canvas.height * 0.1);
+            tryCompare(field, "activeFocus", true);
+            verify(field.enabled);
+            compare(field.text, "");
+            for (const character of "Literal <text>")
+                keyClick(character);
+            if (i === 0)
+                mouseClick(findChild(editor, "applyAnnotation"));
+            else
+                keyClick(Qt.Key_Return);
+            compare(service.requestData.options.text, "Literal <text>");
+            compare(service.requestData.options.fontSize, 28);
+            verify(Math.abs(service.requestData.options.x - location.x) <= 1);
+            verify(Math.abs(service.requestData.options.y - location.y) <= 1);
+            verify(editor.textPending);
+            // The worker publishes a new preview only after the label is baked in.
+            service.previewChanged();
+            verify(!editor.textPending);
+            verify(!editor.textPlaced);
+            compare(field.text, "");
+        }
     }
 
     function test_busyBlocksDrawing() {
