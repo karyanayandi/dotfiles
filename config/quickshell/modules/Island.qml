@@ -420,8 +420,10 @@ PanelWindow {
                     launcher.open(mode);
             }
             onPanelRequested: panel => {
-                win.dismiss();
-                win.panelRequested(panel);
+                if (win.view === panel)
+                    win.dismiss();
+                else
+                    win.panelRequested(panel);
             }
         }
     }

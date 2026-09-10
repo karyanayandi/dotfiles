@@ -26,7 +26,6 @@ Item {
         function onRawEvent(event) {
             if (event.name === "submap")
                 barWin.submap = event.data;
-
         }
 
         target: Hyprland
@@ -66,14 +65,22 @@ Item {
                 leftPadding: 10
                 rightPadding: 10
 
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 8
+                    color: cpuMouse.pressed ? Theme.colActionBg : cpuMouse.containsMouse ? Theme.colBgAlt : "transparent"
+                    z: -1
+                }
+
                 MouseArea {
                     id: cpuMouse
+
+                    hoverEnabled: true
 
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: barWin.controls.opened = !barWin.controls.opened
                 }
-
             }
 
             Text {
@@ -85,8 +92,17 @@ Item {
                 leftPadding: 10
                 rightPadding: 10
 
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 8
+                    color: bluetoothMouse.pressed ? Theme.colActionBg : bluetoothMouse.containsMouse ? Theme.colBgAlt : "transparent"
+                    z: -1
+                }
+
                 MouseArea {
                     id: bluetoothMouse
+
+                    hoverEnabled: true
 
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
@@ -94,7 +110,6 @@ Item {
                         barWin.launcherRequested("bluetooth");
                     }
                 }
-
             }
 
             Text {
@@ -109,19 +124,28 @@ Item {
                 rightPadding: 10
                 scale: volMa.pressed ? 0.92 : 1
 
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 8
+                    color: volMa.pressed ? Theme.colActionBg : volMa.containsMouse ? Theme.colBgAlt : "transparent"
+                    z: -1
+                }
+
                 MouseArea {
                     id: volMa
+
+                    hoverEnabled: true
 
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-                    onClicked: (mouse) => {
+                    onClicked: mouse => {
                         if (mouse.button === Qt.MiddleButton)
                             barWin.audio.volMuteToggle();
                         else
                             barWin.panelRequested("audio");
                     }
-                    onWheel: (w) => {
+                    onWheel: w => {
                         if (w.angleDelta.y > 0)
                             barWin.audio.volRaise();
                         else if (w.angleDelta.y < 0)
@@ -134,9 +158,7 @@ Item {
                         duration: 100
                         easing.type: Easing.OutCubic
                     }
-
                 }
-
             }
 
             Item {
@@ -146,6 +168,12 @@ Item {
                 Layout.preferredHeight: 30
                 Layout.rightMargin: 20
                 scale: bellMa.pressed ? 0.92 : 1
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 8
+                    color: bellMa.pressed ? Theme.colActionBg : bellMa.containsMouse ? Theme.colBgAlt : "transparent"
+                }
 
                 Text {
                     id: notifText
@@ -172,10 +200,11 @@ Item {
                 MouseArea {
                     id: bellMa
 
+                    hoverEnabled: true
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onClicked: (mouse) => {
+                    onClicked: mouse => {
                         if (mouse.button === Qt.RightButton)
                             barWin.notifs.toggleDnd();
                         else
@@ -188,14 +217,13 @@ Item {
                         duration: 100
                         easing.type: Easing.OutCubic
                     }
-
                 }
-
             }
 
             AbstractButton {
                 id: recordingButton
 
+                hoverEnabled: true
                 visible: barWin.capture.recording
                 implicitWidth: contentItem.implicitWidth + 16
                 implicitHeight: 30
@@ -210,19 +238,15 @@ Item {
 
                 background: Rectangle {
                     radius: 8
-                    color: recordingButton.down ? Theme.colActionBg : "transparent"
+                    color: recordingButton.down ? Theme.colActionBg : recordingButton.hovered ? Theme.colBgAlt : "transparent"
                     border.width: recordingButton.visualFocus ? 2 : 0
                     border.color: Theme.colFg
                 }
-
             }
 
             BarParts.Clock {
                 onClicked: barWin.panelRequested("calendar")
             }
-
         }
-
     }
-
 }
