@@ -13,6 +13,7 @@ Scope {
     property string status: ""
     property int pendingAcknowledgments: 0
     property bool preparingSleep: false
+    property bool bridgeFailed: false
 
     signal clearInput()
 
@@ -120,14 +121,21 @@ Scope {
         running: true
         stdinEnabled: true
         onExited: {
-            console.error("Lock session bridge stopped. Sleep locking unavailable; locking now.");
+            console.error("Lock session bridge stopped. Sleep locking unavailable; check python-dbus and python-gobject.");
             root.pendingAcknowledgments = 0;
-            root.lock();
+            // Lock once per outage, not after every failed restart following an unlock.
+            if (!root.bridgeFailed)
+                root.lock();
+
+            root.bridgeFailed = true;
             bridgeRestart.restart();
         }
 
         stdout: SplitParser {
             onRead: (data) => {
+                if (data === "lock" || data === "sleep" || data === "resume")
+                    root.bridgeFailed = false;
+
                 if (data === "lock" || data === "sleep") {
                     if (data === "sleep") {
                         // Invalidate authentication before releasing the sleep inhibitor.

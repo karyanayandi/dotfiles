@@ -34,6 +34,7 @@ methods = "\n".join(
     )
 )
 read_handler = extract("onRead: (data) => {", 12)
+exit_handler = extract("onExited: {", 8)
 completed_handler = extract("onCompleted: (result) => {", 8)
 
 qml = """
@@ -44,6 +45,8 @@ TestCase {
     id: root
     name: "LockscreenSleepRace"
     property bool preparingSleep: false
+    property bool bridgeFailed: false
+    property var bridgeRestart: ({ restart: function() {} })
     property int pendingAcknowledgments: 0
     property string status: ""
     property var events: []
@@ -63,10 +66,12 @@ TestCase {
     function powerDisplays(on) { events.push("display"); }
     __METHODS__
     function receive(data) { __READ__ }
+    function bridgeExited() { __EXIT__ }
     function complete(result) { __COMPLETE__ }
 
     function init() {
         preparingSleep = false;
+        bridgeFailed = false;
         pendingAcknowledgments = 0;
         session.secure = true;
         session.locked = true;
@@ -108,6 +113,20 @@ TestCase {
         receive("unlock"); // Untrusted unlock command is ignored.
         compare(session.locked, true);
     }
+    function test_bridge_failure_locks_once_per_outage() {
+        session.locked = false;
+        bridgeExited();
+        compare(session.locked, true);
+        complete(results.success);
+        bridgeExited();
+        compare(session.locked, false);
+        receive("unlock"); // Invalid output must not reset the outage.
+        bridgeExited();
+        compare(session.locked, false);
+        receive("resume"); // Healthy bridge restores fail-closed behavior.
+        bridgeExited();
+        compare(session.locked, true);
+    }
     function test_failed_auth_stays_locked() {
         complete(1);
         compare(session.locked, true);
@@ -117,6 +136,7 @@ TestCase {
 qml = (
     qml.replace("__METHODS__", methods)
     .replace("__READ__", read_handler)
+    .replace("__EXIT__", exit_handler)
     .replace(
         "__COMPLETE__",
         completed_handler.replace("PamResult.Success", "results.success"),
