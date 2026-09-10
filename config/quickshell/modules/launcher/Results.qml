@@ -111,7 +111,7 @@ Item {
                         anchors.rightMargin: 8
                         text: modelData.title || ""
                         color: Theme.colFg
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontUi
                         font.pixelSize: 10
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter

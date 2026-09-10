@@ -19,13 +19,13 @@ RowLayout {
     Text {
         text: "\u21B5 select"
         color: Theme.g18
-        font.family: Theme.fontFamily
+        font.family: Theme.fontUi
         font.pixelSize: 10
     }
     Text {
         text: "esc close"
         color: Theme.g18
-        font.family: Theme.fontFamily
+        font.family: Theme.fontUi
         font.pixelSize: 10
     }
     Item {
@@ -45,7 +45,7 @@ RowLayout {
             anchors.centerIn: parent
             text: "ctrl+b  random " + root.wallpaper.rotationLabel
             color: root.wallpaper.rotationInterval > 0 ? Theme.colBg : Theme.colFg
-            font.family: Theme.fontFamily
+            font.family: Theme.fontUi
             font.pixelSize: 11
         }
         MouseArea {
@@ -68,7 +68,7 @@ RowLayout {
             anchors.centerIn: parent
             text: root.bluetooth.scanning ? "Scanning\u2026" : "Scan"
             color: Theme.colFg
-            font.family: Theme.fontFamily
+            font.family: Theme.fontUi
             font.pixelSize: 11
         }
         MouseArea {
@@ -91,7 +91,7 @@ RowLayout {
             anchors.centerIn: parent
             text: root.bluetooth.powered ? "BT On" : "BT Off"
             color: root.bluetooth.powered ? Theme.colBg : Theme.colFg
-            font.family: Theme.fontFamily
+            font.family: Theme.fontUi
             font.pixelSize: 11
         }
         MouseArea {
@@ -114,7 +114,7 @@ RowLayout {
             anchors.centerIn: parent
             text: "Clear"
             color: Theme.colFg
-            font.family: Theme.fontFamily
+            font.family: Theme.fontUi
             font.pixelSize: 11
         }
         MouseArea {

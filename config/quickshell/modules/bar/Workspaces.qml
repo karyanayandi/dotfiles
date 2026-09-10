@@ -63,7 +63,7 @@ RowLayout {
                 anchors.centerIn: parent
                 text: modelData.name
                 color: Theme.colFg
-                font.family: Theme.fontFamily
+                font.family: Theme.fontUi
                 font.pixelSize: Theme.fontSize
             }
 
@@ -100,7 +100,7 @@ RowLayout {
         visible: root.submap !== "" && root.submap !== "default"
         text: root.submap
         color: Theme.colFg
-        font.family: Theme.fontFamily
+        font.family: Theme.fontUi
         font.pixelSize: Theme.fontSize
         font.italic: true
         leftPadding: 10

@@ -49,7 +49,7 @@ QtObject {
     property color colBgAlpha095: Qt.rgba(g0.r, g0.g, g0.b, 0.95)
     property color colBgAlpha085: Qt.rgba(g0.r, g0.g, g0.b, 0.85)
     property color colBgAlpha078: Qt.rgba(g0.r, g0.g, g0.b, 0.78)
-    property string fontUi: "sans-serif"
+    property string fontUi: "Adwaita Sans"
     property string fontFamily: "JetBrainsMono NF"
     property color colLauncherBg: Qt.rgba(g0.r, g0.g, g0.b, 0.98)
     property color colLauncherBorder: Qt.rgba(g17.r, g17.g, g17.b, 0.35)

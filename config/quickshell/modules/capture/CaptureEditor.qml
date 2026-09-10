@@ -248,7 +248,7 @@ ColumnLayout {
                     text: annotationText.text
                     textFormat: Text.PlainText
                     color: root.ink
-                    font.family: "DejaVu Sans"
+                    font.family: Theme.fontUi
                     font.pixelSize: Math.max(1, fontSize.value * preview.paintedWidth / Math.max(1, preview.sourceSize.width))
                 }
 

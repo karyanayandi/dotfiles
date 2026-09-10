@@ -321,7 +321,7 @@ class AnnotationTests(unittest.TestCase):
                         "magick",
                         str(self.original),
                         "-font",
-                        "DejaVu-Sans",
+                        "Adwaita-Sans",
                         "-pointsize",
                         "18",
                         "-fill",

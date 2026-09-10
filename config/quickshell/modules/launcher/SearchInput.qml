@@ -131,7 +131,7 @@ RowLayout {
         visible: !input.text.length
         text: "esc"
         color: Theme.colFgDim
-        font.family: Theme.fontFamily
+        font.family: Theme.fontUi
         font.pixelSize: 10
         Layout.alignment: Qt.AlignVCenter
 

@@ -19,7 +19,7 @@ AbstractButton {
     contentItem: Text {
         text: Qt.formatDateTime(root.now, "HH:mm")
         color: Theme.colFg
-        font.family: Theme.fontFamily
+        font.family: Theme.fontUi
         font.pixelSize: Theme.fontSize
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter

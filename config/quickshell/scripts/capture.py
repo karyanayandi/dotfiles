@@ -315,7 +315,7 @@ class Capture:
                 )
                 args += [
                     "-font",
-                    "DejaVu-Sans",
+                    "Adwaita-Sans",
                     "-pointsize",
                     str(size),
                     "-fill",
