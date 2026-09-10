@@ -10,11 +10,12 @@ import Quickshell.Services.Polkit
 Item {
     id: root
 
+    readonly property bool active: !!agent && agent.isActive
+    readonly property var agent: loader.item
+
     // Opt in only after stopping the existing agent for a supervised test.
     property bool agentEnabled: Quickshell.env("QS_POLKIT_AGENT") === "1"
-    readonly property var agent: loader.item
     readonly property var flow: agent ? agent.flow : null
-    readonly property bool active: !!agent && agent.isActive
     readonly property bool opened: active && !!flow && !flow.isCompleted
 
     function cancel() {
@@ -22,9 +23,10 @@ Item {
             flow.cancelAuthenticationRequest();
     }
 
-    visible: opened
+    implicitHeight: form.implicitHeight + 48
     implicitWidth: 480
-    implicitHeight: Math.min(560, form.implicitHeight + 48)
+    visible: opened
+
     Keys.onEscapePressed: cancel()
     onOpenedChanged: {
         response.clear();
@@ -40,24 +42,22 @@ Item {
         active: root.agentEnabled
 
         sourceComponent: Component {
-            PolkitAgent {}
+            PolkitAgent {
+            }
         }
     }
-
     IpcHandler {
+        function cancel() {
+            root.cancel();
+        }
         // No open/preview/password IPC. Only real authority requests create dialogs.
 
         function status(): string {
             return !root.agentEnabled ? "disabled" : root.agent && root.agent.isRegistered ? "registered" : "not registered";
         }
 
-        function cancel() {
-            root.cancel();
-        }
-
         target: "polkit"
     }
-
     Connections {
         function onFlowChanged() {
             response.clear();
@@ -65,98 +65,98 @@ Item {
 
         target: root.agent
     }
-
     Connections {
+        function onIsCompletedChanged() {
+            response.clear();
+        }
         function onIsResponseRequiredChanged() {
             response.clear();
             if (root.flow && root.flow.isResponseRequired)
                 response.forceActiveFocus();
         }
-
         function onSelectedIdentityChanged() {
-            response.clear();
-        }
-
-        function onIsCompletedChanged() {
             response.clear();
         }
 
         target: root.flow
     }
-
     Pane {
         anchors.fill: parent
-        padding: 24
         font.family: Shell.Theme.fontUi
-        palette.windowText: Shell.Theme.colFg
-        palette.text: Shell.Theme.colFg
+        padding: 24
         palette.base: Shell.Theme.colBgAlt
         palette.button: Shell.Theme.colBgAlt
         palette.buttonText: Shell.Theme.colFg
         palette.highlight: Shell.Theme.g6
         palette.highlightedText: Shell.Theme.g0
+        palette.text: Shell.Theme.colFg
+        palette.windowText: Shell.Theme.colFg
+
+        background: Item {
+        }
+
         Keys.onEscapePressed: root.cancel()
 
-        ScrollView {
-            id: scroll
+        Pane {
+            id: bodyPane
+
             anchors.fill: parent
-            contentWidth: availableWidth
+            padding: 0
+
+            background: Item {
+            }
 
             ColumnLayout {
                 id: form
-                width: scroll.availableWidth
+
                 spacing: 16
+                width: bodyPane.availableWidth
 
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 10
+
                     Label {
-                        text: "\uf023"
                         font.family: Shell.Theme.fontFamily
                         font.pixelSize: 22
+                        text: "\uf023"
                     }
                     Label {
-                        text: "Authenticate"
-                        font.pixelSize: 22
-                        font.bold: true
                         Layout.fillWidth: true
+                        font.bold: true
+                        font.pixelSize: 22
+                        text: "Authenticate"
                         wrapMode: Text.Wrap
                     }
                 }
-
                 Label {
+                    Layout.fillWidth: true
                     text: root.flow ? root.flow.message : ""
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
-                    Layout.fillWidth: true
                 }
-
                 Label {
+                    Layout.fillWidth: true
+                    font.pixelSize: 12
                     text: root.flow ? root.flow.actionId : ""
                     textFormat: Text.PlainText
                     wrapMode: Text.WrapAnywhere
-                    Layout.fillWidth: true
-                    font.pixelSize: 12
                 }
-
                 Panels.PanelComboBox {
-                    leadingGlyph: "\uf007"
-                    currentIndex: root.flow ? root.flow.identities.indexOf(root.flow.selectedIdentity) : -1
-                    Layout.fillWidth: true
                     Accessible.name: "Authentication identity"
+                    Layout.fillWidth: true
+                    currentIndex: root.flow ? root.flow.identities.indexOf(root.flow.selectedIdentity) : -1
+                    leadingGlyph: "\uf007"
                     model: root.flow ? root.flow.identities : []
                     textRole: "displayName"
+
                     onActivated: {
                         if (root.flow)
                             root.flow.selectedIdentity = root.flow.identities[currentIndex];
                     }
                 }
-
                 Panels.PanelTextField {
                     id: response
-                    leadingGlyph: "\uf023"
-                    placeholderText: root.flow ? root.flow.inputPrompt : "Password"
-                    objectName: "polkitResponse"
 
                     function submitResponse() {
                         if (!root.flow || !root.flow.isResponseRequired)
@@ -166,40 +166,41 @@ Item {
                         clear();
                     }
 
-                    Layout.fillWidth: true
-                    enabled: !!root.flow && root.flow.isResponseRequired
                     Accessible.name: root.flow ? root.flow.inputPrompt : "Authentication response"
+                    Layout.fillWidth: true
                     echoMode: root.flow && root.flow.responseVisible ? TextInput.Normal : TextInput.Password
+                    enabled: !!root.flow && root.flow.isResponseRequired
                     inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                    leadingGlyph: "\uf023"
+                    objectName: "polkitResponse"
+                    placeholderText: root.flow ? root.flow.inputPrompt : "Password"
+
                     onAccepted: submitResponse()
                 }
-
                 Label {
-                    text: root.flow ? root.flow.supplementaryMessage : ""
-                    visible: text !== ""
-                    color: Shell.Theme.colUrgent
-                    textFormat: Text.PlainText
-                    wrapMode: Text.Wrap
                     Layout.fillWidth: true
+                    color: Shell.Theme.colUrgent
+                    text: root.flow ? root.flow.supplementaryMessage : ""
+                    textFormat: Text.PlainText
+                    visible: text !== ""
+                    wrapMode: Text.Wrap
                 }
-
                 RowLayout {
                     Panels.PanelButton {
-                        text: "Cancel"
                         glyph: "\uf00d"
+                        text: "Cancel"
+
                         onClicked: root.cancel()
                     }
-
                     Panels.PanelButton {
-                        text: "Authenticate"
-                        glyph: "\uf023"
                         enabled: response.enabled
+                        glyph: "\uf023"
+                        text: "Authenticate"
+
                         onClicked: response.submitResponse()
                     }
                 }
             }
         }
-
-        background: Item {}
     }
 }

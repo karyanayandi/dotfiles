@@ -9,110 +9,111 @@ ComboBox {
 
     property string leadingGlyph: ""
 
+    font.family: Theme.fontUi
+    font.pixelSize: 14
+    hoverEnabled: true
     implicitHeight: 44
     implicitWidth: 180
     leftPadding: leadingGlyph ? 42 : 14
-    rightPadding: 38
-    hoverEnabled: true
-    onVisibleChanged: if (!visible)
-        popup.close()
-    onEnabledChanged: if (!enabled)
-        popup.close()
-    font.family: Theme.fontUi
-    font.pixelSize: 14
-    palette.window: Theme.colBg
-    palette.windowText: Theme.colFg
-    palette.text: Theme.colFg
-    palette.buttonText: Theme.colFg
-    palette.button: Theme.colBgAlt
     palette.base: Theme.colBgAlt
+    palette.button: Theme.colBgAlt
+    palette.buttonText: Theme.colFg
     palette.highlight: Theme.colChipActive
     palette.highlightedText: Theme.colBg
+    palette.text: Theme.colFg
+    palette.window: Theme.colBg
+    palette.windowText: Theme.colFg
+    rightPadding: 38
 
-    contentItem: Text {
-        text: root.displayText
-        font: root.font
-        color: root.enabled ? Theme.colFg : Theme.colFgDim
-        verticalAlignment: Text.AlignVCenter
-        elide: Text.ElideRight
-    }
-    Text {
-        visible: root.leadingGlyph !== ""
-        x: 14
-        anchors.verticalCenter: parent.verticalCenter
-        text: root.leadingGlyph
-        font.family: Theme.fontFamily
-        font.pixelSize: 17
-        color: Theme.colFgDim
-    }
-    indicator: Text {
-        x: root.width - width - 14
-        anchors.verticalCenter: parent.verticalCenter
-        text: root.popup.visible ? "\uf106" : "\uf107"
-        font.family: Theme.fontFamily
-        font.pixelSize: 17
-        color: root.enabled ? Theme.colFg : Theme.colFgDim
-    }
     background: Rectangle {
-        radius: 12
-        color: root.down ? Theme.colActionBg : root.hovered ? Theme.colBgAlt : Theme.colInputBg
-        border.width: root.visualFocus ? 2 : 1
         border.color: root.visualFocus ? Theme.colChipActive : Theme.colBorder
+        border.width: root.visualFocus ? 2 : 1
+        color: root.down ? Theme.colActionBg : root.hovered ? Theme.colBgAlt : Theme.colInputBg
+        radius: 12
+    }
+    contentItem: Text {
+        color: root.enabled ? Theme.colFg : Theme.colFgDim
+        elide: Text.ElideRight
+        font: root.font
+        text: root.displayText
+        verticalAlignment: Text.AlignVCenter
     }
     delegate: ItemDelegate {
         id: option
+
         required property int index
-        text: root.textAt(index)
+
         Accessible.name: text
-        width: ListView.view.width
-        implicitHeight: 40
         highlighted: root.highlightedIndex === index
+        implicitHeight: 40
+        text: root.textAt(index)
+        width: ListView.view.width
+
+        background: Rectangle {
+            color: option.highlighted ? Theme.colChipActive : option.hovered ? Theme.colHoverAlpha : "transparent"
+            radius: 8
+        }
         contentItem: RowLayout {
             spacing: 10
+
             Text {
-                text: "\uf00c"
-                opacity: option.index === root.currentIndex ? 1 : 0
-                font.family: Theme.fontFamily
                 color: option.highlighted ? Theme.colBg : Theme.colFg
+                font.family: Theme.fontFamily
+                opacity: option.index === root.currentIndex ? 1 : 0
+                text: "\uf00c"
             }
             Text {
                 Layout.fillWidth: true
-                text: option.text
-                font: root.font
                 color: option.highlighted ? Theme.colBg : Theme.colFg
                 elide: Text.ElideRight
+                font: root.font
+                text: option.text
             }
-        }
-        background: Rectangle {
-            radius: 8
-            color: option.highlighted ? Theme.colChipActive : option.hovered ? Theme.colHoverAlpha : "transparent"
         }
     }
+    indicator: Text {
+        anchors.verticalCenter: parent.verticalCenter
+        color: root.enabled ? Theme.colFg : Theme.colFgDim
+        font.family: Theme.fontFamily
+        font.pixelSize: 17
+        text: root.popup.visible ? "\uf106" : "\uf107"
+        x: root.width - width - 14
+    }
     popup: Popup {
-        y: root.height + 6
-        width: root.width
+        implicitHeight: options.contentHeight + 12
         padding: 6
-        implicitHeight: Math.min(options.contentHeight + 12, 260)
         popupType: Popup.Item
+        width: root.width
+        y: root.height + 6
+
+        background: Rectangle {
+            border.color: Theme.colBorderStrong
+            border.width: 1
+            color: Theme.colBg
+            radius: 14
+        }
         contentItem: ListView {
             id: options
-            clip: true
-            implicitHeight: contentHeight
-            model: root.popup.visible ? root.delegateModel : null
+
             currentIndex: root.highlightedIndex
-            ScrollIndicator.vertical: ScrollIndicator {
-                contentItem: Rectangle {
-                    implicitWidth: 3
-                    radius: 2
-                    color: Theme.colFgDim
-                }
-            }
+            implicitHeight: contentHeight
+            interactive: false
+            model: root.popup.visible ? root.delegateModel : null
         }
-        background: Rectangle {
-            radius: 14
-            color: Theme.colBg
-            border.width: 1
-            border.color: Theme.colBorderStrong
-        }
+    }
+
+    onEnabledChanged: if (!enabled)
+        popup.close()
+    onVisibleChanged: if (!visible)
+        popup.close()
+
+    Text {
+        anchors.verticalCenter: parent.verticalCenter
+        color: Theme.colFgDim
+        font.family: Theme.fontFamily
+        font.pixelSize: 17
+        text: root.leadingGlyph
+        visible: root.leadingGlyph !== ""
+        x: 14
     }
 }

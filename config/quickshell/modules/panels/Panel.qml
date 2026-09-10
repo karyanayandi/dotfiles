@@ -7,17 +7,18 @@ import Quickshell.Io
 Item {
     id: root
 
-    required property string title
+    default property alias body: content.data
+    readonly property real bodyHeight: content.implicitHeight + (footerContent.visible ? footerContent.implicitHeight + 16 : 0)
+    property alias footer: footerContent.data
     property string icon: ""
     property string ipcTarget: ""
-    default property alias body: content.data
-    property alias footer: footerContent.data
     property bool opened: false
-    readonly property real bodyHeight: content.implicitHeight + (footerContent.visible ? footerContent.implicitHeight + 16 : 0)
+    required property string title
 
-    visible: opened
+    implicitHeight: bodyHeight + 96
     implicitWidth: 440
-    implicitHeight: Math.min(620, bodyHeight + 96)
+    visible: opened
+
     // Island owns window, material, and interruptible geometry transitions.
     onOpenedChanged: {
         if (opened) {
@@ -29,49 +30,26 @@ Item {
     }
 
     IpcHandler {
-        enabled: root.ipcTarget !== ""
+        function close() {
+            root.opened = false;
+        }
+        function open() {
+            if (root.enabled)
+                root.opened = true;
+        }
         function toggle() {
             if (root.enabled)
                 root.opened = !root.opened;
         }
 
-        function open() {
-            if (root.enabled)
-                root.opened = true;
-        }
-
-        function close() {
-            root.opened = false;
-        }
-
+        enabled: root.ipcTarget !== ""
         target: root.ipcTarget
-    }
-
-    Connections {
-        target: root.Window.window
-        function onActiveFocusItemChanged() {
-            const item = root.Window.window.activeFocusItem;
-            if (!item)
-                return;
-            let ancestor = item.parent;
-            while (ancestor && ancestor !== content)
-                ancestor = ancestor.parent;
-            if (!ancestor)
-                return;
-            const y = item.mapToItem(content, 0, 0).y;
-            const flick = scroll.contentItem as Flickable;
-            if (!flick)
-                return;
-            if (y < flick.contentY)
-                flick.contentY = y;
-            else if (y + item.height > flick.contentY + flick.height)
-                flick.contentY = y + item.height - flick.height;
-        }
     }
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 16
+
         Keys.onEscapePressed: root.opened = false
 
         RowLayout {
@@ -79,61 +57,62 @@ Item {
             spacing: 10
 
             Text {
-                visible: root.icon !== ""
-                text: root.icon
                 color: Theme.colFg
                 font.family: Theme.fontFamily
                 font.pixelSize: 22
+                text: root.icon
+                visible: root.icon !== ""
             }
             Text {
                 Layout.fillWidth: true
-                text: root.title
                 color: Theme.colFg
+                font.bold: true
                 font.family: Theme.fontUi
                 font.pixelSize: 22
-                font.bold: true
+                text: root.title
             }
-
             PanelButton {
                 id: closeButton
 
-                glyph: "\uf00d"
                 Accessible.name: "Close " + root.title
+                glyph: "\uf00d"
+
                 onClicked: root.opened = false
             }
         }
+        Pane {
+            id: bodyPane
 
-        ScrollView {
-            id: scroll
-
-            Layout.fillWidth: true
             Layout.fillHeight: true
-            contentWidth: availableWidth
-            clip: true
+            Layout.fillWidth: true
             font.family: Theme.fontUi
             font.pixelSize: 14
-            palette.window: Theme.colBg
-            palette.windowText: Theme.colFg
-            palette.text: Theme.colFg
+            padding: 0
             palette.base: Theme.colBgAlt
             palette.button: Theme.colBgAlt
             palette.buttonText: Theme.colFg
             palette.highlight: Theme.colChipActive
             palette.highlightedText: Theme.colBg
+            palette.text: Theme.colFg
+            palette.window: Theme.colBg
+            palette.windowText: Theme.colFg
+
+            background: Item {
+            }
 
             ColumnLayout {
                 id: content
 
-                width: scroll.availableWidth
                 spacing: 12
+                width: bodyPane.availableWidth
             }
         }
-
         ColumnLayout {
             id: footerContent
+
             Layout.fillWidth: true
-            visible: children.length > 0
             spacing: 8
+            visible: children.length > 0
         }
     }
 }

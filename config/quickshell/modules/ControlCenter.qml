@@ -12,24 +12,43 @@ Item {
     id: win
 
     required property var audio
-    required property var notifs
-    property bool opened: false
-    property bool networkAvailable: false
-    property date now: new Date()
-    property string cpuUsage: "CPU --"
-    property string ramUsage: "RAM --"
     readonly property string bluetoothStatus: {
         const devices = bluetooth.devices.filter(device => device.connected).map(device => device.name);
         return devices.length ? devices.join(", ") : "No device connected";
+    }
+    property string cpuUsage: "CPU --"
+    property bool networkAvailable: false
+    required property var notifs
+    property date now: new Date()
+    property bool opened: false
+    property string ramUsage: "RAM --"
+
+    signal launcherRequested(string mode)
+    signal panelRequested(string panel)
+
+    implicitHeight: content.implicitHeight + 40
+    implicitWidth: 380
+    visible: opened
+
+    Keys.onEscapePressed: win.opened = false
+    onOpenedChanged: {
+        if (opened) {
+            notifs.controlCenterVisible = false;
+            Qt.callLater(() => {
+                if (win.enabled && win.opened)
+                    closeButton.forceActiveFocus();
+            });
+        }
     }
 
     Services.BluetoothService {
         id: bluetooth
     }
-
     Process {
         id: systemUsage
+
         command: ["sh", "-c", "{ awk '/^cpu / { idle=$5+$6; total=0; for (i=2; i<=NF; i++) total+=$i; print total, idle }' /proc/stat; sleep 0.1; awk '/^cpu / { idle=$5+$6; total=0; for (i=2; i<=NF; i++) total+=$i; print total, idle }' /proc/stat; } | awk 'NR==1 { total=$1; idle=$2; next } { printf \"CPU %d%%\\n\", 100 - 100 * ($2-idle) / ($1-total) }'; free -h | awk '/^Mem:/ { print \"RAM \" $3 \"/\" $2 }'"]
+
         stdout: SplitParser {
             onRead: data => {
                 data = data.trim();
@@ -42,326 +61,285 @@ Item {
     }
     Timer {
         interval: 2000
-        running: win.opened
         repeat: true
+        running: win.opened
         triggeredOnStart: true
+
         onTriggered: systemUsage.running = true
     }
-
     Timer {
         interval: 1000
-        running: win.opened
         repeat: true
+        running: win.opened
         triggeredOnStart: true
+
         onTriggered: win.now = new Date()
     }
-    signal launcherRequested(string mode)
-    signal panelRequested(string panel)
-
-    visible: opened
-    implicitWidth: 380
-    implicitHeight: content.implicitHeight + 40
-
-    Keys.onEscapePressed: win.opened = false
-
-    onOpenedChanged: {
-        if (opened) {
-            notifs.controlCenterVisible = false;
-            Qt.callLater(() => {
-                if (win.enabled && win.opened)
-                    closeButton.forceActiveFocus();
-            });
-        }
-    }
-
     Connections {
-        target: win.notifs
         function onControlCenterVisibleChanged() {
             if (win.notifs.controlCenterVisible)
                 win.opened = false;
         }
-    }
 
+        target: win.notifs
+    }
     IpcHandler {
-        target: "controls"
         function toggle() {
             if (win.enabled)
                 win.opened = !win.opened;
         }
-    }
 
+        target: "controls"
+    }
     Process {
-        running: true
         command: ["sh", "-c", "command -v networkctl >/dev/null && command -v ghostty >/dev/null"]
+        running: true
+
         onExited: exitCode => win.networkAvailable = exitCode === 0
     }
-
     PwObjectTracker {
         objects: [win.audio.sink]
     }
-
-    component SettingButton: Button {
-        id: button
-        Layout.fillWidth: true
-        Layout.preferredWidth: 0
-        property string detail: ""
-        property string glyph: ""
-        implicitHeight: Math.max(52, contentItem.implicitHeight + 24)
-        font.family: Theme.fontUi
-        font.pixelSize: 14
-        Accessible.name: detail ? text + ", " + detail : text
-        background: Rectangle {
-            radius: 14
-            color: button.down ? Theme.g2 : button.checked ? Theme.colActionBg : button.hovered ? Theme.g2 : Theme.colBgAlt
-            border.width: button.visualFocus ? 2 : 1
-            border.color: button.visualFocus ? Theme.colFg : Theme.colBorder
-        }
-        contentItem: ColumnLayout {
-            spacing: 4
-            Extras.IconLabel {
-                Layout.fillWidth: true
-                icon: button.glyph
-                text: button.text
-                font: button.font
-                color: button.enabled ? Theme.colFg : Theme.colFgDim
-                wrap: true
-            }
-            Text {
-                Layout.fillWidth: true
-                visible: button.detail !== ""
-                text: button.detail
-                Layout.preferredWidth: 0
-                font.family: Theme.fontUi
-                font.pixelSize: 12
-                color: Theme.colFgDim
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-            }
-        }
-    }
-
     Item {
         anchors.fill: parent
 
-        ScrollView {
-            id: scroll
+        Pane {
+            id: bodyPane
+
             anchors.fill: parent
             anchors.margins: 20
-            contentWidth: availableWidth
-            clip: true
+            padding: 0
+
+            background: Item {
+            }
 
             ColumnLayout {
                 id: content
-                width: scroll.availableWidth
+
                 spacing: 14
+                width: bodyPane.availableWidth
 
                 RowLayout {
                     Layout.fillWidth: true
+
                     Text {
-                        text: "\uf1de"
                         color: Theme.colFg
                         font.family: Theme.fontFamily
                         font.pixelSize: 22
+                        text: "\uf1de"
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: "Control center"
                         color: Theme.colFg
                         font.family: Theme.fontUi
+                        font.letterSpacing: -0.4
                         font.pixelSize: 22
                         font.weight: Font.DemiBold
-                        font.letterSpacing: -0.4
+                        text: "Control center"
                     }
                     SettingButton {
                         id: closeButton
+
+                        Accessible.name: "Close control center"
                         Layout.fillWidth: false
                         Layout.preferredWidth: 40
-                        implicitHeight: 40
                         glyph: "\uf00d"
-                        Accessible.name: "Close control center"
+                        implicitHeight: 40
+
                         onClicked: win.opened = false
                     }
                 }
-
                 Text {
                     Layout.fillWidth: true
-                    text: Qt.formatDateTime(win.now, "HH:mm · dddd, dd MMMM")
-                    wrapMode: Text.WordWrap
                     color: Theme.colFgDim
                     font.family: Theme.fontUi
                     font.pixelSize: 13
+                    text: Qt.formatDateTime(win.now, "HH:mm · dddd, dd MMMM")
+                    wrapMode: Text.WordWrap
                 }
-
                 GridLayout {
                     Layout.fillWidth: true
-                    columns: 2
                     columnSpacing: 10
+                    columns: 2
                     rowSpacing: 10
 
                     SettingButton {
-                        text: "Network"
-                        glyph: "\uf1eb"
                         enabled: win.networkAvailable
+                        glyph: "\uf1eb"
+                        text: "Network"
+
                         onClicked: {
                             Quickshell.execDetached(["ghostty", "--wait-after-command=true", "-e", "networkctl", "--no-pager", "status", "--all"]);
                             win.opened = false;
                         }
                     }
                     SettingButton {
-                        text: "Bluetooth"
-                        glyph: "\uf293"
                         detail: win.bluetoothStatus
+                        glyph: "\uf293"
+                        text: "Bluetooth"
+
                         onClicked: {
                             win.launcherRequested("bluetooth");
                         }
                     }
                     SettingButton {
-                        text: "Do not disturb"
-                        glyph: "\uf1f6"
                         checkable: true
                         checked: win.notifs.doNotDisturb
+                        glyph: "\uf1f6"
+                        text: "Do not disturb"
+
                         onClicked: win.notifs.toggleDnd()
                     }
                     SettingButton {
-                        text: win.audio.muted ? "Muted" : "Sound"
-                        glyph: win.audio.muted ? "\uf026" : "\uf028"
-                        enabled: !!win.audio.sink?.audio
                         checkable: true
                         checked: win.audio.muted
+                        enabled: !!win.audio.sink?.audio
+                        glyph: win.audio.muted ? "\uf026" : "\uf028"
+                        text: win.audio.muted ? "Muted" : "Sound"
+
                         onClicked: win.audio.volMuteToggle()
                     }
                 }
-
                 SettingButton {
-                    text: "System monitor"
-                    glyph: "\uf085"
                     detail: win.cpuUsage + " · " + win.ramUsage
+                    glyph: "\uf085"
+                    text: "System monitor"
+
                     onClicked: {
                         Quickshell.execDetached(["ghostty", "-e", "btm"]);
                         win.opened = false;
                     }
                 }
-
                 Rectangle {
                     Layout.fillWidth: true
+                    color: Theme.colBgAlt
                     implicitHeight: sound.implicitHeight + 28
                     radius: 16
-                    color: Theme.colBgAlt
 
                     ColumnLayout {
                         id: sound
+
                         anchors.fill: parent
                         anchors.margins: 14
                         spacing: 6
 
                         RowLayout {
                             Layout.fillWidth: true
+
                             Text {
                                 Layout.fillWidth: true
-                                text: "Volume"
                                 color: Theme.colFg
                                 font.family: Theme.fontUi
                                 font.pixelSize: 14
                                 font.weight: Font.Medium
+                                text: "Volume"
                             }
                             Text {
-                                text: Math.round(volume.value * 100) + "%"
                                 color: Theme.colFgDim
                                 font.family: Theme.fontUi
                                 font.pixelSize: 13
+                                text: Math.round(volume.value * 100) + "%"
                             }
                         }
                         Slider {
                             id: volume
-                            implicitHeight: 36
-                            Layout.fillWidth: true
-                            from: 0
-                            to: 1
-                            stepSize: 0.01
-                            enabled: !!win.audio.sink?.audio
+
                             Accessible.name: "Output volume"
-                            onMoved: win.audio.sink.audio.volume = value
-                            Binding {
-                                target: volume
-                                property: "value"
-                                value: win.audio.vol
-                                when: !volume.pressed
-                            }
+                            Layout.fillWidth: true
+                            enabled: !!win.audio.sink?.audio
+                            from: 0
+                            implicitHeight: 36
+                            stepSize: 0.01
+                            to: 1
+
                             background: Rectangle {
-                                x: volume.leftPadding
-                                y: volume.topPadding + volume.availableHeight / 2 - height / 2
-                                width: volume.availableWidth
+                                color: Theme.colMeterBg
                                 height: 6
                                 radius: 3
-                                color: Theme.colMeterBg
+                                width: volume.availableWidth
+                                x: volume.leftPadding
+                                y: volume.topPadding + volume.availableHeight / 2 - height / 2
+
                                 Rectangle {
-                                    width: volume.visualPosition * parent.width
+                                    color: Theme.colMeterFg
                                     height: parent.height
                                     radius: 3
-                                    color: Theme.colMeterFg
+                                    width: volume.visualPosition * parent.width
                                 }
                             }
                             handle: Rectangle {
+                                border.color: Theme.g7
+                                border.width: volume.visualFocus ? 3 : 0
+                                color: volume.pressed ? Theme.g6 : Theme.colFg
+                                implicitHeight: 22
+                                implicitWidth: 22
+                                radius: 11
                                 x: volume.leftPadding + volume.visualPosition * (volume.availableWidth - width)
                                 y: volume.topPadding + volume.availableHeight / 2 - height / 2
-                                implicitWidth: 22
-                                implicitHeight: 22
-                                radius: 11
-                                color: volume.pressed ? Theme.g6 : Theme.colFg
-                                border.width: volume.visualFocus ? 3 : 0
-                                border.color: Theme.g7
+                            }
+
+                            onMoved: win.audio.sink.audio.volume = value
+
+                            Binding {
+                                property: "value"
+                                target: volume
+                                value: win.audio.vol
+                                when: !volume.pressed
                             }
                         }
                         Text {
                             Layout.fillWidth: true
-                            text: win.audio.sink ? win.audio.sink.description : "No audio output available"
-                            elide: Text.ElideRight
                             color: Theme.colFgDim
+                            elide: Text.ElideRight
                             font.family: Theme.fontUi
                             font.pixelSize: 12
+                            text: win.audio.sink ? win.audio.sink.description : "No audio output available"
                         }
                     }
                 }
-
                 SettingButton {
-                    text: "Audio mixer"
                     glyph: "\uf1de"
+                    text: "Audio mixer"
+
                     onClicked: win.panelRequested("audio")
                 }
-
                 GridLayout {
                     Layout.fillWidth: true
-                    columns: 2
                     columnSpacing: 10
+                    columns: 2
                     rowSpacing: 10
 
                     SettingButton {
-                        text: "Capture"
                         glyph: "\uf030"
+                        text: "Capture"
+
                         onClicked: win.panelRequested("capture")
                     }
                     SettingButton {
-                        text: "Media"
                         glyph: "\uf001"
+                        text: "Media"
+
                         onClicked: win.panelRequested("media")
                     }
                     SettingButton {
-                        text: "Displays"
                         glyph: "\uf108"
+                        text: "Displays"
+
                         onClicked: win.panelRequested("displays")
                     }
                     SettingButton {
-                        text: "Calendar"
                         glyph: "\uf073"
+                        text: "Calendar"
+
                         onClicked: win.panelRequested("calendar")
                     }
                     SettingButton {
-                        text: "Color picker"
                         glyph: "\uf1fb"
+                        text: "Color picker"
+
                         onClicked: win.panelRequested("color")
                     }
                 }
-
                 Extras.RemovableDrives {
                     Layout.fillWidth: true
                     active: win.opened
@@ -370,6 +348,50 @@ Item {
                     Layout.fillWidth: true
                     active: win.opened
                 }
+            }
+        }
+    }
+
+    component SettingButton: Button {
+        id: button
+
+        property string detail: ""
+        property string glyph: ""
+
+        Accessible.name: detail ? text + ", " + detail : text
+        Layout.fillWidth: true
+        Layout.preferredWidth: 0
+        font.family: Theme.fontUi
+        font.pixelSize: 14
+        implicitHeight: Math.max(52, contentItem.implicitHeight + 24)
+
+        background: Rectangle {
+            border.color: button.visualFocus ? Theme.colFg : Theme.colBorder
+            border.width: button.visualFocus ? 2 : 1
+            color: button.down ? Theme.g2 : button.checked ? Theme.colActionBg : button.hovered ? Theme.g2 : Theme.colBgAlt
+            radius: 14
+        }
+        contentItem: ColumnLayout {
+            spacing: 4
+
+            Extras.IconLabel {
+                Layout.fillWidth: true
+                color: button.enabled ? Theme.colFg : Theme.colFgDim
+                font: button.font
+                icon: button.glyph
+                text: button.text
+                wrap: true
+            }
+            Text {
+                Layout.fillWidth: true
+                Layout.preferredWidth: 0
+                color: Theme.colFgDim
+                font.family: Theme.fontUi
+                font.pixelSize: 12
+                horizontalAlignment: Text.AlignHCenter
+                text: button.detail
+                visible: button.detail !== ""
+                wrapMode: Text.Wrap
             }
         }
     }

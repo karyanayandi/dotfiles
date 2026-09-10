@@ -27,6 +27,8 @@ Tab/Shift+Tab navigate; Space activates buttons; Escape closes. Calendar arrows 
 
 ## Features and boundaries
 
+Menus and dropdowns use full content height without scrolling. Launcher results and notifications still scroll. Oversized non-scrolling menus can extend beyond the screen.
+
 - Audio uses PipeWire device/stream volume, mute, and default input/output selection. Media uses MPRIS and capability-gates transport and seeking.
 - Calendar browses dates. No event sync or calendar account required.
 - Capture has Screenshot/Recording tabs and a fixed action footer. Screenshot captures screen, visible window region, or area. Drag preview to select a crop or rectangle annotation; Exact bounds supplies keyboard-accessible pixel controls. Undo retains 20 edits. Freehand, text annotations, and window-only video are not implemented.
@@ -60,6 +62,7 @@ Quickshell 0.3.1 with PipeWire, MPRIS, and Polkit modules; Python 3; UDisks2 and
 Run from repository root:
 
 ```sh
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-menu-layouts.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-capture.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-control-extras.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-codex-limits.py

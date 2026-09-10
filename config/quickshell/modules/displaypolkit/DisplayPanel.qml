@@ -8,23 +8,22 @@ import Quickshell.Io
 Item {
     id: root
 
+    // Island owns visibility arbitration and keyboard exclusivity.
+    property bool blocked: false
+    property string error: ""
+    readonly property string helper: Qt.resolvedUrl("../../scripts/display-settings.py").toString().replace("file://", "")
     property bool opened: false
     property var outputs: []
+    property int remaining: 0
     property var trial: ({
             "pending": false,
             "message": "Ready"
         })
-    property string error: ""
-    property int remaining: 0
-    readonly property string helper: Qt.resolvedUrl("../../scripts/display-settings.py").toString().replace("file://", "")
-    // Island owns visibility arbitration and keyboard exclusivity.
-    property bool blocked: false
 
     function refresh() {
         if (!listing.running)
             listing.running = true;
     }
-
     function run(action) {
         if (command.running)
             return;
@@ -33,7 +32,6 @@ Item {
         command.command = ["python3", helper, action];
         command.running = true;
     }
-
     function selectOutput() {
         const m = outputs[output.currentIndex];
         if (!m)
@@ -51,10 +49,11 @@ Item {
         rotation.currentIndex = m.transform;
     }
 
-    visible: opened
-    implicitWidth: 520
-    implicitHeight: Math.min(640, form.implicitHeight + 48)
     enabled: !blocked
+    implicitHeight: form.implicitHeight + 48
+    implicitWidth: 520
+    visible: opened
+
     Keys.onEscapePressed: opened = false
     onOpenedChanged: {
         if (opened) {
@@ -85,7 +84,6 @@ Item {
             }
         }
     }
-
     Process {
         id: command
 
@@ -96,7 +94,6 @@ Item {
             }
         }
     }
-
     Process {
         id: status
 
@@ -112,12 +109,12 @@ Item {
             }
         }
     }
-
     Timer {
         interval: 500
-        running: root.opened
         repeat: true
+        running: root.opened
         triggeredOnStart: true
+
         onTriggered: {
             if (!status.running) {
                 status.running = true;
@@ -126,132 +123,151 @@ Item {
     }
     Pane {
         anchors.fill: parent
-        padding: 24
         font.family: Shell.Theme.fontUi
-        palette.windowText: Shell.Theme.colFg
+        padding: 24
         palette.text: Shell.Theme.colFg
-        background: Item {}
+        palette.windowText: Shell.Theme.colFg
 
-        ScrollView {
-            id: scroll
+        background: Item {
+        }
+
+        Pane {
+            id: bodyPane
+
             anchors.fill: parent
-            contentWidth: availableWidth
-            clip: true
+            padding: 0
+
+            background: Item {
+            }
 
             ColumnLayout {
                 id: form
-                width: scroll.availableWidth
+
                 spacing: 16
+                width: bodyPane.availableWidth
 
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 10
+
                     Label {
-                        text: "\uf108"
                         font.family: Shell.Theme.fontFamily
                         font.pixelSize: 22
+                        text: "\uf108"
                     }
                     Label {
-                        text: "Displays"
-                        font.pixelSize: 22
-                        font.bold: true
                         Layout.fillWidth: true
+                        font.bold: true
+                        font.pixelSize: 22
+                        text: "Displays"
                     }
                     Panels.PanelButton {
-                        glyph: "\uf021"
                         Accessible.name: "Refresh displays"
                         enabled: !root.trial.pending
+                        glyph: "\uf021"
+
                         onClicked: root.refresh()
                     }
                     Panels.PanelButton {
-                        glyph: "\uf00d"
                         Accessible.name: "Close displays"
+                        glyph: "\uf00d"
+
                         onClicked: root.opened = false
                     }
                 }
-
                 Panels.PanelComboBox {
                     id: output
-                    leadingGlyph: "\uf108"
-                    Layout.fillWidth: true
-                    model: root.outputs.map(m => m.name)
+
                     Accessible.name: "Display"
+                    Layout.fillWidth: true
                     enabled: !root.trial.pending
+                    leadingGlyph: "\uf108"
+                    model: root.outputs.map(m => m.name)
+
                     onActivated: root.selectOutput()
                 }
-
                 ColumnLayout {
-                    enabled: !root.trial.pending && !command.running && root.outputs.length > 0
                     Layout.fillWidth: true
+                    enabled: !root.trial.pending && !command.running && root.outputs.length > 0
                     spacing: 12
 
                     Label {
-                        text: "Resolution"
                         color: Shell.Theme.colFgDim
                         font.pixelSize: 12
+                        text: "Resolution"
                     }
                     Panels.PanelComboBox {
                         id: mode
-                        leadingGlyph: "\uf065"
-                        Layout.fillWidth: true
+
                         Accessible.name: "Resolution and refresh rate"
+                        Layout.fillWidth: true
                         displayText: currentText ? currentText.replace("@", " · ") + " Hz" : "Select resolution"
+                        leadingGlyph: "\uf065"
                     }
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 12
+
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.preferredWidth: 0
+
                             Label {
-                                text: "Scale"
                                 color: Shell.Theme.colFgDim
                                 font.pixelSize: 12
+                                text: "Scale"
                             }
                             Panels.PanelTextField {
                                 id: scale
-                                leadingGlyph: "\uf00e"
-                                Layout.fillWidth: true
+
                                 Accessible.name: "Display scale"
+                                Layout.fillWidth: true
+                                leadingGlyph: "\uf00e"
+
                                 validator: DoubleValidator {
                                     bottom: 0.5
-                                    top: 4
                                     locale: "C"
+                                    top: 4
                                 }
                             }
                         }
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.preferredWidth: 0
+
                             Label {
-                                text: "Rotation"
                                 color: Shell.Theme.colFgDim
                                 font.pixelSize: 12
+                                text: "Rotation"
                             }
                             Panels.PanelComboBox {
                                 id: rotation
-                                leadingGlyph: "\uf01e"
-                                Layout.fillWidth: true
+
                                 Accessible.name: "Display rotation"
+                                Layout.fillWidth: true
+                                leadingGlyph: "\uf01e"
                                 model: ["Normal", "90°", "180°", "270°", "Flipped", "Flipped 90°", "Flipped 180°", "Flipped 270°"]
                             }
                         }
                     }
                     Label {
-                        text: "Position"
                         color: Shell.Theme.colFgDim
                         font.pixelSize: 12
+                        text: "Position"
                     }
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 12
+
                         Panels.PanelTextField {
                             id: positionX
-                            leadingGlyph: "\uf07e"
+
+                            Accessible.name: "Horizontal position in pixels"
                             Layout.fillWidth: true
                             Layout.preferredWidth: 0
+                            leadingGlyph: "\uf07e"
                             placeholderText: "X"
-                            Accessible.name: "Horizontal position in pixels"
+
                             validator: IntValidator {
                                 bottom: -99999
                                 top: 99999
@@ -259,11 +275,13 @@ Item {
                         }
                         Panels.PanelTextField {
                             id: positionY
-                            leadingGlyph: "\uf07d"
+
+                            Accessible.name: "Vertical position in pixels"
                             Layout.fillWidth: true
                             Layout.preferredWidth: 0
+                            leadingGlyph: "\uf07d"
                             placeholderText: "Y"
-                            Accessible.name: "Vertical position in pixels"
+
                             validator: IntValidator {
                                 bottom: -99999
                                 top: 99999
@@ -272,10 +290,12 @@ Item {
                     }
                     RowLayout {
                         Layout.fillWidth: true
+
                         Panels.PanelButton {
+                            enabled: scale.acceptableInput && positionX.acceptableInput && positionY.acceptableInput
                             glyph: "\uf06e"
                             text: "Preview"
-                            enabled: scale.acceptableInput && positionX.acceptableInput && positionY.acceptableInput
+
                             onClicked: {
                                 root.error = "";
                                 command.command = ["python3", root.helper, "apply", JSON.stringify({
@@ -289,36 +309,40 @@ Item {
                             }
                         }
                         Label {
-                            text: "Reverts after 20 seconds"
                             color: Shell.Theme.colFgDim
                             font.pixelSize: 12
+                            text: "Reverts after 20 seconds"
                         }
                     }
                 }
                 Label {
-                    visible: text !== ""
-                    text: root.error || (root.trial.pending ? "Reverting in " + root.remaining + "s" : root.trial.message === "Ready" ? "" : root.trial.message)
-                    textFormat: Text.PlainText
-                    wrapMode: Text.Wrap
                     Layout.fillWidth: true
                     color: root.error ? Shell.Theme.colUrgent : Shell.Theme.colFg
+                    text: root.error || (root.trial.pending ? "Reverting in " + root.remaining + "s" : root.trial.message === "Ready" ? "" : root.trial.message)
+                    textFormat: Text.PlainText
+                    visible: text !== ""
+                    wrapMode: Text.Wrap
                 }
                 RowLayout {
                     visible: root.trial.pending
+
                     Panels.PanelButton {
                         glyph: "\uf00c"
                         text: "Keep"
+
                         onClicked: root.run("keep")
                     }
                     Panels.PanelButton {
+                        Accessible.name: "Keep and save layout for next session"
                         glyph: "\uf0c7"
                         text: "Save"
-                        Accessible.name: "Keep and save layout for next session"
+
                         onClicked: root.run("save")
                     }
                     Panels.PanelButton {
                         glyph: "\uf0e2"
                         text: "Revert"
+
                         onClicked: root.run("revert")
                     }
                 }
