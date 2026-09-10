@@ -70,7 +70,9 @@ ColumnLayout {
                 required property string modelData
                 objectName: "annotationTool_" + modelData
                 Layout.fillWidth: true
-                text: modelData === "rectangle" ? "Select" : modelData === "pan" ? "Move" : modelData.charAt(0).toUpperCase() + modelData.slice(1)
+                glyph: modelData === "rectangle" ? "\uf096" : modelData === "marker" ? "\uf040" : modelData === "arrow" ? "\uf178" : modelData === "text" ? "\uf031" : "\uf047"
+                Accessible.name: modelData === "rectangle" ? "Select" : modelData === "pan" ? "Move" : modelData.charAt(0).toUpperCase() + modelData.slice(1)
+                ToolTip.visible: hovered || activeFocus
                 checkable: true
                 checked: root.tool === modelData
                 onClicked: {
@@ -117,6 +119,9 @@ ColumnLayout {
                 }
             }
         }
+        Item {
+            Layout.fillWidth: true
+        }
         Label {
             text: "Width"
             color: Theme.colFgDim
@@ -127,7 +132,7 @@ ColumnLayout {
             from: 1
             to: 64
             value: 6
-            Layout.fillWidth: true
+            Layout.preferredWidth: 120
         }
     }
 
