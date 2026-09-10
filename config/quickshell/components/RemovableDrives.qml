@@ -7,9 +7,10 @@ import QtQuick.Layouts
 ColumnLayout {
     id: root
 
-    property bool active: visible
+    property bool active: false
     property string helperPath: decodeURIComponent(Qt.resolvedUrl("../scripts/removable-drives.py").toString().replace(/^file:\/\//, ""))
 
+    visible: (source.result.devices || []).length > 0
     spacing: 8
 
     Services.ControlDataSource {

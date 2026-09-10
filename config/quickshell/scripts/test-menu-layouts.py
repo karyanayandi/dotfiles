@@ -28,3 +28,10 @@ for name in (
 assert "ScrollBar.AsNeeded" in (modules / "launcher/Results.qml").read_text()
 assert "Flickable {" in (modules / "notifications/Center.qml").read_text()
 print("PASS menus use content height; scrolling stays in launcher and notifications")
+
+# Empty drive section must not stop discovery when control center is open.
+drives = (modules.parent / "components/RemovableDrives.qml").read_text()
+assert "visible: (source.result.devices || []).length > 0" in drives
+controls = (modules / "ControlCenter.qml").read_text()
+assert re.search(r"Extras\.RemovableDrives\s*\{[^}]*active: win\.opened", controls)
+print("PASS empty drives stay hidden without disabling discovery")

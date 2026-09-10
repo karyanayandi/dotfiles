@@ -26,7 +26,7 @@ Item {
     signal launcherRequested(string mode)
     signal panelRequested(string panel)
 
-    implicitHeight: content.implicitHeight + 40
+    implicitHeight: content.implicitHeight + 28
     implicitWidth: 380
     visible: opened
 
@@ -107,7 +107,7 @@ Item {
             id: bodyPane
 
             anchors.fill: parent
-            anchors.margins: 20
+            anchors.margins: 14
             padding: 0
 
             background: Item {
@@ -116,7 +116,7 @@ Item {
             ColumnLayout {
                 id: content
 
-                spacing: 14
+                spacing: 10
                 width: bodyPane.availableWidth
 
                 RowLayout {
@@ -125,7 +125,7 @@ Item {
                     Text {
                         color: Theme.colFg
                         font.family: Theme.fontFamily
-                        font.pixelSize: 22
+                        font.pixelSize: 18
                         text: "\uf1de"
                     }
                     Text {
@@ -133,7 +133,7 @@ Item {
                         color: Theme.colFg
                         font.family: Theme.fontUi
                         font.letterSpacing: -0.4
-                        font.pixelSize: 22
+                        font.pixelSize: 18
                         font.weight: Font.DemiBold
                         text: "Control center"
                     }
@@ -191,48 +191,53 @@ Item {
                         onClicked: win.notifs.toggleDnd()
                     }
                     SettingButton {
-                        checkable: true
-                        checked: win.audio.muted
-                        enabled: !!win.audio.sink?.audio
-                        glyph: win.audio.muted ? "\uf026" : "\uf028"
-                        text: win.audio.muted ? "Muted" : "Sound"
+                        glyph: "\uf030"
+                        text: "Capture"
 
-                        onClicked: win.audio.volMuteToggle()
+                        onClicked: win.panelRequested("capture")
                     }
                 }
-                SettingButton {
-                    detail: win.cpuUsage + " · " + win.ramUsage
-                    glyph: "\uf085"
-                    text: "System monitor"
 
-                    onClicked: {
-                        Quickshell.execDetached(["ghostty", "-e", "btm"]);
-                        win.opened = false;
-                    }
-                }
                 Rectangle {
                     Layout.fillWidth: true
                     color: Theme.colBgAlt
-                    implicitHeight: sound.implicitHeight + 28
-                    radius: 16
+                    implicitHeight: sound.implicitHeight + 20
+                    radius: 22
 
                     ColumnLayout {
                         id: sound
 
                         anchors.fill: parent
-                        anchors.margins: 14
-                        spacing: 6
+                        anchors.margins: 10
+                        spacing: 4
 
                         RowLayout {
                             Layout.fillWidth: true
 
+                            SettingButton {
+                                Accessible.name: win.audio.muted ? "Unmute output" : "Mute output"
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: 36
+                                implicitHeight: 36
+                                checkable: true
+                                checked: win.audio.muted
+                                enabled: !!win.audio.sink?.audio
+                                glyph: win.audio.muted ? "\uf026" : "\uf028"
+                                onClicked: win.audio.volMuteToggle()
+                            }
                             Text {
                                 Layout.fillWidth: true
                                 color: Theme.colFg
                                 font.family: Theme.fontUi
                                 font.pixelSize: 14
-                                font.weight: Font.Medium
                                 text: "Volume"
+                            }
+                            SettingButton {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: 74
+                                implicitHeight: 36
+                                text: "Mixer"
+                                onClicked: win.panelRequested("audio")
                             }
                             Text {
                                 color: Theme.colFgDim
@@ -297,24 +302,12 @@ Item {
                         }
                     }
                 }
-                SettingButton {
-                    glyph: "\uf1de"
-                    text: "Audio mixer"
-
-                    onClicked: win.panelRequested("audio")
-                }
                 GridLayout {
                     Layout.fillWidth: true
-                    columnSpacing: 10
+                    columnSpacing: 8
                     columns: 2
-                    rowSpacing: 10
+                    rowSpacing: 8
 
-                    SettingButton {
-                        glyph: "\uf030"
-                        text: "Capture"
-
-                        onClicked: win.panelRequested("capture")
-                    }
                     SettingButton {
                         glyph: "\uf001"
                         text: "Media"
@@ -340,13 +333,32 @@ Item {
                         onClicked: win.panelRequested("color")
                     }
                 }
+                SettingButton {
+                    glyph: "\uf085"
+                    text: win.cpuUsage + " · " + win.ramUsage
+                    Accessible.name: "System monitor, " + text
+                    onClicked: {
+                        Quickshell.execDetached(["ghostty", "-e", "btm"]);
+                        win.opened = false;
+                    }
+                }
                 Extras.RemovableDrives {
                     Layout.fillWidth: true
                     active: win.opened
                 }
-                Extras.CodexLimits {
+                Rectangle {
                     Layout.fillWidth: true
-                    active: win.opened
+                    implicitHeight: codexLimits.implicitHeight + 28
+                    color: Theme.colBgAlt
+                    radius: 22
+
+                    Extras.CodexLimits {
+                        id: codexLimits
+
+                        anchors.fill: parent
+                        anchors.margins: 14
+                        active: win.opened
+                    }
                 }
             }
         }
@@ -363,35 +375,56 @@ Item {
         Layout.preferredWidth: 0
         font.family: Theme.fontUi
         font.pixelSize: 14
-        implicitHeight: Math.max(52, contentItem.implicitHeight + 24)
+        implicitHeight: Math.max(40, contentItem.implicitHeight + topPadding + bottomPadding)
+        leftPadding: text ? 12 : 8
+        rightPadding: leftPadding
+        topPadding: 8
+        bottomPadding: 8
 
         background: Rectangle {
             border.color: button.visualFocus ? Theme.colFg : Theme.colBorder
             border.width: button.visualFocus ? 2 : 1
             color: button.down ? Theme.g2 : button.checked ? Theme.colActionBg : button.hovered ? Theme.g2 : Theme.colBgAlt
-            radius: 14
+            radius: 18
         }
-        contentItem: ColumnLayout {
-            spacing: 4
+        contentItem: RowLayout {
+            spacing: button.glyph && button.text ? 10 : 0
 
-            Extras.IconLabel {
-                Layout.fillWidth: true
-                color: button.enabled ? Theme.colFg : Theme.colFgDim
-                font: button.font
-                icon: button.glyph
-                text: button.text
-                wrap: true
-            }
             Text {
+                Layout.preferredWidth: 20
+                Layout.fillWidth: !button.text
+                Layout.alignment: Qt.AlignVCenter
+                visible: button.glyph !== ""
+                text: button.glyph
+                color: button.enabled ? Theme.colFg : Theme.colFgDim
+                font.family: Theme.fontFamily
+                font.pixelSize: 16
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+            ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 0
-                color: Theme.colFgDim
-                font.family: Theme.fontUi
-                font.pixelSize: 12
-                horizontalAlignment: Text.AlignHCenter
-                text: button.detail
-                visible: button.detail !== ""
-                wrapMode: Text.Wrap
+                visible: button.text !== ""
+                spacing: 3
+
+                Text {
+                    Layout.fillWidth: true
+                    text: button.text
+                    color: button.enabled ? Theme.colFg : Theme.colFgDim
+                    font: button.font
+                    horizontalAlignment: button.glyph ? Text.AlignLeft : Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+                Text {
+                    Layout.fillWidth: true
+                    color: Theme.colFgDim
+                    font.family: Theme.fontUi
+                    font.pixelSize: 12
+                    text: button.detail
+                    visible: button.detail !== ""
+                    wrapMode: Text.Wrap
+                }
             }
         }
     }
