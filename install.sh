@@ -7,7 +7,6 @@ yay -S --needed \
   base-devel \
   bat \
   bibata-cursor-theme \
-  bluetui \
   bluez \
   bluez-utils \
   bottom \
@@ -78,7 +77,6 @@ yay -S --needed \
   openssh \
   p7zip \
   pacman-contrib \
-  pavucontrol \
   pfetch \
   podman-compose \
   polkit-gnome \
@@ -98,7 +96,6 @@ yay -S --needed \
   sof-firmware \
   starship \
   stow \
-  swappy \
   tela-icon-theme \
   tmux \
   trash-cli \
