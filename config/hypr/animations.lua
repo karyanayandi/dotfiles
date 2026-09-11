@@ -1,10 +1,10 @@
 -- ~/.config/hypr/animations.lua
 
-hl.animation { leaf = "global", enabled = true, speed = 3, bezier = "easeOut" }
-
 -- Critically damped: quick settle without decorative bounce.
 hl.curve("appleSpring", { type = "spring", mass = 1, stiffness = 180, dampening = 27 })
 hl.curve("easeOut", { type = "bezier", points = { { 0.23, 1 }, { 0.32, 1 } } })
+
+hl.animation { leaf = "global", enabled = true, speed = 3, bezier = "easeOut" }
 
 hl.animation { leaf = "border", enabled = true, speed = 2, bezier = "easeOut" }
 
