@@ -63,6 +63,7 @@ alias install "paru -S"
 alias ll "eza -al -g --icons"
 alias ls "eza --group-directories-first --icons"
 alias lsl "eza --group-directories-first -lh --icons"
+alias lg lazygit
 alias lzd lazydocker
 alias lzg lazygit
 alias oc "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
