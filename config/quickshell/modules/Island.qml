@@ -89,7 +89,8 @@ PanelWindow {
     }
 
     WlrLayershell.keyboardFocus: auth.active || (interactive && !capture.opened && !captureSelecting) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    WlrLayershell.layer: interactive ? WlrLayer.Overlay : WlrLayer.Top
+    // Audio feedback must cover fullscreen clients without changing launcher/focus behavior.
+    WlrLayershell.layer: interactive || view === "volume" ? WlrLayer.Overlay : WlrLayer.Top
     WlrLayershell.namespace: "quickshell"
     color: "transparent"
     exclusiveZone: Config.barExclusiveZone
