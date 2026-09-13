@@ -8,6 +8,23 @@ import tempfile
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
+bindings = (root.parent / "hypr/bind.lua").read_text()
+assert (
+    'hl.bind("SHIFT + Print", hl.dsp.exec_cmd "qs ipc call capture start screenshot area")'
+    in bindings
+)
+assert (
+    'hl.bind(mainMod .. " + CTRL + G", hl.dsp.exec_cmd "qs ipc call capture start record screen")'
+    in bindings
+)
+island = (root / "modules/Island.qml").read_text()
+assert "function start(action: string, mode: string)" in island
+assert (
+    'win.startCapture(action, {\n                "mode": mode\n            });'
+    in island
+)
+assert 'capture.video = action === "record"' in island
+assert "captureService.busy || captureDelay.running" in island
 with tempfile.TemporaryDirectory(prefix="capture-session-test-") as directory:
     directory = Path(directory)
     (directory / "scripts").symlink_to(root / "scripts", target_is_directory=True)

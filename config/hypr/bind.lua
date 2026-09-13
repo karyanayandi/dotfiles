@@ -42,6 +42,9 @@ hl.bind(mainMod .. " + SHIFT + S", function()
 end)
 
 -- Screen recording / screenshots
+-- Direct starts skip the panel; existing bindings below still open settings.
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd "qs ipc call capture start screenshot area")
+hl.bind(mainMod .. " + CTRL + G", hl.dsp.exec_cmd "qs ipc call capture start record screen")
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd "qs ipc call capture open record")
 hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd "qs ipc call capture stop")
 hl.bind(mainMod .. " + ALT + G", hl.dsp.exec_cmd "qs ipc call capture open record-area")

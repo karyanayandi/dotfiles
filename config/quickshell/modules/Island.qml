@@ -77,8 +77,12 @@ PanelWindow {
         }
     }
     function startCapture(action, options) {
-        if (auth.active || !captureService.ready || captureService.busy)
+        if (auth.active || !captureService.ready || captureService.busy || captureDelay.running)
             return;
+        if (action === "screenshot" || action === "record") {
+            captureService.beginSession();
+            capture.video = action === "record";
+        }
         capture.opened = false;
         if (action === "pick")
             activate("");
@@ -99,6 +103,7 @@ PanelWindow {
 
     mask: Region {
         item: auth.active ? backdrop : win.captureSelecting ? null : win.interactive && !capture.opened ? backdrop : island
+
         Region {
             item: feedback.visible && !win.captureSelecting ? feedback : null
         }
@@ -133,8 +138,9 @@ PanelWindow {
     CaptureWindow {
         id: capture
 
-        service: captureService
         blocked: auth.active
+        service: captureService
+
         onCaptureRequested: (action, options) => win.startCapture(action, options)
     }
     IpcHandler {
@@ -147,6 +153,15 @@ PanelWindow {
                 if (!captureService.busy)
                     captureService.request("capabilities");
             }
+        }
+        function start(action: string, mode: string) {
+            if (action !== "screenshot" && action !== "record")
+                return;
+            if (!["screen", "area"].includes(mode) && !(action === "screenshot" && mode === "window"))
+                return;
+            win.startCapture(action, {
+                "mode": mode
+            });
         }
         function status(): string {
             return JSON.stringify({
@@ -234,10 +249,10 @@ PanelWindow {
         id: feedback
 
         anchors.horizontalCenter: parent.horizontalCenter
-        y: Math.max(12, island.y - height - 12)
-        width: Math.min(420, win.width - 24)
-        z: 2
         visible: opacity > 0 && !auth.active
+        width: Math.min(420, win.width - 24)
+        y: Math.max(12, island.y - height - 12)
+        z: 2
     }
     Rectangle {
         id: island
