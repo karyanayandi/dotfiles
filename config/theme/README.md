@@ -17,6 +17,11 @@
   Apps using another platform theme or their own palette are not covered.
 - Ghostty reloads its app config with `SIGUSR2`, so new windows also inherit the
   new palette. Only processes with a registered signal handler receive it.
+  `window-theme = ghostty` also recolors GTK tabs, titlebars and popovers on
+  reload. Source-checked for Ghostty 1.3.1's GTK 4.16+ path, used by installed
+  GTK 4.22: `auto` only selects light/dark, while `ghostty` rebuilds GTK CSS
+  colors from the config. Live windows were not visually tested.
+  This does not recolor every GTK accent or replace the desktop GTK theme.
 - Foot and Ghostty receive OSC palette, foreground, background, cursor and
   selection updates through their outer PTYs, including terminals hosting tmux.
   Only terminal processes and devices owned by the current user are targeted.

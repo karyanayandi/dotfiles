@@ -5,5 +5,7 @@ cursor-style-blink = false
 window-padding-x = 8
 window-padding-y = 8
 window-padding-balance = true
+# Recolor GTK tabs and popovers on config reload, not only terminal cells.
+window-theme = ghostty
 
 config-file = ?/home/karyana/.config/theme/generated/ghostty

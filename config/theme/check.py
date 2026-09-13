@@ -75,6 +75,7 @@ def check():
     if not binary:
         raise SystemExit("Install matugen, or add its binary directory to PATH.")
     config = tomllib.loads((THEME / "config.toml").read_text())
+    assert "window-theme = ghostty" in (ROOT / "config/ghostty/config").read_text()
     # Pi's native watcher ignores externally registered theme paths.
     assert config["templates"]["pi"]["output_path"] == "~/.pi/agent/themes/matugen.json"
     with tempfile.TemporaryDirectory(prefix="wallpaper-theme-test-") as directory:
