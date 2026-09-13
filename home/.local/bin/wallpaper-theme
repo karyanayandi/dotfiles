@@ -56,7 +56,7 @@ if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
   THEME_NAME=matugen bash "$HOME/.tmux/theme/theme.tmux"
 fi
 
-# Ghostty caches config for future windows. Only signal processes with a handler.
+# Ghostty GTK reloads config and gtk-custom-css. Only signal processes with a handler.
 pkill --require-handler --signal USR2 --euid "$UID" --exact ghostty || true
 
 # Update the outer terminal PTYs directly, including those hosting tmux.

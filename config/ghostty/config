@@ -5,7 +5,9 @@ cursor-style-blink = false
 window-padding-x = 8
 window-padding-y = 8
 window-padding-balance = true
-# Recolor GTK tabs and popovers on config reload, not only terminal cells.
 window-theme = ghostty
+# GTK's startup-loaded user CSS outranks window-theme. Reload the same palette
+# at user priority so tabs, popovers, and accents follow wallpaper changes.
+gtk-custom-css = ?/home/karyana/.config/gtk-4.0/colors.css
 
 config-file = ?/home/karyana/.config/theme/generated/ghostty

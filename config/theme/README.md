@@ -20,8 +20,10 @@
   `window-theme = ghostty` also recolors GTK tabs, titlebars and popovers on
   reload. Source-checked for Ghostty 1.3.1's GTK 4.16+ path, used by installed
   GTK 4.22: `auto` only selects light/dark, while `ghostty` rebuilds GTK CSS
-  colors from the config. Live windows were not visually tested.
-  This does not recolor every GTK accent or replace the desktop GTK theme.
+  colors from the config. Startup-loaded GTK user CSS overrides that provider.
+  `gtk-custom-css` reloads `gtk-4.0/colors.css` at user priority so native tabs,
+  popovers and accents receive the new palette too. Verified with native GTK
+  color probes; existing windows still need visual review.
 - Lazygit and Lazydocker theme templates use ANSI names instead of RGB literals.
   Existing OSC terminal-palette updates recolor these cells without app config
   reloads. Selected rows use reverse video for contrast rather than a fixed RGB
@@ -59,6 +61,7 @@ Checks:
 
 ```sh
 python3 config/theme/check.py
+python3 config/theme/test-ghostty.py
 sh config/quickshell/scripts/test-theme.sh
 ```
 
