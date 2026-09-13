@@ -70,6 +70,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-control-extras.
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-codex-limits.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-display-settings.py
 node config/quickshell/scripts/test-osd-layer.cjs
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/scripts/test-theme-motion.py
 sh config/quickshell/scripts/test-theme.sh
 QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input config/quickshell/modules/panels/tst_calendar.qml -o -,txt
 ```

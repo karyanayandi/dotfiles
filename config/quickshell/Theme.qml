@@ -4,6 +4,9 @@ import Quickshell.Io
 pragma Singleton
 
 QtObject {
+    id: root
+
+    property bool transitionsReady: false
     // Keep legacy palette names so every consumer updates through existing bindings.
     property FileView colorsFile
     property color g0: palette.g0
@@ -59,11 +62,89 @@ QtObject {
     property string fontFallback: "Nerd Font"
     property int fontSize: 15
 
+    // Animate base colors once; semantic and alpha colors follow each frame.
+    component PaletteBehavior: Behavior {
+        enabled: root.transitionsReady && !Config.reducedMotion
+
+        ColorAnimation {
+            duration: Config.animNormal
+            easing.type: Easing.InOutQuad
+        }
+
+    }
+
+    PaletteBehavior on g0 {
+    }
+
+    PaletteBehavior on g1 {
+    }
+
+    PaletteBehavior on g2 {
+    }
+
+    PaletteBehavior on g3 {
+    }
+
+    PaletteBehavior on g4 {
+    }
+
+    PaletteBehavior on g5 {
+    }
+
+    PaletteBehavior on g6 {
+    }
+
+    PaletteBehavior on g7 {
+    }
+
+    PaletteBehavior on g8 {
+    }
+
+    PaletteBehavior on g9 {
+    }
+
+    PaletteBehavior on g10 {
+    }
+
+    PaletteBehavior on g11 {
+    }
+
+    PaletteBehavior on g12 {
+    }
+
+    PaletteBehavior on g13 {
+    }
+
+    PaletteBehavior on g14 {
+    }
+
+    PaletteBehavior on g15 {
+    }
+
+    PaletteBehavior on g16 {
+    }
+
+    PaletteBehavior on g17 {
+    }
+
+    PaletteBehavior on g18 {
+    }
+
+    PaletteBehavior on g19 {
+    }
+
+    PaletteBehavior on g20 {
+    }
+
     colorsFile: FileView {
         path: Quickshell.env("HOME") + "/.config/quickshell/colors.json"
         blockLoading: true
         watchChanges: true
         onFileChanged: reload()
+        // Show the initial palette immediately, then animate subsequent reloads.
+        onLoaded: Qt.callLater(() => {
+            root.transitionsReady = true;
+        })
 
         JsonAdapter {
             id: palette
