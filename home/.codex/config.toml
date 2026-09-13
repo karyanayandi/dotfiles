@@ -5,6 +5,7 @@ followUpQueueMode = "queue"
 appearanceTheme = "dark"
 appearanceDarkCodeThemeId = "codex"
 reduced-motion-preference = "on"
+conversationDetailMode = "STEPS_COMMANDS"
 
 [desktop.appearanceDarkChromeTheme]
 accent = "#0169cc"
@@ -80,8 +81,8 @@ BROWSER_USE_TINYSKY_ENABLED = "1"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.903.61454"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.903.61454/scripts/browser-service.mjs"}'
+BROWSER_USE_CODEX_APP_VERSION = "26.908.40834"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.908.40834/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/opt/codex-desktop/resources/codex"
 
 [shell_environment_policy.set]
@@ -94,6 +95,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/karyana/Codes/projects/ui"]
+trust_level = "trusted"
+
+[projects."/home/karyana/Codes/projects/yopem"]
 trust_level = "trusted"
 
 [hooks.state]
