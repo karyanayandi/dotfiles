@@ -27,7 +27,7 @@ import {
 } from "./layout.js"
 import {
   installCompactMessages,
-  installMinimalCustomUi,
+  installCompactCustomUi,
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
@@ -202,7 +202,7 @@ export default function ui(pi: ExtensionAPI) {
   let outputTokens = 0
   let tokensDirty = true
   let restoreCompactMessages: (() => void) | undefined
-  let restoreMinimalCustomUi: (() => void) | undefined
+  let restoreCompactCustomUi: (() => void) | undefined
   let restoreToolSpacing: (() => void) | undefined
   let restoreThinkingSelectorLabels: (() => void) | undefined
   let currentModel: ExtensionContext["model"]
@@ -426,10 +426,10 @@ export default function ui(pi: ExtensionAPI) {
     tokensDirty = true
     applySessionUI(ctx)
     restoreCompactMessages?.()
-    restoreMinimalCustomUi?.()
+    restoreCompactCustomUi?.()
     restoreToolSpacing?.()
     restoreCompactMessages = installCompactMessages(ctx.ui.theme, getCompact)
-    restoreMinimalCustomUi = installMinimalCustomUi(ctx.ui, getMinimal)
+    restoreCompactCustomUi = installCompactCustomUi(ctx.ui, getCompact)
     restoreToolSpacing = installToolSpacing(
       getCompact,
       ctx.ui.theme,
@@ -568,8 +568,8 @@ export default function ui(pi: ExtensionAPI) {
     stopped = true
     restoreCompactMessages?.()
     restoreCompactMessages = undefined
-    restoreMinimalCustomUi?.()
-    restoreMinimalCustomUi = undefined
+    restoreCompactCustomUi?.()
+    restoreCompactCustomUi = undefined
     restoreToolSpacing?.()
     restoreToolSpacing = undefined
     restoreThinkingSelectorLabels?.()

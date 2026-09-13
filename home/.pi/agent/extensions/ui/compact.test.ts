@@ -13,7 +13,7 @@ import { type TUI, visibleWidth, Text } from "@earendil-works/pi-tui"
 import {
   compactSubagentTakeover,
   installCompactMessages,
-  installMinimalCustomUi,
+  installCompactCustomUi,
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
@@ -167,8 +167,8 @@ describe("compactSubagentTakeover", () => {
   })
 })
 
-describe("installMinimalCustomUi", () => {
-  test("renders completed edits through pi-tool-display only in minimal", () => {
+describe("installCompactCustomUi", () => {
+  test("renders completed edits through pi-tool-display only in compact layouts", () => {
     const apiKey = Symbol.for("pi-tool-display.api.v1")
     const rendererKey = Symbol.for("pi-subagents.transcriptToolRenderer.v1")
     const previousApi = Reflect.get(globalThis, apiKey)
@@ -178,9 +178,9 @@ describe("installMinimalCustomUi", () => {
     }))
     Reflect.set(globalThis, apiKey, { version: 1, decorateTool })
 
-    let minimal = true
+    let compact = true
     const ui = { custom: vi.fn() } as unknown as ExtensionUIContext
-    const restore = installMinimalCustomUi(ui, () => minimal)
+    const restore = installCompactCustomUi(ui, () => compact)
     const renderer = Reflect.get(globalThis, rendererKey) as
       | ((request: {
           call: {
@@ -232,7 +232,7 @@ describe("installMinimalCustomUi", () => {
       ).toEqual(["pi-display edit demo.ts", "pi-display diff +1 -1"])
       expect(decorateTool).toHaveBeenCalledTimes(1)
       expect(bg).toHaveBeenCalledWith("toolSuccessBg", expect.any(String))
-      minimal = false
+      compact = false
       expect(renderer?.(request)).toBeUndefined()
     } finally {
       restore()

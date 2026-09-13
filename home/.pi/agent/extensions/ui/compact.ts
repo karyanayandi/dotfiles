@@ -717,14 +717,14 @@ type GlobalWithToolRenderers = typeof globalThis & {
   [subagentTranscriptToolRendererKey]?: SubagentTranscriptToolRenderer
 }
 
-function createSubagentTranscriptToolRenderer(getMinimal: () => boolean) {
+function createSubagentTranscriptToolRenderer(getCompact: () => boolean) {
   let cache = new WeakMap<object, Component>()
 
   return {
     render(request: SubagentTranscriptToolRenderRequest) {
       const { call, result, snapshot, theme, width } = request
       if (
-        !getMinimal() ||
+        !getCompact() ||
         call.name !== "edit" ||
         call.displayArgs === undefined ||
         result?.displayResult === undefined
@@ -901,12 +901,12 @@ export function compactSubagentTakeover(
 
 // Keep subagent takeover styling owned by this extension: wrap its custom UI
 // instance rather than coupling the subagents extension to a layout setting.
-export function installMinimalCustomUi(
+export function installCompactCustomUi(
   ui: ExtensionUIContext,
-  getMinimal: () => boolean,
+  getCompact: () => boolean,
 ) {
   const globalWithRenderers = globalThis as GlobalWithToolRenderers
-  const editRenderer = createSubagentTranscriptToolRenderer(getMinimal)
+  const editRenderer = createSubagentTranscriptToolRenderer(getCompact)
   const previousTranscriptRenderer =
     globalWithRenderers[subagentTranscriptToolRendererKey]
   const transcriptRenderer: SubagentTranscriptToolRenderer = (request) =>
@@ -919,12 +919,14 @@ export function installMinimalCustomUi(
       (tui, theme, keybindings, done) =>
         Promise.resolve(factory(tui, theme, keybindings, done)).then(
           (component) => {
-            if (!getMinimal() || component.constructor.name !== "TakeoverView")
-              return component
+            if (component.constructor.name !== "TakeoverView") return component
             const render = component.render.bind(component)
             const invalidate = component.invalidate.bind(component)
+            // Like the main transcript, follow layout changes on every render.
             component.render = (width) =>
-              compactSubagentTakeover(render(width), width, theme)
+              getCompact()
+                ? compactSubagentTakeover(render(width), width, theme)
+                : render(width)
             component.invalidate = () => {
               editRenderer.invalidate()
               invalidate()
