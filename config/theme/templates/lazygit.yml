@@ -1,11 +1,12 @@
+# ANSI names follow OSC palette updates without a config reload.
 gui:
   theme:
-    activeBorderColor: ["{{colors.primary.default.hex}}", bold]
-    inactiveBorderColor: ["{{colors.outline.default.hex}}"]
-    searchingActiveBorderColor: ["{{colors.tertiary.default.hex}}"]
-    optionsTextColor: ["{{colors.secondary.default.hex}}"]
-    selectedLineBgColor: ["{{colors.surface_container_high.default.hex}}"]
-    cherryPickedCommitBgColor: ["{{colors.surface_container.default.hex}}"]
-    cherryPickedCommitFgColor: ["{{colors.primary.default.hex}}"]
-    unstagedChangesColor: ["{{colors.error.default.hex}}"]
-    defaultFgColor: ["{{colors.on_surface.default.hex}}"]
+    activeBorderColor: [green, bold]
+    inactiveBorderColor: [white]
+    searchingActiveBorderColor: [yellow]
+    optionsTextColor: [blue]
+    selectedLineBgColor: [default, reverse]
+    cherryPickedCommitBgColor: [default]
+    cherryPickedCommitFgColor: [green]
+    unstagedChangesColor: [red]
+    defaultFgColor: [default]

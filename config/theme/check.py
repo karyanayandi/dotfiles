@@ -76,6 +76,37 @@ def check():
         raise SystemExit("Install matugen, or add its binary directory to PATH.")
     config = tomllib.loads((THEME / "config.toml").read_text())
     assert "window-theme = ghostty" in (ROOT / "config/ghostty/config").read_text()
+    # These apps keep ANSI references; the terminal palette changes, not their YAML.
+    ansi_templates = {"lazygit", "lazydocker"}
+    docker_fields = {
+        "activeBorderColor",
+        "inactiveBorderColor",
+        "optionsTextColor",
+        "selectedLineBgColor",
+    }
+    for name in ansi_templates:
+        text = (THEME / f"templates/{name}.yml").read_text()
+        assert "{{" not in text, f"{name}: truecolor would need an app reload"
+        fields = set()
+        for line in text.splitlines():
+            if ": [" not in line:
+                continue
+            key, values = line.strip().split(": ", 1)
+            fields.add(key)
+            assert values.startswith("[") and values.endswith("]")
+            assert set(values[1:-1].split(", ")) <= {
+                "default",
+                "green",
+                "white",
+                "yellow",
+                "blue",
+                "red",
+                "bold",
+                "reverse",
+            }, line
+        assert "selectedLineBgColor: [default, reverse]" in text
+        if name == "lazydocker":
+            assert fields == docker_fields, "Lazydocker supports only four theme fields"
     # Pi's native watcher ignores externally registered theme paths.
     assert config["templates"]["pi"]["output_path"] == "~/.pi/agent/themes/matugen.json"
     with tempfile.TemporaryDirectory(prefix="wallpaper-theme-test-") as directory:
@@ -131,8 +162,17 @@ def check():
                     subprocess.run(["fish", "--no-execute", str(output)], check=True)
             rendered = [p.read_text() for p in outputs]
             if previous is not None:
+                static_outputs = {
+                    home / config["templates"][name]["output_path"].removeprefix("~/")
+                    for name in ansi_templates
+                }
                 for path, before, after in zip(outputs, previous, rendered):
-                    assert before != after, f"Palette does not change: {path}"
+                    if path in static_outputs:
+                        assert before == after, (
+                            f"ANSI config should stay stable: {path}"
+                        )
+                    else:
+                        assert before != after, f"Palette does not change: {path}"
             previous = rendered
         terminal = runpy.run_path(str(THEME / "terminal.py"))
         data = terminal["sequences"](home / ".config/theme/generated/ghostty")
