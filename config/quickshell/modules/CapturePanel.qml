@@ -34,6 +34,11 @@ CaptureSurface {
         opened = true;
     }
 
+    onOpenedChanged: {
+        if (opened)
+            service.beginSession();
+    }
+
     icon: "\uf030"
     title: editing ? "Edit screenshot" : video ? "Record screen" : "Take screenshot"
 

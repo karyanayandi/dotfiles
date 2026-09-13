@@ -26,6 +26,19 @@ Scope {
     property double startedAt: 0
     property int elapsed: 0
     property bool hasResult: false
+    property bool previewExported: false
+
+    function beginSession() {
+        if (busy || !previewExported)
+            return;
+
+        preview = "";
+        canUndo = false;
+        savedPath = "";
+        hasResult = false;
+        message = "";
+        previewExported = false;
+    }
 
     signal reveal(string panel)
     signal feedback(string text, bool failed)
@@ -81,6 +94,7 @@ Scope {
             message = "Recording. Use the stop shortcut or reopen this panel to stop.";
             break;
         case "preview":
+            previewExported = false;
             preview = data.url;
             canUndo = data.canUndo === true;
             message = "";
@@ -90,10 +104,14 @@ Scope {
             message = "";
             break;
         case "saved":
+            if (data.kind === "screenshot")
+                previewExported = true;
             savedPath = data.path;
             result("Saved " + data.path.split("/").pop(), false);
             break;
         case "copied":
+            if (action === "copy-image")
+                previewExported = true;
             result("Copied to clipboard", false);
             break;
         case "cancelled":
