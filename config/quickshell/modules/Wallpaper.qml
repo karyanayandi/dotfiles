@@ -1,22 +1,20 @@
+import ".."
+import "../components"
+import QtQuick
 import Quickshell
 import Quickshell.Wayland
-import QtQuick
-import ".."
 
 Variants {
     id: root
+
     required property var wallpaper
+
     model: Quickshell.screens
 
     PanelWindow {
         required property var modelData
+
         screen: modelData
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
         exclusiveZone: 0
         color: Theme.colBg
         WlrLayershell.layer: WlrLayer.Background
@@ -24,12 +22,18 @@ Variants {
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-        Image {
+        anchors {
+            top: true
+            bottom: true
+            left: true
+            right: true
+        }
+
+        WallpaperImage {
             anchors.fill: parent
             source: root.wallpaper.current ? "file://" + root.wallpaper.current : ""
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            cache: true
         }
+
     }
+
 }

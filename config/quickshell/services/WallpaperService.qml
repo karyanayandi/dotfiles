@@ -10,6 +10,7 @@ Item {
     property var wallpapers: []
     property string current: ""
     property string pendingTheme: ""
+    property bool restored: false
     property int rotationInterval: 1.08e+07
     readonly property var intervalOptions: [0, 1.8e+06, 3.6e+06, 1.08e+07, 2.16e+07, 4.32e+07]
     readonly property string rotationLabel: {
@@ -62,7 +63,7 @@ Item {
 
     visible: false
     onCurrentChanged: {
-        if (root.current) {
+        if (root.restored && root.current) {
             root.pendingTheme = root.current;
             themeDelay.restart();
         }
@@ -79,6 +80,8 @@ Item {
         } catch (error) {
             root.current = saved;
         }
+        // A QML hot reload restores the wallpaper, not a new user selection.
+        root.restored = true;
         scan.running = true;
     }
 
