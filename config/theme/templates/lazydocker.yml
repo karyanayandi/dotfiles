@@ -1,7 +1,7 @@
 <* include "lazydocker-base" *>
-  # No live config reload. ANSI colors follow the terminal palette.
+  # Reopen after generation to refresh the selection background.
   theme:
     activeBorderColor: [green, bold]
     inactiveBorderColor: [white]
     optionsTextColor: [blue]
-    selectedLineBgColor: [default, reverse]
+    selectedLineBgColor: ["{{colors.surface_container_high.default.hex}}"]

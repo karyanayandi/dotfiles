@@ -1,11 +1,11 @@
-# ANSI names follow OSC palette updates without a config reload.
+# ANSI foregrounds follow OSC updates; selection background needs config reload.
 gui:
   theme:
     activeBorderColor: [green, bold]
     inactiveBorderColor: [white]
     searchingActiveBorderColor: [yellow]
     optionsTextColor: [blue]
-    selectedLineBgColor: [default, reverse]
+    selectedLineBgColor: ["{{colors.surface_container_high.default.hex}}"]
     cherryPickedCommitBgColor: [default]
     cherryPickedCommitFgColor: [green]
     unstagedChangesColor: [red]

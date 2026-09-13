@@ -24,15 +24,13 @@
   `gtk-custom-css` reloads `gtk-4.0/colors.css` at user priority so native tabs,
   popovers and accents receive the new palette too. Verified with native GTK
   color probes; existing windows still need visual review.
-- Lazygit and Lazydocker theme templates use ANSI names instead of RGB literals.
-  Existing OSC terminal-palette updates recolor these cells without app config
-  reloads. Selected rows use reverse video for contrast rather than a fixed RGB
-  background. Lazydocker's ignored Git-only theme fields were removed.
-  Run `wallpaper-theme` once to generate the new configs. Reopen Lazydocker once
-  to adopt them; it has no live config reload in 0.25.2. Lazygit 0.65.0 can adopt
-  its config when terminal focus returns, or on restart. Afterwards palette
-  changes need neither restart nor focus changes in terminals covered below.
-  This covers configured UI colors, not truecolor output from subprocesses.
+- Lazygit and Lazydocker use ANSI foreground colors, updated by the terminal
+  palette. Selected rows use the generated `surface_container_high` RGB
+  background. Reverse video made colored text into mismatched background blocks.
+  Run `wallpaper-theme` to generate configs. Reopen Lazydocker to refresh its
+  selection background after palette changes; 0.25.2 has no live config reload.
+  Lazygit 0.65.0 reloads on terminal focus return or restart.
+  Truecolor subprocess output is not covered by terminal palette updates.
   Other terminals need their own palette update mechanism.
 - Foot and Ghostty receive OSC palette, foreground, background, cursor and
   selection updates through their outer PTYs, including terminals hosting tmux.
@@ -72,7 +70,8 @@ Capability sources checked against installed app versions:
 - [Lazydocker supported theme fields](https://github.com/jesseduffield/lazydocker/blob/v0.25.2/pkg/config/app_config.go)
 - [Lazydocker ANSI and reverse attributes](https://github.com/jesseduffield/lazydocker/blob/v0.25.2/pkg/gui/gocui.go)
 
-Checks use temporary palettes and PTYs. They verify static ANSI app themes,
+Checks use temporary palettes and PTYs. They verify ANSI foregrounds and generated
+selection backgrounds,
 Ghostty's window theme setting, color delivery, no shell-input
 injection, Ghostty reload arguments, idle Starship repaint without a keypress,
 and Quickshell palette watching. They do not signal or recolor live terminals.
