@@ -1,4 +1,3 @@
-
 local icons = require "config.icons"
 
 return {
@@ -15,6 +14,7 @@ return {
     fzf.setup {
       "telescope",
       winopts = {
+        fullscreen = true,
         backdrop = false,
         height = 0.85,
         width = 0.80,
