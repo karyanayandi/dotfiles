@@ -7,7 +7,6 @@ starship init fish | source
 mise activate fish | source
 
 # Environment
-export TERM=screen-256color
 export TERMINAL=ghostty
 export EDITOR=nvim
 export SHELL=/usr/bin/fish
