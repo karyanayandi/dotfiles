@@ -13,6 +13,11 @@ from pathlib import Path
 
 source = (Path(__file__).resolve().parents[1] / "modules/LockScreen.qml").read_text()
 
+assert "MprisPlaybackState.Playing" in source
+assert "ToplevelManager.activeToplevel" in source
+assert source.count("enabled: Config.lock") == 3
+assert source.count("&& !root.mediaPlaying") == 3
+
 
 def extract(header, indent):
     match = re.search(
@@ -28,6 +33,7 @@ def extract(header, indent):
 methods = "\n".join(
     f"function {name}({args}) {{{extract(f'function {name}({args}) {{', 4)}}}"
     for name, args in (
+        ("playerMatchesWindow", "player, appId, title"),
         ("lock", ""),
         ("acknowledgeLock", ""),
         ("authenticate", "response"),
@@ -77,6 +83,13 @@ TestCase {
         session.locked = true;
         pam.active = true;
         events = [];
+    }
+    function test_media_player_matches_focused_window() {
+        verify(playerMatchesWindow({ desktopEntry: "firefox", identity: "Mozilla Firefox", trackTitle: "Test Video" }, "org.mozilla.firefox", "Test Video - YouTube — Mozilla Firefox"));
+        verify(playerMatchesWindow({ desktopEntry: "google-chrome", identity: "Google Chrome", trackTitle: "Test Video" }, "google-chrome", "Test Video - YouTube - Google Chrome"));
+        verify(!playerMatchesWindow({ desktopEntry: "firefox", identity: "Mozilla Firefox", trackTitle: "Background Video" }, "org.mozilla.firefox", "Other Tab — Mozilla Firefox"));
+        verify(!playerMatchesWindow({ desktopEntry: "spotify", identity: "Spotify", trackTitle: "Test Video" }, "firefox", "Test Video — Mozilla Firefox"));
+        verify(!playerMatchesWindow({ desktopEntry: "firefox", identity: "Mozilla Firefox", trackTitle: "" }, "org.mozilla.firefox", "Mozilla Firefox"));
     }
     function test_sleep_blocks_late_success() {
         receive("sleep");

@@ -22,7 +22,7 @@ Requires Quickshell 0.3.1, a compositor supporting `ext-session-lock-v1` and idl
 | `lockDisplayOffTimeout` | 600 |
 | `lockSuspendTimeout` | 0, disabled |
 
-Zero disables each timer independently. Idle monitors respect compositor idle inhibitors. Display-off supports Hyprland and Niri; input restores displays. Automatic suspend is opt-in and uses `systemctl suspend`, not the old swayidle `suspend-then-hibernate`. Both display-off and automatic suspend wait for the compositor's secure confirmation.
+Zero disables each timer independently. Idle monitors respect compositor idle inhibitors and pause when an MPRIS player's app and track title match the focused window. Background windows and windows on other workspaces do not suppress locking. Display-off supports Hyprland and Niri; input restores displays. Automatic suspend is opt-in and uses `systemctl suspend`, not the old swayidle `suspend-then-hibernate`. Both display-off and automatic suspend wait for the compositor's secure confirmation.
 
 A small Python child bridges logind because this Quickshell version lacks native logind integration. It holds a sleep delay inhibitor, requests locking before suspend, and releases the inhibitor only after the compositor confirms coverage. It also handles lid-triggered sleep and launcher suspend. Resume restores displays. Bridge failure locks the session once per outage and retries the bridge every five seconds. Failed retries do not relock after authentication. Sleep locking remains unavailable until the bridge recovers; install missing dependencies with `sudo pacman -S python-dbus python-gobject`.
 

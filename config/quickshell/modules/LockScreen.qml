@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Mpris
 import Quickshell.Services.Pam
 import Quickshell.Wayland
 
@@ -14,8 +15,24 @@ Scope {
     property int pendingAcknowledgments: 0
     property bool preparingSleep: false
     property bool bridgeFailed: false
+    readonly property var activeToplevel: ToplevelManager.activeToplevel
+    readonly property bool mediaPlaying: Mpris.players.values.some(player => player.playbackState === MprisPlaybackState.Playing && root.playerMatchesWindow(player, root.activeToplevel ? root.activeToplevel.appId : "", root.activeToplevel ? root.activeToplevel.title : ""))
 
     signal clearInput()
+
+    function playerMatchesWindow(player, appId, title) {
+        const normalize = value => (value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const activeApp = normalize(appId);
+        const activeTitle = normalize(title);
+        const trackTitle = normalize(player.trackTitle);
+        if (!activeApp || !activeTitle || !trackTitle || !activeTitle.includes(trackTitle))
+            return false;
+
+        return [player.desktopEntry, player.identity].some(name => {
+            const candidate = normalize(name);
+            return candidate && (activeApp.includes(candidate) || candidate.includes(activeApp));
+        });
+    }
 
     function lock() {
         session.locked = true;
@@ -69,7 +86,7 @@ Scope {
 
     IdleMonitor {
         timeout: Config.lockTimeout
-        enabled: Config.lockTimeout > 0
+        enabled: Config.lockTimeout > 0 && !root.mediaPlaying
         respectInhibitors: true
         onIsIdleChanged: {
             if (isIdle)
@@ -82,7 +99,7 @@ Scope {
         id: displayIdle
 
         timeout: Config.lockDisplayOffTimeout
-        enabled: Config.lockDisplayOffTimeout > 0
+        enabled: Config.lockDisplayOffTimeout > 0 && !root.mediaPlaying
         respectInhibitors: true
         onIsIdleChanged: {
             if (isIdle) {
@@ -98,7 +115,7 @@ Scope {
         id: suspendIdle
 
         timeout: Config.lockSuspendTimeout
-        enabled: Config.lockSuspendTimeout > 0
+        enabled: Config.lockSuspendTimeout > 0 && !root.mediaPlaying
         respectInhibitors: true
         onIsIdleChanged: {
             if (isIdle) {
