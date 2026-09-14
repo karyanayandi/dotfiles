@@ -15,6 +15,10 @@ return {
       "telescope",
       winopts = {
         fullscreen = true,
+        treesitter = {
+          enabled = true,
+          fzf_colors = { ["hl"] = "-1:reverse", ["hl+"] = "-1:reverse" },
+        },
         backdrop = false,
         height = 0.85,
         width = 0.80,
