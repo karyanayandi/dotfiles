@@ -10,23 +10,23 @@ import {
 } from "./src/config.ts"
 import { pick } from "./src/picker.ts"
 
-type ModelShortcut = `ctrl+${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
+type ModelShortcut = `f${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10}`
 
 function isModelShortcut(shortcut: string): shortcut is ModelShortcut {
-  return /^ctrl\+[0-9]$/.test(shortcut)
+  return /^f(?:[1-9]|10)$/.test(shortcut)
 }
 
 const availableShortcuts = [
-  "ctrl+1",
-  "ctrl+2",
-  "ctrl+3",
-  "ctrl+4",
-  "ctrl+5",
-  "ctrl+6",
-  "ctrl+7",
-  "ctrl+8",
-  "ctrl+9",
-  "ctrl+0",
+  "f1",
+  "f2",
+  "f3",
+  "f4",
+  "f5",
+  "f6",
+  "f7",
+  "f8",
+  "f9",
+  "f10",
 ] as const
 
 function describeTarget({ model, thinkingLevel }: ShortcutConfig) {
@@ -155,7 +155,7 @@ export default function modelShortcuts(pi: ExtensionAPI) {
   for (const [shortcut, config] of Object.entries(loadShortcuts())) {
     if (!isModelShortcut(shortcut)) {
       console.error(
-        `Model shortcuts: only ctrl+0 through ctrl+9 are supported; got ${shortcut}`,
+        `Model shortcuts: only f1 through f10 are supported; got ${shortcut}`,
       )
       continue
     }
