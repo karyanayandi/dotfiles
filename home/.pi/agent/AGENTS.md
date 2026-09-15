@@ -1,12 +1,26 @@
 # Agent guidelines
 
+## Scope and priority
+
+- Read the closest project-specific `AGENTS.md` before changing code.
+- If a user asks to update `AGENTS.md` only, edit only `AGENTS.md`. Do not
+  change source files, dependencies, lockfiles, or generated files.
+- Before coding, query available codebase memory mcp for prior decisions, plans,
+  blockers, and relevant implementation context.
+- Inspect existing callers, types, tests, and configuration before editing.
+- Make smallest complete change. Reuse existing code before adding helpers,
+  abstractions, dependencies, or configuration.
+- Only `AGENTS.md`, `README.md`, and `LICENSE.md` may be committed as Markdown
+  files. Put detailed plans and working documentation in gitignored `docs/`.
+  Keep `README.md` focused on project overview, setup, usage, and license.
+
 ## Validation
 
 - After making changes, run the project's available check, format, and lint
   commands.
 - If any command is unavailable, say so and suggest adding it.
-- Fix lint errors at their source. Do not disable lint rules.
 - If a lint exception is safe and necessary, document why in a code comment.
+- Fix lint violations at their root. Do not disable rules to silence errors.
 
 ## TypeScript
 
@@ -15,14 +29,20 @@
   unsafe casts.
 - Let TypeScript infer return types unless an explicit type is necessary.
 - Do not use dynamic `await import(...)` calls.
+- Do not use `await import()`. Use static imports.
+- Prefer function declarations. Use arrow functions only when needed, such as
+  inline callbacks, closures, or APIs that require a function expression.
+- Use `const` whenever reassignment is unnecessary.
+- Do not use `console.log`; use `console.error`, `console.warn`, or
+  `console.info` when logging is necessary.
 
 ## Functions and React
 
 - Use normal function declarations by default.
-- Use arrow functions only when they are needed, such as callbacks or lexical
-  `this`.
-- In React, define and export components and hooks in one declaration with
+- Define and export components and hooks in one declaration with
   `export function`.
+- React components and hooks must use named `export function` declarations.
+  Never use `export default` for React code.
 - Keep components small, reusable, composable, and easy to maintain. Extract
   focused subcomponents when a component gains unrelated responsibilities.
 - Do not define a function and export it separately.
