@@ -1,5 +1,10 @@
 # Agent guidelines
 
+## Git
+
+- Commit every small, coherent change so history stays easy to track.
+- Use Conventional Commits for every commit message.
+
 ## Validation
 
 - After making changes, run the project's available check, format, and lint commands.
