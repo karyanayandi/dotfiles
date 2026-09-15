@@ -19,6 +19,7 @@
 - Use normal function declarations by default.
 - Use arrow functions only when they are needed, such as callbacks or lexical `this`.
 - In React, define and export components and hooks in one declaration with `export function`.
+- Keep components small, reusable, composable, and easy to maintain. Extract focused subcomponents when a component gains unrelated responsibilities.
 - Do not define a function and export it separately.
 - Ban `useEffect` entirely. Do not import or call it. Prefer derived values, event handlers, or framework APIs.
 
