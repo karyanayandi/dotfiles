@@ -30,9 +30,11 @@ RowLayout {
             property bool isActive: modelData.active === true
             property bool isFocused: modelData.focused === true
             property bool isUrgent: modelData.urgent === true
+            property bool isSpecial: modelData.name.startsWith("special:")
 
-            Layout.preferredHeight: 30
-            Layout.preferredWidth: wsText.implicitWidth + 20
+            visible: !isSpecial
+            Layout.preferredHeight: isSpecial ? 0 : 30
+            Layout.preferredWidth: isSpecial ? 0 : wsText.implicitWidth + 20
             radius: 6
             color: wsMouse.containsMouse ? Theme.colAccent : (isUrgent ? Qt.alpha(Theme.colUrgent, 0.16) : "transparent")
             scale: wsMouse.pressed ? 0.96 : 1

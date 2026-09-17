@@ -36,10 +36,7 @@ hl.bind(mainMod .. " + ALT + D", hl.dsp.exec_cmd "qs ipc call displays toggle")
 
 -- Dwindle layout extras
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pseudo { action = "toggle" })
-hl.bind(mainMod .. " + SHIFT + S", function()
-  hl.dispatch(hl.dsp.layout "togglesplit")
-  hl.dispatch(hl.dsp.window.move { workspace = "special:magic" })
-end)
+hl.bind(mainMod .. " + SHIFT + backslash", hl.dsp.window.move { workspace = "special:magic" })
 
 -- Screen recording / screenshots
 -- Direct starts skip the panel; existing bindings below still open settings.
@@ -82,7 +79,7 @@ hl.bind(mainMod .. " + 0", hl.dsp.focus { workspace = "10" })
 hl.bind(mainMod .. " + SHIFT + 0", hl.dsp.window.move { workspace = "10" })
 
 -- Special workspace
-hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special "magic")
+hl.bind(mainMod .. " + backslash", hl.dsp.workspace.toggle_special "magic")
 
 -- Mouse workspace switching
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus { workspace = "e+1" })
