@@ -33,6 +33,7 @@ alias ... "cd ../.."
 alias .... "cd ../../.."
 alias ..... "cd ../../../.."
 alias ...... "cd ../../../../.."
+alias a "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi"
 alias autoclean "pacman -Qtdq | sudo pacman -Rns -"
 alias bn bun
 alias br "bun run"
@@ -68,6 +69,7 @@ alias lzg lazygit
 alias oc "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
 alias opencode "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
 alias os openspec
+alias p "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi" 
 alias pac "sudo pacman -S"
 alias pi "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi"
 alias pkglist "paru -Qe"
