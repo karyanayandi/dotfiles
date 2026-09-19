@@ -71,6 +71,38 @@ hl.window_rule {
   move = { "monitor_w-500", "monitor_h-290" },
 }
 
+local picture_in_picture_geometry
+
+local function is_picture_in_picture(window)
+  return window.title:lower():gsub("[^%a]", ""):find("pictureinpicture", 1, true) ~= nil
+end
+
+hl.on("window.close", function(window)
+  if is_picture_in_picture(window) then
+    picture_in_picture_geometry = {
+      x = window.at.x,
+      y = window.at.y,
+      width = window.size.x,
+      height = window.size.y,
+    }
+  end
+end)
+
+hl.on("window.open", function(window)
+  if picture_in_picture_geometry and is_picture_in_picture(window) then
+    hl.dispatch(hl.dsp.window.resize {
+      x = picture_in_picture_geometry.width,
+      y = picture_in_picture_geometry.height,
+      window = window,
+    })
+    hl.dispatch(hl.dsp.window.move {
+      x = picture_in_picture_geometry.x,
+      y = picture_in_picture_geometry.y,
+      window = window,
+    })
+  end
+end)
+
 -- Layer rules
 hl.layer_rule { name = "quickshell-noanim", match = { namespace = "quickshell" }, no_anim = true }
 hl.layer_rule { name = "quickshell-noblur", match = { namespace = "quickshell" }, blur = false }
