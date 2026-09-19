@@ -1,2 +1,2 @@
 [commit.generation]
-command = "opencode run -m opencode/deepseek-v4-flash-free"
+command = "pi --print --no-session --no-tools --no-extensions"
