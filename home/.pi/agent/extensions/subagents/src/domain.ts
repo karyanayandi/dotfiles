@@ -63,7 +63,7 @@ export interface SpawnTask {
 
 export interface SubagentMeta {
   readonly backend: BackendName
-  /** Display label, e.g. "openai-codex/gpt-5.6-terra" or "gpt-5-codex". */
+  /** Display label, e.g. "openai-codex/gpt-6-terra" or "gpt-5-codex". */
   readonly modelLabel?: string
   /** Context window capacity for utilization display, when known. */
   readonly contextWindow?: number

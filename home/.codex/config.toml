@@ -53,9 +53,6 @@ enabled = true
 [plugins."template-creator@openai-primary-runtime"]
 enabled = true
 
-[plugins."sites@openai-bundled"]
-enabled = true
-
 [plugins."codex-app-tools@openai-bundled"]
 enabled = true
 
@@ -81,8 +78,8 @@ BROWSER_USE_TINYSKY_ENABLED = "1"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.908.40834"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.908.40834/scripts/browser-service.mjs"}'
+BROWSER_USE_CODEX_APP_VERSION = "26.917.61114"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.917.61114/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/opt/codex-desktop/resources/codex"
 
 [shell_environment_policy.set]

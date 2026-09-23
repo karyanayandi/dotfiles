@@ -36,8 +36,8 @@ Bare model IDs work only when unambiguous. Common picks in this environment:
 | Model                            | Recommended effort |
 | -------------------------------- | ------------------ |
 | inherited parent model (default) | inherited          |
-| `openai-codex/gpt-5.6-sol`       | `medium`           |
-| `openai-codex/gpt-5.6-terra`     | `medium`           |
+| `openai-codex/gpt-6-sol`         | `medium`           |
+| `openai-codex/gpt-6-terra`       | `medium`           |
 
 **Thinking budgets:** `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
 These map directly to pi thinking levels.
@@ -45,14 +45,13 @@ These map directly to pi thinking levels.
 ## Codex Harness
 
 **Harness.** `codex`. **Prompt nicknames.** "codex", "Codex CLI", "codex agent",
-"codex subagent". **Default.** `gpt-5.6-sol` with `high` effort for coding work.
+"codex subagent". **Default.** `gpt-6-sol` with `high` effort for coding work.
 Use another model only when user asks.
 
-| Model           | Recommended effort |
-| --------------- | ------------------ |
-| `gpt-5.6-sol`   | `medium`           |
-| `gpt-5.6-terra` | `medium`           |
-| `gpt-5.6-luna`  | `high`             |
+| Model        | Recommended effort |
+| ------------ | ------------------ |
+| `gpt-6-sol`  | `medium`           |
+| `gpt-6-luna` | `max`              |
 
 **Extension thinking budgets.** `off`, `minimal`, `low`, `medium`, `high`,
 `xhigh`, `max`. Codex maps them to nearest supported selected-model effort.
