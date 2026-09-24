@@ -531,6 +531,41 @@ describe("installToolSpacing", () => {
     expect(lite).toContain(args.prompt)
   })
 
+  test("preserves native image rows and escape sequences in compact layout", () => {
+    const imageLines = [
+      "",
+      "  read screenshot.png",
+      "\u001b_Gimage-data\u001b\\",
+      "",
+      "",
+    ]
+    const originalRender = vi
+      .spyOn(ToolExecutionComponent.prototype, "render")
+      .mockReturnValue(imageLines)
+    const row = new ToolExecutionComponent(
+      "read",
+      "tool-image",
+      { path: "screenshot.png" },
+      {},
+      undefined,
+      tui,
+      "/tmp/example",
+    )
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      row.updateResult({
+        content: [
+          { type: "image", data: "iVBORw0KGgo=", mimeType: "image/png" },
+        ],
+        isError: false,
+      })
+      expect(row.render(120)).toEqual(imageLines)
+    } finally {
+      restore()
+      originalRender.mockRestore()
+    }
+  })
+
   test("shows executed code beneath code-tool header in compact layout", () => {
     const tool: any = {
       name: "ctx_execute",

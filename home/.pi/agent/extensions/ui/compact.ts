@@ -412,6 +412,9 @@ export function installToolSpacing(
     if (cached?.width === width) return cached.lines
 
     const rendered = originalRender.call(this, width)
+    // Image rows contain blank height placeholders and terminal image escapes.
+    // Collapsing or clamping them draws the image over neighboring text.
+    if (state?.hasImages) return rendered
     // Tools without custom renderers, such as playwriter, may expose unexpected
     // args or result shapes before they are ready. A throw in render force-closes
     // pi, so use original renderer on error. Clamp lines to `width`, because a
