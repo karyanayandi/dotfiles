@@ -531,7 +531,7 @@ describe("installToolSpacing", () => {
     expect(lite).toContain(args.prompt)
   })
 
-  test("shows code tools with code-block marker instead of fence marker", () => {
+  test("shows executed code beneath code-tool header in compact layout", () => {
     const tool: any = {
       name: "ctx_execute",
       label: "ctx_execute",
@@ -546,7 +546,11 @@ describe("installToolSpacing", () => {
     const row = new ToolExecutionComponent(
       "ctx_execute",
       "tool-1",
-      { language: "python", code: "print('hello')", cwd: "/tmp/project" },
+      {
+        language: "python",
+        code: "value = 42\nprint(value)",
+        cwd: "/tmp/project",
+      },
       {},
       tool,
       tui,
@@ -561,8 +565,46 @@ describe("installToolSpacing", () => {
         .join("\n")
         .replace(/\x1b\[[0-9;]*m/g, "")
       expect(text).toContain("</> python")
+      expect(text).toContain("  value = 42\n  print(value)")
       expect(text).not.toContain("```")
-      expect(text).not.toContain("print('hello')")
+    } finally {
+      restore()
+    }
+  })
+
+  test("wraps long executed code without overflowing terminal width", () => {
+    const code = `print('${"x".repeat(100)}')`
+    const tool: any = {
+      name: "ctx_execute",
+      label: "ctx_execute",
+      description: "run code",
+      parameters: {},
+      renderShell: "default",
+      renderCall: () => new Text("ctx_execute", 0, 0),
+      async execute() {
+        return { content: [], details: undefined }
+      },
+    }
+    const row = new ToolExecutionComponent(
+      "ctx_execute",
+      "tool-1",
+      { language: "python", code },
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    const restore = installToolSpacing(() => true, theme)
+    try {
+      const lines = row.render(40)
+      expect(
+        lines
+          .slice(1)
+          .map((line) => line.trimStart())
+          .join(""),
+      ).toContain(code)
+      expect(lines.every((line) => visibleWidth(line) <= 40)).toBe(true)
     } finally {
       restore()
     }

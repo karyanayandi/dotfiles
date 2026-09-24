@@ -530,14 +530,14 @@ export function installToolSpacing(
       ]
     }
 
-    // fd/rg, Task* and other custom tools: join a short call + result summary
-    // pair (or keep the call line), then wrap to width so long rows continue
-    // onto the next line.
+    // fd/rg, Task* and other custom tools: wrap call text; code tools also
+    // keep their source lines visible beneath the call.
+    const codeCall = formatCodeToolCall(bareName, self.args, theme)
     const single =
       (getMinimal()
         ? formatSubagentToolCall(bareName, self.args, theme)
         : undefined) ??
-      formatCodeToolCall(bareName, self.args, theme) ??
+      codeCall?.header ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
         (args ? ` ${args}` : "")
     const contentWidth = Math.max(1, width - COMPACT_INDENT.length - 2)
@@ -545,6 +545,14 @@ export function installToolSpacing(
     return [
       `${COMPACT_INDENT}${status} ${wrapped[0] ?? ""}`,
       ...wrapped.slice(1).map((l) => `${COMPACT_INDENT}${l}`),
+      ...(codeCall?.code
+        .split("\n")
+        .flatMap((line) =>
+          wrapTextWithAnsi(
+            theme.fg("toolOutput", sanitizeTerminalText(line)),
+            width - COMPACT_INDENT.length,
+          ).map((part) => `${COMPACT_INDENT}${part}`),
+        ) ?? []),
     ]
   }
   prototype.render = compactRender
@@ -640,7 +648,10 @@ function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
   const { code, language } = args as Record<string, unknown>
   if (typeof code !== "string" || typeof language !== "string") return undefined
   const meta = compactArgs(args, theme)
-  return `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", language)}${meta ? ` ${meta}` : ""}`
+  return {
+    header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", language)}${meta ? ` ${meta}` : ""}`,
+    code,
+  }
 }
 
 // Clamp every rendered line to `width`. pi's TUI throws and force-closes when
