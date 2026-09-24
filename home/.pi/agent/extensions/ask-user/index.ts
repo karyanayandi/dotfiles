@@ -9,12 +9,14 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
 import {
+  type AutocompleteProvider,
   Editor,
   type EditorTheme,
   Key,
   matchesKey,
   Text,
   truncateToWidth,
+  visibleWidth,
 } from "@earendil-works/pi-tui"
 import * as v from "valibot"
 import { toolSchema } from "../shared/schema.ts"
@@ -102,6 +104,16 @@ function wrapText(text: string, width: number): string[] {
 }
 
 export default function askUser(pi: ExtensionAPI) {
+  let autocompleteProvider: AutocompleteProvider | undefined
+
+  pi.on("session_start", (_event, ctx) => {
+    if (ctx.mode !== "tui") return
+    ctx.ui.addAutocompleteProvider((provider) => {
+      autocompleteProvider = provider
+      return provider
+    })
+  })
+
   pi.registerTool({
     name: "ask_user",
     label: "Ask User",
@@ -153,6 +165,7 @@ export default function askUser(pi: ExtensionAPI) {
           let optionIndex = 0
           let editMode = false
           let cachedLines: string[] | undefined
+          let cachedWidth = 0
 
           let settled = false
 
@@ -181,6 +194,8 @@ export default function askUser(pi: ExtensionAPI) {
             },
           }
           const editor = new Editor(tui, editorTheme)
+          if (autocompleteProvider)
+            editor.setAutocompleteProvider(autocompleteProvider)
 
           editor.onSubmit = (value) => {
             const trimmed = value.trim()
@@ -215,7 +230,10 @@ export default function askUser(pi: ExtensionAPI) {
 
           function handleInput(data: string) {
             if (editMode) {
-              if (matchesKey(data, Key.escape)) {
+              if (
+                matchesKey(data, Key.escape) &&
+                !editor.isShowingAutocomplete()
+              ) {
                 editMode = false
                 editor.setText("")
                 refresh()
@@ -259,7 +277,8 @@ export default function askUser(pi: ExtensionAPI) {
           }
 
           function render(width: number): string[] {
-            if (cachedLines) return cachedLines
+            if (!editMode && cachedLines && cachedWidth === width)
+              return cachedLines
 
             const lines: string[] = []
             const add = (s: string) => lines.push(truncateToWidth(s, width))
@@ -299,10 +318,24 @@ export default function askUser(pi: ExtensionAPI) {
 
             if (editMode) {
               lines.push("")
-              add(theme.fg("muted", " Your answer:"))
-              for (const line of editor.render(width - 2)) {
-                add(` ${line}`)
+              add(theme.fg("muted", " Type your answer:"))
+              const fieldWidth = Math.max(1, width - 5)
+              editor.focused = true
+              const fieldLines = editor.render(fieldWidth)
+              add(
+                theme.fg(
+                  "accent",
+                  ` ╭─ Answer ${"─".repeat(Math.max(0, width - 12))}╮`,
+                ),
+              )
+              for (const line of fieldLines.slice(1)) {
+                add(
+                  ` ${theme.fg("accent", "│")} ${line}${" ".repeat(Math.max(0, fieldWidth - visibleWidth(line)))} ${theme.fg("accent", "│")}`,
+                )
               }
+              add(
+                theme.fg("accent", ` ╰${"─".repeat(Math.max(0, width - 3))}╯`),
+              )
             }
 
             lines.push("")
@@ -319,6 +352,7 @@ export default function askUser(pi: ExtensionAPI) {
             add(theme.fg("accent", "─".repeat(width)))
 
             cachedLines = lines
+            cachedWidth = width
             return lines
           }
 
