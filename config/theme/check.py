@@ -110,6 +110,7 @@ def check():
             assert fields == docker_fields, "Lazydocker supports only four theme fields"
     # Pi's native watcher ignores externally registered theme paths.
     assert config["templates"]["pi"]["output_path"] == "~/.pi/agent/themes/matugen.json"
+    assert config["templates"]["fzf"]["output_path"] == "~/.config/theme/generated/fzf.opts"
     with tempfile.TemporaryDirectory(prefix="wallpaper-theme-test-") as directory:
         home = Path(directory)
         entries = ["[config]"]
@@ -161,6 +162,23 @@ def check():
                     ET.fromstring(text)
                 elif output.suffix == ".fish" and shutil.which("fish"):
                     subprocess.run(["fish", "--no-execute", str(output)], check=True)
+            fzf_opts = (home / ".config/theme/generated/fzf.opts").read_text()
+            assert fzf_opts.startswith("--color=bg:#")
+            if shutil.which("fzf"):
+                fzf_env = {
+                    **os.environ,
+                    "FZF_DEFAULT_OPTS_FILE": str(home / ".config/theme/generated/fzf.opts"),
+                }
+                fzf_env.pop("FZF_DEFAULT_OPTS", None)
+                filtered = subprocess.run(
+                    ["fzf", "--filter=match"],
+                    input="match\n",
+                    env=fzf_env,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                assert filtered.stdout == "match\n"
             rendered = [p.read_text() for p in outputs]
             if previous is not None:
                 for path, before, after in zip(outputs, previous, rendered):
@@ -251,6 +269,59 @@ def check():
             assert qt_config.parent.stat().st_mtime > 1
             assert not list(qt_config.parent.glob(".matugen-reload.*"))
             assert qt_config.read_text() == "[Appearance]\ncustom_palette=true\n"
+        store = home / ".cache/quickshell/wallpaper"
+        store.parent.mkdir(parents=True)
+        store.write_text(json.dumps({"wallpaper": str(image), "interval": 0}))
+        subprocess.run([str(runner)], env=env, check=True)
+        assert (home / "gtk-theme").read_text() == "matugen-dark-alt"
+        if shutil.which("tmux"):
+            theme_script = home / ".tmux/theme/theme.tmux"
+            theme_script.parent.mkdir(parents=True)
+            theme_script.write_text("#!/bin/sh\nexit 0\n")
+            tmux = ["tmux", "-L", "wallpaper-theme-check"]
+            subprocess.run([*tmux, "new-session", "-d"], env=env, check=True)
+            socket = subprocess.run(
+                [*tmux, "display-message", "-p", "#{socket_path}"],
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            tmux_env = {**env, "TMUX": f"{socket},0,0"}
+            try:
+                subprocess.run(
+                    [
+                        *tmux,
+                        "set-environment",
+                        "-g",
+                        "FZF_DEFAULT_OPTS",
+                        "--color=bg:#000000",
+                    ],
+                    env=env,
+                    check=True,
+                )
+                subprocess.run([str(runner), str(image)], env=tmux_env, check=True)
+                actual = subprocess.run(
+                    [*tmux, "show-environment", "-g", "FZF_DEFAULT_OPTS_FILE"],
+                    env=env,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                ).stdout.strip()
+                assert actual == (
+                    f"FZF_DEFAULT_OPTS_FILE={home}/.config/theme/generated/fzf.opts"
+                )
+                cleared = subprocess.run(
+                    [*tmux, "show-environment", "-g", "FZF_DEFAULT_OPTS"],
+                    env=env,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                assert cleared.returncode == 1
+                assert "unknown variable: FZF_DEFAULT_OPTS" in cleared.stderr
+            finally:
+                subprocess.run([*tmux, "kill-server"], env=env, check=True)
         assert (home / "signal-args").read_text().splitlines() == [
             "--require-handler",
             "--signal",
@@ -260,11 +331,6 @@ def check():
             "--exact",
             "ghostty",
         ]
-        store = home / ".cache/quickshell/wallpaper"
-        store.parent.mkdir(parents=True)
-        store.write_text(json.dumps({"wallpaper": str(image), "interval": 0}))
-        subprocess.run([str(runner)], env=env, check=True)
-        assert (home / "gtk-theme").read_text() == "matugen-dark-alt"
         failed = subprocess.run(
             [str(runner), str(image)], env={**env, "FAIL": "7"}, check=False
         )

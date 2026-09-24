@@ -25,4 +25,5 @@ set -g fish_color_user {{colors.secondary.default.hex_stripped}}
 set -g fish_color_host {{colors.secondary.default.hex_stripped}}
 set -g fish_color_host_remote {{colors.primary.default.hex_stripped}}
 set -g fish_color_status {{colors.error.default.hex_stripped}}
-set -gx FZF_DEFAULT_OPTS "--color=bg:{{colors.background.default.hex}},bg+:{{colors.surface_container_high.default.hex}},fg:{{colors.on_surface_variant.default.hex}},fg+:{{colors.on_surface.default.hex}},hl:{{colors.secondary.default.hex}},hl+:{{colors.secondary.default.hex}},spinner:{{colors.primary.default.hex}},header:{{colors.secondary.default.hex}},info:{{colors.tertiary.default.hex}},pointer:{{colors.primary.default.hex}},marker:{{colors.primary.default.hex}},prompt:{{colors.tertiary.default.hex}}"
+set -e FZF_DEFAULT_OPTS
+set -gx FZF_DEFAULT_OPTS_FILE "$HOME/.config/theme/generated/fzf.opts"

@@ -53,6 +53,8 @@ if command -v gsettings >/dev/null; then
 fi
 
 if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
+  tmux set-environment -gu FZF_DEFAULT_OPTS
+  tmux set-environment -g FZF_DEFAULT_OPTS_FILE "$config_home/theme/generated/fzf.opts"
   THEME_NAME=matugen bash "$HOME/.tmux/theme/theme.tmux"
 fi
 

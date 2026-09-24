@@ -94,6 +94,10 @@ post_hook = 'bat cache --build --source "$HOME/.config/theme/generated/bat"'
 input_path = "./templates/fish.fish"
 output_path = "~/.config/theme/generated/fish.fish"
 
+[templates.fzf]
+input_path = "./templates/fzf.opts"
+output_path = "~/.config/theme/generated/fzf.opts"
+
 [templates.tmux]
 input_path = "./templates/tmux.conf"
 output_path = "~/.config/theme/generated/tmux.conf"
