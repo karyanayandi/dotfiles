@@ -68,6 +68,12 @@ interface AskUserDetails {
   cancelled: boolean
 }
 
+class AnswerEditor extends Editor {
+  protected override renderBottomBorder() {
+    return ""
+  }
+}
+
 type SelectionResult = {
   answer: string
   wasCustom: boolean
@@ -193,7 +199,7 @@ export default function askUser(pi: ExtensionAPI) {
               noMatch: (t) => theme.fg("warning", t),
             },
           }
-          const editor = new Editor(tui, editorTheme)
+          const editor = new AnswerEditor(tui, editorTheme)
           if (autocompleteProvider)
             editor.setAutocompleteProvider(autocompleteProvider)
 
@@ -318,7 +324,6 @@ export default function askUser(pi: ExtensionAPI) {
 
             if (editMode) {
               lines.push("")
-              add(theme.fg("muted", " Type your answer:"))
               const fieldWidth = Math.max(1, width - 5)
               editor.focused = true
               const fieldLines = editor.render(fieldWidth)
@@ -328,7 +333,7 @@ export default function askUser(pi: ExtensionAPI) {
                   ` ╭─ Answer ${"─".repeat(Math.max(0, width - 12))}╮`,
                 ),
               )
-              for (const line of fieldLines.slice(1)) {
+              for (const line of fieldLines.slice(1).filter(Boolean)) {
                 add(
                   ` ${theme.fg("accent", "│")} ${line}${" ".repeat(Math.max(0, fieldWidth - visibleWidth(line)))} ${theme.fg("accent", "│")}`,
                 )
