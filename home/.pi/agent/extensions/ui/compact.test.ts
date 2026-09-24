@@ -168,6 +168,48 @@ describe("compactSubagentTakeover", () => {
 })
 
 describe("installCompactCustomUi", () => {
+  test("renders subagent code calls instead of raw JSON arguments", () => {
+    const rendererKey = Symbol.for("pi-subagents.transcriptToolRenderer.v1")
+    const ui = { custom: vi.fn() } as unknown as ExtensionUIContext
+    const restore = installCompactCustomUi(ui, () => true)
+    const renderer = Reflect.get(globalThis, rendererKey) as
+      | ((request: {
+          call: {
+            type: "toolCall"
+            toolId: string
+            name: string
+            displayArgs: unknown
+          }
+          result?: { kind: "toolResult"; isError: boolean }
+          snapshot: { cwd: string }
+          width: number
+          theme: Theme
+        }) => string[] | undefined)
+      | undefined
+    const code = `const value = "${"x".repeat(4_100)}"\nconsole.info(value)`
+    try {
+      const lines = renderer?.({
+        call: {
+          type: "toolCall",
+          toolId: "tool-code",
+          name: "ctx_execute",
+          displayArgs: { language: "javascript", code },
+        },
+        result: { kind: "toolResult", isError: false },
+        snapshot: { cwd: "/tmp/project" },
+        width: 80,
+        theme,
+      })
+      const text = lines?.join("\n") ?? ""
+      expect(text).toContain("ctx_execute </> javascript")
+      expect(text).toContain("console.info(value)")
+      expect(text).not.toContain('{"language":')
+      expect(lines?.every((line) => visibleWidth(line) <= 80)).toBe(true)
+    } finally {
+      restore()
+    }
+  })
+
   test("renders completed edits through pi-tool-display only in compact layouts", () => {
     const apiKey = Symbol.for("pi-tool-display.api.v1")
     const rendererKey = Symbol.for("pi-subagents.transcriptToolRenderer.v1")

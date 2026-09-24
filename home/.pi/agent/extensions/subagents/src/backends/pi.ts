@@ -231,7 +231,10 @@ function assistantParts(msg: AssistantMessage): TranscriptPart[] {
         toolId: part.id,
         name: part.name,
         argsPreview: safeJson(part.arguments),
-        displayArgs: part.name === "edit" ? part.arguments : undefined,
+        displayArgs:
+          part.name === "edit" || part.name === "ctx_execute"
+            ? part.arguments
+            : undefined,
       })
     }
   }

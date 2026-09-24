@@ -737,8 +737,34 @@ function createSubagentTranscriptToolRenderer(getCompact: () => boolean) {
   return {
     render(request: SubagentTranscriptToolRenderRequest) {
       const { call, result, snapshot, theme, width } = request
+      if (!getCompact()) return undefined
+      if (call.name === "ctx_execute") {
+        const codeCall = formatCodeToolCall(call.name, call.displayArgs, theme)
+        if (!codeCall) return undefined
+        const marker = result
+          ? result.isError
+            ? theme.fg("error", "✕")
+            : theme.fg("success", "✓")
+          : theme.fg("muted", "·")
+        const contentWidth = Math.max(1, width - CALL_GUTTER)
+        const header = wrapTextWithAnsi(codeCall.header, contentWidth)
+        return clampLines(
+          [
+            `${COMPACT_INDENT}${marker} ${header[0] ?? ""}`,
+            ...header.slice(1).map((line) => `${COMPACT_INDENT}${line}`),
+            ...codeCall.code
+              .split("\n")
+              .flatMap((line) =>
+                wrapTextWithAnsi(
+                  theme.fg("toolOutput", sanitizeTerminalText(line)),
+                  Math.max(1, width - COMPACT_INDENT.length),
+                ).map((part) => `${COMPACT_INDENT}${part}`),
+              ),
+          ],
+          width,
+        )
+      }
       if (
-        !getCompact() ||
         call.name !== "edit" ||
         call.displayArgs === undefined ||
         result?.displayResult === undefined
