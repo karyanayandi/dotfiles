@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { expandDollarSkill } from "./index.ts"
+import { expandDollarSkill, searchSkills } from "./index.ts"
 
 test("expands recognized dollar skills", () => {
   assert.equal(
@@ -20,4 +20,24 @@ test("leaves unknown or inline dollar text alone", () => {
     expandDollarSkill("Use $react-doctor", ["react-doctor"]),
     undefined,
   )
+})
+
+test("searches skill names and descriptions with literal case-insensitive terms", () => {
+  const commands = [
+    { name: "skill:react-doctor", description: "Diagnose React issues" },
+    {
+      name: "skill:accessibility",
+      description: "Keyboard navigation and WCAG",
+    },
+  ]
+
+  assert.deepEqual(searchSkills("doctor", commands), ["react-doctor"])
+  assert.deepEqual(searchSkills("KEYBOARD", commands), ["accessibility"])
+  assert.deepEqual(searchSkills("WCAG", commands), ["accessibility"])
+  assert.deepEqual(searchSkills(".", commands), [])
+  assert.deepEqual(searchSkills("0", commands), [])
+  assert.deepEqual(searchSkills("", commands), [
+    "react-doctor",
+    "accessibility",
+  ])
 })
