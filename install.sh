@@ -72,7 +72,7 @@ yay -S --needed \
   ntfs-3g \
   ntfsprogs \
   ollama \
-  opencode-bin \
+  opencode \
   opencode-desktop-bin \
   openssh \
   p7zip \
