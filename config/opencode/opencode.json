@@ -9,22 +9,16 @@
       "disabled": true
     }
   },
-  "model": "openai/gpt-5.6-terra",
-  "small_model": "openai/gpt-5.6-luna",
+  "model": "openai/gpt-6-sol",
+  "small_model": "openai/gpt-6-luna",
   "agent": {
-    "explore": {
-      "disable": true
-    },
-    "general": {
-      "disable": true
-    },
     "coder": {
-      "model": "openai/gpt-5.6-terra"
+      "model": "openai/gpt-6-luna"
     },
     "explorer": {
       "description": "Fast explorer subagent for codebase exploration",
       "mode": "subagent",
-      "model": "openai/gpt-5.6-terra"
+      "model": "openai/gpt-6-luna"
     }
   },
   "mcp": {
@@ -57,11 +51,8 @@
     }
   },
   "plugin": [
-    "@dietrichgebert/ponytail",
-    "@mohak34/opencode-notifier@latest",
     "@tarquinen/opencode-dcp@latest",
     "context-mode",
-    "opencode-goal-plugin",
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "provider": {

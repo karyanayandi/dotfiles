@@ -22,6 +22,23 @@
 - If a lint exception is safe and necessary, document why in a code comment.
 - Fix lint violations at their root. Do not disable rules to silence errors.
 
+## Testing
+
+- Never write unit tests after writing implementation code. If unit tests are
+  necessary, define them before implementation, not as a retrospective check.
+- Strongly prefer end-to-end (E2E) tests as the sole testing mechanism. Exercise
+  complex features through real user workflows and observable outcomes rather
+  than testing internal functions or mocked interactions in isolation.
+- Make E2E runs reproducible: state prerequisites, use repeatable setup and
+  inputs, and leave a verifiable artifact at the end (such as a test report,
+  trace, screenshot, or saved output) with enough context to confirm the result
+  and rerun the same scenario. Do not claim success without checking the
+  artifact.
+- If isolation testing is unavoidable, first enumerate the expected behavior and
+  all plausible failure modes and edge cases; write the corresponding tests
+  before implementation code. Do not add isolated tests afterward merely to
+  mirror code already written.
+
 ## TypeScript
 
 - Keep type safety. Never use the `any` type, `as any`, or `as unknown as`.
