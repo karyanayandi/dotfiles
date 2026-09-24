@@ -19,8 +19,18 @@
 - After making changes, run the project's available check, format, and lint
   commands.
 - If any command is unavailable, say so and suggest adding it.
-- If a lint exception is safe and necessary, document why in a code comment.
-- Fix lint violations at their root. Do not disable rules to silence errors.
+- When lint, typecheck, or tests fail, read the exact diagnostic and fix the
+  underlying code or test to satisfy the existing rule, type contract, or
+  expected behavior. Follow the linter's requested pattern rather than hiding
+  the violation.
+- Never suppress or weaken checks as a substitute for fixing failures: do not
+  change rule or compiler configuration, use type escape hatches, skip tests,
+  remove assertions, or narrow test selection to hide failures.
+- If a lint rule genuinely cannot be satisfied for one specific line, a
+  line-scoped disable is allowed only for that rule and line. Add a nearby
+  comment explaining why the exception is necessary; never disable the rule for
+  an entire file or project.
+- Rerun the failing command after the fix and report any remaining failures.
 
 ## Testing
 
