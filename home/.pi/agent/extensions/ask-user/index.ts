@@ -111,13 +111,11 @@ function wrapText(text: string, width: number): string[] {
 
 export default function askUser(pi: ExtensionAPI) {
   let autocompleteProvider: AutocompleteProvider | undefined
+  let autocompleteRegistered = false
 
-  pi.on("session_start", (_event, ctx) => {
-    if (ctx.mode !== "tui") return
-    ctx.ui.addAutocompleteProvider((provider) => {
-      autocompleteProvider = provider
-      return provider
-    })
+  pi.on("session_start", () => {
+    autocompleteRegistered = false
+    autocompleteProvider = undefined
   })
 
   pi.registerTool({
@@ -159,6 +157,14 @@ export default function askUser(pi: ExtensionAPI) {
 
       if (signal?.aborted) {
         return reply(buildAskUserResultMessage({ kind: "cancelled" }))
+      }
+
+      if (!autocompleteRegistered) {
+        ctx.ui.addAutocompleteProvider((provider) => {
+          autocompleteProvider = provider
+          return provider
+        })
+        autocompleteRegistered = true
       }
 
       const allOptions: DisplayOption[] = [
