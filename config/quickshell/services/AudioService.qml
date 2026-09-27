@@ -118,7 +118,7 @@ Item {
         }
     }
     Timer {
-        interval: 200
+        interval: 1000
         running: true
         repeat: true
         onTriggered: volPoll.running = true

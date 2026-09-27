@@ -302,8 +302,8 @@ Item {
     }
 
     Timer {
-        interval: 500
-        running: true
+        interval: 2000
+        running: root.apps.length === 0
         repeat: true
         onTriggered: if (root.apps.length === 0)
             root.refreshApps()

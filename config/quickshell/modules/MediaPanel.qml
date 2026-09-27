@@ -20,6 +20,7 @@ Panel {
     }
 
     Repeater {
+        id: playerRepeater
         model: Mpris.players
 
         delegate: ColumnLayout {
@@ -27,6 +28,11 @@ Panel {
 
             required property var modelData
             readonly property var player: modelData
+
+            function tickPosition() {
+                if (row.player.positionSupported && row.player.playbackState === MprisPlaybackState.Playing)
+                    row.player.positionChanged();
+            }
 
             Layout.fillWidth: true
             spacing: 8
@@ -102,15 +108,6 @@ Panel {
                 }
             }
 
-            Timer {
-                interval: 1000
-                running: root.opened && row.player.positionSupported && row.player.playbackState === MprisPlaybackState.Playing
-                repeat: true
-                triggeredOnStart: true
-                // MPRIS extrapolates position in its getter; it does not notify every second.
-                onTriggered: row.player.positionChanged()
-            }
-
             PanelSlider {
                 id: seek
                 Layout.fillWidth: true
@@ -126,6 +123,21 @@ Panel {
                 }
                 Accessible.name: "Playback position for " + row.player.identity
                 onMoved: row.player.position = value
+            }
+        }
+    }
+
+    Timer {
+        id: posTimer
+        interval: 1000
+        running: root.opened
+        repeat: true
+        // MPRIS extrapolates position in its getter; it does not notify every second.
+        onTriggered: {
+            for (let i = 0; i < playerRepeater.count; i++) {
+                const d = playerRepeater.itemAt(i);
+                if (d)
+                    d.tickPosition();
             }
         }
     }

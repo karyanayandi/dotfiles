@@ -32,7 +32,7 @@ Item {
     property string _lastHash: ""
     Timer {
         id: pollTimer
-        interval: 700
+        interval: 1500
         running: false
         repeat: true
         onTriggered: pastePoll.running = true
