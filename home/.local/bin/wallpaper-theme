@@ -64,6 +64,9 @@ pkill --require-handler --signal USR2 --euid "$UID" --exact ghostty || true
 # Update the outer terminal PTYs directly, including those hosting tmux.
 python3 "$config_home/theme/terminal.py"
 
+# OpenCode's system theme re-queries the terminal palette on SIGUSR2.
+pkill --require-handler --signal USR2 --euid "$UID" --exact opencode || true
+
 # Reload supported consumers without restarting terminals, shells, or lock screens.
 if command -v fish >/dev/null; then
   fish -c 'set -U wallpaper_theme_generation (date +%s%N)'

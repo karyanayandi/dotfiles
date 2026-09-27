@@ -110,10 +110,6 @@ output_path = "~/.config/theme/generated/nvim.lua"
 input_path = '~/.config/theme/templates/pi.json'
 output_path = '~/.pi/agent/themes/matugen.json'
 
-[templates.opencode]
-input_path = '~/.config/theme/templates/opencode.json'
-output_path = '~/.config/opencode/themes/matugen.json'
-
 [templates.tmux-status]
 input_path = '~/.config/theme/templates/tmux.sh'
 output_path = '~/.cache/theme/tmux.sh'

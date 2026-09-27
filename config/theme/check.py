@@ -110,6 +110,7 @@ def check():
             assert fields == docker_fields, "Lazydocker supports only four theme fields"
     # Pi's native watcher ignores externally registered theme paths.
     assert config["templates"]["pi"]["output_path"] == "~/.pi/agent/themes/matugen.json"
+    assert json.loads((ROOT / "config/opencode/cli.json").read_text())["theme"]["name"] == "system"
     assert config["templates"]["fzf"]["output_path"] == "~/.config/theme/generated/fzf.opts"
     with tempfile.TemporaryDirectory(prefix="wallpaper-theme-test-") as directory:
         home = Path(directory)
@@ -223,7 +224,7 @@ def check():
         fake.chmod(0o755)
         # Never signal the user's Ghostty during isolated runner tests.
         signal_stub = bindir / "pkill"
-        signal_stub.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/signal-args"\n')
+        signal_stub.write_text('#!/bin/sh\nprintf "%s\\n" "$@" >> "$HOME/signal-args"\n')
         signal_stub.chmod(0o755)
         settings_stub = bindir / "gsettings"
         settings_stub.write_text(
@@ -269,6 +270,12 @@ def check():
             assert qt_config.parent.stat().st_mtime > 1
             assert not list(qt_config.parent.glob(".matugen-reload.*"))
             assert qt_config.read_text() == "[Appearance]\ncustom_palette=true\n"
+        assert (home / "signal-args").read_text().splitlines() == [
+            "--require-handler", "--signal", "USR2", "--euid", str(os.getuid()),
+            "--exact", "ghostty",
+            "--require-handler", "--signal", "USR2", "--euid", str(os.getuid()),
+            "--exact", "opencode",
+        ]
         store = home / ".cache/quickshell/wallpaper"
         store.parent.mkdir(parents=True)
         store.write_text(json.dumps({"wallpaper": str(image), "interval": 0}))
@@ -322,15 +329,6 @@ def check():
                 assert "unknown variable: FZF_DEFAULT_OPTS" in cleared.stderr
             finally:
                 subprocess.run([*tmux, "kill-server"], env=env, check=True)
-        assert (home / "signal-args").read_text().splitlines() == [
-            "--require-handler",
-            "--signal",
-            "USR2",
-            "--euid",
-            str(os.getuid()),
-            "--exact",
-            "ghostty",
-        ]
         failed = subprocess.run(
             [str(runner), str(image)], env={**env, "FAIL": "7"}, check=False
         )
