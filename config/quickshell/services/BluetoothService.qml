@@ -13,50 +13,60 @@ Item {
         devProc.running = true;
     }
 
-    function togglePower() {
-        let cmd = root.powered ? "bluetoothctl power off" : "bluetoothctl power on";
-        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        p.command = ["sh", "-c", cmd + " 2>/dev/null; sleep 0.3"];
+    function isValidAddr(addr) {
+        return /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(addr || "");
+    }
+
+    function spawnOnce(argv, onDone) {
+        let p = Qt.createQmlObject('import Quickshell.Io; Process { destroyOnExited: true }', root);
+        p.command = argv;
+        if (onDone)
+            p.exited.connect(onDone);
         p.running = true;
-        Qt.callLater(() => {
-            return root.refresh();
-        });
+    }
+
+    function togglePower() {
+        let argv = root.powered ? ["bluetoothctl", "power", "off"] : ["bluetoothctl", "power", "on"];
+        spawnOnce(argv, () => Qt.callLater(() => root.refresh()));
     }
 
     function connect(addr) {
-        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        p.command = ["sh", "-c", "bluetoothctl connect " + addr + " 2>/dev/null &"];
-        p.running = true;
+        if (!isValidAddr(addr)) {
+            console.warn("Bluetooth: invalid addr", addr);
+            return ;
+        }
+        spawnOnce(["bluetoothctl", "connect", addr]);
     }
 
     function disconnect(addr) {
-        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        p.command = ["sh", "-c", "bluetoothctl disconnect " + addr + " 2>/dev/null &"];
-        p.running = true;
+        if (!isValidAddr(addr)) {
+            console.warn("Bluetooth: invalid addr", addr);
+            return ;
+        }
+        spawnOnce(["bluetoothctl", "disconnect", addr]);
     }
 
     function scan() {
         if (root.scanning)
             return ;
-
         root.scanning = true;
-        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        p.command = ["sh", "-c", "timeout 8 bluetoothctl --timeout 8 scan on 2>/dev/null; bluetoothctl scan off 2>/dev/null; echo done"];
-        p.running = true;
+        let p = Qt.createQmlObject('import Quickshell.Io; Process { destroyOnExited: true }', root);
+        p.command = ["timeout", "8", "bluetoothctl", "--timeout", "8", "scan", "on"];
         p.exited.connect(() => {
             root.scanning = false;
             root.refresh();
         });
-        // auto-stop
+        p.running = true;
         scanTimer.restart();
     }
 
     visible: false
     Component.onCompleted: refresh()
 
+    property bool pollingActive: true
     Timer {
-        interval: 3000
-        running: true
+        interval: 10000
+        running: root.pollingActive
         repeat: true
         onTriggered: refresh()
     }
@@ -64,7 +74,7 @@ Item {
     Process {
         id: powerProc
 
-        command: ["sh", "-c", "bluetoothctl show 2>/dev/null | grep -q 'Powered: yes' && echo on || echo off"]
+        command: ["bluetoothctl", "show"]
 
         stdout: SplitParser {
             onRead: (d) => {
@@ -77,7 +87,7 @@ Item {
     Process {
         id: devProc
 
-        command: ["sh", "-c", "bluetoothctl devices 2>/dev/null; echo '---'; bluetoothctl devices Connected 2>/dev/null"]
+        command: ["bluetoothctl", "devices"]
 
         stdout: StdioCollector {
             onStreamFinished: {
@@ -115,14 +125,6 @@ Item {
                     root.devices = next;
 
             }
-        }
-
-    }
-
-    Process {
-        id: connProc
-
-        stdout: SplitParser {
         }
 
     }
