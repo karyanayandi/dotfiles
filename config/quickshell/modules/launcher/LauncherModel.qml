@@ -10,13 +10,20 @@ Item {
     required property var wallpaper
     property bool pinnedMode: false
     property string query: ""
+    property string _debouncedQuery: ""
+    Timer {
+        id: queryDebounce
+        interval: 100
+        onTriggered: root._debouncedQuery = root.query
+    }
+    onQueryChanged: queryDebounce.restart()
     property int selected: 0
     property string mode: "all"
     property var apps: []
     readonly property var clipboard: clipSvc
     readonly property var bluetooth: btSvc
     readonly property var results: {
-        const query = root.query.toLowerCase().trim();
+        const query = root._debouncedQuery.toLowerCase().trim();
         const mode = root.mode;
         const score = (text, needle) => {
             if (!needle)
@@ -97,31 +104,31 @@ Item {
                     title: "Lock",
                     subtitle: "Quickshell lock screen",
                     icon: "\u{f023}",
-                    cmd: "qs ipc call lockscreen lock"
+                    argv: ["qs", "ipc", "call", "lockscreen", "lock"]
                 },
                 {
                     title: "Logout",
                     subtitle: "end current session",
                     icon: "\u{f08b}",
-                    cmd: "loginctl terminate-session \"$XDG_SESSION_ID\""
+                    argv: ["sh", "-c", "exec loginctl terminate-session \"$XDG_SESSION_ID\" >/dev/null 2>&1"]
                 },
                 {
                     title: "Suspend",
                     subtitle: "systemctl suspend",
                     icon: "\u{f186}",
-                    cmd: "systemctl suspend"
+                    argv: ["systemctl", "suspend"]
                 },
                 {
                     title: "Reboot",
                     subtitle: "systemctl reboot",
                     icon: "\u{f021}",
-                    cmd: "systemctl reboot"
+                    argv: ["systemctl", "reboot"]
                 },
                 {
                     title: "Shutdown",
                     subtitle: "systemctl poweroff",
                     icon: "\u{f0425}",
-                    cmd: "systemctl poweroff"
+                    argv: ["systemctl", "poweroff"]
                 }
             ].map(item => {
                 item.kind = "power";
@@ -239,10 +246,15 @@ Item {
         if (!item)
             return;
         if (item.kind === "app") {
-            if (item.entry && item.entry.execute)
-                item.entry.execute();
-            else
-                run((item.exec || "") + " >/dev/null 2>&1 & disown");
+            if (item.entry && item.entry.execute) {
+                try {
+                    item.entry.execute();
+                } catch (e) {
+                    console.warn("Launcher: execute failed", e);
+                }
+            } else {
+                console.warn("Launcher: no DesktopEntry.execute for", item.title || item.exec);
+            }
             root.closeRequested();
         } else if (item.kind === "wallpaper") {
             root.wallpaper.setWallpaper(item.path);
@@ -256,8 +268,10 @@ Item {
                 clipSvc.autopaste(item.text);
             root.closeRequested();
         } else if (item.kind === "emoji" || item.kind === "nerd") {
-            const text = item.text.replace(/'/g, "'\\''");
-            run(ctrl ? "printf %s '" + text + "' | wl-copy" : "printf %s '" + text + "' | wl-copy; sleep 0.12; if command -v wtype >/dev/null 2>&1; then wtype -- '" + text + "' 2>/dev/null; fi");
+            if (ctrl)
+                clipSvc.copy(item.text);
+            else
+                clipSvc.autopaste(item.text);
             root.closeRequested();
         } else if (item.kind === "switch") {
             root.mode = item.go;
@@ -275,14 +289,15 @@ Item {
             else
                 btSvc.connect(item.addr);
         } else if (item.kind === "power") {
-            run(item.cmd + " >/dev/null 2>&1");
+            if (item.argv)
+                runArgv(item.argv);
             root.closeRequested();
         }
     }
 
-    function run(command) {
-        const process = Qt.createQmlObject("import Quickshell.Io; Process {}", root);
-        process.command = ["sh", "-c", command];
+    function runArgv(argv) {
+        let process = Qt.createQmlObject('import Quickshell.Io; Process { destroyOnExited: true }', root);
+        process.command = argv;
         process.running = true;
     }
 
