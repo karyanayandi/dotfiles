@@ -1,17 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "autoupdate": false,
+  "update": "disable",
   "compaction": {
     "auto": true
   },
-  "lsp": {
-    "eslint": {
-      "disabled": true
-    }
-  },
   "model": "openai/gpt-6-sol",
-  "small_model": "openai/gpt-6-luna",
-  "agent": {
+  "agents": {
+    "title": {
+      "model": "openai/gpt-6-luna"
+    },
     "coder": {
       "model": "openai/gpt-6-luna"
     },
@@ -22,52 +19,69 @@
     }
   },
   "mcp": {
-    "context7": {
-      "enabled": true,
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"
-      ]
-    },
-    "firecrawl": {
-      "type": "remote",
-      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
-    },
-    "playwriter": {
-      "command": ["bun", "x", "playwriter@latest"],
-      "enabled": true,
-      "type": "local"
-    },
-    "shadcn": {
-      "command": ["bun", "x", "shadcn@latest", "mcp"],
-      "enabled": true,
-      "type": "local"
-    },
-    "codebase-memory-mcp": {
-      "type": "local",
-      "command": ["/usr/sbin/codebase-memory-mcp"]
+    "servers": {
+      "context7": {
+        "type": "local",
+        "command": [
+          "bash",
+          "-c",
+          "set -a && source /home/karyana/.env && set +a && exec bunx -y @upstash/context7-mcp"
+        ]
+      },
+      "firecrawl": {
+        "type": "remote",
+        "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+      },
+      "playwriter": {
+        "command": [
+          "bun",
+          "x",
+          "playwriter@latest"
+        ],
+        "type": "local"
+      },
+      "shadcn": {
+        "command": [
+          "bun",
+          "x",
+          "shadcn@latest",
+          "mcp"
+        ],
+        "type": "local"
+      },
+      "codebase-memory-mcp": {
+        "type": "local",
+        "command": [
+          "/usr/sbin/codebase-memory-mcp"
+        ]
+      }
     }
   },
-  "plugin": [
+  "plugins": [
+    "./local-plugins/worktrunk",
     "@tarquinen/opencode-dcp@latest",
-    "context-mode",
+    "./local-plugins/context-mode",
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
-  "provider": {
+  "providers": {
     "9router": {
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
         "baseURL": "http://127.0.0.1:20128/v1",
         "apiKey": "sk-56d3a6bbccf98bff-3qbmu3-2f219179"
       },
       "models": {
         "oc/muse-spark-1.2-contributor-free": {
           "name": "oc/deepseek-v4-flash-free",
-          "modalities": {
-            "input": ["text", "image"],
-            "output": ["text"]
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         }
       }
