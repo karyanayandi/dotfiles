@@ -64,6 +64,7 @@ Item {
     Component.onCompleted: refresh()
 
     property bool pollingActive: true
+    property var _pendingDevices: []
     Timer {
         interval: 10000
         running: root.pollingActive
@@ -76,9 +77,9 @@ Item {
 
         command: ["bluetoothctl", "show"]
 
-        stdout: SplitParser {
-            onRead: (d) => {
-                root.powered = (d.trim() === "on");
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.powered = /Powered:\s*yes/m.test(text);
             }
         }
 
@@ -91,36 +92,52 @@ Item {
 
         stdout: StdioCollector {
             onStreamFinished: {
-                const next = [];
-                let connected = false;
+                const base = [];
                 for (const line of text.trim().split("\n")) {
-                    if (line === "---") {
-                        connected = true;
-                        continue;
-                    }
-                    const match = line.match(/^Device ([0-9A-F:]+) (.+)$/);
+                    const match = line.match(/^Device ([0-9A-Fa-f:]+) (.+)$/);
                     if (!match)
                         continue;
 
-                    const device = next.find((device) => {
-                        return device.addr === match[1];
-                    });
-                    if (device) {
-                        if (connected)
-                            device.connected = true;
-
-                    } else {
-                        next.push({
+                    if (!base.find((d) => d.addr === match[1])) {
+                        base.push({
                             "addr": match[1],
                             "name": match[2],
-                            "connected": connected,
+                            "connected": false,
                             "paired": true
                         });
                     }
                 }
-                next.sort((a, b) => {
+                base.sort((a, b) => {
                     return a.addr.localeCompare(b.addr);
                 });
+                root._pendingDevices = base;
+                devConnectedProc.running = true;
+            }
+        }
+
+    }
+
+    Process {
+        id: devConnectedProc
+
+        command: ["bluetoothctl", "devices", "Connected"]
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const linked = {
+                };
+                for (const line of text.trim().split("\n")) {
+                    const match = line.match(/^Device ([0-9A-Fa-f:]+)(?:\s+.*)?$/);
+                    if (match)
+                        linked[match[1]] = true;
+
+                }
+                const next = root._pendingDevices.map((d) => ({
+                    "addr": d.addr,
+                    "name": d.name,
+                    "connected": !!linked[d.addr],
+                    "paired": d.paired
+                }));
                 if (JSON.stringify(next) !== JSON.stringify(root.devices))
                     root.devices = next;
 
