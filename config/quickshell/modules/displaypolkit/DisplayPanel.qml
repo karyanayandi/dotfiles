@@ -69,17 +69,25 @@ Item {
         id: listing
 
         command: ["python3", root.helper, "list"]
+        onExited: exitCode => {
+            if (exitCode !== 0 && !root.error)
+                root.error = "Helper failed " + exitCode;
+        }
 
         stdout: StdioCollector {
             onStreamFinished: {
-                const data = JSON.parse(text);
-                if (data.error) {
-                    root.error = data.error;
-                } else {
-                    root.outputs = data.filter(m => {
-                        return !m.disabled;
-                    });
-                    root.selectOutput();
+                try {
+                    const data = JSON.parse(text);
+                    if (data.error) {
+                        root.error = data.error;
+                    } else {
+                        root.outputs = data.filter(m => {
+                            return !m.disabled;
+                        });
+                        root.selectOutput();
+                    }
+                } catch (e) {
+                    root.error = String(e).slice(0, 300);
                 }
             }
         }
@@ -87,10 +95,18 @@ Item {
     Process {
         id: command
 
+        onExited: exitCode => {
+            if (exitCode !== 0 && !root.error)
+                root.error = "Helper failed " + exitCode;
+        }
         stdout: StdioCollector {
             onStreamFinished: {
-                if (text.trim())
-                    root.error = JSON.parse(text).error || "";
+                try {
+                    if (text.trim())
+                        root.error = JSON.parse(text).error || "";
+                } catch (e) {
+                    root.error = String(e).slice(0, 300);
+                }
             }
         }
     }
@@ -98,14 +114,22 @@ Item {
         id: status
 
         command: ["python3", root.helper, "status"]
+        onExited: exitCode => {
+            if (exitCode !== 0 && !root.error)
+                root.error = "Helper failed " + exitCode;
+        }
 
         stdout: StdioCollector {
             onStreamFinished: {
-                const wasPending = root.trial.pending;
-                root.trial = JSON.parse(text);
-                root.remaining = Math.max(0, Math.ceil((root.trial.deadline || 0) - Date.now() / 1000));
-                if (wasPending && !root.trial.pending)
-                    root.refresh();
+                try {
+                    const wasPending = root.trial.pending;
+                    root.trial = JSON.parse(text);
+                    root.remaining = Math.max(0, Math.ceil((root.trial.deadline || 0) - Date.now() / 1000));
+                    if (wasPending && !root.trial.pending)
+                        root.refresh();
+                } catch (e) {
+                    root.error = String(e).slice(0, 300);
+                }
             }
         }
     }

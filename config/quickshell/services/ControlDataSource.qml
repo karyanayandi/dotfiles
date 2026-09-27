@@ -41,6 +41,8 @@ Item {
 
         stdout: StdioCollector {
             onStreamFinished: {
+                if (process.exitCode !== 0)
+                    return;
                 try {
                     root.result = JSON.parse(text);
                 } catch (_) {
