@@ -7,7 +7,7 @@ Item {
     property var emojis: []
     Process {
         id: load
-        command: ["sh", "-c", "F=$HOME/.cache/quickshell/emoji.json; " + "if [ ! -s \"$F\" ]; then mkdir -p \"$(dirname \"$F\")\"; " + "curl -fsSL https://unicode.org/Public/emoji/15.1/emoji-test.txt 2>/dev/null" + " | python3 $HOME/.config/quickshell/scripts/emoji.py > \"$F\"; fi; " + "cat \"$F\" 2>/dev/null || echo '[]'"]
+        command: ["sh", "-c", "F=$HOME/.cache/quickshell/emoji.json; " + "if [ ! -s \"$F\" ]; then mkdir -p \"$(dirname \"$F\")\"; " + "curl --max-time 20 --retry 1 -fsSL https://unicode.org/Public/emoji/15.1/emoji-test.txt 2>/dev/null" + " | python3 $HOME/.config/quickshell/scripts/emoji.py > \"$F.tmp\" && mv \"$F.tmp\" \"$F\"; fi; " + "cat \"$F\" 2>/dev/null || echo '[]'"]
         running: true
         stdout: SplitParser {
             onRead: data => {
@@ -15,7 +15,9 @@ Item {
                     let v = JSON.parse(data.trim());
                     if (Array.isArray(v) && v.length)
                         root.emojis = v;
-                } catch (e) {}
+                } catch (e) {
+                    console.warn("EmojiService parse failed", String(e).slice(0, 200));
+                }
             }
         }
     }
