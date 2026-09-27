@@ -18,10 +18,11 @@ Item {
     }
 
     function spawnOnce(argv, onDone) {
-        let p = Qt.createQmlObject('import Quickshell.Io; Process { destroyOnExited: true }', root);
+        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
         p.command = argv;
         if (onDone)
             p.exited.connect(onDone);
+        p.exited.connect(() => p.destroy());
         p.running = true;
     }
 
@@ -50,12 +51,13 @@ Item {
         if (root.scanning)
             return ;
         root.scanning = true;
-        let p = Qt.createQmlObject('import Quickshell.Io; Process { destroyOnExited: true }', root);
+        let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
         p.command = ["timeout", "8", "bluetoothctl", "--timeout", "8", "scan", "on"];
         p.exited.connect(() => {
             root.scanning = false;
             root.refresh();
         });
+        p.exited.connect(() => p.destroy());
         p.running = true;
         scanTimer.restart();
     }

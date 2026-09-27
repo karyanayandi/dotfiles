@@ -296,8 +296,9 @@ Item {
     }
 
     function runArgv(argv) {
-        let process = Qt.createQmlObject('import Quickshell.Io; Process { destroyOnExited: true }', root);
+        let process = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
         process.command = argv;
+        process.exited.connect(() => process.destroy());
         process.running = true;
     }
 
