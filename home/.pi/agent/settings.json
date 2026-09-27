@@ -22,7 +22,8 @@
     "npm:pi-observational-memory",
     "npm:pi-skill-palette",
     "npm:pi-tool-display",
-    "npm:pi-worktrunk"
+    "npm:pi-worktrunk",
+    "npm:pi-autoresearch"
   ],
   "quietStartup": true,
   "showHardwareCursor": true,
