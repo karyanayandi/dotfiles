@@ -779,8 +779,7 @@ export default function (pi: ExtensionAPI) {
       } else {
         const selected = await ctx.ui.select("Codex subagent model", [
           "Use Codex CLI default",
-          "gpt-6-sol",
-          "gpt-6-terra",
+          "gpt-6.1-sol",
           "gpt-6-luna",
           "Custom…",
         ])
@@ -788,7 +787,7 @@ export default function (pi: ExtensionAPI) {
         if (selected === "Custom…") {
           const custom = await ctx.ui.input(
             "Codex model",
-            current.models.codex ?? "gpt-6-sol",
+            current.models.codex ?? "gpt-6.1-sol",
           )
           if (!custom?.trim()) return
           model = custom.trim()
