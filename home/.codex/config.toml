@@ -1,5 +1,5 @@
-model = "gpt-6-luna"
-model_reasoning_effort = "xhigh"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "low"
 [desktop]
 followUpQueueMode = "queue"
 appearanceTheme = "dark"
@@ -59,28 +59,31 @@ enabled = true
 [plugins."unified-computer-use@openai-bundled"]
 enabled = true
 
+[plugins."code-review@openai-bundled"]
+enabled = true
+
 [features]
 js_repl = false
 
 [mcp_servers.node_repl]
 args = []
-command = "/opt/codex-desktop/resources/cua_node/bin/node_repl"
+command = "/usr/lib/chatgpt/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = "/opt/codex-desktop/resources/cua_node/lib/node_modules"
-NODE_REPL_NODE_PATH = "/opt/codex-desktop/resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex:/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_MODULE_DIRS = "/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/usr/lib/chatgpt/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/karyana/.codex:/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/karyana/.codex"
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
 BROWSER_USE_TINYSKY_ENABLED = "1"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.924.20706"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.924.20706/scripts/browser-service.mjs"}'
-CODEX_CLI_PATH = "/opt/codex-desktop/resources/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.928.31416"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.928.31416/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
 
 [shell_environment_policy.set]
 NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,8785b5437d98636c3002d3d7e64b98db79c3b66870b1bd3d18dea953a99b1562"
