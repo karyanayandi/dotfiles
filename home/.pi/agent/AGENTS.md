@@ -88,6 +88,10 @@
 - If one is running, do not start another server or switch to a different port.
 - Ask the user to stop the existing process before starting a replacement.
 
+## Browser automation
+
+- When using Playwriter, prefer the current active tab. Open a new tab only when the task genuinely requires it.
+
 ## Git
 
 - Use Conventional Commits for commit message.
