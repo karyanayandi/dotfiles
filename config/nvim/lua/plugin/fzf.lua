@@ -130,6 +130,7 @@ return {
         },
       },
       files = {
+        cwd = vim.fs.root(0, ".git"),
         git_icons = true,
         file_icons = true,
         color_icons = true,
