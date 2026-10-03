@@ -4,6 +4,7 @@ import type { AssistantMessage } from "@earendil-works/pi-ai"
 import {
   AssistantMessageComponent,
   initTheme,
+  getMarkdownTheme,
   ToolExecutionComponent,
   Theme,
   type ExtensionAPI,
@@ -11,7 +12,12 @@ import {
   type ToolDefinition,
   UserMessageComponent,
 } from "@earendil-works/pi-coding-agent"
-import { ProcessTerminal, visibleWidth, Text } from "@earendil-works/pi-tui"
+import {
+  Markdown,
+  ProcessTerminal,
+  visibleWidth,
+  Text,
+} from "@earendil-works/pi-tui"
 import { TuiMainScreen } from "@earendil-works/pi-tui/dist/tui-main-screen.js"
 import { Type } from "typebox"
 
@@ -266,6 +272,54 @@ describe("installCompactMessages", () => {
     } finally {
       restore()
     }
+  })
+
+  test("renders assistant code panels without fences and restores native Markdown", () => {
+    let compact = true
+    const restore = installCompactMessages(theme, () => compact)
+
+    const source =
+      'Before\n\n```json\n{"message":"hello"}\n```\n\nAfter\n\n````js\nconst fence = "```"\n````'
+
+    const markdown = new Markdown(source, 0, 0, getMarkdownTheme())
+
+    const message = new AssistantMessageComponent({
+      ...assistantMessage,
+      content: [{ type: "text", text: source }],
+    })
+
+    try {
+      for (const width of [1, 4, 40, 120]) {
+        const lines = message.render(width)
+        expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+
+        if (width < 40) continue
+        const output = lines.map(stripVTControlCharacters).join("\n")
+        expect(output).toContain("</> json")
+        expect(output).toContain("</> js")
+        expect(output).toContain('const fence = "```"')
+        expect(output).toContain("Before")
+        expect(output).toContain("After")
+        expect(output).not.toMatch(/^\s*```(?:json|js)?\s*$/m)
+        expect(output).toContain("│")
+      }
+
+      expect(
+        markdown.render(80).map(stripVTControlCharacters).join("\n"),
+      ).toContain("</> json")
+      compact = false
+      expect(
+        markdown.render(80).map(stripVTControlCharacters).join("\n"),
+      ).toContain("```json")
+      compact = true
+      markdown.render(80)
+    } finally {
+      restore()
+    }
+
+    expect(
+      markdown.render(80).map(stripVTControlCharacters).join("\n"),
+    ).toContain("```json")
   })
 
   test("reuses finalized assistant rendering until invalidated", () => {
@@ -574,6 +628,133 @@ describe("installToolSpacing", () => {
       expect(row.render(120)).toEqual(original)
     } finally {
       restore()
+    }
+  })
+
+  test.each([
+    ["codemode", "default"],
+    ["codemode", "self"],
+    ["workflow", "self"],
+  ] as const)("styles %s code with %s shell like ctx", (name, renderShell) => {
+    const code = 'const value = "' + "x".repeat(100) + '"\nreturn value'
+    const args = name === "workflow" ? { script: code } : { code }
+
+    const tool = {
+      name,
+      label: name,
+      description: "run script",
+      parameters: Type.Object({}),
+      renderShell,
+      renderCall: () => new Text("```js workflow\n" + code, 0, 0),
+      execute() {
+        return Promise.resolve({ content: [], details: undefined })
+      },
+    } satisfies ToolDefinition
+
+    const row = new ToolExecutionComponent(
+      name,
+      "tool-script",
+      args,
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+
+    row.setArgsComplete()
+    const native = row.render(120)
+    let compact = true
+    const restore = installToolSpacing(() => compact, theme)
+
+    try {
+      for (const width of [4, 40, 120]) {
+        const lines = row.render(width)
+        expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+
+        if (width <= 4) continue
+        expect(stripVTControlCharacters(lines[0] ?? "")).toContain(
+          `${name} </> javascript`,
+        )
+        expect(lines).toHaveLength(3)
+        expect(lines.join("\n")).not.toContain("```")
+
+        if (width === 40) expect(lines[1]).toContain("…")
+        else
+          expect(
+            lines
+              .slice(1)
+              .map((line) => line.trimStart())
+              .join("\n"),
+          ).toBe(code)
+      }
+
+      row.setExpanded(true)
+      expect(row.render(120)).toEqual(native)
+      row.setExpanded(false)
+      compact = false
+      expect(row.render(120)).toEqual(native)
+    } finally {
+      restore()
+    }
+  })
+
+  test("shows workflow JSON result panel collapsed and expanded", () => {
+    const tool = {
+      name: "workflow",
+      label: "workflow",
+      description: "script",
+      parameters: Type.Object({}),
+      renderCall: () => new Text("workflow", 0, 0),
+      renderResult: () =>
+        new Markdown(
+          '```json\n{"values":[2,4,6]}\n```',
+          0,
+          0,
+          getMarkdownTheme(),
+        ),
+      execute() {
+        return Promise.resolve({ content: [], details: undefined })
+      },
+    } satisfies ToolDefinition
+
+    const row = new ToolExecutionComponent(
+      "workflow",
+      "result-test",
+      { script: "return { values: [2, 4, 6] }" },
+      {},
+      tool,
+      tui,
+      "/tmp/example",
+    )
+
+    const restoreMessages = installCompactMessages(theme, () => true)
+    const restoreTools = installToolSpacing(() => true, theme)
+
+    try {
+      row.setArgsComplete()
+      row.updateResult({
+        content: [],
+        details: { result: { values: [2, 4, 6] } },
+        isError: false,
+      })
+
+      for (const expanded of [false, true]) {
+        row.setExpanded(expanded)
+
+        for (const width of [1, 4, 40, 120]) {
+          const lines = row.render(width)
+          expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+
+          if (width < 40) continue
+          const output = lines.map(stripVTControlCharacters).join("\n")
+          expect(output).toContain("</> json")
+          expect(output).toContain('"values"')
+          expect(output).not.toContain("```")
+        }
+      }
+    } finally {
+      restoreTools()
+      restoreMessages()
     }
   })
 

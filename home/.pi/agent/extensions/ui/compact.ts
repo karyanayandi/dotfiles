@@ -8,6 +8,7 @@ import {
   createGrepToolDefinition,
   createLsToolDefinition,
   createReadToolDefinition,
+  getMarkdownTheme,
   type AgentToolResult,
   type ExtensionAPI,
   type Theme,
@@ -16,6 +17,7 @@ import {
 } from "@earendil-works/pi-coding-agent"
 import {
   Container,
+  Markdown,
   Text,
   truncateToWidth,
   type Component,
@@ -577,15 +579,36 @@ export function installToolSpacing(
 
     const contentWidth = width - CALL_GUTTER
 
-    if (!isBgShell) {
+    const codeCall = formatCodeToolCall(bareName, self.args, theme)
+
+    const details = self.result?.details
+
+    const resultJson =
+      bareName === "workflow" &&
+      v.is(workflowResultSchema, details) &&
+      details.result !== undefined
+        ? JSON.stringify(details.result, null, 2)
+        : undefined
+
+    const resultLines =
+      resultJson === undefined
+        ? []
+        : new Markdown(
+            `\`\`\`json\n${resultJson}\n\`\`\``,
+            0,
+            0,
+            getMarkdownTheme(),
+          )
+            .render(width - COMPACT_INDENT.length)
+            .map((line) => `${COMPACT_INDENT}${line}`)
+
+    if (!isBgShell && !codeCall) {
       return [
         `${COMPACT_INDENT}${status} ${truncateToWidth(content.join(" "), contentWidth, "…")}`,
       ]
     }
 
     // Code tools keep explicit source lines beneath the truncated header.
-    const codeCall = formatCodeToolCall(bareName, self.args, theme)
-
     const single =
       codeCall?.header ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
@@ -603,6 +626,7 @@ export function installToolSpacing(
               "…",
             )}`,
         ) ?? []),
+      ...resultLines,
     ]
   }
 
@@ -704,12 +728,15 @@ function formatCodeToolCall<TArgs>(name: string, args: TArgs, theme: Theme) {
     }
   }
 
-  if (!v.is(codeArgsSchema, args)) return undefined
-  const meta = compactArgs(args, theme)
+  const codeArgs =
+    name === "codemode" ? { ...args, language: "javascript" } : args
+
+  if (!v.is(codeArgsSchema, codeArgs)) return undefined
+  const meta = compactArgs(codeArgs, theme)
 
   return {
-    header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", args.language)}${meta ? ` ${meta}` : ""}`,
-    code: args.code,
+    header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", codeArgs.language)}${meta ? ` ${meta}` : ""}`,
+    code: codeArgs.code,
   }
 }
 
@@ -743,9 +770,23 @@ const toolExecutionStateSchema = v.object({
   isPartial: v.boolean(),
   toolName: v.optional(v.string()),
   args: v.optional(v.unknown()),
-  result: v.optional(v.object({ isError: v.optional(v.boolean()) })),
+  result: v.optional(
+    v.object({
+      isError: v.optional(v.boolean()),
+      details: v.optional(v.unknown()),
+    }),
+  ),
   getRenderShell: v.function(),
 })
+
+const workflowResultSchema = v.object({ result: v.optional(v.unknown()) })
+
+const markdownStateSchema = v.object({
+  theme: v.unknown(),
+  paddingX: v.number(),
+})
+
+const markdownThemeSchema = v.looseObject({ codeBlockBorder: v.function() })
 
 const assistantMessageStateSchema = v.object({
   hiddenThinkingLabel: v.string(),
@@ -769,6 +810,52 @@ export function installCompactMessages(
   theme: Theme,
   getCompact: () => boolean,
 ): () => void {
+  const originalMarkdownRender = Markdown.prototype.render
+
+  const compactMarkdownRender = function (
+    this: Markdown,
+    width: number,
+  ): string[] {
+    if (!getCompact()) return originalMarkdownRender.call(this, width)
+
+    if (width <= 0) return []
+
+    const { theme: originalTheme, paddingX } = v.parse(
+      markdownStateSchema,
+      this,
+    )
+
+    const markdownTheme = v.parse(markdownThemeSchema, originalTheme)
+    const borderWidth = Math.max(0, width - paddingX * 2)
+    let opening = true
+    Reflect.set(this, "theme", {
+      ...markdownTheme,
+      codeBlockIndent: theme.fg("borderMuted", "│ "),
+      codeBlockBorder(text: string) {
+        const border = opening
+          ? `╭─ </> ${sanitizeTerminalText(text.slice(3))}`.trimEnd()
+          : "╰"
+
+        opening = !opening
+
+        return theme.fg(
+          "borderMuted",
+          truncateToWidth(border.padEnd(borderWidth, "─"), borderWidth, "…"),
+        )
+      },
+    })
+    this.invalidate()
+
+    try {
+      return clampLines(originalMarkdownRender.call(this, width), width)
+    } finally {
+      Reflect.set(this, "theme", originalTheme)
+      this.invalidate()
+    }
+  }
+
+  Markdown.prototype.render = compactMarkdownRender
+
   const originalTextRender = Text.prototype.render
 
   const compactTextRender = function (this: Text, width: number): string[] {
@@ -894,6 +981,8 @@ export function installCompactMessages(
       state?.streaming === false ||
       (state === undefined && lastMessage?.stopReason !== "pending")
 
+    lines = clampLines(lines, width)
+
     if (cacheable) compactAssistantLines.set(this, { width, lines })
 
     return lines
@@ -922,6 +1011,10 @@ export function installCompactMessages(
     compactAssistantUpdateContent
 
   return () => {
+    if (Markdown.prototype.render === compactMarkdownRender) {
+      Markdown.prototype.render = originalMarkdownRender
+    }
+
     if (Text.prototype.render === compactTextRender) {
       Text.prototype.render = originalTextRender
     }
