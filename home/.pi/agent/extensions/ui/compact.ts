@@ -87,7 +87,7 @@ interface PatchableToolExecutionPrototype {
   __piUiToolSpacingPatchOwner?: object
 }
 
-const TOOL_SPACING_PATCH_VERSION = 1
+const TOOL_SPACING_PATCH_VERSION = 2
 
 const TOOL_SPACING_PATCH_OWNER = {}
 
@@ -444,14 +444,22 @@ export function installToolSpacing(
     this: ToolExecutionComponent,
     width: number,
   ): string[] {
-    if (!getCompact()) return originalRender.call(this, width)
+    const { toolName } = v.parse(toolExecutionNameSchema, this)
+
+    if (!getCompact()) {
+      return displayToolTitle(originalRender.call(this, width), toolName)
+    }
+
     const state = renderState.get(this)
     const cacheable = state?.settled && !state.expanded && !state.hasImages
     const cached = cacheable ? renderCache.get(this) : undefined
 
     if (cached?.width === width) return cached.lines
 
-    const rendered = originalRender.call(this, width)
+    const rendered = displayToolTitle(
+      originalRender.call(this, width),
+      toolName,
+    )
 
     // Image rows contain blank height placeholders and terminal image escapes.
     // Collapsing or clamping them draws the image over neighboring text.
@@ -565,7 +573,8 @@ export function installToolSpacing(
 
     const args =
       bareName !== "" &&
-      (!self.callRendererComponent || firstPlain === bareName)
+      (!self.callRendererComponent ||
+        firstPlain === bareName.replace(/^ctx_/, ""))
         ? compactArgs(self.args, theme)
         : ""
 
@@ -601,11 +610,13 @@ export function installToolSpacing(
             .map((line) => `${COMPACT_INDENT}${line}`)
 
     const callContent = self.callRendererComponent
-      ? v
-          .parse(
+      ? displayToolTitle(
+          v.parse(
             v.array(v.string()),
             self.callRendererComponent.render(contentWidth),
-          )
+          ),
+          self.toolName,
+        )
           .map((line) => line.trimEnd())
           .filter(Boolean)
       : undefined
@@ -630,7 +641,7 @@ export function installToolSpacing(
     const single =
       codeCall?.header ??
       (args
-        ? `${bareName} ${args}`
+        ? `${bareName.replace(/^ctx_/, "")} ${args}`
         : (callContent ??
           (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? ""))))
 
@@ -749,11 +760,13 @@ function formatCodeToolCall<TArgs>(name: string, args: TArgs, theme: Theme) {
   const codeArgs =
     name === "codemode" ? { ...args, language: "javascript" } : args
 
+  const displayName = name.replace(/^ctx_/, "")
+
   if (!v.is(codeArgsSchema, codeArgs)) return undefined
   const meta = compactArgs(codeArgs, theme)
 
   return {
-    header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", codeArgs.language)}${meta ? ` ${meta}` : ""}`,
+    header: `${theme.fg("toolTitle", theme.bold(displayName))} ${theme.fg("accent", "</>")} ${theme.fg("accent", codeArgs.language)}${meta ? ` ${meta}` : ""}`,
     code: codeArgs.code,
   }
 }
@@ -782,6 +795,22 @@ function plainTerminalText(text: string): string {
 }
 
 const textStateSchema = v.object({ text: v.string() })
+
+function displayToolTitle(lines: string[], name?: string): string[] {
+  if (!name?.startsWith("ctx_")) return lines
+
+  const titleIndex = lines.findIndex(
+    (line) => plainTerminalText(line).trim() !== "",
+  )
+
+  return lines.map((line, index) =>
+    index === titleIndex && plainTerminalText(line).trim().startsWith(name)
+      ? line.replace(name, name.slice(4))
+      : line,
+  )
+}
+
+const toolExecutionNameSchema = v.object({ toolName: v.optional(v.string()) })
 
 const toolExecutionStateSchema = v.object({
   expanded: v.boolean(),

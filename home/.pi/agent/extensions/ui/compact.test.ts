@@ -339,6 +339,67 @@ describe("installCompactMessages", () => {
 })
 
 describe("installToolSpacing", () => {
+  test("strips ctx_ only from tool titles across layouts and expansion states", () => {
+    for (const compact of [false, true]) {
+      const restore = installToolSpacing(() => compact, theme)
+
+      try {
+        for (const name of [
+          "ctx_execute",
+          "ctx_search",
+          "ctx_execute_file",
+          "playwriter_execute",
+        ]) {
+          for (const custom of [false, true]) {
+            const tool = {
+              name,
+              label: name,
+              description: "context tool",
+              parameters: Type.Object({}),
+              renderCall: custom
+                ? () => new Text(`${name} query:ctx_value`, 0, 0)
+                : undefined,
+              execute() {
+                return Promise.resolve({ content: [], details: undefined })
+              },
+            } satisfies ToolDefinition
+
+            const row = new ToolExecutionComponent(
+              name,
+              "tool-title",
+              { query: "ctx_value" },
+              {},
+              tool,
+              tui,
+              "/tmp/example",
+            )
+
+            row.setArgsComplete()
+            row.updateResult({
+              content: [{ type: "text", text: "ctx_result" }],
+              isError: false,
+            })
+
+            for (const expanded of [false, true]) {
+              row.setExpanded(expanded)
+              const text = stripVTControlCharacters(row.render(120).join("\n"))
+              expect(text).toContain(name.replace(/^ctx_/, ""))
+
+              if (name.startsWith("ctx_")) expect(text).not.toContain(name)
+
+              if (custom || (compact && !expanded))
+                expect(text).toContain("ctx_value")
+
+              if (expanded || !compact) expect(text).toContain("ctx_result")
+            }
+          }
+        }
+      } finally {
+        restore()
+      }
+    }
+  })
+
   test("keeps long read paths and summaries visible collapsed and expanded", () => {
     const args = {
       path: "/home/example/" + "nested/".repeat(12) + "file.ts",
@@ -895,7 +956,8 @@ describe("installToolSpacing", () => {
     try {
       const text = stripVTControlCharacters(row.render(120).join("\n"))
 
-      expect(text).toContain("</> python")
+      expect(text).toContain("execute </> python")
+      expect(text).not.toContain("ctx_execute")
       expect(text).toContain("  value = 42\n  print(value)")
       expect(text).not.toContain("```")
     } finally {
