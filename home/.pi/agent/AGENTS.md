@@ -93,8 +93,8 @@
 - Do not define a function and export it separately.
 - Ban `useEffect` entirely. Do not import or call it. Prefer derived values,
   event handlers, or framework APIs.
-- Ban `useCallback` entirely. Do not import or call it. Let React Compiler
-  handle callback memoization.
+- Ban `useCallback` and `useMemo` entirely. Do not import or call it. Let React
+  Compiler handle memoization.
 
 ## Comments and documentation
 
@@ -110,7 +110,8 @@
 
 ## Browser automation
 
-- When using Playwriter, prefer the current active tab. Open a new tab only when the task genuinely requires it.
+- When using Playwriter, prefer the current active tab. Open a new tab only when
+  the task genuinely requires it.
 
 ## Git
 
