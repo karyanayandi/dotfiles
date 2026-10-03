@@ -8,14 +8,12 @@ import {
   createReadToolDefinition,
   type AgentToolResult,
   type ExtensionAPI,
-  type ExtensionUIContext,
   type Theme,
   ToolExecutionComponent,
   type ToolDefinition,
   type ToolRenderResultOptions,
 } from "@earendil-works/pi-coding-agent"
 import {
-  Box,
   Container,
   Text,
   truncateToWidth,
@@ -339,7 +337,6 @@ export function registerCompactTools(
 export function installToolSpacing(
   getCompact: () => boolean,
   theme: Theme,
-  getMinimal: () => boolean = getCompact,
 ): () => void {
   const prototype = getToolExecutionPrototype()
   const previousOriginalRender = prototype.__piUiToolSpacingOriginalRender
@@ -537,9 +534,6 @@ export function installToolSpacing(
     // keep their source lines visible beneath the call.
     const codeCall = formatCodeToolCall(bareName, self.args, theme)
     const single =
-      (getMinimal()
-        ? formatSubagentToolCall(bareName, self.args, theme)
-        : undefined) ??
       codeCall?.header ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
         (args ? ` ${args}` : "")
@@ -615,42 +609,16 @@ function compactArgs(args: unknown, theme: Theme): string {
   return parts.join(" ")
 }
 
-function formatSubagentToolCall(name: string, args: unknown, theme: Theme) {
-  if (!args || typeof args !== "object" || Array.isArray(args)) return undefined
-  const input = args as Record<string, unknown>
-  const ids = Array.isArray(input.ids)
-    ? input.ids.filter((id): id is string => typeof id === "string").join(", ")
-    : ""
-
-  switch (name) {
-    case "subagent_spawn":
-      return renderLine(
-        name,
-        withMeta(
-          compactText(input.name, "subagent"),
-          [input.harness, input.model, input.reasoning_effort]
-            .filter((value): value is string => typeof value === "string")
-            .join(" · ") || undefined,
-        ),
-        theme,
-      )
-    case "subagent_wait":
-    case "subagent_cancel":
-      return renderLine(name, { subject: compactText(ids) }, theme)
-    case "subagent_check":
-      return renderLine(name, { subject: compactText(input.id) }, theme)
-    case "subagent_list":
-      return theme.fg("toolTitle", theme.bold(name))
-    default:
-      return undefined
-  }
-}
-
 function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
   if (!args || typeof args !== "object" || Array.isArray(args)) return undefined
-  const { code, language } = args as Record<string, unknown>
+  const input = args as Record<string, unknown>
+  const code = name === "workflow" ? input.script : input.code
+  const language = name === "workflow" ? "javascript" : input.language
   if (typeof code !== "string" || typeof language !== "string") return undefined
-  const meta = compactArgs(args, theme)
+  const meta = compactArgs(
+    name === "workflow" ? { ...input, script: undefined } : input,
+    theme,
+  )
   return {
     header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", language)}${meta ? ` ${meta}` : ""}`,
     code,
@@ -661,334 +629,6 @@ function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
 // line exceeds terminal width, regardless of renderShell or Box padding.
 function clampLines(lines: string[], width: number): string[] {
   return lines.map((line) => truncateToWidth(line, width, "…"))
-}
-
-interface SubagentTranscriptToolRenderRequest {
-  readonly call: {
-    readonly type: "toolCall"
-    readonly toolId: string
-    readonly name: string
-    readonly displayArgs?: unknown
-  }
-  readonly result?: {
-    readonly kind: "toolResult"
-    readonly isError: boolean
-    readonly displayResult?: unknown
-  }
-  readonly snapshot: { readonly cwd: string }
-  readonly width: number
-  readonly theme: Theme
-}
-
-type SubagentTranscriptToolRenderer = (
-  request: SubagentTranscriptToolRenderRequest,
-) => string[] | undefined
-
-interface ToolDisplayRenderContext {
-  readonly args: unknown
-  readonly state: Record<string, unknown>
-  readonly lastComponent: Component | undefined
-  readonly invalidate: () => void
-  readonly toolCallId: string
-  readonly cwd: string
-  readonly executionStarted: boolean
-  readonly argsComplete: boolean
-  readonly isPartial: boolean
-  readonly expanded: boolean
-  readonly showImages: boolean
-  readonly isError: boolean
-}
-
-interface ToolDisplayDefinition {
-  readonly renderCall?: (
-    args: unknown,
-    theme: Theme,
-    context: ToolDisplayRenderContext,
-  ) => Component
-  readonly renderResult?: (
-    result: unknown,
-    options: ToolRenderResultOptions,
-    theme: Theme,
-    context: ToolDisplayRenderContext,
-  ) => Component
-}
-
-interface ToolDisplayApi {
-  readonly version: 1
-  readonly decorateTool: (
-    tool: Record<string, unknown>,
-    adapter?: Record<string, unknown>,
-  ) => ToolDisplayDefinition
-}
-
-const toolDisplayApiKey = Symbol.for("pi-tool-display.api.v1")
-const subagentTranscriptToolRendererKey = Symbol.for(
-  "pi-subagents.transcriptToolRenderer.v1",
-)
-
-type GlobalWithToolRenderers = typeof globalThis & {
-  [toolDisplayApiKey]?: ToolDisplayApi
-  [subagentTranscriptToolRendererKey]?: SubagentTranscriptToolRenderer
-}
-
-function createSubagentTranscriptToolRenderer(getCompact: () => boolean) {
-  let cache = new WeakMap<object, Component>()
-
-  return {
-    render(request: SubagentTranscriptToolRenderRequest) {
-      const { call, result, snapshot, theme, width } = request
-      if (!getCompact()) return undefined
-      if (call.name === "ctx_execute") {
-        const codeCall = formatCodeToolCall(call.name, call.displayArgs, theme)
-        if (!codeCall) return undefined
-        const marker = result
-          ? result.isError
-            ? theme.fg("error", "✕")
-            : theme.fg("success", "✓")
-          : theme.fg("muted", "·")
-        const contentWidth = Math.max(1, width - CALL_GUTTER)
-        const header = wrapTextWithAnsi(codeCall.header, contentWidth)
-        return clampLines(
-          [
-            `${COMPACT_INDENT}${marker} ${header[0] ?? ""}`,
-            ...header.slice(1).map((line) => `${COMPACT_INDENT}${line}`),
-            ...codeCall.code
-              .split("\n")
-              .flatMap((line) =>
-                wrapTextWithAnsi(
-                  theme.fg("toolOutput", sanitizeTerminalText(line)),
-                  Math.max(1, width - COMPACT_INDENT.length),
-                ).map((part) => `${COMPACT_INDENT}${part}`),
-              ),
-          ],
-          width,
-        )
-      }
-      if (
-        call.name !== "edit" ||
-        call.displayArgs === undefined ||
-        result?.displayResult === undefined
-      )
-        return undefined
-
-      const api = (globalThis as GlobalWithToolRenderers)[toolDisplayApiKey]
-      if (api?.version !== 1) return undefined
-
-      const cacheKey =
-        result.displayResult !== null &&
-        typeof result.displayResult === "object"
-          ? result.displayResult
-          : undefined
-      let component = cacheKey ? cache.get(cacheKey) : undefined
-      if (!component) {
-        const tool = api.decorateTool(
-          { name: "edit" },
-          { kind: "edit", overrideExistingRenderers: true },
-        )
-        if (!tool.renderCall || !tool.renderResult) return undefined
-
-        const state: Record<string, unknown> = {}
-        const context: ToolDisplayRenderContext = {
-          args: call.displayArgs,
-          state,
-          lastComponent: undefined,
-          invalidate: () => {},
-          toolCallId: call.toolId,
-          cwd: snapshot.cwd,
-          executionStarted: true,
-          argsComplete: true,
-          isPartial: false,
-          expanded: false,
-          showImages: false,
-          isError: result.isError,
-        }
-        const background = result.isError ? "toolErrorBg" : "toolSuccessBg"
-        const box = new Box(1, 1, (text) => theme.bg(background, text))
-        box.addChild(tool.renderCall(call.displayArgs, theme, context))
-        box.addChild(
-          tool.renderResult(
-            result.displayResult,
-            { expanded: false, isPartial: false },
-            theme,
-            context,
-          ),
-        )
-        component = box
-        if (cacheKey) cache.set(cacheKey, component)
-      }
-
-      return clampLines(component.render(width), width)
-    },
-    invalidate() {
-      cache = new WeakMap()
-    },
-  }
-}
-
-function compactTakeoverTool(
-  value: string,
-  output: string | undefined,
-  status: "done" | "error" | "running",
-  width: number,
-  theme: Theme,
-) {
-  const [name = "", ...args] = value.split(/\s+/)
-  const marker =
-    status === "error"
-      ? theme.fg("error", "✕")
-      : status === "done"
-        ? theme.fg("success", "✓")
-        : theme.fg("muted", "·")
-  let text = theme.fg("toolTitle", theme.bold(name))
-  if (args.length > 0) text += ` ${theme.fg("accent", args.join(" "))}`
-  if (output) text += theme.fg("muted", ` · ${output}`)
-  return truncateToWidth(`${COMPACT_INDENT}${marker} ${text}`, width, "…")
-}
-
-export function compactSubagentTakeover(
-  lines: string[],
-  width: number,
-  theme: Theme,
-) {
-  const border = "─".repeat(Math.max(1, width))
-  const borders = lines
-    .map((line, index) => (plainTerminalText(line) === border ? index : -1))
-    .filter((index) => index >= 0)
-  const start = (borders[1] ?? -1) + 1
-  const end = borders[2]
-  if (start <= 0 || end === undefined || end <= start) return lines
-
-  const body: string[] = []
-  const pending: Array<{ index: number; value: string }> = []
-  let paragraph: "thinking" | "user" | undefined
-  for (const line of lines.slice(start, end)) {
-    const plain = plainTerminalText(line).trim()
-    if (!plain) {
-      paragraph = undefined
-      if (line) body.push(line)
-      continue
-    }
-    if (plain.startsWith("> ")) {
-      paragraph = "user"
-      body.push(theme.fg("dim", `${COMPACT_INDENT}› ${plain.slice(2)}`))
-      continue
-    }
-    if (plain.startsWith("~ ")) {
-      paragraph = "thinking"
-      body.push(
-        `${COMPACT_INDENT}${theme.fg("muted", theme.italic(plain.slice(2)))}`,
-      )
-      continue
-    }
-    if (plain.startsWith("→ ") || /^(?:output|error):/.test(plain)) {
-      paragraph = undefined
-    }
-    if (paragraph) {
-      body.push(
-        theme.fg(
-          paragraph === "user" ? "dim" : "muted",
-          `${COMPACT_INDENT.repeat(2)}${paragraph === "thinking" ? theme.italic(plain) : plain}`,
-        ),
-      )
-      continue
-    }
-    if (plain.startsWith("→ ")) {
-      const value = plain.slice(2)
-      pending.push({ index: body.length, value })
-      body.push(compactTakeoverTool(value, undefined, "running", width, theme))
-      continue
-    }
-    const result = /^(output|error):\s*(.*)$/.exec(plain)
-    if (result) {
-      const call = pending.shift()
-      const status = result[1] === "error" ? "error" : "done"
-      if (call) {
-        body[call.index] = compactTakeoverTool(
-          call.value,
-          result[2],
-          status,
-          width,
-          theme,
-        )
-      } else {
-        body.push(
-          compactTakeoverTool("output", result[2], status, width, theme),
-        )
-      }
-      continue
-    }
-    const live = /^(\S+)(?:\s+·\s+)(running|done|error)(?:\s+·\s+(.*))?$/.exec(
-      plain,
-    )
-    if (live) {
-      const status =
-        live[2] === "done" ? "done" : live[2] === "error" ? "error" : "running"
-      body.push(compactTakeoverTool(live[1], live[3], status, width, theme))
-      continue
-    }
-    body.push(line)
-  }
-
-  const height = end - start
-  const visible = body.slice(-height)
-  return [
-    ...lines.slice(0, start),
-    ...visible,
-    ...Array.from({ length: height - visible.length }, () => ""),
-    ...lines.slice(end),
-  ]
-}
-
-// Keep subagent takeover styling owned by this extension: wrap its custom UI
-// instance rather than coupling the subagents extension to a layout setting.
-export function installCompactCustomUi(
-  ui: ExtensionUIContext,
-  getCompact: () => boolean,
-) {
-  const globalWithRenderers = globalThis as GlobalWithToolRenderers
-  const editRenderer = createSubagentTranscriptToolRenderer(getCompact)
-  const previousTranscriptRenderer =
-    globalWithRenderers[subagentTranscriptToolRendererKey]
-  const transcriptRenderer: SubagentTranscriptToolRenderer = (request) =>
-    editRenderer.render(request) ?? previousTranscriptRenderer?.(request)
-  globalWithRenderers[subagentTranscriptToolRendererKey] = transcriptRenderer
-
-  const originalCustom = ui.custom
-  const custom: ExtensionUIContext["custom"] = (factory, options) =>
-    originalCustom(
-      (tui, theme, keybindings, done) =>
-        Promise.resolve(factory(tui, theme, keybindings, done)).then(
-          (component) => {
-            if (component.constructor.name !== "TakeoverView") return component
-            const render = component.render.bind(component)
-            const invalidate = component.invalidate.bind(component)
-            // Like the main transcript, follow layout changes on every render.
-            component.render = (width) =>
-              getCompact()
-                ? compactSubagentTakeover(render(width), width, theme)
-                : render(width)
-            component.invalidate = () => {
-              editRenderer.invalidate()
-              invalidate()
-            }
-            return component
-          },
-        ),
-      options,
-    )
-  ui.custom = custom
-  return () => {
-    if (ui.custom === custom) ui.custom = originalCustom
-    if (
-      globalWithRenderers[subagentTranscriptToolRendererKey] ===
-      transcriptRenderer
-    ) {
-      if (previousTranscriptRenderer)
-        globalWithRenderers[subagentTranscriptToolRendererKey] =
-          previousTranscriptRenderer
-      else delete globalWithRenderers[subagentTranscriptToolRendererKey]
-    }
-  }
 }
 
 // --- compact message rendering ---

@@ -1,19 +1,17 @@
+import { stripVTControlCharacters } from "node:util"
 import { describe, expect, test, vi } from "vitest"
 import type { AssistantMessage } from "@earendil-works/pi-ai"
 import {
   AssistantMessageComponent,
   initTheme,
   ToolExecutionComponent,
-  type ExtensionUIContext,
   type Theme,
   UserMessageComponent,
 } from "@earendil-works/pi-coding-agent"
 import { type TUI, visibleWidth, Text } from "@earendil-works/pi-tui"
 
 import {
-  compactSubagentTakeover,
   installCompactMessages,
-  installCompactCustomUi,
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
@@ -132,155 +130,6 @@ describe("registerCompactTools", () => {
     const lines = call?.render(80) ?? []
     expect(lines.length).toBeGreaterThan(0)
     expect(lines.join("\n")).toContain("read")
-  })
-})
-
-describe("compactSubagentTakeover", () => {
-  test("uses minimal transcript rows without changing overlay chrome", () => {
-    const border = "─".repeat(80)
-    const lines = [
-      border,
-      "header",
-      border,
-      "> Read-only demo",
-      "~ Thinking: listing files",
-      '→ fd {"path":"/tmp"}',
-      "",
-      "  output: /tmp/example.ts",
-      "",
-      border,
-      "input",
-      "hints",
-      border,
-    ]
-
-    const compact = compactSubagentTakeover(lines, 80, theme)
-    const transcript = compact.slice(3, 9).join("\n")
-
-    expect(compact).toHaveLength(lines.length)
-    expect(compact.slice(0, 3)).toEqual(lines.slice(0, 3))
-    expect(transcript).toContain("  › Read-only demo")
-    expect(transcript).toContain("  Thinking: listing files")
-    expect(transcript).not.toContain("~ Thinking")
-    expect(transcript).toContain('  ✓ fd {"path":"/tmp"} · /tmp/example.ts')
-    expect(transcript).not.toContain("output:")
-  })
-})
-
-describe("installCompactCustomUi", () => {
-  test("renders subagent code calls instead of raw JSON arguments", () => {
-    const rendererKey = Symbol.for("pi-subagents.transcriptToolRenderer.v1")
-    const ui = { custom: vi.fn() } as unknown as ExtensionUIContext
-    const restore = installCompactCustomUi(ui, () => true)
-    const renderer = Reflect.get(globalThis, rendererKey) as
-      | ((request: {
-          call: {
-            type: "toolCall"
-            toolId: string
-            name: string
-            displayArgs: unknown
-          }
-          result?: { kind: "toolResult"; isError: boolean }
-          snapshot: { cwd: string }
-          width: number
-          theme: Theme
-        }) => string[] | undefined)
-      | undefined
-    const code = `const value = "${"x".repeat(4_100)}"\nconsole.info(value)`
-    try {
-      const lines = renderer?.({
-        call: {
-          type: "toolCall",
-          toolId: "tool-code",
-          name: "ctx_execute",
-          displayArgs: { language: "javascript", code },
-        },
-        result: { kind: "toolResult", isError: false },
-        snapshot: { cwd: "/tmp/project" },
-        width: 80,
-        theme,
-      })
-      const text = lines?.join("\n") ?? ""
-      expect(text).toContain("ctx_execute </> javascript")
-      expect(text).toContain("console.info(value)")
-      expect(text).not.toContain('{"language":')
-      expect(lines?.every((line) => visibleWidth(line) <= 80)).toBe(true)
-    } finally {
-      restore()
-    }
-  })
-
-  test("renders completed edits through pi-tool-display only in compact layouts", () => {
-    const apiKey = Symbol.for("pi-tool-display.api.v1")
-    const rendererKey = Symbol.for("pi-subagents.transcriptToolRenderer.v1")
-    const previousApi = Reflect.get(globalThis, apiKey)
-    const decorateTool = vi.fn(() => ({
-      renderCall: () => new Text("pi-display edit demo.ts", 0, 0),
-      renderResult: () => new Text("pi-display diff +1 -1", 0, 0),
-    }))
-    Reflect.set(globalThis, apiKey, { version: 1, decorateTool })
-
-    let compact = true
-    const ui = { custom: vi.fn() } as unknown as ExtensionUIContext
-    const restore = installCompactCustomUi(ui, () => compact)
-    const renderer = Reflect.get(globalThis, rendererKey) as
-      | ((request: {
-          call: {
-            type: "toolCall"
-            toolId: string
-            name: string
-            displayArgs: unknown
-          }
-          result: {
-            kind: "toolResult"
-            isError: boolean
-            displayResult: unknown
-          }
-          snapshot: { cwd: string }
-          width: number
-          theme: Theme
-        }) => string[] | undefined)
-      | undefined
-    const displayResult = { details: { diff: "+new" } }
-    const bg = vi.fn((_color: string, text: string) => text)
-    const displayTheme = { ...theme, bg } as unknown as Theme
-    const request = {
-      call: {
-        type: "toolCall" as const,
-        toolId: "tool-1",
-        name: "edit",
-        displayArgs: { path: "demo.ts" },
-      },
-      result: {
-        kind: "toolResult" as const,
-        isError: false,
-        displayResult,
-      },
-      snapshot: { cwd: "/tmp/project" },
-      width: 80,
-      theme: displayTheme,
-    }
-
-    try {
-      expect(
-        renderer?.(request)
-          ?.map((line) => line.trim())
-          .filter(Boolean),
-      ).toEqual(["pi-display edit demo.ts", "pi-display diff +1 -1"])
-      expect(
-        renderer?.(request)
-          ?.map((line) => line.trim())
-          .filter(Boolean),
-      ).toEqual(["pi-display edit demo.ts", "pi-display diff +1 -1"])
-      expect(decorateTool).toHaveBeenCalledTimes(1)
-      expect(bg).toHaveBeenCalledWith("toolSuccessBg", expect.any(String))
-      compact = false
-      expect(renderer?.(request)).toBeUndefined()
-    } finally {
-      restore()
-      if (previousApi === undefined) Reflect.deleteProperty(globalThis, apiKey)
-      else Reflect.set(globalThis, apiKey, previousApi)
-    }
   })
 })
 
@@ -522,55 +371,42 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("formats subagent calls only in minimal layout", () => {
-    const args = {
-      prompt: "Review every file and report possible bugs",
-      name: "bug review",
-      harness: "pi",
-      reasoning_effort: "high",
-    }
-    const render = (minimal: boolean) => {
-      const tool: any = {
-        name: "subagent_spawn",
-        label: "Spawn Subagent",
-        description: "spawn",
-        parameters: {},
-        async execute() {
-          return { content: [], details: undefined }
-        },
+  test("renders workflow script as code in compact layouts and restores native rows", () => {
+    const script = 'const value = "' + "x".repeat(100) + '"\nreturn value'
+    const row = new ToolExecutionComponent(
+      "workflow",
+      "tool-workflow",
+      { script, background: true },
+      {},
+      undefined,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    const original = row.render(120)
+    let compact = true
+    const restore = installToolSpacing(() => compact, theme)
+    try {
+      for (const width of [40, 120]) {
+        const lines = row.render(width)
+        const text = stripVTControlCharacters(lines.join("\n"))
+        expect(text).toContain("workflow </> javascript")
+        expect(text).toContain("background:true")
+        expect(text).not.toContain("script:")
+        expect(
+          lines
+            .slice(1)
+            .map((line) => line.trimStart())
+            .join("")
+            .replace(/\s/g, ""),
+        ).toContain(script.replace(/\s/g, ""))
+        expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
       }
-      const row = new ToolExecutionComponent(
-        "subagent_spawn",
-        "tool-1",
-        args,
-        {},
-        tool,
-        tui,
-        "/tmp/example",
-      )
-      row.setArgsComplete()
-      row.markExecutionStarted()
-      const restore = installToolSpacing(
-        () => true,
-        theme,
-        () => minimal,
-      )
-      try {
-        return row
-          .render(120)
-          .join("\n")
-          .replace(/\x1b\[[0-9;]*m/g, "")
-      } finally {
-        restore()
-      }
+      compact = false
+      expect(row.render(120)).toEqual(original)
+    } finally {
+      restore()
     }
-
-    const minimal = render(true)
-    expect(minimal).toContain("subagent_spawn bug review pi · high")
-    expect(minimal).not.toContain(args.prompt)
-
-    const lite = render(false)
-    expect(lite).toContain(args.prompt)
   })
 
   test("preserves native image rows and escape sequences in compact layout", () => {

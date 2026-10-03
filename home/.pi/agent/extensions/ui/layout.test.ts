@@ -7,22 +7,20 @@ describe("renderExtensionStatuses", () => {
   test("sorts statuses and keeps each indicator on one line", () => {
     const lines = renderExtensionStatuses(
       new Map([
-        ["subagents", "subagents: ■ 1 running\n · /subagents to view"],
+        ["tasks", "tasks: ■ 1 running\n · /tasks to view"],
         ["workflows", "■ 1 running"],
       ]),
       80,
     )
 
-    expect(lines).toEqual([
-      "subagents: ■ 1 running · /subagents to view ■ 1 running",
-    ])
+    expect(lines).toEqual(["tasks: ■ 1 running · /tasks to view ■ 1 running"])
   })
 
   test("omits empty statuses and respects terminal width", () => {
     const lines = renderExtensionStatuses(
       new Map([
         ["empty", " \n\t"],
-        ["subagents", "subagents: ■ 1 running"],
+        ["workflows", "workflows: ■ 1 running"],
       ]),
       12,
     )
