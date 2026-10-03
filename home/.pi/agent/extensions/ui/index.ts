@@ -7,14 +7,11 @@ import {
   type ExtensionContext,
   type KeybindingsManager,
   getAgentDir,
-  ThinkingSelectorComponent,
 } from "@earendil-works/pi-coding-agent"
 import {
   truncateToWidth,
   type Component,
   type EditorTheme,
-  type SelectItem,
-  type SelectList,
   type TUI,
   visibleWidth,
 } from "@earendil-works/pi-tui"
@@ -31,82 +28,6 @@ import {
   installToolSpacing,
   registerCompactTools,
 } from "./compact.js"
-
-type ThinkingLevel = ReturnType<ExtensionAPI["getThinkingLevel"]>
-
-type ThinkingModel = Pick<
-  NonNullable<ExtensionContext["model"]>,
-  "provider" | "id"
->
-
-interface ThinkingSelectorInternals {
-  buildSelectList(items: SelectItem[], preselect: string): SelectList
-}
-
-const GPT_THINKING_LABELS = new Map([
-  ["minimal", "light"],
-  ["low", "light"],
-  ["medium", "medium"],
-  ["high", "high"],
-  ["xhigh", "extra high"],
-  ["max", "ultra"],
-])
-
-function isCodexGpt(model: ThinkingModel | undefined) {
-  return model?.provider === "openai-codex" && model.id.startsWith("gpt-6-")
-}
-
-export function displayThinkingLevel(
-  model: ThinkingModel | undefined,
-  level: ThinkingLevel | string,
-) {
-  return isCodexGpt(model) ? (GPT_THINKING_LABELS.get(level) ?? level) : level
-}
-
-function installThinkingSelectorLabels(
-  getModel: () => ExtensionContext["model"],
-) {
-  const prototype = ThinkingSelectorComponent.prototype
-
-  // SAFETY: Validated callable is Pi 1.0 private buildSelectList; installed declaration and implementation accept SelectItem[]/string and return SelectList.
-  const originalBuildSelectList = v.parse(
-    v.object({ buildSelectList: v.function() }),
-    prototype,
-  ).buildSelectList as ThinkingSelectorInternals["buildSelectList"]
-
-  const buildSelectList = function (
-    this: ThinkingSelectorComponent,
-    items: SelectItem[],
-    preselect: string,
-  ) {
-    const model = getModel()
-
-    if (!isCodexGpt(model)) {
-      return originalBuildSelectList.call(this, items, preselect)
-    }
-
-    const hasLight = items.some((item) => item.value === "minimal")
-
-    const visibleItems = hasLight
-      ? items.filter((item) => item.value !== "low")
-      : items
-
-    return originalBuildSelectList.call(
-      this,
-      visibleItems.map((item) => ({
-        ...item,
-        label: displayThinkingLevel(model, item.value),
-      })),
-      preselect,
-    )
-  }
-
-  Reflect.set(prototype, "buildSelectList", buildSelectList)
-
-  return () => {
-    Reflect.set(prototype, "buildSelectList", originalBuildSelectList)
-  }
-}
 
 class EmptyFooter implements Component {
   render(): string[] {
@@ -238,8 +159,6 @@ export default function ui(pi: ExtensionAPI) {
   let tokensDirty = true
   let restoreCompactMessages: (() => void) | undefined
   let restoreToolSpacing: (() => void) | undefined
-  let restoreThinkingSelectorLabels: (() => void) | undefined
-  let currentModel: ExtensionContext["model"]
 
   // pi-minimalist message and tool style applies only to minimal and lite.
   // Read getter at render time so `/ui layout` switches apply live.
@@ -276,7 +195,7 @@ export default function ui(pi: ExtensionAPI) {
           const left = theme.fg(
             "dim",
             sanitizeTerminalText(
-              `${ctx.model?.id ?? "no model"} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
+              `${ctx.model?.id ?? "no model"} · ${pi.getThinkingLevel()}`,
             ),
           )
 
@@ -442,8 +361,7 @@ export default function ui(pi: ExtensionAPI) {
     tui?.requestRender()
   })
 
-  pi.on("model_select", (event) => {
-    currentModel = event.model
+  pi.on("model_select", () => {
     tui?.requestRender()
   })
 
@@ -472,11 +390,6 @@ export default function ui(pi: ExtensionAPI) {
 
   pi.on("session_start", (event, ctx) => {
     stopped = false
-    restoreThinkingSelectorLabels?.()
-    currentModel = ctx.model
-    restoreThinkingSelectorLabels = installThinkingSelectorLabels(
-      () => currentModel,
-    )
     clearTerminalOnEditorMount = event.reason === "startup"
     layout = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
     inputTokens = 0
@@ -555,7 +468,7 @@ export default function ui(pi: ExtensionAPI) {
           const body = lines.filter((line) => line !== "")
 
           const info = truncateToWidth(
-            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
             width,
             "…",
           )
@@ -618,7 +531,7 @@ export default function ui(pi: ExtensionAPI) {
         const status = truncateToWidth(
           [
             gitStatus,
-            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
+            `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
           ]
             .filter(Boolean)
             .join(" · "),
@@ -648,9 +561,6 @@ export default function ui(pi: ExtensionAPI) {
     restoreCompactMessages = undefined
     restoreToolSpacing?.()
     restoreToolSpacing = undefined
-    restoreThinkingSelectorLabels?.()
-    restoreThinkingSelectorLabels = undefined
-    currentModel = undefined
     gitAbortController?.abort()
     gitAbortController = undefined
     stopSpinner()
