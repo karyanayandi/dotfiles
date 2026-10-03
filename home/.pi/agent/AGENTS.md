@@ -93,6 +93,8 @@
 - Do not define a function and export it separately.
 - Ban `useEffect` entirely. Do not import or call it. Prefer derived values,
   event handlers, or framework APIs.
+- Ban `useCallback` entirely. Do not import or call it. Let React Compiler
+  handle callback memoization.
 
 ## Comments and documentation
 
