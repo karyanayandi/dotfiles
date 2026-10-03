@@ -20,6 +20,7 @@ import {
   Markdown,
   Text,
   truncateToWidth,
+  wrapTextWithAnsi,
   type Component,
 } from "@earendil-works/pi-tui"
 
@@ -30,7 +31,7 @@ const COMPACT_INDENT = "  "
 const CALL_GUTTER = COMPACT_INDENT.length + 2 // "  " + "✓ " = 4
 
 // Layout-dependent port of https://github.com/zackerydev/pi-minimalist-ui.
-// This renders compact single-line style only when `getCompact()` is true
+// This renders compact wrapped calls only when `getCompact()` is true
 // (minimal/lite). Full/off layouts use pi's built-in renderers.
 
 // SAFETY: Replace terminal C0/C1 controls and bidi overrides in untrusted tool labels; matching these bytes is intentional.
@@ -97,7 +98,7 @@ function getToolExecutionPrototype() {
   return prototype
 }
 
-class SingleLine implements Component {
+class CompactCallText implements Component {
   private cachedWidth?: number
   private cachedLines?: string[]
 
@@ -112,10 +113,7 @@ class SingleLine implements Component {
   render(width: number): string[] {
     if (this.cachedWidth === width && this.cachedLines) return this.cachedLines
     this.cachedWidth = width
-    this.cachedLines =
-      width > 0
-        ? [truncateToWidth(this.text, Math.max(1, width - CALL_GUTTER), "…")]
-        : []
+    this.cachedLines = width > 0 ? wrapTextWithAnsi(this.text, width) : []
 
     return this.cachedLines
   }
@@ -201,7 +199,7 @@ function registerCompactTool<
   const original = factory(process.cwd())
   const originalCall = original.renderCall
   const originalResult = original.renderResult
-  const callLines = new WeakMap<TState, SingleLine>()
+  const callLines = new WeakMap<TState, CompactCallText>()
 
   const tool: ToolDefinition<TParams, TDetails, TState> = {
     ...original,
@@ -219,9 +217,9 @@ function registerCompactTool<
       }
 
       const line =
-        context.lastComponent instanceof SingleLine
+        context.lastComponent instanceof CompactCallText
           ? context.lastComponent
-          : new SingleLine("")
+          : new CompactCallText("")
 
       callLines.set(context.state, line)
       line.setText(renderLine(original.name, renderer.call(args), theme))
@@ -235,7 +233,7 @@ function registerCompactTool<
         )
       }
 
-      // Tools collapse to a single compact line.
+      // Results stay hidden while the call and summary wrap to available width.
       const summary = context.isError
         ? errorSummary(result)
         : renderer.summary?.(result, context.args)
@@ -359,9 +357,8 @@ export function registerCompactTools(
 }
 
 /**
- * Collapse each tool's transcript row to a single line in compact layouts.
- * This is what gives un-wrapped custom tools the pi-minimalist single-line look
- * without re-registering them. When a
+ * Keep tool calls compact while wrapping overflow in compact layouts.
+ * Custom tools retain their call renderers without re-registering them. When a
  * tool renders a short call+summary pair (exactly two content lines, e.g. fd/rg)
  * they are joined; otherwise only the call line is kept, augmented with the
  * call's args when the tool has no custom renderer (bare-name fallback). Never
@@ -567,7 +564,8 @@ export function installToolSpacing(
     const firstPlain = plainTerminalText(lines[0] ?? "").trim()
 
     const args =
-      bareName !== "" && firstPlain === bareName
+      bareName !== "" &&
+      (!self.callRendererComponent || firstPlain === bareName)
         ? compactArgs(self.args, theme)
         : ""
 
@@ -602,29 +600,49 @@ export function installToolSpacing(
             .render(width - COMPACT_INDENT.length)
             .map((line) => `${COMPACT_INDENT}${line}`)
 
-    if (!isBgShell && !codeCall) {
-      return [
-        `${COMPACT_INDENT}${status} ${truncateToWidth(content.join(" "), contentWidth, "…")}`,
-      ]
+    const callContent = self.callRendererComponent
+      ? v
+          .parse(
+            v.array(v.string()),
+            self.callRendererComponent.render(contentWidth),
+          )
+          .map((line) => line.trimEnd())
+          .filter(Boolean)
+      : undefined
+
+    function renderHeader(text: string | string[]) {
+      const wrapped = Array.isArray(text)
+        ? text
+        : wrapTextWithAnsi(text, contentWidth)
+
+      return wrapped.map((line, index) =>
+        index === 0
+          ? `${COMPACT_INDENT}${status} ${line}`
+          : `${" ".repeat(CALL_GUTTER)}${line}`,
+      )
     }
 
-    // Code tools keep explicit source lines beneath the truncated header.
+    if (!isBgShell && !codeCall) {
+      return renderHeader(callContent ?? content.join(" "))
+    }
+
+    // Code tools keep explicit source lines beneath the wrapped header.
     const single =
       codeCall?.header ??
-      (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
-        (args ? ` ${args}` : "")
+      (args
+        ? `${bareName} ${args}`
+        : (callContent ??
+          (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? ""))))
 
     return [
-      `${COMPACT_INDENT}${status} ${truncateToWidth(single, contentWidth, "…")}`,
+      ...renderHeader(single),
       ...(codeCall?.code
         .split("\n")
-        .map(
-          (line) =>
-            `${COMPACT_INDENT}${truncateToWidth(
-              theme.fg("toolOutput", sanitizeTerminalText(line)),
-              width - COMPACT_INDENT.length,
-              "…",
-            )}`,
+        .flatMap((line) =>
+          wrapTextWithAnsi(
+            theme.fg("toolOutput", sanitizeTerminalText(line)),
+            width - COMPACT_INDENT.length,
+          ).map((part) => `${COMPACT_INDENT}${part}`),
         ) ?? []),
       ...resultLines,
     ]
@@ -777,6 +795,11 @@ const toolExecutionStateSchema = v.object({
     }),
   ),
   getRenderShell: v.function(),
+  callRendererComponent: v.optional(
+    v.custom<Component>((value) =>
+      v.is(v.object({ render: v.function(), invalidate: v.function() }), value),
+    ),
+  ),
 })
 
 const workflowResultSchema = v.object({ result: v.optional(v.unknown()) })

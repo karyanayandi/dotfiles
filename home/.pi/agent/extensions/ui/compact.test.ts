@@ -339,6 +339,57 @@ describe("installCompactMessages", () => {
 })
 
 describe("installToolSpacing", () => {
+  test("keeps long read paths and summaries visible collapsed and expanded", () => {
+    const args = {
+      path: "/home/example/" + "nested/".repeat(12) + "file.ts",
+      offset: 2,
+      limit: 3,
+    }
+
+    const row = new ToolExecutionComponent(
+      "read",
+      "long-read",
+      args,
+      {},
+      createTools(() => true).get("read"),
+      tui,
+      "/tmp/example",
+    )
+
+    const restore = installToolSpacing(() => true, theme)
+
+    try {
+      row.setArgsComplete()
+      row.updateResult({
+        content: [{ type: "text", text: "one\ntwo\nthree" }],
+        isError: false,
+      })
+
+      for (const expanded of [false, true]) {
+        row.setExpanded(expanded)
+
+        for (const width of [8, 24, 80, 120]) {
+          const lines = row.render(width)
+          expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+          expect(lines.join("")).not.toContain("…")
+
+          const text = lines
+            .map((line) => stripVTControlCharacters(line).trim())
+            .join("")
+            .replace(/\s/g, "")
+
+          expect(text).toContain(args.path)
+          expect(text).toContain("3lines")
+
+          if (expanded) expect(text).toContain("onetwothree")
+          else expect(text).not.toContain("onetwothree")
+        }
+      }
+    } finally {
+      restore()
+    }
+  })
+
   test("collapses a compact tool row to one non-empty line with a status prefix", () => {
     const tool = createTools(() => true).get("ls")
 
@@ -470,7 +521,7 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("truncates long rows with ellipsis on a narrow terminal", () => {
+  test("wraps long rows on a narrow terminal", () => {
     const tool = createTools(() => true).get("grep")
 
     const row = new ToolExecutionComponent(
@@ -498,11 +549,20 @@ describe("installToolSpacing", () => {
     try {
       expect(row.render(0)).toEqual([])
 
-      for (const width of [1, 3, 4, 8, 12, 24]) {
+      for (const width of [1, 3, 4]) {
         const lines = row.render(width)
         expect(lines, `width ${width}`).toHaveLength(1)
         expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(width)
-        expect(stripVTControlCharacters(lines[0] ?? "")).toContain("…")
+      }
+
+      for (const width of [8, 12, 24]) {
+        const lines = row.render(width)
+        expect(lines.length).toBeGreaterThan(1)
+        expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+        expect(lines.join("")).not.toContain("…")
+        expect(
+          lines.map((line) => stripVTControlCharacters(line).trim()).join(""),
+        ).toContain("registerTool")
       }
 
       expect(row.render(80)[0]).toContain("registerTool")
@@ -512,7 +572,7 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("truncates custom tool headers with ANSI and wide characters", () => {
+  test("wraps custom tool headers with ANSI and wide characters", () => {
     const row = new ToolExecutionComponent(
       "custom_tool",
       "tool-custom",
@@ -531,9 +591,12 @@ describe("installToolSpacing", () => {
     try {
       for (const width of [8, 24, 80]) {
         const lines = row.render(width)
-        expect(lines).toHaveLength(1)
-        expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(width)
-        expect(stripVTControlCharacters(lines[0] ?? "")).toContain("…")
+        expect(lines.length).toBeGreaterThan(1)
+        expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+        expect(lines.join("")).not.toContain("…")
+        expect(
+          lines.map((line) => stripVTControlCharacters(line).trim()).join(""),
+        ).toContain("界😀".repeat(40))
       }
 
       row.setExpanded(true)
@@ -607,10 +670,10 @@ describe("installToolSpacing", () => {
         const text = stripVTControlCharacters(lines.join("\n"))
         expect(text).toContain("workflow </> javascript")
         expect(text).not.toContain("script:")
-        expect(lines).toHaveLength(3)
 
         if (width === 40) {
-          expect(lines[1]).toContain("…")
+          expect(lines.length).toBeGreaterThan(3)
+          expect(lines.join("")).not.toContain("…")
         } else {
           expect(text).toContain("background:true")
           expect(
@@ -675,11 +738,12 @@ describe("installToolSpacing", () => {
         expect(stripVTControlCharacters(lines[0] ?? "")).toContain(
           `${name} </> javascript`,
         )
-        expect(lines).toHaveLength(3)
         expect(lines.join("\n")).not.toContain("```")
 
-        if (width === 40) expect(lines[1]).toContain("…")
-        else
+        if (width === 40) {
+          expect(lines.length).toBeGreaterThan(3)
+          expect(lines.join("")).not.toContain("…")
+        } else
           expect(
             lines
               .slice(1)
@@ -839,7 +903,7 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("truncates long executed code without adding wrapped rows", () => {
+  test("wraps long executed code without losing source", () => {
     const code = `print('${"x".repeat(100)}')`
 
     const tool = {
@@ -869,9 +933,15 @@ describe("installToolSpacing", () => {
 
     try {
       const lines = row.render(40)
-      expect(lines).toHaveLength(2)
+      expect(lines.length).toBeGreaterThan(2)
       expect(lines[1]).toContain("print('")
-      expect(lines[1]).toContain("…")
+      expect(lines.join("")).not.toContain("…")
+      expect(
+        lines
+          .slice(1)
+          .map((line) => line.slice(2))
+          .join(""),
+      ).toBe(code)
       expect(lines.every((line) => visibleWidth(line) <= 40)).toBe(true)
     } finally {
       restore()
