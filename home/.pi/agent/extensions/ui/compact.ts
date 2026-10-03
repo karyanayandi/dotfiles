@@ -17,14 +17,12 @@ import {
   Container,
   Text,
   truncateToWidth,
-  wrapTextWithAnsi,
   type Component,
 } from "@earendil-works/pi-tui"
 
 // Left gutter for compact tool rows and user prompts.
 const COMPACT_INDENT = "  "
 // Gutter reserved on the first row of a tool call: indent + status + space.
-// Long call text wraps to the next line instead of being truncated.
 const CALL_GUTTER = COMPACT_INDENT.length + 2 // "  " + "✓ " = 4
 
 // Layout-dependent port of https://github.com/zackerydev/pi-minimalist-ui.
@@ -112,7 +110,7 @@ class SingleLine implements Component {
     this.cachedWidth = width
     this.cachedLines =
       width > 0
-        ? wrapTextWithAnsi(this.text, Math.max(1, width - CALL_GUTTER))
+        ? [truncateToWidth(this.text, Math.max(1, width - CALL_GUTTER), "…")]
         : []
     return this.cachedLines
   }
@@ -519,36 +517,30 @@ export function installToolSpacing(
         ? theme.fg("muted", "·")
         : theme.fg("success", "✓")
 
-    // Compact (re-registered) tools already wrap their call line through a
-    // SingleLine at `width - CALL_GUTTER`; prepend the gutter and keep every
-    // wrapped row so long text flows onto following lines instead of being cut.
+    const contentWidth = width - CALL_GUTTER
     if (!isBgShell) {
-      const [first, ...rest] = content
       return [
-        `${COMPACT_INDENT}${status} ${first}`,
-        ...rest.map((l) => `${COMPACT_INDENT}${l}`),
+        `${COMPACT_INDENT}${status} ${truncateToWidth(content.join(" "), contentWidth, "…")}`,
       ]
     }
 
-    // fd/rg, Task* and other custom tools: wrap call text; code tools also
-    // keep their source lines visible beneath the call.
+    // Code tools keep explicit source lines beneath the truncated header.
     const codeCall = formatCodeToolCall(bareName, self.args, theme)
     const single =
       codeCall?.header ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
         (args ? ` ${args}` : "")
-    const contentWidth = Math.max(1, width - COMPACT_INDENT.length - 2)
-    const wrapped = wrapTextWithAnsi(single, contentWidth)
     return [
-      `${COMPACT_INDENT}${status} ${wrapped[0] ?? ""}`,
-      ...wrapped.slice(1).map((l) => `${COMPACT_INDENT}${l}`),
+      `${COMPACT_INDENT}${status} ${truncateToWidth(single, contentWidth, "…")}`,
       ...(codeCall?.code
         .split("\n")
-        .flatMap((line) =>
-          wrapTextWithAnsi(
-            theme.fg("toolOutput", sanitizeTerminalText(line)),
-            width - COMPACT_INDENT.length,
-          ).map((part) => `${COMPACT_INDENT}${part}`),
+        .map(
+          (line) =>
+            `${COMPACT_INDENT}${truncateToWidth(
+              theme.fg("toolOutput", sanitizeTerminalText(line)),
+              width - COMPACT_INDENT.length,
+              "…",
+            )}`,
         ) ?? []),
     ]
   }

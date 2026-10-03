@@ -295,7 +295,7 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("wraps long rows to the next line instead of truncating on a narrow terminal", () => {
+  test("truncates long rows with ellipsis on a narrow terminal", () => {
     const tool = createTools(() => true).get("grep")
     const row = new ToolExecutionComponent(
       "grep",
@@ -318,20 +318,46 @@ describe("installToolSpacing", () => {
 
     const restore = installToolSpacing(() => true, theme)
     try {
-      for (const width of [8, 12, 24, 3]) {
+      expect(row.render(0)).toEqual([])
+      for (const width of [1, 3, 4, 8, 12, 24]) {
         const lines = row.render(width)
-        // Rows may wrap, but each fits terminal width.
-        expect(lines.length, `width ${width}`).toBeGreaterThanOrEqual(1)
-        for (const line of lines) {
-          expect(visibleWidth(line), `width ${width}`).toBeLessThanOrEqual(
-            width,
-          )
-        }
+        expect(lines, `width ${width}`).toHaveLength(1)
+        expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(width)
+        expect(stripVTControlCharacters(lines[0] ?? "")).toContain("…")
       }
-      // Long text wraps instead of truncating to "…".
-      const wide = row.render(24).join("\n")
-      expect(wide.replace(/\x1b\[[0-9;]*m/g, "")).toContain("registerTool")
-      expect(wide).not.toContain("…")
+      expect(row.render(80)[0]).toContain("registerTool")
+      expect(row.render(80)[0]).not.toContain("…")
+    } finally {
+      restore()
+    }
+  })
+
+  test("truncates custom tool headers with ANSI and wide characters", () => {
+    const row = new ToolExecutionComponent(
+      "custom_tool",
+      "tool-custom",
+      { path: "界😀".repeat(40) },
+      {},
+      undefined,
+      tui,
+      "/tmp/example",
+    )
+    row.setArgsComplete()
+    const native = row.render(24)
+    let compact = true
+    const restore = installToolSpacing(() => compact, theme)
+    try {
+      for (const width of [8, 24, 80]) {
+        const lines = row.render(width)
+        expect(lines).toHaveLength(1)
+        expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(width)
+        expect(stripVTControlCharacters(lines[0] ?? "")).toContain("…")
+      }
+      row.setExpanded(true)
+      expect(row.render(24)).toEqual(native)
+      row.setExpanded(false)
+      compact = false
+      expect(row.render(24)).toEqual(native)
     } finally {
       restore()
     }
@@ -391,15 +417,19 @@ describe("installToolSpacing", () => {
         const lines = row.render(width)
         const text = stripVTControlCharacters(lines.join("\n"))
         expect(text).toContain("workflow </> javascript")
-        expect(text).toContain("background:true")
         expect(text).not.toContain("script:")
-        expect(
-          lines
-            .slice(1)
-            .map((line) => line.trimStart())
-            .join("")
-            .replace(/\s/g, ""),
-        ).toContain(script.replace(/\s/g, ""))
+        expect(lines).toHaveLength(3)
+        if (width === 40) {
+          expect(lines[1]).toContain("…")
+        } else {
+          expect(text).toContain("background:true")
+          expect(
+            lines
+              .slice(1)
+              .map((line) => line.trimStart())
+              .join("\n"),
+          ).toBe(script)
+        }
         expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
       }
       compact = false
@@ -485,7 +515,7 @@ describe("installToolSpacing", () => {
     }
   })
 
-  test("wraps long executed code without overflowing terminal width", () => {
+  test("truncates long executed code without adding wrapped rows", () => {
     const code = `print('${"x".repeat(100)}')`
     const tool: any = {
       name: "ctx_execute",
@@ -511,12 +541,9 @@ describe("installToolSpacing", () => {
     const restore = installToolSpacing(() => true, theme)
     try {
       const lines = row.render(40)
-      expect(
-        lines
-          .slice(1)
-          .map((line) => line.trimStart())
-          .join(""),
-      ).toContain(code)
+      expect(lines).toHaveLength(2)
+      expect(lines[1]).toContain("print('")
+      expect(lines[1]).toContain("…")
       expect(lines.every((line) => visibleWidth(line) <= 40)).toBe(true)
     } finally {
       restore()
