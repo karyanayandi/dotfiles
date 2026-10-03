@@ -4,6 +4,11 @@
   "defaultProjectTrust": "always",
   "defaultProvider": "openai-codex",
   "defaultThinkingLevel": "medium",
+  "subagents": {
+    "defaultModel": "gpt-6-luna",
+    "defaultThinking": "max",
+    "defaultProvider": "openai-codex"
+  },
   "editorPaddingX": 3,
   "enableInstallTelemetry": true,
   "enableSkillCommands": false,
@@ -42,7 +47,5 @@
     "openai-codex/gpt-6.1-sol": "medium",
     "openai-codex/gpt-6-luna": "max"
   },
-  "extensions": [
-    "-builtin:mcp"
-  ]
+  "extensions": ["-builtin:mcp"]
 }
