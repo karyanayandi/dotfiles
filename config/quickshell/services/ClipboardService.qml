@@ -39,17 +39,17 @@ Item {
     }
     Process {
         id: pastePoll
-        command: ["sh", "-c", "mkdir -p " + root.imgDir + "; " + "if wl-paste --list-types 2>/dev/null | grep -qx 'image/png'; then " + "h=$(wl-paste -t image/png 2>/dev/null | sha256sum | cut -c1-12); f=" + root.imgDir + "/$h.png; " + "[ -s \"$f\" ] || wl-paste -t image/png > \"$f\"; echo \"IMG:$f\"; " + "else wl-paste 2>/dev/null | head -c 8000 | tr -d '\\0' | head -c 4000; fi"]
-        stdout: SplitParser {
-            onRead: data => {
-                let raw = (data || "").trim();
+        command: ["sh", "-c", "mkdir -p " + root.imgDir + "; " + "if wl-paste --list-types 2>/dev/null | grep -qx 'image/png'; then " + "h=$(wl-paste -t image/png 2>/dev/null | sha256sum | cut -c1-12); f=" + root.imgDir + "/$h.png; " + "[ -s \"$f\" ] || wl-paste -t image/png > \"$f\"; echo \"IMG:$f\"; " + "else wl-paste --no-newline 2>/dev/null; fi"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let raw = text || "";
                 if (!raw)
                     return;
                 let isImg = raw.startsWith("IMG:");
-                let t = isImg ? raw.slice(4) : raw;
+                let t = isImg ? raw.slice(4).trim() : raw;
                 if (!t)
                     return;
-                let hash = (isImg ? "I" : "T") + t.length + ":" + t.slice(0, 48);
+                let hash = (isImg ? "I" : "T") + t;
                 if (hash === root._lastHash)
                     return;
                 root._lastHash = hash;
