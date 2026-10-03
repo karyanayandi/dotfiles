@@ -3,19 +3,23 @@ import type { ToolDefinition } from "@earendil-works/pi-coding-agent"
 export const CHILD_TOOL_CALL_TIMEOUT_MS = 3 * 60 * 1_000
 
 interface ToolRegistry {
-  getAllTools(): Array<{ name: string }>
+  getAllTools(): { name: string }[]
   getToolDefinition(name: string): ToolDefinition | undefined
 }
 
 function formatTimeout(timeoutMs: number) {
   if (timeoutMs % 60_000 === 0) {
     const minutes = timeoutMs / 60_000
+
     return `${minutes} minute${minutes === 1 ? "" : "s"}`
   }
+
   if (timeoutMs % 1_000 === 0) {
     const seconds = timeoutMs / 1_000
+
     return `${seconds} second${seconds === 1 ? "" : "s"}`
   }
+
   return `${timeoutMs} ms`
 }
 
@@ -35,11 +39,14 @@ export async function runWithToolCallTimeout<T>(
   execute: (signal: AbortSignal) => Promise<T>,
 ) {
   const timeoutController = new AbortController()
+
   const executionSignal = signal
     ? AbortSignal.any([signal, timeoutController.signal])
     : timeoutController.signal
+
   const timeoutError = new ToolCallTimeoutError(toolName, timeoutMs)
   let timer: ReturnType<typeof setTimeout> | undefined
+
   const timeout = new Promise<never>((_resolve, reject) => {
     timer = setTimeout(() => {
       reject(timeoutError)
@@ -48,8 +55,10 @@ export async function runWithToolCallTimeout<T>(
   })
 
   let removeAbortListener: (() => void) | undefined
+
   const aborted = new Promise<never>((_resolve, reject) => {
     if (!signal) return
+
     const onAbort = () => {
       reject(
         signal.reason instanceof Error
@@ -57,10 +66,13 @@ export async function runWithToolCallTimeout<T>(
           : new Error(`Tool call "${toolName}" was aborted.`),
       )
     }
+
     if (signal.aborted) {
       onAbort()
+
       return
     }
+
     signal.addEventListener("abort", onAbort, { once: true })
     removeAbortListener = () => signal.removeEventListener("abort", onAbort)
   })
@@ -87,7 +99,7 @@ export function createToolCallTimeoutGuard(
     wrapped.add(definition)
 
     const execute = definition.execute
-    definition.execute = async (toolCallId, params, signal, onUpdate, ctx) =>
+    definition.execute = (toolCallId, params, signal, onUpdate, ctx) =>
       runWithToolCallTimeout(definition.name, timeoutMs, signal, (signal) =>
         execute.call(definition, toolCallId, params, signal, onUpdate, ctx),
       )
@@ -97,6 +109,7 @@ export function createToolCallTimeoutGuard(
     apply(session: ToolRegistry) {
       for (const { name } of session.getAllTools()) {
         const definition = session.getToolDefinition(name)
+
         if (definition) wrap(definition)
       }
     },

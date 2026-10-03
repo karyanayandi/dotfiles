@@ -10,6 +10,7 @@ export function cacheRenderer(
       if (cachedWidth === width && cachedLines) return cachedLines
       cachedWidth = width
       cachedLines = render(width)
+
       return cachedLines
     },
     invalidate() {

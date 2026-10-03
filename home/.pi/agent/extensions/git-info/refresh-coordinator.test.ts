@@ -3,10 +3,12 @@ import test from "node:test"
 import { makeRefreshCoordinator } from "./src/refresh-coordinator.ts"
 
 function deferred() {
-  let resolve: () => void = () => {}
+  let resolve!: () => void
+
   const promise = new Promise<void>((done) => {
     resolve = done
   })
+
   return { promise, resolve }
 }
 
@@ -23,13 +25,16 @@ test("an explicit refresh waits for an active background refresh", async () => {
   })
 
   await started.promise
-  await coordinator.runIfIdle(async () => {
+  await coordinator.runIfIdle(() => {
     state = 99
+
+    return Promise.resolve()
   })
 
-  const forced = coordinator.run(async () => {
+  const forced = coordinator.run(() => {
     state += 1
-    return state
+
+    return Promise.resolve(state)
   })
 
   release.resolve()
@@ -41,8 +46,6 @@ test("an explicit refresh waits for an active background refresh", async () => {
 test("failed refresh does not block later refreshes", async () => {
   const coordinator = makeRefreshCoordinator()
 
-  await assert.rejects(
-    coordinator.run(async () => Promise.reject(new Error("no"))),
-  )
-  assert.equal(await coordinator.run(async () => 1), 1)
+  await assert.rejects(coordinator.run(() => Promise.reject(new Error("no"))))
+  assert.equal(await coordinator.run(() => Promise.resolve(1)), 1)
 })

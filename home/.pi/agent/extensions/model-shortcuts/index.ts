@@ -39,12 +39,15 @@ function changeThinkingLevel(
   direction: -1 | 1,
 ) {
   const thinkingLevels = levels.filter((level) => level !== "off")
+
   const next = nextThinkingLevel(
     thinkingLevels.length > 0 ? thinkingLevels : levels,
     pi.getThinkingLevel(),
     direction,
   )
+
   pi.setThinkingLevel(next)
+
   return pi.getThinkingLevel()
 }
 
@@ -55,14 +58,18 @@ export default function modelShortcuts(pi: ExtensionAPI) {
   ] as const) {
     pi.registerShortcut(shortcut, {
       description: `${direction === -1 ? "Lower" : "Raise"} thinking level`,
-      handler: async (ctx) => {
-        if (!ctx.model) return
+      handler: (ctx) => {
+        if (!ctx.model) return Promise.resolve()
+
         const level = changeThinkingLevel(
           pi,
           getSupportedThinkingLevels(ctx.model),
           direction,
         )
+
         ctx.ui.notify(`Thinking level: ${level}`, "info")
+
+        return Promise.resolve()
       },
     })
   }
@@ -71,10 +78,12 @@ export default function modelShortcuts(pi: ExtensionAPI) {
     description: "Configure model keyboard shortcuts",
     handler: async (_args, ctx) => {
       const shortcuts = loadShortcuts()
+
       const action = await pick(ctx, "Model shortcuts", [
         { value: "set", label: "Add or replace" },
         { value: "remove", label: "Remove" },
       ])
+
       if (!action) return
 
       if (action === "remove") {
@@ -85,17 +94,21 @@ export default function modelShortcuts(pi: ExtensionAPI) {
             label: shortcut,
             description: describeTarget(target),
           }))
+
         if (items.length === 0) {
           ctx.ui.notify("No model shortcuts configured", "info")
+
           return
         }
 
         const shortcut = await pick(ctx, "Remove shortcut", items)
+
         if (!shortcut) return
         delete shortcuts[shortcut]
         saveShortcuts(shortcuts)
         ctx.ui.notify(`Removed ${shortcut}; reloading shortcuts`, "info")
         await ctx.reload()
+
         return
       }
 
@@ -107,15 +120,21 @@ export default function modelShortcuts(pi: ExtensionAPI) {
             label: shortcut,
             description: describeTarget(target),
           })),
-        ...availableShortcuts
-          .filter((shortcut) => !(shortcut in shortcuts))
-          .map((shortcut) => ({
-            value: shortcut,
-            label: shortcut,
-            description: "unassigned",
-          })),
+        ...availableShortcuts.flatMap((shortcut) =>
+          shortcut in shortcuts
+            ? []
+            : [
+                {
+                  value: shortcut,
+                  label: shortcut,
+                  description: "unassigned",
+                },
+              ],
+        ),
       ]
+
       const shortcut = await pick(ctx, "Select shortcut", items)
+
       if (!shortcut || !isModelShortcut(shortcut)) return
 
       const models = ctx.modelRegistry
@@ -126,22 +145,26 @@ export default function modelShortcuts(pi: ExtensionAPI) {
           description: model.provider,
         }))
         .sort((left, right) => left.value.localeCompare(right.value))
+
       const model = await pick(ctx, "Select model", models)
+
       if (!model) return
 
       const selectedThinkingLevel = await pick(ctx, "Select thinking level", [
         { value: "default", label: "default", description: "Use setting" },
         ...thinkingLevels.map((level) => ({ value: level, label: level })),
       ])
+
       if (!selectedThinkingLevel) return
 
       const thinkingLevel = thinkingLevels.find(
         (level) => level === selectedThinkingLevel,
       )
-      const target: ShortcutConfig = {
-        model,
-        ...(thinkingLevel ? { thinkingLevel } : {}),
-      }
+
+      const target: ShortcutConfig = { model }
+
+      if (thinkingLevel) target.thinkingLevel = thinkingLevel
+
       shortcuts[shortcut] = target
       saveShortcuts(shortcuts)
       ctx.ui.notify(
@@ -174,8 +197,10 @@ export default function modelShortcuts(pi: ExtensionAPI) {
       description: `Switch to ${describeTarget(config)}`,
       handler: async (ctx) => {
         const model = ctx.modelRegistry.find(provider, modelId)
+
         if (!model) {
           ctx.ui.notify(`Model not found: ${config.model}`, "error")
+
           return
         }
 

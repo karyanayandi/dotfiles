@@ -67,6 +67,7 @@ test("kill report distinguishes killed / raced natural exit / already settled", 
       exit: "exit 1",
     },
   ])
+
   const lines = report.split("\n")
   assert.equal(lines[0], 'Killed bt-1 "a" (SIGTERM).')
   assert.match(lines[1], /exited on its own before the kill landed \(exit 0\)/)
@@ -84,6 +85,7 @@ test("status result marks head-truncated output with a pointer at the full log",
       }),
     }),
   )
+
   assert.match(text, /stdout truncated: showing last /)
   assert.match(text, /Full log: \/tmp\/bt-1\.stdout\.log/)
 })
@@ -92,6 +94,7 @@ test("completion message reports kill vs exit and omits empty stderr", () => {
   const killed = buildTerminalResultMessage(
     snap({ status: "killed", exitCode: undefined, signal: "SIGTERM" }),
   )
+
   assert.match(killed, /was killed after/)
   assert.ok(!killed.includes("stderr"), "empty stderr section omitted")
 
@@ -102,6 +105,7 @@ test("completion message reports kill vs exit and omits empty stderr", () => {
       stderr: view({ text: "boom\n", totalBytes: 5 }),
     }),
   )
+
   assert.match(failed, /exited \(exit 3\)/)
   assert.match(failed, /stderr:\nboom/)
 })
@@ -111,6 +115,7 @@ test("completion output is a shorter tail than the detailed status view", () => 
     { length: 100 },
     (_, index) => `line-${index + 1}`,
   ).join("\n")
+
   const terminal = snap({
     stdout: view({ text: output, totalBytes: Buffer.byteLength(output) }),
   })

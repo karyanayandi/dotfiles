@@ -36,18 +36,25 @@ export interface ChildResourceOptions {
 /** Load normal global/package resources and trust-gated project resources. */
 export async function createChildResources(options: ChildResourceOptions) {
   const agentDir = options.agentDir ?? getAgentDir()
+
   const settingsManager = SettingsManager.create(options.cwd, agentDir, {
     projectTrusted: options.projectTrusted,
   })
-  const loader = new DefaultResourceLoader({
-    cwd: options.cwd,
-    agentDir,
-    settingsManager,
-    ...(options.appendSystemPrompt
-      ? { appendSystemPrompt: options.appendSystemPrompt }
-      : {}),
-  })
+
+  const loaderOptions: ConstructorParameters<typeof DefaultResourceLoader>[0] =
+    {
+      cwd: options.cwd,
+      agentDir,
+      settingsManager,
+    }
+
+  if (options.appendSystemPrompt)
+    loaderOptions.appendSystemPrompt = options.appendSystemPrompt
+
+  const loader = new DefaultResourceLoader(loaderOptions)
+
   await loader.reload()
+
   return { loader, settingsManager }
 }
 
@@ -65,8 +72,10 @@ export function resolveStandaloneChildProjectTrust(options: {
   if (path.resolve(options.childCwd) === path.resolve(options.parentCwd)) {
     return options.parentTrusted
   }
+
   try {
     const trustStore = new ProjectTrustStore(options.agentDir ?? getAgentDir())
+
     return trustStore.get(options.childCwd) === true
   } catch {
     return false
@@ -82,7 +91,9 @@ export async function bindChildSessionExtensions(
 
 interface ChildExtensionRunner {
   hasHandlers(eventType: string): boolean
-  emit(event: SessionShutdownEvent): Promise<unknown>
+  emit(
+    event: SessionShutdownEvent,
+  ): ReturnType<NonNullable<AgentSession["extensionRunner"]>["emit"]>
 }
 
 export interface DisposableChildSession {
@@ -92,11 +103,13 @@ export interface DisposableChildSession {
 
 const childShutdowns = new WeakMap<object, Promise<void>>()
 
-function waitBounded(operation: Promise<unknown>, timeoutMs: number) {
+function waitBounded<Result>(operation: Promise<Result>, timeoutMs: number) {
   let timer: ReturnType<typeof setTimeout> | undefined
+
   const timeout = new Promise<void>((resolve) => {
     timer = setTimeout(resolve, timeoutMs)
   })
+
   return Promise.race([
     operation.then(
       () => undefined,
@@ -104,7 +117,7 @@ function waitBounded(operation: Promise<unknown>, timeoutMs: number) {
     ),
     timeout,
   ])
-    .catch(() => {})
+    .catch(() => undefined)
     .finally(() => {
       if (timer) clearTimeout(timer)
     })
@@ -119,6 +132,7 @@ export function shutdownAndDisposeChildSession(
   options: { timeoutMs?: number } = {},
 ) {
   const existing = childShutdowns.get(session)
+
   if (existing) return existing
 
   const shutdown = (async () => {
@@ -144,5 +158,6 @@ export function shutdownAndDisposeChildSession(
   })()
 
   childShutdowns.set(session, shutdown)
+
   return shutdown
 }

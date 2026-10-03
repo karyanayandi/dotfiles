@@ -1,3 +1,4 @@
+import * as v from "valibot"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import {
@@ -32,22 +33,24 @@ import {
 } from "./compact.js"
 
 type ThinkingLevel = ReturnType<ExtensionAPI["getThinkingLevel"]>
+
 type ThinkingModel = Pick<
   NonNullable<ExtensionContext["model"]>,
   "provider" | "id"
 >
-type ThinkingSelectorInternals = {
+
+interface ThinkingSelectorInternals {
   buildSelectList(items: SelectItem[], preselect: string): SelectList
 }
 
-const GPT_THINKING_LABELS: Record<string, string> = {
-  minimal: "light",
-  low: "light",
-  medium: "medium",
-  high: "high",
-  xhigh: "extra high",
-  max: "ultra",
-}
+const GPT_THINKING_LABELS = new Map([
+  ["minimal", "light"],
+  ["low", "light"],
+  ["medium", "medium"],
+  ["high", "high"],
+  ["xhigh", "extra high"],
+  ["max", "ultra"],
+])
 
 function isCodexGpt(model: ThinkingModel | undefined) {
   return model?.provider === "openai-codex" && model.id.startsWith("gpt-6-")
@@ -57,26 +60,37 @@ export function displayThinkingLevel(
   model: ThinkingModel | undefined,
   level: ThinkingLevel | string,
 ) {
-  return isCodexGpt(model) ? (GPT_THINKING_LABELS[level] ?? level) : level
+  return isCodexGpt(model) ? (GPT_THINKING_LABELS.get(level) ?? level) : level
 }
 
 function installThinkingSelectorLabels(
   getModel: () => ExtensionContext["model"],
 ) {
-  const prototype =
-    ThinkingSelectorComponent.prototype as unknown as ThinkingSelectorInternals
-  const originalBuildSelectList = prototype.buildSelectList
+  const prototype = ThinkingSelectorComponent.prototype
 
-  prototype.buildSelectList = function (items, preselect) {
+  // SAFETY: Validated callable is Pi 1.0 private buildSelectList; installed declaration and implementation accept SelectItem[]/string and return SelectList.
+  const originalBuildSelectList = v.parse(
+    v.object({ buildSelectList: v.function() }),
+    prototype,
+  ).buildSelectList as ThinkingSelectorInternals["buildSelectList"]
+
+  const buildSelectList = function (
+    this: ThinkingSelectorComponent,
+    items: SelectItem[],
+    preselect: string,
+  ) {
     const model = getModel()
+
     if (!isCodexGpt(model)) {
       return originalBuildSelectList.call(this, items, preselect)
     }
 
     const hasLight = items.some((item) => item.value === "minimal")
+
     const visibleItems = hasLight
       ? items.filter((item) => item.value !== "low")
       : items
+
     return originalBuildSelectList.call(
       this,
       visibleItems.map((item) => ({
@@ -87,8 +101,10 @@ function installThinkingSelectorLabels(
     )
   }
 
+  Reflect.set(prototype, "buildSelectList", buildSelectList)
+
   return () => {
-    prototype.buildSelectList = originalBuildSelectList
+    Reflect.set(prototype, "buildSelectList", originalBuildSelectList)
   }
 }
 
@@ -97,7 +113,9 @@ class EmptyFooter implements Component {
     return []
   }
 
-  invalidate(): void {}
+  invalidate(): void {
+    return undefined
+  }
 }
 
 class MinimalFooter implements Component {
@@ -109,11 +127,16 @@ class MinimalFooter implements Component {
     return renderExtensionStatuses(this.getStatuses(), width)
   }
 
-  invalidate(): void {}
+  invalidate(): void {
+    return undefined
+  }
 }
 
 function isHorizontalBorder(line: string): boolean {
+  // SAFETY: Border recognition ignores only ANSI CSI escapes emitted by terminal renderers.
+  // oxlint-disable-next-line eslint/no-control-regex
   const plain = line.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
+
   return /^─+$/.test(plain) || /^─── [↑↓] \d+ more ─*$/.test(plain)
 }
 
@@ -121,43 +144,57 @@ function isHorizontalBorder(line: string): boolean {
 // Unlike hardware cursor, block is static text and ignores window focus. Strip
 // it so hardware cursor is only visible caret. Terminals ghost it on blur.
 function neutralizeFakeCursor(line: string): string {
+  // SAFETY: Match exact SGR reverse-video/reset pair used by Pi software cursor, preserving other ANSI styles.
+  // oxlint-disable-next-line eslint/no-control-regex
   return line.replace(/\u001b\[7m([\s\S]*?)\u001b\[0m/g, "$1")
 }
 
-type Layout = "full" | "lite" | "minimal" | "off"
+const layoutSchema = v.picklist(["full", "lite", "minimal", "off"])
 
-function parseLayout(value: unknown): Layout | undefined {
-  if (
-    value === "full" ||
-    value === "lite" ||
-    value === "minimal" ||
-    value === "off"
-  )
-    return value
-  return undefined
+type Layout = v.InferOutput<typeof layoutSchema>
+
+const settingsLayoutSchema = v.object({
+  ui: v.object({ layout: layoutSchema }),
+})
+
+function parseLayout<TValue>(value: TValue) {
+  const parsed = v.safeParse(layoutSchema, value)
+
+  return parsed.success ? parsed.output : undefined
 }
 
-function readSettingsField(path: string): unknown {
+function readSettingsLayout(path: string) {
   if (!existsSync(path)) return undefined
+
   try {
-    const settings = JSON.parse(readFileSync(path, "utf8"))
-    return settings.ui?.layout
+    const parsed = v.safeParse(
+      settingsLayoutSchema,
+      JSON.parse(readFileSync(path, "utf8")),
+    )
+
+    return parsed.success ? parsed.output.ui.layout : undefined
   } catch {
     return undefined
   }
 }
 
-function readLayout(
-  cwd: string,
-  projectTrusted: boolean,
-): { layout: Layout; scope: "global" | "project" } {
+interface LayoutSetting {
+  layout: Layout
+  scope: "global" | "project"
+}
+
+function readLayout(cwd: string, projectTrusted: boolean): LayoutSetting {
   const globalPath = join(getAgentDir(), "settings.json")
-  const globalLayout = parseLayout(readSettingsField(globalPath))
+  const globalLayout = readSettingsLayout(globalPath)
+
   const projectLayout = projectTrusted
-    ? parseLayout(readSettingsField(join(cwd, ".pi/settings.json")))
+    ? readSettingsLayout(join(cwd, ".pi/settings.json"))
     : undefined
+
   if (projectLayout) return { layout: projectLayout, scope: "project" }
+
   if (globalLayout) return { layout: globalLayout, scope: "global" }
+
   return { layout: "full", scope: "global" }
 }
 
@@ -170,9 +207,11 @@ function writeUiSetting(
     scope === "global"
       ? join(getAgentDir(), "settings.json")
       : join(cwd, ".pi/settings.json")
+
   const dir = dirname(path)
   const current = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {}
   const next = { ...current, ui: { ...current.ui, layout: value } }
+
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   writeFileSync(path, JSON.stringify(next, null, 2))
 }
@@ -214,13 +253,18 @@ export default function ui(pi: ExtensionAPI) {
       // Lite uses built-in "Working..." indicator in response area, not footer
       // spinner.
       ctx.ui.setFooter((tui, theme) => ({
-        dispose() {},
-        invalidate() {},
+        dispose() {
+          return undefined
+        },
+        invalidate() {
+          return undefined
+        },
         render(width: number): string[] {
           if (tokensDirty) {
             tokensDirty = false
             inputTokens = 0
             outputTokens = 0
+
             for (const e of ctx.sessionManager.getBranch()) {
               if (e.type === "message" && e.message.role === "assistant") {
                 inputTokens += e.message.usage?.input ?? 0
@@ -228,23 +272,29 @@ export default function ui(pi: ExtensionAPI) {
               }
             }
           }
+
           const left = theme.fg(
             "dim",
             sanitizeTerminalText(
               `${ctx.model?.id ?? "no model"} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
             ),
           )
+
           const parts = [ctx.model ? fmt(ctx.model.contextWindow) : "?"]
+
           if (inputTokens > 0 || outputTokens > 0) {
             parts.push(
               `\u{f062}${fmt(inputTokens)}`, // nf-fa-arrow_up: input
               `\u{f063}${fmt(outputTokens)}`, // nf-fa-arrow_down: output
             )
           }
+
           const right = theme.fg("dim", parts.join(" | "))
+
           const pad = " ".repeat(
             Math.max(1, width - visibleWidth(left) - visibleWidth(right)),
           )
+
           return [truncateToWidth(left + pad + right, width)]
         },
       }))
@@ -258,12 +308,14 @@ export default function ui(pi: ExtensionAPI) {
     } else {
       ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
     }
+
     if (layout !== "lite") ctx.ui.setWorkingVisible(false)
   }
 
   const startSpinner = () => {
     working = true
     spinnerFrame = 0
+
     if (spinnerTimer) clearInterval(spinnerTimer)
     spinnerTimer = setInterval(() => {
       spinnerFrame = (spinnerFrame + 1) % spinnerFrames.length
@@ -274,6 +326,7 @@ export default function ui(pi: ExtensionAPI) {
 
   const stopSpinner = () => {
     working = false
+
     if (spinnerTimer) clearInterval(spinnerTimer)
     spinnerTimer = undefined
     tui?.requestRender()
@@ -284,34 +337,35 @@ export default function ui(pi: ExtensionAPI) {
     handler: async (args, ctx) => {
       const arg = args.trim().toLowerCase()
       const [settingArg, valueArg] = arg.split(/\s+/, 2)
-      const isLayoutArg = (v: string | undefined) =>
-        v === "full" || v === "lite" || v === "minimal" || v === "off"
 
-      let next: Layout | undefined
-      const value =
-        valueArg ?? (isLayoutArg(settingArg) ? settingArg : undefined)
-      if (isLayoutArg(value)) {
-        next = value as Layout
-      } else {
+      let next = parseLayout(valueArg ?? parseLayout(settingArg))
+
+      if (!next) {
         const current = readLayout(ctx.cwd, ctx.isProjectTrusted()).layout
+
         const choice = await ctx.ui.select(`UI layout (current: ${current})`, [
           "full",
           "lite",
           "minimal",
           "off",
         ])
-        if (!choice) return
-        next = choice as Layout
+
+        next = parseLayout(choice)
+
+        if (!next) return
       }
 
       const { layout: current, scope } = readLayout(
         ctx.cwd,
         ctx.isProjectTrusted(),
       )
+
       if (next === current) {
         ctx.ui.notify(`UI layout already ${current}`, "info")
+
         return
       }
+
       writeUiSetting(ctx.cwd, scope, next)
       layout = next
       applySessionUI(ctx)
@@ -328,15 +382,19 @@ export default function ui(pi: ExtensionAPI) {
         timeout: 2_000,
       })
       .catch(() => undefined)
+
     if (signal.aborted) return
     branch =
       branchResult?.code === 0 && !branchResult.killed
         ? branchResult.stdout.trim() || undefined
         : undefined
+
     if (!branch) {
       dirty = undefined
+
       return
     }
+
     const statusResult = await pi
       .exec("git", ["--no-optional-locks", "status", "--porcelain"], {
         cwd,
@@ -344,6 +402,7 @@ export default function ui(pi: ExtensionAPI) {
         timeout: 2_000,
       })
       .catch(() => undefined)
+
     if (signal.aborted) return
     dirty =
       statusResult?.code === 0 && !statusResult.killed
@@ -354,13 +413,17 @@ export default function ui(pi: ExtensionAPI) {
   const refreshGit = async (cwd: string) => {
     if (stopped) return
     pendingCwd = cwd
+
     if (refreshingGit) {
       refreshPending = true
+
       return
     }
+
     refreshingGit = true
     const controller = new AbortController()
     gitAbortController = controller
+
     try {
       do {
         refreshPending = false
@@ -368,6 +431,7 @@ export default function ui(pi: ExtensionAPI) {
       } while (refreshPending && !controller.signal.aborted)
     } finally {
       refreshingGit = false
+
       if (gitAbortController === controller) gitAbortController = undefined
       tui?.requestRender()
     }
@@ -423,6 +487,7 @@ export default function ui(pi: ExtensionAPI) {
     restoreToolSpacing?.()
     restoreCompactMessages = installCompactMessages(ctx.ui.theme, getCompact)
     restoreToolSpacing = installToolSpacing(getCompact, ctx.ui.theme)
+
     if (getCompact()) ctx.ui.setHiddenThinkingLabel("")
     void refreshGit(ctx.cwd)
 
@@ -439,6 +504,7 @@ export default function ui(pi: ExtensionAPI) {
         // Use terminal cursor for position. It ghosts on blur, unlike pi's
         // always-solid software block cursor. Strip fake cursor below.
         instance.setShowHardwareCursor(true)
+
         if (clearTerminalOnEditorMount) {
           clearTerminalOnEditorMount = false
           instance.terminal.clearScreen()
@@ -452,67 +518,86 @@ export default function ui(pi: ExtensionAPI) {
           // would make super.render draw invisible borders.
           this.borderColor = this.defaultBorderColor
           this.setPaddingX(1)
+
           return super.render(width).map(neutralizeFakeCursor)
         }
+
         const isMinimal = layout === "minimal"
         this.borderColor = isMinimal ? () => "" : this.defaultBorderColor
         this.setPaddingX(isMinimal ? 1 : 2)
         const lines = super.render(width).map(neutralizeFakeCursor)
+
         if (isMinimal) {
           const indicator = working
             ? ctx.ui.theme.fg("text", spinnerFrames[spinnerFrame] ?? "")
             : ctx.ui.theme.fg("text", "┃")
+
           const firstEmpty = lines.findIndex((line) => line === "")
           const firstContent = firstEmpty >= 0 ? firstEmpty + 1 : 0
           const pad = " ".repeat(this.getPaddingX())
+
           if (firstContent < lines.length) {
             let line = lines[firstContent]
             const paddingX = this.getPaddingX()
             let i = 0
             let removed = 0
+
             while (removed < paddingX && i < line.length && line[i] === " ") {
               removed++
               i++
             }
+
             line = pad + indicator + " " + line.slice(i)
             lines[firstContent] = truncateToWidth(line, width, "", true)
           }
+
           // Add blank top margin. Drop bottom border.
           const body = lines.filter((line) => line !== "")
+
           const info = truncateToWidth(
             `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${displayThinkingLevel(ctx.model, pi.getThinkingLevel())}`,
             width,
             "…",
           )
+
           return ["", ...body, pad + ctx.ui.theme.fg("muted", info)]
         }
 
         const borderIndices: number[] = []
+
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i]
+
           if (line !== undefined && isHorizontalBorder(line))
             borderIndices.push(i)
         }
+
         const top = borderIndices.at(0)
         const bottom = borderIndices.at(-1)
+
         if (top === undefined || bottom === undefined) return lines
+
         const counts = [
           succeeded > 0 ? ctx.ui.theme.fg("success", `✓${succeeded}`) : "",
           failed > 0 ? ctx.ui.theme.fg("error", `✕${failed}`) : "",
         ]
           .filter(Boolean)
           .join(" ")
+
         const safeBranch = branch ? sanitizeTerminalText(branch) : undefined
+
         const gitStateIcon =
           dirty === undefined
             ? ""
             : ctx.ui.theme.fg(dirty ? "error" : "success", dirty ? "✗" : "✓")
+
         const gitStatus =
           safeBranch && gitStateIcon
             ? `${ctx.ui.theme.fg("accent", safeBranch)} ${gitStateIcon}`
             : safeBranch
               ? ctx.ui.theme.fg("accent", safeBranch)
               : undefined
+
         const spinner = working
           ? ctx.ui.theme.fg("accent", spinnerFrames[spinnerFrame] ?? "")
           : ""
@@ -520,13 +605,16 @@ export default function ui(pi: ExtensionAPI) {
         lines[top] = addBorderLabels(width, spinner, counts, (text) =>
           this.borderColor(text),
         )
+
         for (let i = top + 1; i < bottom; i++) {
           const line = lines[i]
+
           if (line !== undefined)
             lines[i] = addSideBorders(line, width, (text) =>
               this.borderColor(text),
             )
         }
+
         const status = truncateToWidth(
           [
             gitStatus,
@@ -537,11 +625,13 @@ export default function ui(pi: ExtensionAPI) {
           Math.max(0, width - 4),
           "…",
         )
+
         lines[bottom] = addBottomLabel(
           width,
           ctx.ui.theme.fg("muted", status),
           (text) => this.borderColor(text),
         )
+
         return lines
       }
     }

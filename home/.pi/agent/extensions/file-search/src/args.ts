@@ -11,18 +11,27 @@ import { homedir } from "node:os"
 import { join } from "node:path"
 
 export const FD_DEFAULT_LIMIT = 1000
+
 export const FD_MAX_LIMIT = 10_000
+
 export const FD_MAX_DEPTH_LIMIT = 64
+
 export const RG_DEFAULT_COUNT_LIMIT = 100
+
 export const RG_MAX_COUNT_LIMIT = 1000
+
 export const RG_MAX_CONTEXT = 20
 
 /** Some models prefix path arguments with @; built-in tools strip it, so do we. */
 export function normalizeSearchPath(raw: string) {
   let path = raw.trim()
+
   if (path.startsWith("@")) path = path.slice(1)
+
   if (path === "~") return homedir()
+
   if (path.startsWith("~/")) return join(homedir(), path.slice(2))
+
   return path
 }
 
@@ -33,6 +42,7 @@ function clamp(value: number, minimum: number, maximum: number) {
 function optionalPath(raw: string | undefined) {
   if (raw === undefined) return undefined
   const normalized = normalizeSearchPath(raw)
+
   return normalized === "" ? undefined : normalized
 }
 
@@ -57,18 +67,24 @@ const FD_TYPE_FLAGS: Record<FdEntryType, string> = {
 
 export function buildFdArgs(params: FdToolParams) {
   const args = ["--color=never"]
+
   if (params.hidden) args.push("--hidden")
+
   if (params.glob) args.push("--glob")
+
   if (params.type) args.push("--type", FD_TYPE_FLAGS[params.type])
+
   if (params.extension) {
     args.push("--extension", params.extension.replace(/^\.+/, ""))
   }
+
   if (params.max_depth !== undefined) {
     args.push(
       "--max-depth",
       String(clamp(params.max_depth, 1, FD_MAX_DEPTH_LIMIT)),
     )
   }
+
   args.push(
     "--max-results",
     String(clamp(params.limit ?? FD_DEFAULT_LIMIT, 1, FD_MAX_LIMIT)),
@@ -76,7 +92,9 @@ export function buildFdArgs(params: FdToolParams) {
   // An empty pattern matches everything, which keeps `path` usable without a pattern.
   args.push("--", params.pattern ?? "")
   const path = optionalPath(params.path)
+
   if (path) args.push(path)
+
   return args
 }
 
@@ -99,15 +117,21 @@ export function buildRgArgs(params: RgToolParams) {
     "--no-heading",
     "--with-filename",
   ]
+
   if (params.case_sensitive === true) args.push("--case-sensitive")
   else if (params.case_sensitive === false) args.push("--ignore-case")
   else args.push("--smart-case")
+
   if (params.fixed_strings) args.push("--fixed-strings")
+
   if (params.hidden) args.push("--hidden")
+
   if (params.context !== undefined) {
     args.push("--context", String(clamp(params.context, 0, RG_MAX_CONTEXT)))
   }
+
   if (params.glob) args.push("--glob", params.glob)
+
   if (params.file_type) args.push("--type", params.file_type)
   args.push(
     "--max-count",
@@ -117,6 +141,8 @@ export function buildRgArgs(params: RgToolParams) {
   )
   args.push("--", params.pattern)
   const path = optionalPath(params.path)
+
   if (path) args.push(path)
+
   return args
 }

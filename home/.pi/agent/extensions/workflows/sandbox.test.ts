@@ -7,19 +7,24 @@ function run(
   overrides: Partial<Parameters<typeof runWorkflowSandbox>[0]> = {},
 ) {
   const abort = new AbortController()
+
   return runWorkflowSandbox({
     source,
     args: undefined,
     cwd: process.cwd(),
     signal: abort.signal,
-    onAgent: async (prompt) => ({ ok: true, output: `reply:${prompt}` }),
-    onPhase: () => {},
+    onAgent: (prompt) =>
+      Promise.resolve({ ok: true, output: `reply:${prompt}` }),
+    onPhase: () => {
+      /* Default fixture does not collect phase updates. */
+    },
     ...overrides,
   })
 }
 
 test("sandbox exposes only workflow capabilities and validates results", async () => {
   const phases: string[] = []
+
   const result = await run(
     `
       phase("Gather");
@@ -36,6 +41,7 @@ test("sandbox exposes only workflow capabilities and validates results", async (
     `,
     { onPhase: (title) => phases.push(title) },
   )
+
   assert.deepEqual(result, {
     replies: ["reply:one", "reply:two"],
     processType: "undefined",
@@ -51,6 +57,7 @@ test("sandbox result serialization handles cycles and bigint", async () => {
     value.self = value;
     return value;
   `)
+
   assert.deepEqual(result, { count: "7n", self: "[circular]" })
 })
 
@@ -58,9 +65,10 @@ test("sandbox rejects unawaited agent calls", async () => {
   let calls = 0
   await assert.rejects(
     run(`agent("orphan"); return "done";`, {
-      onAgent: async () => {
+      onAgent: () => {
         calls++
-        return { ok: true, output: "unexpected" }
+
+        return Promise.resolve({ ok: true, output: "unexpected" })
       },
     }),
     /unawaited agent/,
@@ -74,13 +82,29 @@ test("sandbox source cannot escape the host accounting wrapper", async () => {
     run(
       `}), agent("orphan"), Promise.resolve("bypass"); (async function () {`,
       {
-        onAgent: async () => {
+        onAgent: () => {
           calls++
-          return { ok: true, output: "unexpected" }
+
+          return Promise.resolve({ ok: true, output: "unexpected" })
         },
       },
     ),
     /unawaited agent/,
+  )
+  assert.equal(calls, 0)
+})
+
+test("sandbox rejects array agent options before invoking the host agent", async () => {
+  let calls = 0
+  await assert.rejects(
+    run(`return await agent("invalid", []);`, {
+      onAgent: () => {
+        calls++
+
+        return Promise.resolve({ ok: true, output: "unexpected" })
+      },
+    }),
+    /invalid agent request/,
   )
   assert.equal(calls, 0)
 })
@@ -91,10 +115,12 @@ test("sandbox VM still rejects non-yielding synchronous code", async () => {
 
 test("workflow agent invocations have no per-request wall timer", async () => {
   let signalAborted = false
+
   const result = await run(`return (await agent("delayed")).output;`, {
     onAgent: async (_prompt, _options, signal) => {
       await new Promise((resolve) => setTimeout(resolve, 30))
       signalAborted = signal.aborted
+
       return { ok: true, output: "completed" }
     },
   })
@@ -106,10 +132,13 @@ test("workflow agent invocations have no per-request wall timer", async () => {
 test("workflow cancellation aborts a pending agent request", async () => {
   const controller = new AbortController()
   let startedResolve: (() => void) | undefined
+
   const started = new Promise<void>((resolve) => {
     startedResolve = resolve
   })
+
   let requestAborted = false
+
   const pending = run(`return await agent("pending");`, {
     signal: controller.signal,
     onAgent: async (_prompt, _options, signal) => {
@@ -124,6 +153,7 @@ test("workflow cancellation aborts a pending agent request", async () => {
           { once: true },
         )
       })
+
       return { ok: false, output: "", error: "Agent was aborted" }
     },
   })

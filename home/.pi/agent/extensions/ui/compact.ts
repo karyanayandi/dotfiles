@@ -1,3 +1,5 @@
+import * as v from "valibot"
+import type { Static, TSchema } from "typebox"
 import {
   AssistantMessageComponent,
   UserMessageComponent,
@@ -11,7 +13,6 @@ import {
   type Theme,
   ToolExecutionComponent,
   type ToolDefinition,
-  type ToolRenderResultOptions,
 } from "@earendil-works/pi-coding-agent"
 import {
   Container,
@@ -22,6 +23,7 @@ import {
 
 // Left gutter for compact tool rows and user prompts.
 const COMPACT_INDENT = "  "
+
 // Gutter reserved on the first row of a tool call: indent + status + space.
 const CALL_GUTTER = COMPACT_INDENT.length + 2 // "  " + "✓ " = 4
 
@@ -29,7 +31,9 @@ const CALL_GUTTER = COMPACT_INDENT.length + 2 // "  " + "✓ " = 4
 // This renders compact single-line style only when `getCompact()` is true
 // (minimal/lite). Full/off layouts use pi's built-in renderers.
 
+// SAFETY: Replace terminal C0/C1 controls and bidi overrides in untrusted tool labels; matching these bytes is intentional.
 const unsafeTerminalCharacters =
+  // oxlint-disable-next-line eslint/no-control-regex
   /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g
 
 function sanitizeTerminalText(text: string): string {
@@ -45,19 +49,25 @@ function withMeta(subject: string, meta?: string): CompactCall {
   return meta ? { subject, meta } : { subject }
 }
 
-interface CompactRenderer<TDetails> {
-  call: (args: any) => CompactCall
-  summary?: (result: AgentToolResult<TDetails>, args: any) => string | undefined
+interface CompactRenderer<TArgs, TDetails> {
+  call: (args: Partial<TArgs>) => CompactCall
+  summary?: (
+    result: AgentToolResult<TDetails>,
+    args: Partial<TArgs>,
+  ) => string | undefined
   expanded?: (
     result: AgentToolResult<TDetails>,
-    args: any,
+    args: Partial<TArgs>,
     isError: boolean,
   ) => string
 }
 
 type ToolRender = ToolExecutionComponent["render"]
+
 type ToolInvalidate = ToolExecutionComponent["invalidate"]
+
 type ToolUpdateResult = ToolExecutionComponent["updateResult"]
+
 type ToolSetExpanded = ToolExecutionComponent["setExpanded"]
 
 interface PatchableToolExecutionPrototype {
@@ -75,23 +85,15 @@ interface PatchableToolExecutionPrototype {
 }
 
 const TOOL_SPACING_PATCH_VERSION = 1
+
 const TOOL_SPACING_PATCH_OWNER = {}
 
 function getToolExecutionPrototype() {
-  return ToolExecutionComponent.prototype as unknown as PatchableToolExecutionPrototype
-}
+  const prototype: PatchableToolExecutionPrototype =
+    ToolExecutionComponent.prototype
 
-type FallbackCall = (
-  args: any,
-  theme: Theme,
-  context: any,
-) => Component | undefined
-type FallbackResult = (
-  result: AgentToolResult<any>,
-  options: ToolRenderResultOptions,
-  theme: Theme,
-  context: any,
-) => Component | undefined
+  return prototype
+}
 
 class SingleLine implements Component {
   private cachedWidth?: number
@@ -112,6 +114,7 @@ class SingleLine implements Component {
       width > 0
         ? [truncateToWidth(this.text, Math.max(1, width - CALL_GUTTER), "…")]
         : []
+
     return this.cachedLines
   }
 
@@ -121,9 +124,10 @@ class SingleLine implements Component {
   }
 }
 
-function compactText(value: unknown, fallback = "…"): string {
-  if (typeof value !== "string") return fallback
+function compactText<TValue>(value: TValue, fallback = "…"): string {
+  if (!v.is(v.string(), value)) return fallback
   const compact = value.replace(/\s+/g, " ").trim()
+
   return sanitizeTerminalText(compact) || fallback
 }
 
@@ -143,6 +147,7 @@ function countSummary(
   label: string,
 ): string | undefined {
   const count = lineCount(textOutput(result))
+
   return count > 0 ? `${count} ${label}` : undefined
 }
 
@@ -151,11 +156,13 @@ function errorSummary(result: AgentToolResult<unknown>): string | undefined {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
+
   return lines.length > 0 ? compactText(lines.at(-1)) : undefined
 }
 
 function styleOutput(text: string, theme: Theme, isError: boolean): string {
   const color = isError ? "error" : "toolOutput"
+
   return text
     .split("\n")
     .map((line) => theme.fg(color, line))
@@ -171,74 +178,94 @@ function renderLine(
   summary?: string,
 ): string {
   let text = `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", compactText(call.subject))}`
+
   if (call.meta) text += theme.fg("muted", ` ${compactText(call.meta, "")}`)
+
   if (summary) text += theme.fg("muted", `. ${compactText(summary, "")}`)
+
   return text
 }
 
-function registerCompactTool(
-  pi: ExtensionAPI,
-  factory: (cwd: string) => ToolDefinition<any, any, any>,
-  renderer: CompactRenderer<any>,
+function registerCompactTool<
+  TParams extends TSchema,
+  TDetails,
+  TState extends object,
+>(
+  pi: Pick<ExtensionAPI, "registerTool">,
+  factory: (cwd: string) => ToolDefinition<TParams, TDetails, TState>,
+  renderer: CompactRenderer<Static<TParams>, TDetails>,
   getCompact: () => boolean,
 ): void {
   const original = factory(process.cwd())
-  const originalCall: FallbackCall | undefined = original.renderCall
-  const originalResult: FallbackResult | undefined = original.renderResult
-  pi.registerTool({
+  const originalCall = original.renderCall
+  const originalResult = original.renderResult
+  const callLines = new WeakMap<TState, SingleLine>()
+
+  const tool: ToolDefinition<TParams, TDetails, TState> = {
     ...original,
     // Read at render time. Minimal/lite tools use self-shell. Full/off tools
     // keep pi's background box.
     get renderShell(): "self" | "default" {
       return getCompact() ? "self" : "default"
     },
-    async execute(toolCallId, params, signal, onUpdate, ctx) {
+    execute(toolCallId, params, signal, onUpdate, ctx) {
       return factory(ctx.cwd).execute(toolCallId, params, signal, onUpdate, ctx)
     },
-    renderCall(args: any, theme: Theme, context: any) {
+    renderCall(args, theme, context) {
       if (!getCompact()) {
         return originalCall?.(args, theme, context) ?? new Text("", 0, 0)
       }
+
       const line =
         context.lastComponent instanceof SingleLine
           ? context.lastComponent
           : new SingleLine("")
-      context.state.line = line
+
+      callLines.set(context.state, line)
       line.setText(renderLine(original.name, renderer.call(args), theme))
+
       return line
     },
-    renderResult(
-      result: any,
-      options: ToolRenderResultOptions,
-      theme: Theme,
-      context: any,
-    ) {
+    renderResult(result, options, theme, context) {
       if (!getCompact()) {
         return (
           originalResult?.(result, options, theme, context) ?? new Container()
         )
       }
+
       // Tools collapse to a single compact line.
       const summary = context.isError
         ? errorSummary(result)
         : renderer.summary?.(result, context.args)
-      context.state.line?.setText(
-        renderLine(original.name, renderer.call(context.args), theme, summary),
-      )
+
+      callLines
+        .get(context.state)
+        ?.setText(
+          renderLine(
+            original.name,
+            renderer.call(context.args),
+            theme,
+            summary,
+          ),
+        )
 
       if (!options.expanded) return new Container()
+
       const output =
         renderer.expanded?.(result, context.args, context.isError) ??
         textOutput(result)
+
       return output
         ? new Text(styleOutput(output, theme, context.isError), 0, 0)
         : new Container()
     },
-  })
+  }
+
+  pi.registerTool(tool)
 }
 
 export function registerCompactTools(
-  pi: ExtensionAPI,
+  pi: Pick<ExtensionAPI, "registerTool">,
   getCompact: () => boolean,
 ): void {
   registerCompactTool(
@@ -247,19 +274,24 @@ export function registerCompactTools(
     {
       call: (args) => {
         const start = args.offset
+
         const end =
           start !== undefined && args.limit !== undefined
             ? start + args.limit - 1
             : undefined
+
         let range: string | undefined
+
         if (start !== undefined) {
           range =
             end !== undefined ? `lines ${start}–${end}` : `lines ${start}+`
         }
+
         return withMeta(compactText(args.path), range)
       },
       summary: (result) => {
         const count = lineCount(textOutput(result))
+
         return count > 0
           ? `${count} lines${result.details?.truncation?.truncated ? ", truncated" : ""}`
           : undefined
@@ -288,6 +320,7 @@ export function registerCompactTools(
       call: (args) => {
         const path = compactText(args.path, ".")
         const glob = args.glob ? ` ${compactText(args.glob, "")}` : ""
+
         return withMeta(
           `/${compactText(args.pattern, "")}/`,
           `in ${path}${glob}`,
@@ -338,26 +371,33 @@ export function installToolSpacing(
 ): () => void {
   const prototype = getToolExecutionPrototype()
   const previousOriginalRender = prototype.__piUiToolSpacingOriginalRender
+
   const hasPreviousPatch =
-    typeof previousOriginalRender === "function" &&
+    previousOriginalRender !== undefined &&
     previousOriginalRender !== prototype.render
+
   const isCurrentPatch =
     prototype.__piUiToolSpacingPatchOwner === TOOL_SPACING_PATCH_OWNER
+
   let restoredStalePatch = false
 
   // A session reload can load this module before old patch state is cleaned up.
   // Restore old wrapper before installing this one.
   if (hasPreviousPatch && !isCurrentPatch) {
     prototype.render = previousOriginalRender
+
     if (prototype.__piUiToolSpacingOriginalInvalidate) {
       prototype.invalidate = prototype.__piUiToolSpacingOriginalInvalidate
     }
+
     if (prototype.__piUiToolSpacingOriginalUpdateResult) {
       prototype.updateResult = prototype.__piUiToolSpacingOriginalUpdateResult
     }
+
     if (prototype.__piUiToolSpacingOriginalSetExpanded) {
       prototype.setExpanded = prototype.__piUiToolSpacingOriginalSetExpanded
     }
+
     delete prototype.__piUiToolSpacingOriginalRender
     delete prototype.__piUiToolSpacingOriginalInvalidate
     delete prototype.__piUiToolSpacingOriginalUpdateResult
@@ -374,23 +414,28 @@ export function installToolSpacing(
     !restoredStalePatch &&
     prototype.__piUiToolSpacingPatched &&
     prototype.__piUiToolSpacingPatchVersion === TOOL_SPACING_PATCH_VERSION &&
-    typeof prototype.__piUiToolSpacingOriginalRender === "function"
+    prototype.__piUiToolSpacingOriginalRender !== undefined
   ) {
-    return () => {}
+    return () => undefined
   }
 
   if (!prototype.__piUiToolSpacingOriginalRender) {
     prototype.__piUiToolSpacingOriginalRender = prototype.render
   }
+
   const originalRender = prototype.__piUiToolSpacingOriginalRender
-  if (!originalRender) return () => {}
+
+  if (!originalRender) return () => undefined
+
   const originalInvalidate = prototype.invalidate
   const originalUpdateResult = prototype.updateResult
   const originalSetExpanded = prototype.setExpanded
+
   const renderCache = new WeakMap<
     ToolExecutionComponent,
     { width: number; lines: string[] }
   >()
+
   const renderState = new WeakMap<
     ToolExecutionComponent,
     { settled: boolean; expanded: boolean; hasImages: boolean }
@@ -404,9 +449,11 @@ export function installToolSpacing(
     const state = renderState.get(this)
     const cacheable = state?.settled && !state.expanded && !state.hasImages
     const cached = cacheable ? renderCache.get(this) : undefined
+
     if (cached?.width === width) return cached.lines
 
     const rendered = originalRender.call(this, width)
+
     // Image rows contain blank height placeholders and terminal image escapes.
     // Collapsing or clamping them draws the image over neighboring text.
     if (state?.hasImages) return rendered
@@ -415,18 +462,23 @@ export function installToolSpacing(
     // pi, so use original renderer on error. Clamp lines to `width`, because a
     // wider line makes pi's TUI throw and force-close.
     let lines: string[]
+
     try {
       lines = clampLines(compactRenderInner.call(this, width, rendered), width)
     } catch {
       lines = clampLines(rendered, width)
     }
+
     if (cacheable) renderCache.set(this, { width, lines })
+
     return lines
   }
+
   const compactInvalidate = function (this: ToolExecutionComponent) {
     renderCache.delete(this)
     originalInvalidate.call(this)
   }
+
   const compactUpdateResult: ToolUpdateResult = function (
     this: ToolExecutionComponent,
     result,
@@ -441,6 +493,7 @@ export function installToolSpacing(
     renderCache.delete(this)
     originalUpdateResult.call(this, result, isPartial)
   }
+
   const compactSetExpanded: ToolSetExpanded = function (
     this: ToolExecutionComponent,
     expanded,
@@ -454,30 +507,29 @@ export function installToolSpacing(
     renderCache.delete(this)
     originalSetExpanded.call(this, expanded)
   }
+
   const compactRenderInner = function (
     this: ToolExecutionComponent,
     width: number,
     rendered: string[],
   ): string[] {
-    const self = this as unknown as {
-      expanded: boolean
-      isPartial: boolean
-      toolName?: string
-      args?: unknown
-      result?: { isError?: boolean }
-      getRenderShell: () => string | undefined
-    }
+    const self = v.parse(toolExecutionStateSchema, this)
+
     if (self.expanded) return rendered
+
     if (width <= 0) return []
 
     // Degenerate width: too narrow to fit indent + status + a character. Emit
     // one bounded line instead of overflowing.
     if (width <= CALL_GUTTER) {
       const raw =
-        rendered
-          .filter((line) => line !== "")
-          .map((l) => plainTerminalText(l).trim())
-          .filter((l) => l !== "")[0] ?? ""
+        rendered.flatMap((line) => {
+          if (line === "") return []
+          const plain = plainTerminalText(line).trim()
+
+          return plain ? [plain] : []
+        })[0] ?? ""
+
       return raw ? [truncateToWidth(raw, width, "…")] : []
     }
 
@@ -489,23 +541,29 @@ export function installToolSpacing(
     }
 
     const content = rendered.filter((line) => line !== "")
+
     if (content.length === 0) return []
 
     // Re-registered compact tools use renderShell "self" and emit one colored
     // line. fd/rg, Task*, and other custom tools use pi's default shell, where a
     // Box adds full-width background padding. Strip padding before collapsing.
-    const isBgShell = self.getRenderShell() !== "self"
+    const isBgShell = self.getRenderShell.call(this) !== "self"
+
     const lines = isBgShell
-      ? content
-          .map((line) => plainTerminalText(line).trim())
-          .filter((l) => l !== "")
+      ? content.flatMap((line) => {
+          const plain = plainTerminalText(line).trim()
+
+          return plain ? [plain] : []
+        })
       : content
+
     if (lines.length === 0) return []
 
     // Tools without custom renderCall fall back to bare-name line. Append an
     // args digest for Task* tools.
     const bareName = self.toolName ? sanitizeTerminalText(self.toolName) : ""
     const firstPlain = plainTerminalText(lines[0] ?? "").trim()
+
     const args =
       bareName !== "" && firstPlain === bareName
         ? compactArgs(self.args, theme)
@@ -518,6 +576,7 @@ export function installToolSpacing(
         : theme.fg("success", "✓")
 
     const contentWidth = width - CALL_GUTTER
+
     if (!isBgShell) {
       return [
         `${COMPACT_INDENT}${status} ${truncateToWidth(content.join(" "), contentWidth, "…")}`,
@@ -526,10 +585,12 @@ export function installToolSpacing(
 
     // Code tools keep explicit source lines beneath the truncated header.
     const codeCall = formatCodeToolCall(bareName, self.args, theme)
+
     const single =
       codeCall?.header ??
       (lines.length <= 2 ? lines.join(" · ") : (lines[0] ?? "")) +
         (args ? ` ${args}` : "")
+
     return [
       `${COMPACT_INDENT}${status} ${truncateToWidth(single, contentWidth, "…")}`,
       ...(codeCall?.code
@@ -544,6 +605,7 @@ export function installToolSpacing(
         ) ?? []),
     ]
   }
+
   prototype.render = compactRender
   prototype.invalidate = compactInvalidate
   prototype.updateResult = compactUpdateResult
@@ -554,18 +616,23 @@ export function installToolSpacing(
   prototype.__piUiToolSpacingPatched = true
   prototype.__piUiToolSpacingPatchVersion = TOOL_SPACING_PATCH_VERSION
   prototype.__piUiToolSpacingPatchOwner = TOOL_SPACING_PATCH_OWNER
+
   return () => {
     if (prototype.render === compactRender) {
       prototype.render = originalRender
+
       if (prototype.invalidate === compactInvalidate) {
         prototype.invalidate = originalInvalidate
       }
+
       if (prototype.updateResult === compactUpdateResult) {
         prototype.updateResult = originalUpdateResult
       }
+
       if (prototype.setExpanded === compactSetExpanded) {
         prototype.setExpanded = originalSetExpanded
       }
+
       delete prototype.__piUiToolSpacingOriginalRender
       delete prototype.__piUiToolSpacingOriginalInvalidate
       delete prototype.__piUiToolSpacingOriginalUpdateResult
@@ -577,43 +644,72 @@ export function installToolSpacing(
   }
 }
 
-function compactArgs(args: unknown, theme: Theme): string {
-  if (!args || typeof args !== "object" || Array.isArray(args)) return ""
+const compactArgumentSchema = v.union([
+  v.string(),
+  v.number(),
+  v.boolean(),
+  v.bigint(),
+  v.symbol(),
+  v.null(),
+  v.undefined(),
+  v.array(v.unknown()),
+  v.object({}),
+  v.function(),
+])
+
+const compactArgsSchema = v.record(v.string(), compactArgumentSchema)
+
+const codeArgsSchema = v.object({ code: v.string(), language: v.string() })
+
+const workflowArgsSchema = v.object({ script: v.string() })
+
+function compactArgs<TArgs>(args: TArgs, theme: Theme): string {
+  if (Array.isArray(args) || !v.is(compactArgsSchema, args)) return ""
   const parts: string[] = []
-  for (const [key, value] of Object.entries(args as Record<string, unknown>)) {
+
+  for (const [key, value] of Object.entries(args)) {
     if (key === "code" || key === "language") continue
+
     if (value === undefined || value === null || value === "") continue
-    const val =
-      typeof value === "string"
-        ? compactText(value, "")
-        : Array.isArray(value)
-          ? value.length > 1
-            ? `[${value.length}]`
-            : compactText(String(value[0] ?? ""), "")
-          : typeof value === "object"
-            ? ""
-            : String(value)
+
+    const val = v.is(v.string(), value)
+      ? compactText(value, "")
+      : Array.isArray(value)
+        ? value.length > 1
+          ? `[${value.length}]`
+          : compactText(String(value[0] ?? ""), "")
+        : v.is(v.object({}), value)
+          ? ""
+          : String(value)
+
     if (!val) continue
     parts.push(
       `${theme.fg("muted", compactText(key))}:${theme.fg("accent", val)}`,
     )
   }
+
   return parts.join(" ")
 }
 
-function formatCodeToolCall(name: string, args: unknown, theme: Theme) {
-  if (!args || typeof args !== "object" || Array.isArray(args)) return undefined
-  const input = args as Record<string, unknown>
-  const code = name === "workflow" ? input.script : input.code
-  const language = name === "workflow" ? "javascript" : input.language
-  if (typeof code !== "string" || typeof language !== "string") return undefined
-  const meta = compactArgs(
-    name === "workflow" ? { ...input, script: undefined } : input,
-    theme,
-  )
+function formatCodeToolCall<TArgs>(name: string, args: TArgs, theme: Theme) {
+  if (Array.isArray(args) || !v.is(compactArgsSchema, args)) return undefined
+
+  if (name === "workflow") {
+    if (!v.is(workflowArgsSchema, args)) return undefined
+    const meta = compactArgs({ ...args, script: undefined }, theme)
+
+    return {
+      header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", "javascript")}${meta ? ` ${meta}` : ""}`,
+      code: args.script,
+    }
+  }
+
+  if (!v.is(codeArgsSchema, args)) return undefined
+  const meta = compactArgs(args, theme)
+
   return {
-    header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", language)}${meta ? ` ${meta}` : ""}`,
-    code,
+    header: `${theme.fg("toolTitle", theme.bold(name))} ${theme.fg("accent", "</>")} ${theme.fg("accent", args.language)}${meta ? ` ${meta}` : ""}`,
+    code: args.code,
   }
 }
 
@@ -625,7 +721,9 @@ function clampLines(lines: string[], width: number): string[] {
 
 // --- compact message rendering ---
 
+// SAFETY: Replace terminal controls and bidi overrides in user text while preserving tabs, newlines, and carriage returns.
 const unsafeMessageCharacters =
+  // oxlint-disable-next-line eslint/no-control-regex
   /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g
 
 function sanitizeMessageText(text: string): string {
@@ -633,104 +731,141 @@ function sanitizeMessageText(text: string): string {
 }
 
 function plainTerminalText(text: string): string {
+  // SAFETY: Strip only ANSI CSI sequences from terminal-rendered rows; ESC is essential to identifying these sequences.
+  // oxlint-disable-next-line eslint/no-control-regex
   return text.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
 }
 
-interface TextState {
-  text: string
-}
+const textStateSchema = v.object({ text: v.string() })
 
-interface UserMessageState {
-  text: string
-}
+const toolExecutionStateSchema = v.object({
+  expanded: v.boolean(),
+  isPartial: v.boolean(),
+  toolName: v.optional(v.string()),
+  args: v.optional(v.unknown()),
+  result: v.optional(v.object({ isError: v.optional(v.boolean()) })),
+  getRenderShell: v.function(),
+})
 
-interface AssistantMessageState {
-  hiddenThinkingLabel: string
-  hideThinkingBlock: boolean
-  lastMessage?: {
-    content: Array<{ thinking?: string; text?: string; type: string }>
-    errorMessage?: string
-    stopReason: string
-  }
-}
+const assistantMessageStateSchema = v.object({
+  hiddenThinkingLabel: v.string(),
+  hideThinkingBlock: v.boolean(),
+  lastMessage: v.optional(
+    v.object({
+      content: v.array(
+        v.object({
+          type: v.string(),
+          text: v.optional(v.string()),
+          thinking: v.optional(v.string()),
+        }),
+      ),
+      errorMessage: v.optional(v.string()),
+      stopReason: v.string(),
+    }),
+  ),
+})
 
 export function installCompactMessages(
   theme: Theme,
   getCompact: () => boolean,
 ): () => void {
   const originalTextRender = Text.prototype.render
+
   const compactTextRender = function (this: Text, width: number): string[] {
     if (!getCompact()) return originalTextRender.call(this, width)
-    const { text } = this as unknown as TextState
+    const { text } = v.parse(textStateSchema, this)
+
     if (plainTerminalText(text.slice(0, 128)).startsWith("Thinking level: "))
       return []
+
     return originalTextRender.call(this, width)
   }
+
   Text.prototype.render = compactTextRender
 
   const originalUserRender = UserMessageComponent.prototype.render
   const originalUserInvalidate = UserMessageComponent.prototype.invalidate
   const compactUserMessages = new WeakMap<UserMessageComponent, Text>()
+
   const compactUserRender = function (
     this: UserMessageComponent,
     width: number,
   ): string[] {
     if (!getCompact()) return originalUserRender.call(this, width)
-    const { text } = this as unknown as UserMessageState
+    const { text } = v.parse(textStateSchema, this)
     let message = compactUserMessages.get(this)
+
     if (!message) {
       const content = theme.fg(
         "dim",
         `${COMPACT_INDENT}› ${sanitizeMessageText(text)}`,
       )
+
       message = new Text(content, 0, 0)
       compactUserMessages.set(this, message)
     }
+
     return message.render(width)
   }
+
   const compactUserInvalidate = function (this: UserMessageComponent) {
     compactUserMessages.delete(this)
     originalUserInvalidate.call(this)
   }
+
   UserMessageComponent.prototype.render = compactUserRender
   UserMessageComponent.prototype.invalidate = compactUserInvalidate
 
   const originalAssistantRender = AssistantMessageComponent.prototype.render
+
   const originalAssistantInvalidate =
     AssistantMessageComponent.prototype.invalidate
+
   const originalAssistantUpdateContent =
     AssistantMessageComponent.prototype.updateContent
+
   const compactAssistantLines = new WeakMap<
     AssistantMessageComponent,
     { width: number; lines: string[] }
   >()
+
   const compactAssistantState = new WeakMap<
     AssistantMessageComponent,
     { streaming: boolean }
   >()
+
   const compactAssistantRender = function (
     this: AssistantMessageComponent,
     width: number,
   ): string[] {
     if (!getCompact()) return originalAssistantRender.call(this, width)
     const state = compactAssistantState.get(this)
+
     const cached =
       state?.streaming === false ? compactAssistantLines.get(this) : undefined
+
     if (cached?.width === width) return cached.lines
 
-    const { hiddenThinkingLabel, hideThinkingBlock, lastMessage } =
-      this as unknown as AssistantMessageState
+    const { hiddenThinkingLabel, hideThinkingBlock, lastMessage } = v.parse(
+      assistantMessageStateSchema,
+      this,
+    )
+
     const hasToolCalls =
       lastMessage?.content.some((part) => part.type === "toolCall") ?? false
+
     const hasThinking =
       lastMessage?.content.some(
         (part) => part.type === "thinking" && part.thinking?.trim(),
       ) ?? false
+
     const hasText =
       lastMessage?.content.some(
         (part) => part.type === "text" && part.text?.trim(),
       ) ?? false
+
     let lines: string[]
+
     if (
       hasToolCalls &&
       hasThinking &&
@@ -747,6 +882,7 @@ export function installCompactMessages(
         lastMessage.errorMessage !== "Request was aborted"
           ? lastMessage.errorMessage
           : "Operation aborted"
+
       lines = new Text(
         theme.fg("error", sanitizeMessageText(message)),
         0,
@@ -757,15 +893,19 @@ export function installCompactMessages(
     const cacheable =
       state?.streaming === false ||
       (state === undefined && lastMessage?.stopReason !== "pending")
+
     if (cacheable) compactAssistantLines.set(this, { width, lines })
+
     return lines
   }
+
   const compactAssistantInvalidate = function (
     this: AssistantMessageComponent,
   ) {
     compactAssistantLines.delete(this)
     originalAssistantInvalidate.call(this)
   }
+
   const compactAssistantUpdateContent: AssistantMessageComponent["updateContent"] =
     function (this: AssistantMessageComponent, message, isStreaming) {
       const previous = compactAssistantState.get(this)
@@ -775,6 +915,7 @@ export function installCompactMessages(
       compactAssistantLines.delete(this)
       originalAssistantUpdateContent.call(this, message, isStreaming)
     }
+
   AssistantMessageComponent.prototype.render = compactAssistantRender
   AssistantMessageComponent.prototype.invalidate = compactAssistantInvalidate
   AssistantMessageComponent.prototype.updateContent =
@@ -784,15 +925,19 @@ export function installCompactMessages(
     if (Text.prototype.render === compactTextRender) {
       Text.prototype.render = originalTextRender
     }
+
     if (UserMessageComponent.prototype.render === compactUserRender) {
       UserMessageComponent.prototype.render = originalUserRender
     }
+
     if (UserMessageComponent.prototype.invalidate === compactUserInvalidate) {
       UserMessageComponent.prototype.invalidate = originalUserInvalidate
     }
+
     if (AssistantMessageComponent.prototype.render === compactAssistantRender) {
       AssistantMessageComponent.prototype.render = originalAssistantRender
     }
+
     if (
       AssistantMessageComponent.prototype.invalidate ===
       compactAssistantInvalidate
@@ -800,6 +945,7 @@ export function installCompactMessages(
       AssistantMessageComponent.prototype.invalidate =
         originalAssistantInvalidate
     }
+
     if (
       AssistantMessageComponent.prototype.updateContent ===
       compactAssistantUpdateContent

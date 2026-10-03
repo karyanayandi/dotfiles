@@ -40,6 +40,7 @@ async function persistToTempFile(prefix: string, output: string) {
   const directory = await mkdtemp(join(tmpdir(), prefix))
   const path = join(directory, "output.txt")
   await writeFile(path, output, "utf8")
+
   return path
 }
 
@@ -61,6 +62,7 @@ function truncationNotice(options: {
 /** Format output already captured by a bounded-memory streaming process. */
 export function formatCapturedOutput(captured: CapturedOutput) {
   const trimmed = captured.preview.replace(/\n+$/, "")
+
   if (!captured.truncated || !captured.fullOutputPath) {
     return {
       text: trimmed,
@@ -73,9 +75,11 @@ export function formatCapturedOutput(captured: CapturedOutput) {
     maxLines: DEFAULT_MAX_LINES,
     maxBytes: DEFAULT_MAX_BYTES,
   })
+
   const content = truncation.content
   const outputLines = content === "" ? 0 : content.split("\n").length
   const outputBytes = Buffer.byteLength(content)
+
   return {
     text: truncationNotice({
       content,
@@ -111,6 +115,7 @@ export async function formatOutput(
   const persist =
     options.persistFullOutput ??
     ((full: string) => persistToTempFile(options.tempPrefix, full))
+
   const fullOutputPath = await persist(trimmed)
 
   const text = truncationNotice({

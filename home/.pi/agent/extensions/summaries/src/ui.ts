@@ -38,9 +38,11 @@ class RecapCard {
     if (this.cachedWidth === width && this.cachedLines) return this.cachedLines
 
     const box = new Box(1, 1, (text) => this.theme.bg("customMessageBg", text))
+
     const title =
       this.theme.fg("accent", "✦ ") +
       this.theme.fg("customMessageLabel", this.theme.bold("Run recap"))
+
     box.addChild(new Text(title, 0, 0))
     box.addChild(
       new Markdown(this.data.recap, 0, 1, getMarkdownTheme(), {
@@ -54,12 +56,15 @@ class RecapCard {
         0,
       ),
     )
+
     if (this.expanded) {
       const source = `${this.data.provider}/${this.data.model} · ${this.data.reasoning}${this.data.fallback ? " · local fallback" : ""}`
       box.addChild(new Text(this.theme.fg("dim", source), 0, 1))
     }
+
     this.cachedWidth = width
     this.cachedLines = box.render(width)
+
     return this.cachedLines
   }
 
@@ -75,6 +80,7 @@ export function renderRecap(
   theme: Theme,
 ) {
   if (!data) return new Text(theme.fg("warning", "Run recap unavailable"), 0, 0)
+
   return new RecapCard(data, theme, expanded)
 }
 
@@ -85,15 +91,19 @@ export async function openModelPicker(
   const models = [...ctx.modelRegistry.getAvailable()].sort((a, b) =>
     `${a.provider}/${a.id}`.localeCompare(`${b.provider}/${b.id}`),
   )
+
   if (models.length === 0) {
     ctx.ui.notify(
       "No configured models are available for run recaps.",
       "warning",
     )
+
     return undefined
   }
+
   const labels = models.map((model) => `${model.provider}/${model.id}`)
   const selected = await ctx.ui.select("Summary model", labels)
+
   return selected === undefined ? undefined : models[labels.indexOf(selected)]
 }
 
@@ -103,6 +113,7 @@ export function openReasoningPicker(
   current: ReasoningLevel,
 ) {
   const supported = getSupportedThinkingLevels(model)
+
   const selectedCurrent = supported.includes(current)
     ? current
     : (supported[0] ?? "off")
@@ -115,7 +126,9 @@ export function openReasoningPicker(
         (level) => done(level),
         () => done(undefined),
       )
+
       const list = selector.getSelectList()
+
       return {
         render: (width) => selector.render(width),
         invalidate: () => selector.invalidate(),

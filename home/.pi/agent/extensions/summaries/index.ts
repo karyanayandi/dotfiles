@@ -18,7 +18,9 @@ import {
 } from "./src/ui.ts"
 
 const RECAP_ENTRY_TYPE = "summary-recap"
+
 const STATUS_KEY = "summaries"
+
 const SHUTDOWN_WAIT_MS = 1_000
 
 async function waitForCancellation(
@@ -28,6 +30,7 @@ async function waitForCancellation(
   if (tasks.length === 0) return
 
   let timeout: ReturnType<typeof setTimeout> | undefined
+
   try {
     await Promise.race([
       Promise.allSettled(tasks),
@@ -40,7 +43,12 @@ async function waitForCancellation(
   }
 }
 
-export default function (pi: ExtensionAPI) {
+export default function summariesExtension(
+  pi: Pick<
+    ExtensionAPI,
+    "on" | "registerEntryRenderer" | "registerCommand" | "appendEntry"
+  >,
+) {
   const runBoundary = createRunBoundary()
   const activeSummaries = new Map<AbortController, Promise<void>>()
   let sessionActive = false
@@ -73,19 +81,23 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("agent_settled", (_event, ctx) => {
     const run = runBoundary.settle()
+
     if (!run || ctx.mode !== "tui" || !sessionActive) return
 
     const entries = getRunEntries(
       ctx.sessionManager.getBranch(),
       run.baselineLeafId,
     )
+
     if (entries.length === 0) return
 
     const config = loadSummaryConfig()
     const controller = new AbortController()
     statusContext = ctx
+
     const task = (async () => {
       let recap: RecapEntryData
+
       try {
         const generated = await summarizeRun({
           modelRegistry: ctx.modelRegistry,
@@ -93,6 +105,7 @@ export default function (pi: ExtensionAPI) {
           transcript: serializeRunTranscript(entries),
           signal: controller.signal,
         })
+
         recap = { ...generated, ...config }
       } catch (error) {
         if (controller.signal.aborted || !sessionActive) return
@@ -126,6 +139,7 @@ export default function (pi: ExtensionAPI) {
     sessionActive = false
     runBoundary.reset()
     const summaries = [...activeSummaries.entries()]
+
     for (const [controller] of summaries) controller.abort()
     await waitForCancellation(
       summaries.map(([, task]) => task),
@@ -146,14 +160,17 @@ export default function (pi: ExtensionAPI) {
             "error",
           )
         }
+
         return
       }
 
       const current = loadSummaryConfig()
       const model = await openModelPicker(ctx, current)
+
       if (!model) return
 
       const reasoning = await openReasoningPicker(ctx, model, current.reasoning)
+
       if (!reasoning) return
 
       const config = {
@@ -161,6 +178,7 @@ export default function (pi: ExtensionAPI) {
         model: model.id,
         reasoning,
       }
+
       try {
         await saveSummaryConfig(config)
       } catch {
@@ -168,6 +186,7 @@ export default function (pi: ExtensionAPI) {
           "Could not save the private summary model config.",
           "error",
         )
+
         return
       }
 

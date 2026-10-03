@@ -32,6 +32,7 @@ export function formatElapsed(snap: TerminalSnapshot) {
   const totalSeconds = Math.max(0, Math.round((end - snap.createdAt) / 1000))
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
+
   return minutes > 0
     ? `${minutes}m${seconds.toString().padStart(2, "0")}s`
     : `${seconds}s`
@@ -39,8 +40,11 @@ export function formatElapsed(snap: TerminalSnapshot) {
 
 export function formatExit(snap: TerminalSnapshot) {
   if (snap.status === "running") return "running"
+
   if (snap.signal) return snap.signal
+
   if (snap.exitCode !== undefined) return `exit ${snap.exitCode}`
+
   return snap.status
 }
 

@@ -1,5 +1,6 @@
 /** Startup resolution and installation of fd and rg executables. */
 
+import * as v from "valibot"
 import { execFile } from "node:child_process"
 import { createHash, randomUUID } from "node:crypto"
 import {
@@ -19,14 +20,18 @@ import { promisify } from "node:util"
 const execFileAsync = promisify(execFile)
 
 export const FD_VERSION = "10.4.2"
+
 export const FD_INTEL_DARWIN_VERSION = "10.3.0"
+
 export const RG_VERSION = "15.2.0"
 
 const DOWNLOAD_TIMEOUT_MS = 30_000
+
 const MAX_ARCHIVE_BYTES = 25 * 1024 * 1024
+
 const MAX_DOWNLOAD_REDIRECTS = 10
 
-const FD_SHA256: Readonly<Record<string, string>> = {
+const FD_SHA256 = {
   "aarch64-apple-darwin":
     "623dc0afc81b92e4d4606b380d7bc91916ba7b97814263e554d50923a39e480a",
   "x86_64-apple-darwin":
@@ -37,7 +42,7 @@ const FD_SHA256: Readonly<Record<string, string>> = {
     "e3257d48e29a6be965187dbd24ce9af564e0fe67b3e73c9bdcd180f4ec11bdde",
 }
 
-const RG_SHA256: Readonly<Record<string, string>> = {
+const RG_SHA256 = {
   "aarch64-apple-darwin":
     "3750b2e93f37e0c692657da574d7019a101c0084da05a790c83fd335bad973e4",
   "x86_64-apple-darwin":
@@ -49,6 +54,7 @@ const RG_SHA256: Readonly<Record<string, string>> = {
 }
 
 export type ToolName = "fd" | "rg"
+
 export type BinarySource = "system" | "bundled" | "installed"
 
 export interface ToolSpec {
@@ -76,16 +82,22 @@ export interface ReleaseAsset {
   readonly sha256: string
 }
 
-function targetTriple(target: PlatformTarget) {
+function targetTriple(
+  target: PlatformTarget,
+): keyof typeof FD_SHA256 | undefined {
   const cpu =
     target.arch === "arm64"
       ? "aarch64"
       : target.arch === "x64"
         ? "x86_64"
         : undefined
+
   if (!cpu) return undefined
+
   if (target.os === "darwin") return `${cpu}-apple-darwin`
+
   if (target.os === "linux") return `${cpu}-unknown-linux-musl`
+
   return undefined
 }
 
@@ -94,15 +106,20 @@ export function releaseAsset(
   target: PlatformTarget,
 ): ReleaseAsset | undefined {
   const triple = targetTriple(target)
+
   if (!triple) return undefined
 
   if (tool === "fd") {
     const sha256 = FD_SHA256[triple]
+
     if (!sha256) return undefined
+
     const version =
       triple === "x86_64-apple-darwin" ? FD_INTEL_DARWIN_VERSION : FD_VERSION
+
     const archiveDir = `fd-v${version}-${triple}`
     const fileName = `${archiveDir}.tar.gz`
+
     return {
       url: `https://github.com/sharkdp/fd/releases/download/v${version}/${fileName}`,
       fileName,
@@ -114,9 +131,11 @@ export function releaseAsset(
   }
 
   const sha256 = RG_SHA256[triple]
+
   if (!sha256) return undefined
   const archiveDir = `ripgrep-${RG_VERSION}-${triple}`
   const fileName = `${archiveDir}.tar.gz`
+
   return {
     url: `https://github.com/BurntSushi/ripgrep/releases/download/${RG_VERSION}/${fileName}`,
     fileName,
@@ -133,6 +152,7 @@ export function currentTarget() {
 
 export function repositoryBinDir() {
   const moduleDir = dirname(fileURLToPath(import.meta.url))
+
   return join(moduleDir, "..", "..", "..", "bin")
 }
 
@@ -185,6 +205,7 @@ export async function resolveBinary(
   }
 
   const bundled = join(binDir, spec.binaryName)
+
   if (await env.probe(bundled, spec.tool)) {
     return {
       tool: spec.tool,
@@ -194,6 +215,7 @@ export async function resolveBinary(
   }
 
   const asset = releaseAsset(spec.tool, target)
+
   if (!asset) {
     throw new UnsupportedPlatformError(
       `No ${spec.tool} binary is available for ${target.os}/${target.arch}. Install ${spec.tool} manually and restart pi.`,
@@ -201,6 +223,7 @@ export async function resolveBinary(
   }
 
   await env.install(asset, bundled)
+
   if (!(await env.probe(bundled, spec.tool))) {
     throw new InstallError(
       `${spec.tool} ${asset.version} was installed to ${bundled} but failed to run.`,
@@ -215,7 +238,7 @@ export async function resolveBinary(
   } satisfies ResolvedBinary
 }
 
-function errorMessage(error: unknown) {
+function errorMessage<ErrorValue>(error: ErrorValue) {
   return error instanceof Error ? error.message : String(error)
 }
 
@@ -224,6 +247,7 @@ export async function readBoundedResponse(
   maxBytes = MAX_ARCHIVE_BYTES,
 ) {
   const declaredLength = Number(response.headers.get("content-length"))
+
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
     await response.body?.cancel().catch(() => undefined)
     throw new Error(`download exceeds the ${maxBytes}-byte size limit`)
@@ -237,12 +261,15 @@ export async function readBoundedResponse(
   try {
     for (;;) {
       const { done, value } = await reader.read()
+
       if (done) break
       totalBytes += value.byteLength
+
       if (totalBytes > maxBytes) {
         await reader.cancel()
         throw new Error(`download exceeds the ${maxBytes}-byte size limit`)
       }
+
       chunks.push(value)
     }
   } finally {
@@ -261,15 +288,19 @@ async function downloadAsset(initialUrl: URL, signal: AbortSignal) {
     }
 
     const response = await fetch(url, { redirect: "manual", signal })
+
     if ([301, 302, 303, 307, 308].includes(response.status)) {
       const location = response.headers.get("location")
       await response.body?.cancel().catch(() => undefined)
+
       if (!location) {
         throw new Error(`redirect from ${url.href} had no location header`)
       }
+
       if (redirects === MAX_DOWNLOAD_REDIRECTS) {
         throw new Error(`download exceeded ${MAX_DOWNLOAD_REDIRECTS} redirects`)
       }
+
       try {
         url = new URL(location, url)
       } catch {
@@ -277,6 +308,7 @@ async function downloadAsset(initialUrl: URL, signal: AbortSignal) {
           `download returned an invalid redirect URL: ${location}`,
         )
       }
+
       continue
     }
 
@@ -284,6 +316,7 @@ async function downloadAsset(initialUrl: URL, signal: AbortSignal) {
       await response.body?.cancel().catch(() => undefined)
       throw new Error(`download failed with HTTP ${response.status}`)
     }
+
     return readBoundedResponse(response)
   }
 
@@ -298,6 +331,7 @@ async function extractArchive(asset: ReleaseAsset, destination: string) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), DOWNLOAD_TIMEOUT_MS)
     let bytes: Buffer
+
     try {
       bytes = await downloadAsset(new URL(asset.url), controller.signal)
     } finally {
@@ -305,6 +339,7 @@ async function extractArchive(asset: ReleaseAsset, destination: string) {
     }
 
     const digest = createHash("sha256").update(bytes).digest("hex")
+
     if (digest !== asset.sha256) {
       throw new Error(
         `SHA-256 mismatch for ${asset.fileName}: expected ${asset.sha256}, received ${digest}`,
@@ -313,15 +348,19 @@ async function extractArchive(asset: ReleaseAsset, destination: string) {
 
     const archivePath = join(workDir, asset.fileName)
     await writeFile(archivePath, bytes)
+
     try {
       await execFileAsync("tar", ["-xzf", archivePath, "-C", workDir], {
         timeout: 60_000,
       })
     } catch (error) {
-      const code =
-        typeof error === "object" && error !== null && "code" in error
-          ? error.code
-          : undefined
+      const parsed = v.safeParse(
+        v.object({ code: v.union([v.number(), v.string()]) }),
+        error,
+      )
+
+      const code = parsed.success ? parsed.output.code : undefined
+
       throw new Error(
         `tar failed with exit code ${code ?? errorMessage(error)}`,
       )
@@ -347,7 +386,9 @@ export const liveBinaryEnv: BinaryEnv = {
     try {
       const args =
         tool === "fd" ? ["--max-results", "1", "--", ""] : ["--version"]
+
       await execFileAsync(command, args, { cwd: tmpdir(), timeout: 5_000 })
+
       return true
     } catch {
       return false

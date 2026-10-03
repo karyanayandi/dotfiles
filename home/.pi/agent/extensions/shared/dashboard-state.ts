@@ -1,5 +1,9 @@
+import * as v from "valibot"
+
 export const MODEL_INFO_CHANNEL = "dashboard:model-info"
+
 export const GIT_INFO_CHANNEL = "dashboard:git-info"
+
 export const REFRESH_CHANNEL = "dashboard:refresh"
 
 export interface ModelInfoState {
@@ -52,48 +56,40 @@ export function emptyGitInfoState(): GitInfoState {
   }
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null
+const modelInfoSchema = v.object({
+  provider: v.string(),
+  modelId: v.string(),
+  modelName: v.string(),
+  thinking: v.string(),
+  contextTokens: v.nullable(v.number()),
+  contextWindow: v.number(),
+  contextPercent: v.nullable(v.number()),
+  cost: v.number(),
+  tokensPerSecond: v.nullable(v.number()),
+  generating: v.boolean(),
+})
+
+const gitInfoSchema = v.object({
+  isRepository: v.boolean(),
+  branch: v.nullable(v.string()),
+  changedFiles: v.number(),
+  pullRequest: v.nullable(
+    v.object({
+      number: v.number(),
+      url: v.string(),
+      isDraft: v.boolean(),
+    }),
+  ),
+})
+
+export function isModelInfoState<Value>(
+  value: Value,
+): value is Value & ModelInfoState {
+  return v.is(modelInfoSchema, value)
 }
 
-function isNullableNumber(value: unknown) {
-  return value === null || typeof value === "number"
-}
-
-export function isModelInfoState(value: unknown): value is ModelInfoState {
-  if (!isRecord(value)) return false
-
-  return (
-    typeof value.provider === "string" &&
-    typeof value.modelId === "string" &&
-    typeof value.modelName === "string" &&
-    typeof value.thinking === "string" &&
-    isNullableNumber(value.contextTokens) &&
-    typeof value.contextWindow === "number" &&
-    isNullableNumber(value.contextPercent) &&
-    typeof value.cost === "number" &&
-    isNullableNumber(value.tokensPerSecond) &&
-    typeof value.generating === "boolean"
-  )
-}
-
-function isPullRequestInfo(value: unknown): value is PullRequestInfo {
-  if (!isRecord(value)) return false
-
-  return (
-    typeof value.number === "number" &&
-    typeof value.url === "string" &&
-    typeof value.isDraft === "boolean"
-  )
-}
-
-export function isGitInfoState(value: unknown): value is GitInfoState {
-  if (!isRecord(value)) return false
-
-  return (
-    typeof value.isRepository === "boolean" &&
-    (value.branch === null || typeof value.branch === "string") &&
-    typeof value.changedFiles === "number" &&
-    (value.pullRequest === null || isPullRequestInfo(value.pullRequest))
-  )
+export function isGitInfoState<Value>(
+  value: Value,
+): value is Value & GitInfoState {
+  return v.is(gitInfoSchema, value)
 }

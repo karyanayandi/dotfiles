@@ -4,30 +4,36 @@ import { crawlEffect, type CrawlClient } from "./index.ts"
 
 test("cancels the remote crawl when polling is interrupted", async () => {
   let pollingStarted!: () => void
+
   const startedPolling = new Promise<void>((resolve) => {
     pollingStarted = resolve
   })
+
   const cancelledJobs: string[] = []
 
   const client: CrawlClient = {
-    startCrawl: async (url) => ({ id: "crawl-123", url }),
-    getCrawlStatus: async () => {
+    startCrawl: (url) => Promise.resolve({ id: "crawl-123", url }),
+    getCrawlStatus: () => {
       pollingStarted()
+
       return new Promise(() => undefined)
     },
-    cancelCrawl: async (jobId) => {
+    cancelCrawl: (jobId) => {
       cancelledJobs.push(jobId)
-      return true
+
+      return Promise.resolve(true)
     },
   }
 
   const controller = new AbortController()
+
   const running = crawlEffect(
     client,
     "https://example.com",
     { limit: 1 },
     controller.signal,
   )
+
   const interrupted = assert.rejects(running)
 
   await startedPolling

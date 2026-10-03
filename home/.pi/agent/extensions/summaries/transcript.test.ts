@@ -46,6 +46,7 @@ test("run slicing starts after the before_agent_start leaf", () => {
     entry("old", { role: "user", content: "old", timestamp: 0 }),
     entry("new", { role: "user", content: "new", timestamp: 1 }),
   ]
+
   assert.deepEqual(
     getRunEntries(entries, "old").map((item) => item.id),
     ["new"],

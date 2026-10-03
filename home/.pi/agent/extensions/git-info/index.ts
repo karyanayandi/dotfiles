@@ -8,35 +8,40 @@ import {
   REFRESH_CHANNEL,
   type PullRequestInfo,
 } from "@pi/shared/dashboard-state"
+import * as v from "valibot"
 import { loadChangedFiles, showChangedFiles } from "./src/changed-files-view.ts"
 import { runCommand } from "./src/process.ts"
 import { makeRefreshCoordinator } from "./src/refresh-coordinator.ts"
 
 const POLL_INTERVAL_MS = 3_000
+
 const GIT_TIMEOUT_MS = 3_000
+
 const GH_TIMEOUT_MS = 10_000
 
 function countChangedFiles(status: string) {
   if (!status.trim()) return 0
+
   return status.split("\n").filter(Boolean).length
 }
 
-function parsePullRequest(value: unknown) {
-  if (typeof value !== "object" || value === null) return null
-  if (!("number" in value) || typeof value.number !== "number") return null
-  if (!("url" in value) || typeof value.url !== "string") return null
-  if (!("state" in value) || value.state !== "OPEN") return null
-
-  return {
-    number: value.number,
-    url: value.url,
-    isDraft: "isDraft" in value && value.isDraft === true,
-  } satisfies PullRequestInfo
-}
+const pullRequestSchema = v.looseObject({
+  number: v.number(),
+  url: v.string(),
+  state: v.literal("OPEN"),
+})
 
 function parsePullRequestJson(value: string) {
   try {
-    return parsePullRequest(JSON.parse(value))
+    const result = v.safeParse(pullRequestSchema, JSON.parse(value))
+
+    if (!result.success) return null
+
+    return {
+      number: result.output.number,
+      url: result.output.url,
+      isDraft: result.output.isDraft === true,
+    } satisfies PullRequestInfo
   } catch {
     return null
   }
@@ -48,10 +53,12 @@ function delay(ms: number, signal: AbortSignal) {
       signal.removeEventListener("abort", onAbort)
       resolve(true)
     }, ms)
+
     const onAbort = () => {
       clearTimeout(timer)
       resolve(false)
     }
+
     signal.addEventListener("abort", onAbort, { once: true })
   })
 }
@@ -67,8 +74,10 @@ export default function gitInfo(pi: ExtensionAPI) {
   let generation = 0
   let queriedPrBranch: string | null = null
   const refreshCoordinator = makeRefreshCoordinator()
+
   const publish = () => {
     pi.events.emit(GIT_INFO_CHANNEL, { ...state })
+
     if (!currentContext) return
 
     currentContext.ui.setStatus(
@@ -81,6 +90,7 @@ export default function gitInfo(pi: ExtensionAPI) {
         : undefined,
     )
   }
+
   const run = (
     command: string,
     args: string[],
@@ -101,7 +111,9 @@ export default function gitInfo(pi: ExtensionAPI) {
       GH_TIMEOUT_MS,
       signal,
     )
+
     if (result.code !== 0) return null
+
     return parsePullRequestJson(result.stdout)
   }
 
@@ -121,12 +133,14 @@ export default function gitInfo(pi: ExtensionAPI) {
       GIT_TIMEOUT_MS,
       signal,
     )
+
     if (refreshGeneration !== generation) return
 
     if (repo.code !== 0 || repo.stdout.trim() !== "true") {
       queriedPrBranch = null
       state = emptyGitInfoState()
       publish()
+
       return
     }
 
@@ -142,12 +156,15 @@ export default function gitInfo(pi: ExtensionAPI) {
         signal,
       ),
     ])
+
     if (refreshGeneration !== generation) return
 
     const branchName = branchResult.stdout.trim()
     const shortHead = headResult.stdout.trim()
+
     const branch =
       branchName || (shortHead ? `detached@${shortHead}` : "detached")
+
     const branchChanged = branchName !== queriedPrBranch
 
     state = {
@@ -163,12 +180,14 @@ export default function gitInfo(pi: ExtensionAPI) {
     if (!branchName) {
       // queriedPrBranch is never "", so branchChanged already cleared pullRequest.
       queriedPrBranch = null
+
       return
     }
 
     if (forcePullRequest || branchChanged) {
       queriedPrBranch = branchName
       const pullRequest = await lookupPullRequest(ctx, branchName, signal)
+
       if (refreshGeneration !== generation) return
       state = { ...state, pullRequest }
       publish()
@@ -189,7 +208,7 @@ export default function gitInfo(pi: ExtensionAPI) {
       refreshTask(ctx, false, generation, signal),
     )
 
-  const reportBackgroundDefect = (error: unknown) => {
+  function reportBackgroundDefect<Failure>(error: Failure) {
     console.error("git-info background task defect", error)
   }
 
@@ -200,6 +219,7 @@ export default function gitInfo(pi: ExtensionAPI) {
   const poll = async (signal: AbortSignal) => {
     while (await delay(POLL_INTERVAL_MS, signal)) {
       if (!currentContext) continue
+
       try {
         await refreshIfIdle(currentContext, signal)
       } catch (error) {
@@ -211,6 +231,7 @@ export default function gitInfo(pi: ExtensionAPI) {
   const stopPolling = async () => {
     const previous = polling
     polling = undefined
+
     if (!previous) return
     previous.controller.abort()
     await previous.done
@@ -239,6 +260,7 @@ export default function gitInfo(pi: ExtensionAPI) {
 
   pi.on("input", (_event, ctx) => {
     refreshInBackground(ctx)
+
     return { action: "continue" }
   })
 
@@ -262,24 +284,31 @@ export default function gitInfo(pi: ExtensionAPI) {
           "The local changes viewer requires the interactive TUI",
           "warning",
         )
+
         return
       }
 
       let files
+
       try {
         files = await loadChangedFiles(ctx.cwd, ctx.signal)
       } catch (error) {
         if (ctx.signal?.aborted) {
           throw abortedError("Loading changed files was cancelled.")
         }
+
         throw error
       }
+
       if (files === null) {
         ctx.ui.notify("Not a git repository", "warning")
+
         return
       }
+
       if (files.length === 0) {
         ctx.ui.notify("Working tree is clean", "info")
+
         return
       }
 
@@ -296,8 +325,10 @@ export default function gitInfo(pi: ExtensionAPI) {
         if (ctx.signal?.aborted) {
           throw abortedError("Git and pull request refresh was cancelled.")
         }
+
         throw error
       }
+
       if (!state.isRepository) {
         ctx.ui.notify("Not a git repository", "warning")
       } else if (state.pullRequest) {

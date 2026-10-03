@@ -7,6 +7,7 @@
     "test": "node --test *.test.ts"
   },
   "dependencies": {
+    "@pi/shared": "workspace:*",
     "firecrawl": "catalog:"
   },
   "devDependencies": {

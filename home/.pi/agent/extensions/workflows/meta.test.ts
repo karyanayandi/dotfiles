@@ -9,6 +9,7 @@ test("metadata is decoded statically and removed from executable source", () => 
     phases: [{ title: "Scan", detail: "files" }],
   };
   return { ok: true };`
+
   const prepared = prepareWorkflowScript(source)
   assert.deepEqual(prepared.meta, {
     name: "audit",
@@ -27,6 +28,7 @@ test("export-like text in strings, comments, regexes, and templates is untouched
     // export const fake = 1
     return { string, template, matches: regex.test(string) };
   `
+
   const prepared = prepareWorkflowScript(source)
   assert.equal(prepared.source, source)
   assert.deepEqual(prepared.meta, { phases: [] })

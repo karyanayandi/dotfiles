@@ -13,7 +13,7 @@ import {
 } from "@earendil-works/pi-coding-agent"
 import { Firecrawl, type CrawlJob, type CrawlOptions } from "firecrawl"
 import * as v from "valibot"
-import { toolSchema } from "../shared/schema.ts"
+import { toolSchema } from "@pi/shared/schema"
 import {
   CRAWL_PARAMETER_DESCRIPTIONS,
   CRAWL_PROMPT_GUIDELINES,
@@ -43,14 +43,17 @@ function readEnvValue(name: string) {
 
   for (const line of envText.split(/\r?\n/)) {
     const trimmed = line.trim()
+
     if (!trimmed || trimmed.startsWith("#")) continue
 
     const match = trimmed.match(
       /^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/,
     )
+
     if (!match || match[1] !== name) continue
 
     const value = match[2].trim()
+
     if (
       (value.startsWith('"') && value.endsWith('"')) ||
       (value.startsWith("'") && value.endsWith("'"))
@@ -73,7 +76,9 @@ class MissingApiKeyError extends Error {
 
 function createClient() {
   const apiKey = readEnvValue("FIRECRAWL_API_KEY")
+
   if (!apiKey) throw new MissingApiKeyError()
+
   try {
     return new Firecrawl({ apiKey })
   } catch (cause) {
@@ -81,11 +86,11 @@ function createClient() {
   }
 }
 
-function stringify(value: unknown) {
+function stringify<Value>(value: Value) {
   return JSON.stringify(value, null, 2)
 }
 
-function errorMessage(error: unknown) {
+function errorMessage<ErrorValue>(error: ErrorValue) {
   return error instanceof Error ? error.message : String(error)
 }
 
@@ -111,13 +116,15 @@ class OutputError extends Error {
   }
 }
 
-async function formatOutput(value: unknown, operation: string) {
+async function formatOutput<Value>(value: Value, operation: string) {
   try {
-    const output = typeof value === "string" ? value : stringify(value)
+    const output = v.is(v.string(), value) ? value : stringify(value)
+
     const truncation = truncateHead(output, {
       maxBytes: DEFAULT_MAX_BYTES,
       maxLines: DEFAULT_MAX_LINES,
     })
+
     if (!truncation.truncated) return output
 
     const outputDirectory = await mkdtemp(join(tmpdir(), "pi-firecrawl-"))
@@ -141,6 +148,7 @@ function throwIfAborted(signal: AbortSignal | undefined): void {
 
 function withAbort<T>(promise: Promise<T>, signal: AbortSignal | undefined) {
   if (!signal) return promise
+
   if (signal.aborted) return Promise.reject(signal.reason)
 
   return new Promise<T>((resolve, reject) => {
@@ -172,12 +180,15 @@ async function pollCrawl(
   signal: AbortSignal | undefined,
 ): Promise<CrawlJob> {
   throwIfAborted(signal)
+
   const job = await withAbort(
     firecrawlRequest(() => client.getCrawlStatus(jobId)),
     signal,
   )
+
   if (job.status !== "scraping") return job
   await wait(2_000, signal)
+
   return pollCrawl(client, jobId, signal)
 }
 
@@ -189,6 +200,7 @@ export async function crawlEffect(
   signal?: AbortSignal,
 ): Promise<CrawlJob> {
   const job = await firecrawlRequest(() => client.startCrawl(url, options))
+
   try {
     return await pollCrawl(client, job.id, signal)
   } catch (error) {
@@ -200,13 +212,14 @@ export async function crawlEffect(
   }
 }
 
-function operationError(operation: string, error: unknown) {
+function operationError<ErrorValue>(operation: string, error: ErrorValue) {
   if (error instanceof MissingApiKeyError) return new Error(error.message)
 
   const cause =
     error instanceof FirecrawlError || error instanceof OutputError
       ? error.cause
       : error
+
   return new Error(`Firecrawl ${operation} failed: ${errorMessage(error)}`, {
     cause,
   })
@@ -235,6 +248,7 @@ async function runFirecrawl<T>(
     })
     const { details, output } = await request(client, requestSignal)
     const formatted = await formatOutput(output, operation)
+
     return {
       content: [{ type: "text" as const, text: formatted }],
       details,
@@ -293,6 +307,7 @@ export default function firecrawlTools(pi: ExtensionAPI) {
               timeout: 30_000,
             }),
           )
+
           return { details: result, output: result }
         },
       ),
@@ -392,6 +407,7 @@ export default function firecrawlTools(pi: ExtensionAPI) {
             },
             requestSignal,
           )
+
           return { details: result, output: result }
         },
       ),
@@ -455,13 +471,16 @@ export default function firecrawlTools(pi: ExtensionAPI) {
               timeout: params.timeout ?? 30_000,
             }),
           )
+
           try {
             const metadata =
               params.includeMetadata && document.metadata
                 ? `\n\nMetadata:\n${stringify(document.metadata)}`
                 : ""
+
             const markdown =
               document.markdown?.trim() || "No markdown content returned."
+
             return { details: document, output: `${markdown}${metadata}` }
           } catch (cause) {
             throw new OutputError(errorMessage(cause), { cause })

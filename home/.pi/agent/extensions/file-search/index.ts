@@ -7,7 +7,7 @@ import type {
 } from "@earendil-works/pi-coding-agent"
 import { Text } from "@earendil-works/pi-tui"
 import * as v from "valibot"
-import { toolSchema } from "../shared/schema.ts"
+import { toolSchema } from "@pi/shared/schema"
 import {
   buildFdArgs,
   buildRgArgs,
@@ -47,8 +47,10 @@ export function makeBinaryInitializers(
 ) {
   const once = <T>(resolve: () => Promise<T>) => {
     let result: Promise<T> | undefined
+
     return () => (result ??= resolve())
   }
+
   return {
     fd: once(() => resolveBinary(TOOL_SPECS.fd, binDir, target, env)),
     rg: once(() => resolveBinary(TOOL_SPECS.rg, binDir, target, env)),
@@ -56,13 +58,14 @@ export function makeBinaryInitializers(
 }
 
 export function installNotifications(binaries: readonly ResolvedBinary[]) {
-  return binaries
-    .filter((binary) => binary.source === "installed")
-    .map(
-      (binary) =>
-        `file-search: no system ${binary.tool} found. downloaded ${binary.tool} ${binary.version ?? ""}`.trimEnd() +
-        ` to ${repositoryBinDir()}`,
-    )
+  return binaries.flatMap((binary) =>
+    binary.source === "installed"
+      ? [
+          `file-search: no system ${binary.tool} found. downloaded ${binary.tool} ${binary.version ?? ""}`.trimEnd() +
+            ` to ${repositoryBinDir()}`,
+        ]
+      : [],
+  )
 }
 
 class SearchError extends Error {
@@ -94,11 +97,11 @@ export interface RgToolDetails {
 
 const EXEC_TIMEOUT_MS = 60_000
 
-function errorMessage(error: unknown) {
+function errorMessage<ErrorValue>(error: ErrorValue) {
   return error instanceof Error ? error.message : String(error)
 }
 
-function isAbortError(error: unknown) {
+function isAbortError<ErrorValue>(error: ErrorValue) {
   return error instanceof DOMException && error.name === "AbortError"
 }
 
@@ -107,16 +110,18 @@ function awaitWithAbort<T>(promise: Promise<T>, signal: AbortSignal) {
     return Promise.reject(
       new DOMException("The operation was aborted", "AbortError"),
     )
+
   return new Promise<T>((resolve, reject) => {
     const abort = () =>
       reject(new DOMException("The operation was aborted", "AbortError"))
+
     signal.addEventListener("abort", abort, { once: true })
     void promise.then(
       (value) => {
         signal.removeEventListener("abort", abort)
         resolve(value)
       },
-      (error: unknown) => {
+      (error) => {
         signal.removeEventListener("abort", abort)
         reject(error)
       },
@@ -135,11 +140,14 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       initializers.fd(),
       initializers.rg(),
     ])
+
     if (!ctx.hasUI || notified) return
 
     notified = true
+
     for (const [index, tool] of (["fd", "rg"] as const).entries()) {
       const initializedTool = initialized[index]
+
       if (initializedTool.status === "fulfilled") {
         for (const message of installNotifications([initializedTool.value])) {
           ctx.ui.notify(message, "info")
@@ -162,11 +170,14 @@ export default function fileSearchTools(pi: ExtensionAPI) {
     const controller = new AbortController()
     let timedOut = false
     const cancel = () => controller.abort()
+
     const timeout = setTimeout(() => {
       timedOut = true
       controller.abort()
     }, EXEC_TIMEOUT_MS)
+
     signal?.addEventListener("abort", cancel, { once: true })
+
     if (signal?.aborted) controller.abort()
 
     try {
@@ -174,6 +185,7 @@ export default function fileSearchTools(pi: ExtensionAPI) {
         initializers[tool](),
         controller.signal,
       )
+
       const result = await executeSearchProcess({
         command: binary.command,
         args,
@@ -189,11 +201,13 @@ export default function fileSearchTools(pi: ExtensionAPI) {
           binarySource: binary.source,
         } satisfies SearchOutcome
       }
+
       if (result.code !== 0) {
         await discardCapturedOutput(result.output)
         const detail = result.stderr.trim() || `exit code ${result.code}`
         throw new SearchError(`${tool} failed: ${detail}`)
       }
+
       return {
         output: result.output,
         noMatches: result.output.lineCount === 0,
@@ -201,10 +215,13 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       } satisfies SearchOutcome
     } catch (error) {
       if (error instanceof SearchError) throw error
+
       if (timedOut) throw new SearchError(`${tool} timed out.`)
+
       if (signal?.aborted || isAbortError(error)) {
         throw new SearchError(`${tool} search was cancelled.`)
       }
+
       throw new SearchError(errorMessage(error))
     } finally {
       clearTimeout(timeout)
@@ -222,6 +239,7 @@ export default function fileSearchTools(pi: ExtensionAPI) {
 
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const outcome = await runSearch("fd", buildFdArgs(params), ctx, signal)
+
       if (outcome.noMatches) {
         return {
           content: [{ type: "text", text: "No files found" }],
@@ -234,6 +252,7 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       }
 
       const formatted = formatCapturedOutput(outcome.output)
+
       return {
         content: [{ type: "text", text: formatted.text }],
         details: {
@@ -248,31 +267,40 @@ export default function fileSearchTools(pi: ExtensionAPI) {
     renderCall(args, theme) {
       let text = theme.fg("toolTitle", theme.bold("fd "))
       text += theme.fg("accent", args.pattern ? `"${args.pattern}"` : "(all)")
+
       if (args.path) text += theme.fg("muted", ` in ${args.path}`)
+
       const flags = [
         args.type && `type=${args.type}`,
         args.extension && `ext=${args.extension}`,
         args.glob && "glob",
         args.hidden && "hidden",
         args.max_depth !== undefined && `depth≤${args.max_depth}`,
-      ].filter((flag): flag is string => typeof flag === "string")
+      ].filter((flag): flag is string => v.is(v.string(), flag))
+
       if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
+
       return new Text(text, 0, 0)
     },
 
     renderResult(result, { expanded, isPartial }, theme) {
       if (isPartial) return new Text(theme.fg("warning", "Searching..."), 0, 0)
       const details = result.details
+
       if (!details || details.matchCount === 0) {
         return new Text(theme.fg("dim", "No files found"), 0, 0)
       }
+
       let text = theme.fg(
         "success",
         `${details.matchCount} ${details.matchCount === 1 ? "entry" : "entries"}`,
       )
+
       if (details.truncated) text += theme.fg("warning", " (truncated)")
+
       if (expanded)
         text += expandedPreview(result, details.fullOutputPath, theme)
+
       return new Text(text, 0, 0)
     },
   })
@@ -287,6 +315,7 @@ export default function fileSearchTools(pi: ExtensionAPI) {
 
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const outcome = await runSearch("rg", buildRgArgs(params), ctx, signal)
+
       if (outcome.noMatches) {
         return {
           content: [{ type: "text", text: "No matches found" }],
@@ -299,6 +328,7 @@ export default function fileSearchTools(pi: ExtensionAPI) {
       }
 
       const formatted = formatCapturedOutput(outcome.output)
+
       return {
         content: [{ type: "text", text: formatted.text }],
         details: {
@@ -313,31 +343,40 @@ export default function fileSearchTools(pi: ExtensionAPI) {
     renderCall(args, theme) {
       let text = theme.fg("toolTitle", theme.bold("rg "))
       text += theme.fg("accent", `"${args.pattern}"`)
+
       if (args.path) text += theme.fg("muted", ` in ${args.path}`)
+
       const flags = [
         args.glob && `glob=${args.glob}`,
         args.file_type && `type=${args.file_type}`,
         args.fixed_strings && "literal",
         args.hidden && "hidden",
         args.context !== undefined && `ctx=${args.context}`,
-      ].filter((flag): flag is string => typeof flag === "string")
+      ].filter((flag): flag is string => v.is(v.string(), flag))
+
       if (flags.length > 0) text += " " + theme.fg("dim", flags.join(" "))
+
       return new Text(text, 0, 0)
     },
 
     renderResult(result, { expanded, isPartial }, theme) {
       if (isPartial) return new Text(theme.fg("warning", "Searching..."), 0, 0)
       const details = result.details
+
       if (!details || details.outputLines === 0) {
         return new Text(theme.fg("dim", "No matches found"), 0, 0)
       }
+
       let text = theme.fg(
         "success",
         `${details.outputLines} output ${details.outputLines === 1 ? "line" : "lines"}`,
       )
+
       if (details.truncated) text += theme.fg("warning", " (truncated)")
+
       if (expanded)
         text += expandedPreview(result, details.fullOutputPath, theme)
+
       return new Text(text, 0, 0)
     },
   })
@@ -356,18 +395,23 @@ function expandedPreview(
 ) {
   let text = ""
   const content = result.content[0]
+
   if (content?.type === "text" && content.text) {
     const lines = content.text.split("\n")
+
     for (const line of lines.slice(0, PREVIEW_LINES)) {
       text += `\n${theme.fg("dim", line)}`
     }
+
     if (lines.length > PREVIEW_LINES) {
       text += `\n${theme.fg("muted", `... ${lines.length - PREVIEW_LINES} more lines`)}`
     }
   }
+
   if (fullOutputPath) {
     text += `\n${theme.fg("dim", `Full output: ${fullOutputPath}`)}`
   }
+
   return text
 }
 

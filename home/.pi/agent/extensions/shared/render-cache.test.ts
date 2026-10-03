@@ -5,9 +5,11 @@ import { cacheRenderer } from "./render-cache.ts"
 test("caches render output by width until invalidated", () => {
   let renders = 0
   let invalidations = 0
+
   const component = cacheRenderer(
     (width) => {
       renders += 1
+
       return [`${width}`]
     },
     () => {

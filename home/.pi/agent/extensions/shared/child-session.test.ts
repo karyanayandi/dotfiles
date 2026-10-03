@@ -26,6 +26,7 @@ import {
 
 async function withTempDir(run: (directory: string) => Promise<void>) {
   const directory = await mkdtemp(path.join(tmpdir(), "pi-child-policy-"))
+
   try {
     await run(directory)
   } finally {
@@ -37,9 +38,11 @@ test("child denylist keeps extension and workflow structured tools available", a
   await withTempDir(async (directory) => {
     let starts = 0
     let shutdowns = 0
+
     const settingsManager = SettingsManager.inMemory(undefined, {
       projectTrusted: false,
     })
+
     const inlineLoader = new DefaultResourceLoader({
       cwd: directory,
       agentDir: path.join(directory, "inline-agent"),
@@ -52,6 +55,7 @@ test("child denylist keeps extension and workflow structured tools available", a
           pi.on("session_shutdown", () => {
             shutdowns++
           })
+
           for (const name of [
             "fixture_extension_tool",
             ...CHILD_EXCLUDED_TOOL_NAMES,
@@ -61,17 +65,18 @@ test("child denylist keeps extension and workflow structured tools available", a
               label: name,
               description: name,
               parameters: toolSchema(v.object({})),
-              async execute() {
-                return {
+              execute() {
+                return Promise.resolve({
                   content: [{ type: "text", text: "ok" }],
                   details: {},
-                }
+                })
               },
             })
           }
         },
       ],
     })
+
     await inlineLoader.reload()
 
     const structuredOutput = defineTool({
@@ -79,13 +84,14 @@ test("child denylist keeps extension and workflow structured tools available", a
       label: "Structured Output",
       description: "fixture structured result",
       parameters: toolSchema(v.object({ value: v.string() })),
-      async execute(_id, params) {
-        return {
+      execute(_id, params) {
+        return Promise.resolve({
           content: [{ type: "text", text: params.value }],
           details: {},
-        }
+        })
       },
     })
+
     const { session } = await createAgentSession({
       cwd: directory,
       agentDir: path.join(directory, "inline-agent"),
@@ -95,6 +101,7 @@ test("child denylist keeps extension and workflow structured tools available", a
       customTools: [structuredOutput],
       ...childToolPolicy(),
     })
+
     await bindChildSessionExtensions(session)
 
     assert.deepEqual(
@@ -116,6 +123,7 @@ test("child denylist keeps extension and workflow structured tools available", a
     assert.equal(activeTools.has("fixture_extension_tool"), true)
     assert.equal(allTools.has("structured_output"), true)
     assert.equal(activeTools.has("structured_output"), true)
+
     for (const denied of CHILD_EXCLUDED_TOOL_NAMES) {
       assert.equal(allTools.has(denied), false, `${denied} should be denied`)
       assert.equal(
@@ -124,6 +132,7 @@ test("child denylist keeps extension and workflow structured tools available", a
         `${denied} should be inactive`,
       )
     }
+
     for (const builtin of ["read", "bash", "edit", "write"]) {
       assert.equal(
         activeTools.has(builtin),
@@ -146,6 +155,7 @@ test("resource loading gates project extensions but retains global extensions", 
     const agentDir = path.join(directory, "agent")
     await mkdir(path.join(cwd, ".pi", "extensions"), { recursive: true })
     await mkdir(path.join(agentDir, "extensions"), { recursive: true })
+
     const extensionSource = (name: string) => `
       export default function (pi) {
         pi.registerTool({
@@ -155,6 +165,7 @@ test("resource loading gates project extensions but retains global extensions", 
         });
       }
     `
+
     await writeFile(
       path.join(agentDir, "extensions", "global.ts"),
       extensionSource("global_fixture"),
@@ -169,9 +180,11 @@ test("resource loading gates project extensions but retains global extensions", 
       agentDir,
       projectTrusted: false,
     })
+
     const untrustedTools = untrusted.loader
       .getExtensions()
       .extensions.flatMap((extension) => [...extension.tools.keys()])
+
     assert.equal(untrustedTools.includes("global_fixture"), true)
     assert.equal(untrustedTools.includes("project_fixture"), false)
 
@@ -180,9 +193,11 @@ test("resource loading gates project extensions but retains global extensions", 
       agentDir,
       projectTrusted: true,
     })
+
     const trustedTools = trusted.loader
       .getExtensions()
       .extensions.flatMap((extension) => [...extension.tools.keys()])
+
     assert.equal(trustedTools.includes("global_fixture"), true)
     assert.equal(trustedTools.includes("project_fixture"), true)
   })
@@ -231,13 +246,15 @@ test("alternate standalone cwd only uses explicit saved trust", async () => {
 test("shutdown helper balances hooks and disposal despite errors", async () => {
   let emits = 0
   let disposals = 0
+
   const session: DisposableChildSession = {
     extensionRunner: {
       hasHandlers: () => true,
-      async emit(event: SessionShutdownEvent) {
+      emit(event: SessionShutdownEvent) {
         emits++
         assert.deepEqual(event, { type: "session_shutdown", reason: "quit" })
-        throw new Error("fixture shutdown failure")
+
+        return Promise.reject(new Error("fixture shutdown failure"))
       },
     },
     dispose() {
@@ -256,10 +273,11 @@ test("shutdown helper balances hooks and disposal despite errors", async () => {
 
 test("shutdown helper bounds a stuck hook before disposal", async () => {
   let disposals = 0
+
   const session: DisposableChildSession = {
     extensionRunner: {
       hasHandlers: () => true,
-      emit: () => new Promise(() => {}),
+      emit: () => new Promise(() => undefined),
     },
     dispose() {
       disposals++

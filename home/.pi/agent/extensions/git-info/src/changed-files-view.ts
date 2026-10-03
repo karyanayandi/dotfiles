@@ -11,14 +11,18 @@ import { runCommand } from "./process.ts"
 // oxlint-disable no-control-regex -- this module processes raw terminal/ANSI output
 
 const DIFF_SCROLL_STEP = 5
+
 const MAX_DIFF_LINES = 20_000
+
 // Strip terminal control sequences from repository-controlled paths and diff
 // text before applying trusted theme styling.
 // eslint-disable-next-line no-control-regex
 const OSC_PATTERN =
   /(?:\u001b\]|\u009d)(?:[^\u0007\u001b\u009c]|\u001b(?!\\))*(?:\u0007|\u001b\\|\u009c)/g
+
 // eslint-disable-next-line no-control-regex
 const CSI_PATTERN = /(?:\u001b\[|\u009b)[0-?]*[ -/]*[@-~]/g
+
 // eslint-disable-next-line no-control-regex
 const ESCAPE_PATTERN = /\u001b(?:[()][0-2A-Z]|[ -/]*[@-~])/g
 
@@ -49,6 +53,7 @@ function parseChangedPaths(output: string) {
 
   for (let index = 0; index < records.length; index += 1) {
     const record = records[index]
+
     if (!record || record.length < 4) continue
 
     const status = record.slice(0, 2)
@@ -64,9 +69,11 @@ function parseChangedPaths(output: string) {
 
 function parseNumstat(output: string) {
   const line = output.split("\n").find(Boolean)
+
   if (!line) return { additions: 0, deletions: 0 }
 
   const [added, deleted] = line.split("\t")
+
   return {
     additions: added === "-" ? null : Number.parseInt(added ?? "0", 10),
     deletions: deleted === "-" ? null : Number.parseInt(deleted ?? "0", 10),
@@ -87,6 +94,7 @@ async function loadFile(
   signal?: AbortSignal,
 ) {
   const useNoIndex = changedPath.status === "??" || !hasHead
+
   const diffArguments = useNoIndex
     ? [
         "diff",
@@ -107,18 +115,23 @@ async function loadFile(
         "--",
         changedPath.path,
       ]
+
   const statArguments = useNoIndex
     ? ["diff", "--no-index", "--numstat", "--", "/dev/null", changedPath.path]
     : ["diff", "--numstat", "HEAD", "--", changedPath.path]
+
   const [diffResult, statResult] = await Promise.all([
     run(repoRoot, diffArguments, signal),
     run(repoRoot, statArguments, signal),
   ])
+
   const stats = parseNumstat(statResult.stdout)
+
   const allDiffLines = diffResult.stdout
     .trimEnd()
     .split("\n")
     .map(sanitizeTerminalText)
+
   const diff =
     allDiffLines.length > MAX_DIFF_LINES
       ? [
@@ -140,9 +153,11 @@ async function loadFile(
 
 export async function loadChangedFiles(cwd: string, signal?: AbortSignal) {
   const rootResult = await run(cwd, ["rev-parse", "--show-toplevel"], signal)
+
   if (rootResult.code !== 0) return null
 
   const repoRoot = rootResult.stdout.trim()
+
   const [statusResult, headResult] = await Promise.all([
     run(
       repoRoot,
@@ -151,10 +166,12 @@ export async function loadChangedFiles(cwd: string, signal?: AbortSignal) {
     ),
     run(repoRoot, ["rev-parse", "--verify", "HEAD"], signal),
   ])
+
   if (statusResult.code !== 0) return null
 
   const changedPaths = parseChangedPaths(statusResult.stdout)
   const files: ChangedFile[] = []
+
   for (const changedPath of changedPaths) {
     files.push(
       await loadFile(repoRoot, changedPath, headResult.code === 0, signal),
@@ -166,6 +183,7 @@ export async function loadChangedFiles(cwd: string, signal?: AbortSignal) {
 
 function padToWidth(text: string, width: number) {
   const truncated = truncateToWidth(text, width, "")
+
   return `${truncated}${" ".repeat(Math.max(0, width - visibleWidth(truncated)))}`
 }
 
@@ -188,7 +206,9 @@ export async function showChangedFiles(
 
       function ensureSelectedFileVisible() {
         const visibleFiles = Math.max(1, Math.floor(bodyHeight() / 2))
+
         if (selectedIndex < sidebarOffset) sidebarOffset = selectedIndex
+
         if (selectedIndex >= sidebarOffset + visibleFiles) {
           sidebarOffset = selectedIndex - visibleFiles + 1
         }
@@ -206,25 +226,33 @@ export async function showChangedFiles(
           0,
           files[selectedIndex]!.diff.length - bodyHeight(),
         )
+
         diffOffset = Math.max(0, Math.min(maxOffset, diffOffset + amount))
         tui.requestRender()
       }
 
       function styleDiffLine(line: string) {
         const expanded = line.replaceAll("\t", "    ")
+
         if (
           expanded.startsWith("diff --git") ||
           expanded.startsWith("index ")
         ) {
           return theme.fg("accent", theme.bold(expanded))
         }
+
         if (expanded.startsWith("@@")) return theme.fg("mdHeading", expanded)
+
         if (expanded.startsWith("---") || expanded.startsWith("+++")) {
           return theme.fg("muted", expanded)
         }
+
         if (expanded.startsWith("+")) return theme.fg("success", expanded)
+
         if (expanded.startsWith("-")) return theme.fg("error", expanded)
+
         if (expanded.startsWith("…")) return theme.fg("warning", expanded)
+
         return theme.fg("text", expanded)
       }
 
@@ -233,6 +261,7 @@ export async function showChangedFiles(
         const right = top ? "┐" : "┘"
         const text = `─ ${label} `
         const remaining = Math.max(0, width - visibleWidth(text) - 2)
+
         return theme.fg(
           "borderAccent",
           truncateToWidth(
@@ -247,30 +276,40 @@ export async function showChangedFiles(
         if (focus === "files") {
           if (matchesKey(data, Key.escape)) {
             done(undefined)
+
             return
           }
+
           if (matchesKey(data, Key.down) || data === "j") {
             moveFile(1)
+
             return
           }
+
           if (matchesKey(data, Key.up) || data === "k") {
             moveFile(-1)
+
             return
           }
+
           if (matchesKey(data, Key.home) || data === "g") {
             selectedIndex = 0
             diffOffset = 0
             ensureSelectedFileVisible()
             tui.requestRender()
+
             return
           }
+
           if (matchesKey(data, Key.end) || data === "G") {
             selectedIndex = files.length - 1
             diffOffset = 0
             ensureSelectedFileVisible()
             tui.requestRender()
+
             return
           }
+
           if (
             matchesKey(data, Key.enter) ||
             matchesKey(data, Key.space) ||
@@ -280,6 +319,7 @@ export async function showChangedFiles(
             focus = "diff"
             tui.requestRender()
           }
+
           return
         }
 
@@ -290,29 +330,41 @@ export async function showChangedFiles(
         ) {
           focus = "files"
           tui.requestRender()
+
           return
         }
+
         if (matchesKey(data, Key.down) || data === "j") {
           moveDiff(DIFF_SCROLL_STEP)
+
           return
         }
+
         if (matchesKey(data, Key.up) || data === "k") {
           moveDiff(-DIFF_SCROLL_STEP)
+
           return
         }
+
         if (matchesKey(data, Key.ctrl("d"))) {
           moveDiff(Math.max(1, Math.floor(bodyHeight() / 2)))
+
           return
         }
+
         if (matchesKey(data, Key.ctrl("u"))) {
           moveDiff(-Math.max(1, Math.floor(bodyHeight() / 2)))
+
           return
         }
+
         if (matchesKey(data, Key.home) || data === "g") {
           diffOffset = 0
           tui.requestRender()
+
           return
         }
+
         if (matchesKey(data, Key.end) || data === "G") {
           diffOffset = Math.max(
             0,
@@ -324,10 +376,12 @@ export async function showChangedFiles(
 
       function render(width: number) {
         const height = bodyHeight()
+
         const sidebarWidth = Math.min(
           48,
           Math.max(24, Math.floor(width * 0.34)),
         )
+
         const diffWidth = Math.max(1, width - sidebarWidth - 3)
         const selectedFile = files[selectedIndex]!
         const title = `local changes · ${files.length} ${files.length === 1 ? "file" : "files"} · ${focus === "files" ? "FILES" : "DIFF"}`
@@ -340,21 +394,28 @@ export async function showChangedFiles(
 
           if (file) {
             const isSelected = fileIndex === selectedIndex
+
             if (row % 2 === 0) {
               const marker = isSelected ? "› " : "  "
+
               const isBinary =
                 file.additions === null || file.deletions === null
+
               const stats = isBinary
                 ? "binary"
                 : `+${file.additions} -${file.deletions}`
+
               const styledStats = isBinary
                 ? theme.fg("success", stats)
                 : `${theme.fg("success", `+${file.additions}`)} ${theme.fg("error", `-${file.deletions}`)}`
+
               const nameWidth = Math.max(
                 1,
                 sidebarWidth - visibleWidth(marker) - visibleWidth(stats) - 1,
               )
+
               const name = truncateToWidth(file.name, nameWidth, "…")
+
               const gap = " ".repeat(
                 Math.max(
                   1,
@@ -364,12 +425,14 @@ export async function showChangedFiles(
                     visibleWidth(stats),
                 ),
               )
+
               sidebar = `${marker}${name}${gap}${styledStats}`
             } else {
               sidebar = `  ${theme.fg("dim", truncateToWidth(file.path, Math.max(1, sidebarWidth - 2), "…"))}`
             }
 
             sidebar = padToWidth(sidebar, sidebarWidth)
+
             if (isSelected) {
               sidebar = theme.bg(
                 focus === "files" ? "selectedBg" : "customMessageBg",
@@ -381,14 +444,17 @@ export async function showChangedFiles(
           }
 
           const diffLine = selectedFile.diff[diffOffset + row]
+
           const diff = padToWidth(
             diffLine === undefined ? "" : styleDiffLine(diffLine),
             diffWidth,
           )
+
           const separator = theme.fg(
             focus === "diff" ? "borderAccent" : "borderMuted",
             "│",
           )
+
           lines.push(
             `${theme.fg("borderMuted", "│")}${sidebar}${separator}${diff}${theme.fg("borderMuted", "│")}`,
           )
@@ -398,13 +464,17 @@ export async function showChangedFiles(
           focus === "files"
             ? "j/k or ↑/↓ select · enter/space/l open diff · esc close"
             : "j/k or ↑/↓ scroll · ctrl-d/u page · g/G top/bottom · esc/h files"
+
         lines.push(border(width, help, false))
+
         return lines
       }
 
       return {
         handleInput,
-        invalidate() {},
+        invalidate() {
+          return undefined
+        },
         render,
       }
     },

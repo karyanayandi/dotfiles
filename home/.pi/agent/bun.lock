@@ -24,6 +24,9 @@
     },
     "extensions/ask-user": {
       "name": "ask-user",
+      "dependencies": {
+        "@pi/shared": "workspace:*",
+      },
       "devDependencies": {
         "typescript": "catalog:",
       },
@@ -45,6 +48,9 @@
     },
     "extensions/file-search": {
       "name": "file-search",
+      "dependencies": {
+        "@pi/shared": "workspace:*",
+      },
       "devDependencies": {
         "typescript": "catalog:",
         "vitest": "4.1.10",
@@ -53,6 +59,7 @@
     "extensions/firecrawl-search": {
       "name": "firecrawl-search",
       "dependencies": {
+        "@pi/shared": "workspace:*",
         "firecrawl": "catalog:",
       },
       "devDependencies": {

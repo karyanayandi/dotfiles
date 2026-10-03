@@ -34,6 +34,7 @@ function makePreviewState(): PreviewState {
 
 function observeStdout(state: PreviewState, chunk: Uint8Array) {
   state.totalBytes += chunk.byteLength
+
   for (const byte of chunk) {
     if (byte === 0x0a) {
       state.lineBreaks++
@@ -45,10 +46,12 @@ function observeStdout(state: PreviewState, chunk: Uint8Array) {
 
   if (state.truncated) return
   state.preview += state.decoder.decode(chunk, { stream: true })
+
   const truncation = truncateHead(state.preview, {
     maxLines: DEFAULT_MAX_LINES,
     maxBytes: DEFAULT_MAX_BYTES,
   })
+
   if (truncation.truncated) {
     state.preview = truncation.content
     state.truncated = true
@@ -58,8 +61,10 @@ function observeStdout(state: PreviewState, chunk: Uint8Array) {
 function finishStdout(state: PreviewState, fullOutputPath: string) {
   if (!state.truncated) state.preview += state.decoder.decode()
   const totalBytes = state.totalBytes - state.trailingLineBreaks
+
   const lineCount =
     totalBytes === 0 ? 0 : state.lineBreaks - state.trailingLineBreaks + 1
+
   return {
     preview: state.preview,
     lineCount,
@@ -91,6 +96,7 @@ export async function executeSearchProcess(options: {
       cwd: options.cwd,
       stdio: ["ignore", "pipe", "pipe"],
     })
+
     const output = createWriteStream(fullOutputPath)
     const preview = makePreviewState()
     const stderr: Buffer[] = []
@@ -100,16 +106,20 @@ export async function executeSearchProcess(options: {
       process.once("error", reject)
       process.once("close", resolve)
     })
+
     const outputClosed = new Promise<void>((resolve, reject) => {
       output.once("error", reject)
       output.once("close", resolve)
     })
+
     const abort = () => process.kill()
     options.signal?.addEventListener("abort", abort, { once: true })
+
     if (options.signal?.aborted) abort()
 
     process.stdout.on("data", (chunk: Buffer) => {
       observeStdout(preview, chunk)
+
       if (!output.write(chunk)) process.stdout.pause()
     })
     output.on("drain", () => process.stdout.resume())
@@ -124,9 +134,11 @@ export async function executeSearchProcess(options: {
     try {
       const code = await close
       await outputClosed
+
       if (options.signal?.aborted) throw abortError()
       const captured = finishStdout(preview, fullOutputPath)
       retainDirectory = captured.truncated
+
       return {
         code: code ?? -1,
         stderr: Buffer.concat(stderr, stderrBytes).toString("utf8"),
@@ -134,7 +146,9 @@ export async function executeSearchProcess(options: {
       }
     } finally {
       options.signal?.removeEventListener("abort", abort)
+
       if (!output.closed) output.destroy()
+
       if (!process.killed && options.signal?.aborted) process.kill()
     }
   } finally {

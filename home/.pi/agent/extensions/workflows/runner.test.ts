@@ -123,6 +123,7 @@ test("completed parallel tool calls pair lifecycle timings with calls and result
 
   const transcript = transcriptFromMessages(parallelToolMessages(), timings)
   const toolEntries = transcript.filter((entry) => entry.role === "tool")
+
   const resultEntries = transcript.filter(
     (entry) => entry.role === "toolResult",
   )
@@ -170,6 +171,7 @@ test("in-flight aborted tool calls retain start timing without completion", () =
     parallelToolMessages().slice(0, 2),
     timings,
   )
+
   const first = transcript.find((entry) => entry.toolCallId === "call-a")
 
   assert.equal(first?.startedAt, 2_000)
@@ -183,15 +185,22 @@ test("in-flight aborted tool calls retain start timing without completion", () =
 
 test("first-response watchdog aborts a silent provider request", async () => {
   let aborted = false
+
   const watchdog = createFirstResponseWatchdog(
-    async () => {
+    () => {
       aborted = true
+
+      return Promise.resolve()
     },
     { timeoutMs: 10, model: "fixture-model" },
   )
 
   await assert.rejects(
-    watchdog.waitFor(new Promise<never>(() => {})),
+    watchdog.waitFor(
+      new Promise<never>(() => {
+        // Silent provider fixture stays pending until the watchdog fires.
+      }),
+    ),
     /no assistant response event for fixture-model within 10 ms.*stalled/i,
   )
   assert.equal(aborted, true)
@@ -199,16 +208,16 @@ test("first-response watchdog aborts a silent provider request", async () => {
 
 test("first assistant response disarms the watchdog without limiting the run", async () => {
   const watchdog = createFirstResponseWatchdog(
-    async () => {
-      throw new Error("watchdog should have been disarmed")
-    },
+    () => Promise.reject(new Error("watchdog should have been disarmed")),
     { timeoutMs: 10 },
   )
+
   watchdog.markResponse()
 
   const result = await watchdog.waitFor(
     new Promise<string>((resolve) => setTimeout(() => resolve("done"), 20)),
   )
+
   assert.equal(result, "done")
 })
 
@@ -218,24 +227,29 @@ test("workflow children guard structured, normal, and dynamically registered too
     details: { value: "fixture" },
     terminate: true,
   }
+
   const structured = {
     name: "structured_output",
     label: "Structured Output",
     description: "fixture",
     parameters: toolSchema(v.object({})),
-    async execute() {
-      return structuredResult
+    execute() {
+      return Promise.resolve(structuredResult)
     },
   } satisfies ToolDefinition
+
   const definitions = new Map<string, ToolDefinition>([
     [structured.name, structured],
   ])
+
   let listener: AgentSessionEventListener | undefined
+
   const session = {
     getAllTools: () => [...definitions.keys()].map((name) => ({ name })),
     getToolDefinition: (name: string) => definitions.get(name),
     subscribe(next: AgentSessionEventListener) {
       listener = next
+
       return () => {
         listener = undefined
       }
@@ -246,20 +260,25 @@ test("workflow children guard structured, normal, and dynamically registered too
   assert.equal(await structured.execute(), structuredResult)
 
   let dynamicSignal: AbortSignal | undefined
+
   const dynamic = {
     name: "dynamic_fixture",
     label: "Dynamic Fixture",
     description: "fixture",
     parameters: toolSchema(v.object({})),
-    async execute(
+    execute(
       _toolCallId: string,
       _params: Record<string, never>,
       signal?: AbortSignal,
     ) {
       dynamicSignal = signal
-      return new Promise<never>(() => {})
+
+      return new Promise<never>(() => {
+        // Stalled tool fixture must be rejected by the execution timeout.
+      })
     },
   } satisfies ToolDefinition
+
   const originalDynamicExecute = dynamic.execute
   definitions.set(dynamic.name, dynamic)
   listener?.({ type: "agent_start" })

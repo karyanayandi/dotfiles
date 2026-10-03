@@ -10,20 +10,24 @@
  * errors, aborts, missing structured output) settles into an `AgentOutcome`.
  */
 
+import type {
+  DefaultResourceLoader,
+  SettingsManager,
+} from "@earendil-works/pi-coding-agent"
 import {
   createAgentSession,
-  DefaultResourceLoader,
   defineTool,
   SessionManager,
-  SettingsManager,
   type AgentSession,
   type AgentSessionEvent,
   type AgentSessionEventListener,
   type ExtensionAPI,
   type ExtensionContext,
   type ToolDefinition,
+  type CreateAgentSessionOptions,
 } from "@earendil-works/pi-coding-agent"
 import type { JsonSchema } from "@valibot/to-json-schema"
+import * as v from "valibot"
 import {
   bindChildSessionExtensions,
   childToolPolicy,
@@ -41,14 +45,21 @@ import {
 import { safeStringify, truncateUtf8 } from "./serialization.ts"
 
 const AGENT_OUTPUT_MAX_BYTES = 64 * 1024
+
 export const FIRST_RESPONSE_TIMEOUT_MS = 45_000
+
 const TRANSCRIPT_ENTRY_MAX_BYTES = 16 * 1024
+
 const TRANSCRIPT_TOTAL_MAX_BYTES = 256 * 1024
+
 const TRANSCRIPT_MAX_ENTRIES = 200
 
 export type WorkflowModel = NonNullable<ExtensionContext["model"]>
+
 export type ThinkingLevel = ReturnType<ExtensionAPI["getThinkingLevel"]>
+
 type AgentMessage = AgentSession["messages"][number]
+
 type ToolTimingEvent = Extract<
   AgentSessionEvent,
   { type: "tool_execution_start" | "tool_execution_end" }
@@ -105,17 +116,19 @@ export function createWorkflowResources(
   variant: "plain" | "structured",
   projectTrusted: boolean,
 ) {
-  return createChildResources({
+  const options: Parameters<typeof createChildResources>[0] = {
     cwd,
     projectTrusted,
-    ...(variant === "structured"
-      ? { appendSystemPrompt: [STRUCTURED_OUTPUT_SYSTEM_INSTRUCTION] }
-      : {}),
-  })
+  }
+
+  if (variant === "structured")
+    options.appendSystemPrompt = [STRUCTURED_OUTPUT_SYSTEM_INSTRUCTION]
+
+  return createChildResources(options)
 }
 
 interface WorkflowToolSession {
-  getAllTools(): Array<{ name: string }>
+  getAllTools(): { name: string }[]
   getToolDefinition(name: string): ToolDefinition | undefined
   subscribe(listener: AgentSessionEventListener): () => void
 }
@@ -127,46 +140,58 @@ export function guardWorkflowChildTools(
 ) {
   const guard = createToolCallTimeoutGuard(timeoutMs)
   guard.apply(session)
+
   return session.subscribe((event) => {
     if (event.type === "agent_start") guard.apply(session)
   })
 }
 
-function isJsonSchema(value: unknown): value is JsonSchema {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return false
+function isJsonSchema<T>(value: T): value is T & JsonSchema {
+  if (Array.isArray(value) || !v.is(v.object({}), value)) return false
   const seen = new WeakSet<object>()
   let nodes = 0
-  const validate = (current: unknown, depth: number): boolean => {
+
+  function validate<TValue>(current: TValue, depth: number): boolean {
     if (++nodes > 10_000 || depth > 24) return false
+
     if (
       current === null ||
-      typeof current === "string" ||
-      typeof current === "boolean"
+      v.is(v.string(), current) ||
+      v.is(v.boolean(), current)
     ) {
       return true
     }
-    if (typeof current === "number") return Number.isFinite(current)
+
+    if (v.is(v.number(), current)) return Number.isFinite(current)
+
     if (Array.isArray(current)) {
       return current.every((item) => validate(item, depth + 1))
     }
-    if (typeof current !== "object") return false
+
+    if (!v.is(v.object({}), current)) return false
+
     if (seen.has(current)) return false
     seen.add(current)
+
     return Object.keys(current).every((key) => {
       if (key === "__proto__" || key === "constructor" || key === "prototype") {
         return false
       }
-      return validate((current as Record<string, unknown>)[key], depth + 1)
+
+      // SAFETY: Object.keys enumerated current's own keys; every retrieved value is validated recursively before the schema is accepted.
+      return validate(current[key as keyof typeof current], depth + 1)
     })
   }
+
   return validate(value, 0)
 }
 
 /** Preserve the caller's full JSON Schema instead of lossy keyword conversion. */
-function structuredOutputSchema(schema: unknown) {
+function structuredOutputSchema<T>(schema: T) {
   if (!isJsonSchema(schema)) {
     throw new Error("structured output schema must be a bounded JSON object")
   }
+
   return unsafeSchema(schema)
 }
 
@@ -174,22 +199,25 @@ function structuredOutputSchema(schema: unknown) {
  * One-shot terminating tool injected when a schema is supplied: the subagent
  * calls it as its final action and we capture the validated object.
  */
-function makeStructuredOutputTool(
-  schema: unknown,
-  capture: (value: unknown) => void,
+function makeStructuredOutputTool<T>(
+  schema: T,
+  capture: <TValue>(value: TValue) => void,
 ): ToolDefinition {
   return defineTool({
     name: "structured_output",
     label: "Structured Output",
     description: STRUCTURED_OUTPUT_TOOL_DESCRIPTION,
     parameters: structuredOutputSchema(schema),
-    async execute(_toolCallId, params) {
+    execute(_toolCallId, params) {
       capture(params)
-      return {
-        content: [{ type: "text", text: "Recorded structured result." }],
+
+      return Promise.resolve({
+        content: [
+          { type: "text" as const, text: "Recorded structured result." },
+        ],
         details: params,
         terminate: true,
-      }
+      })
     },
   })
 }
@@ -197,18 +225,22 @@ function makeStructuredOutputTool(
 function finalOutput(messages: AgentMessage[]): string {
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i]
+
     if (msg.role !== "assistant") continue
+
     const text = msg.content
       .filter((part) => part.type === "text")
       .map((part) => part.text)
       .join("\n")
       .trim()
+
     if (text) return text
   }
+
   return ""
 }
 
-function safeJson(value: unknown): string {
+function safeJson<T>(value: T): string {
   return safeStringify(value, {
     maxBytes: TRANSCRIPT_ENTRY_MAX_BYTES,
     maxDepth: 12,
@@ -223,21 +255,25 @@ export function recordToolExecutionTiming(
   observedAt = Date.now(),
 ) {
   const previous = timings.get(event.toolCallId)
+
   if (event.type === "tool_execution_start") {
     if (previous?.startedAt !== undefined) return
     timings.set(event.toolCallId, { ...previous, startedAt: observedAt })
+
     return
   }
+
   if (previous?.finishedAt !== undefined) return
+
   const durationMs =
     previous?.startedAt === undefined
       ? undefined
       : Math.max(0, observedAt - previous.startedAt)
-  timings.set(event.toolCallId, {
-    ...previous,
-    finishedAt: observedAt,
-    ...(durationMs === undefined ? {} : { durationMs }),
-  })
+
+  const timing: ToolExecutionTiming = { ...previous, finishedAt: observedAt }
+
+  if (durationMs !== undefined) timing.durationMs = durationMs
+  timings.set(event.toolCallId, timing)
 }
 
 function toolMetadata(
@@ -245,16 +281,18 @@ function toolMetadata(
   timings: ReadonlyMap<string, ToolExecutionTiming>,
 ) {
   const timing = timings.get(toolCallId)
-  return {
+
+  const metadata: ToolExecutionTiming & { toolCallId: string } = {
     toolCallId: truncateUtf8(toolCallId, 1024),
-    ...(timing?.startedAt === undefined ? {} : { startedAt: timing.startedAt }),
-    ...(timing?.finishedAt === undefined
-      ? {}
-      : { finishedAt: timing.finishedAt }),
-    ...(timing?.durationMs === undefined
-      ? {}
-      : { durationMs: timing.durationMs }),
   }
+
+  if (timing?.startedAt !== undefined) metadata.startedAt = timing.startedAt
+
+  if (timing?.finishedAt !== undefined) metadata.finishedAt = timing.finishedAt
+
+  if (timing?.durationMs !== undefined) metadata.durationMs = timing.durationMs
+
+  return metadata
 }
 
 /** Convert pi messages into a compact, serializable transcript for the UI. */
@@ -263,19 +301,21 @@ export function transcriptFromMessages(
   toolTimings: ReadonlyMap<string, ToolExecutionTiming> = new Map(),
 ): TranscriptEntry[] {
   const entries: TranscriptEntry[] = []
+
   for (const message of messages) {
     if (message.role === "user") {
-      const text =
-        typeof message.content === "string"
-          ? message.content
-          : message.content
-              .map((part) =>
-                part.type === "text" ? part.text : `[image: ${part.mimeType}]`,
-              )
-              .join("\n")
+      const text = v.is(v.string(), message.content)
+        ? message.content
+        : message.content
+            .map((part) =>
+              part.type === "text" ? part.text : `[image: ${part.mimeType}]`,
+            )
+            .join("\n")
+
       if (text.trim()) {
         entries.push({ role: "user", text, timestamp: message.timestamp })
       }
+
       continue
     }
 
@@ -303,15 +343,18 @@ export function transcriptFromMessages(
           })
         }
       }
+
       continue
     }
 
     if (message.role !== "toolResult") continue
+
     const text = message.content
       .map((part) =>
         part.type === "text" ? part.text : `[image: ${part.mimeType}]`,
       )
       .join("\n")
+
     entries.push({
       role: "toolResult",
       name: message.toolName,
@@ -321,19 +364,25 @@ export function transcriptFromMessages(
       ...toolMetadata(message.toolCallId, toolTimings),
     })
   }
+
   const selected =
     entries.length <= TRANSCRIPT_MAX_ENTRIES
       ? entries
       : [entries[0], ...entries.slice(-(TRANSCRIPT_MAX_ENTRIES - 1))]
+
   const bounded: TranscriptEntry[] = []
   let totalBytes = 0
+
   for (const entry of selected) {
     const remaining = TRANSCRIPT_TOTAL_MAX_BYTES - totalBytes
+
     if (remaining <= 0) break
+
     const text = truncateUtf8(
       entry.text,
       Math.min(TRANSCRIPT_ENTRY_MAX_BYTES, remaining),
     )
+
     totalBytes += Buffer.byteLength(text, "utf8")
     bounded.push({
       ...entry,
@@ -341,6 +390,7 @@ export function transcriptFromMessages(
         text === entry.text ? text : `${text}\n[transcript entry truncated]`,
     })
   }
+
   if (bounded.length < entries.length) {
     bounded.push({
       role: "toolResult",
@@ -348,15 +398,18 @@ export function transcriptFromMessages(
       text: `[transcript truncated: retained ${bounded.length} of ${entries.length} entries]`,
     })
   }
+
   return bounded
 }
 
 function computeUsage(messages: AgentMessage[]): AgentUsage {
   const usage = emptyUsage()
+
   for (const msg of messages) {
     if (msg.role !== "assistant") continue
     usage.turns++
     const u = msg.usage
+
     if (!u) continue
     usage.input += u.input || 0
     usage.output += u.output || 0
@@ -364,10 +417,11 @@ function computeUsage(messages: AgentMessage[]): AgentUsage {
     usage.cacheWrite += u.cacheWrite || 0
     usage.cost += u.cost?.total || 0
   }
+
   return usage
 }
 
-function errorText(error: unknown): string {
+function errorText<T>(error: T): string {
   return (error instanceof Error ? error.message : String(error)).slice(
     0,
     16 * 1024,
@@ -381,12 +435,13 @@ function formatTimeout(timeoutMs: number) {
 }
 
 /** Abort a provider call that opens but never emits its first assistant event. */
-export function createFirstResponseWatchdog(
-  onTimeout: () => Promise<unknown>,
+export function createFirstResponseWatchdog<T>(
+  onTimeout: () => Promise<T>,
   options: { timeoutMs?: number; model?: string } = {},
 ) {
   const timeoutMs = options.timeoutMs ?? FIRST_RESPONSE_TIMEOUT_MS
   let timer: ReturnType<typeof setTimeout> | undefined
+
   const timeout = new Promise<never>((_resolve, reject) => {
     timer = setTimeout(() => {
       timer = undefined
@@ -396,7 +451,9 @@ export function createFirstResponseWatchdog(
           `Agent received no assistant response event${model} within ${formatTimeout(timeoutMs)}; the provider request may be stalled. Retry the workflow.`,
         ),
       )
-      void onTimeout().catch(() => {})
+      void onTimeout().catch(() => {
+        // Timeout rejection already reports the failure; abort is best effort.
+      })
     }, timeoutMs)
     timer.unref?.()
   })
@@ -434,6 +491,7 @@ export async function runAgent(
   let customTools: ToolDefinition[] | undefined
   let session: AgentSession | undefined
   let unsubscribeToolTimeout: (() => void) | undefined
+
   try {
     customTools =
       options.schema !== undefined
@@ -443,18 +501,22 @@ export async function runAgent(
             }),
           ]
         : undefined
-    ;({ session } = await createAgentSession({
+
+    const sessionOptions: CreateAgentSessionOptions = {
       cwd: options.cwd,
-      ...(options.model ? { model: options.model } : {}),
-      ...(options.thinkingLevel
-        ? { thinkingLevel: options.thinkingLevel }
-        : {}),
       resourceLoader: options.loader,
       settingsManager: options.settingsManager,
       sessionManager: SessionManager.inMemory(options.cwd),
-      ...(customTools ? { customTools } : {}),
       ...childToolPolicy(),
-    }))
+    }
+
+    if (options.model) sessionOptions.model = options.model
+
+    if (options.thinkingLevel)
+      sessionOptions.thinkingLevel = options.thinkingLevel
+
+    if (customTools) sessionOptions.customTools = customTools
+    ;({ session } = await createAgentSession(sessionOptions))
     await bindChildSessionExtensions(session)
     unsubscribeToolTimeout = guardWorkflowChildTools(
       session,
@@ -462,7 +524,9 @@ export async function runAgent(
     )
   } catch (error) {
     unsubscribeToolTimeout?.()
+
     if (session) await shutdownAndDisposeChildSession(session)
+
     return {
       ok: false,
       output: "",
@@ -491,15 +555,18 @@ export async function runAgent(
     modelId = sessionModel?.id ?? modelId
     contextWindow = sessionModel?.contextWindow ?? contextWindow
     const context = childSession.getContextUsage()
+
     if (
-      typeof context?.tokens === "number" &&
+      context?.tokens !== undefined &&
+      context.tokens !== null &&
       Number.isFinite(context.tokens) &&
       context.tokens >= 0
     ) {
       usage.contextTokens = context.tokens
     }
+
     if (
-      typeof context?.contextWindow === "number" &&
+      context?.contextWindow !== undefined &&
       Number.isFinite(context.contextWindow) &&
       context.contextWindow > 0
     ) {
@@ -508,7 +575,9 @@ export async function runAgent(
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const msg = messages[i]
+
       if (msg.role !== "assistant") continue
+
       // Some gateways report a concrete fallback model. Prefer its registry
       // metadata when available so capacity tracks the model that served the
       // latest response rather than a hardcoded/configured guess.
@@ -516,23 +585,30 @@ export async function runAgent(
         !sessionModel ||
         (msg.provider === sessionModel.provider &&
           msg.model === sessionModel.id)
+
       const reportedId = msg.responseModel ?? msg.model
+
       const reportedModel = responseMatchesSession
         ? options.modelRegistry.find(msg.provider, reportedId)
         : undefined
+
       if (reportedModel) {
         modelId = reportedModel.id
         contextWindow = reportedModel.contextWindow
       }
+
       if (msg.stopReason) stopReason = msg.stopReason
+
       if (msg.errorMessage) errorMessage = msg.errorMessage
       break
     }
   }
 
-  let markFirstResponse = () => {}
+  let markFirstResponse: (() => void) | undefined
+
   const unsubscribe = childSession.subscribe((event) => {
-    if (isAssistantResponseEvent(event)) markFirstResponse()
+    if (isAssistantResponseEvent(event)) markFirstResponse?.()
+
     if (
       event.type === "tool_execution_start" ||
       event.type === "tool_execution_end"
@@ -544,6 +620,7 @@ export async function runAgent(
     ) {
       return
     }
+
     sync()
     options.onProgress?.({
       preview: finalOutput(childSession.messages),
@@ -556,10 +633,14 @@ export async function runAgent(
 
   let aborted = false
   let abortPromise: Promise<void> | undefined
+
   const onAbort = () => {
     aborted = true
-    abortPromise ??= childSession.abort().catch(() => {})
+    abortPromise ??= childSession.abort().catch(() => {
+      // Cleanup still disposes the child session if provider abort fails.
+    })
   }
+
   if (options.signal) {
     if (options.signal.aborted) onAbort()
     else options.signal.addEventListener("abort", onAbort, { once: true })
@@ -567,12 +648,14 @@ export async function runAgent(
 
   let output = ""
   let transcript: TranscriptEntry[] = []
+
   try {
     if (!aborted) {
       const watchdog = createFirstResponseWatchdog(() => childSession.abort(), {
         timeoutMs: options.firstResponseTimeoutMs,
         model: modelId,
       })
+
       markFirstResponse = watchdog.markResponse
       await watchdog.waitFor(
         childSession.prompt(buildWorkflowAgentPrompt(options.prompt)),
@@ -583,6 +666,7 @@ export async function runAgent(
     stopReason = stopReason ?? "error"
   } finally {
     options.signal?.removeEventListener("abort", onAbort)
+
     if (abortPromise) await abortPromise
     unsubscribe()
     unsubscribeToolTimeout?.()
@@ -610,6 +694,7 @@ export async function runAgent(
   }
 
   const failed = stopReason === "error" || errorMessage !== undefined
+
   if (failed) {
     return {
       ok: false,

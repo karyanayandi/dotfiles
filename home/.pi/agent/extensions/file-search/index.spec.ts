@@ -145,19 +145,24 @@ function makeEnv(options: {
   const installs: ReleaseAsset[] = []
   const probes: string[] = []
   const installed = new Set<string>()
+
   return {
     installs,
     probes,
-    async probe(command) {
+    probe(command) {
       probes.push(command)
-      return (
-        (options.available ?? []).includes(command) || installed.has(command)
+
+      return Promise.resolve(
+        (options.available ?? []).includes(command) || installed.has(command),
       )
     },
-    async install(asset, destination) {
-      if (options.installShouldFail) throw new InstallError("network down")
+    install(asset, destination) {
+      if (options.installShouldFail)
+        return Promise.reject(new InstallError("network down"))
       installs.push(asset)
       installed.add(destination)
+
+      return Promise.resolve()
     },
   }
 }
@@ -202,6 +207,7 @@ it("binary resolution: existing bin fallback is used silently", async () => {
 
 it("binary resolution: missing everywhere triggers one install", async () => {
   const env = makeEnv({ available: [] })
+
   const resolved = await resolveBinary(
     TOOL_SPECS.rg,
     "/repo/bin",
@@ -295,11 +301,13 @@ it("bounded downloads reject oversized declared and streamed bodies", async () =
 
 it("notifications: only fresh installs notify", () => {
   const system: ResolvedBinary = { tool: "fd", command: "fd", source: "system" }
+
   const bundled: ResolvedBinary = {
     tool: "rg",
     command: "/repo/bin/rg",
     source: "bundled",
   }
+
   const installed: ResolvedBinary = {
     tool: "rg",
     command: "/repo/bin/rg",
@@ -320,6 +328,7 @@ it("process output streams to complete spill file", async () => {
     cwd: process.cwd(),
     tempPrefix: "pi-search-test-",
   })
+
   const formatted = formatCapturedOutput(result.output)
 
   expect(result.code).toBe(0)
@@ -335,6 +344,7 @@ it("process output streams to complete spill file", async () => {
 
 it("process cancellation kills child and removes unretained output", async () => {
   const controller = new AbortController()
+
   const result = executeSearchProcess({
     command: process.execPath,
     args: ["-e", "setTimeout(() => {}, 10_000)"],
@@ -342,6 +352,7 @@ it("process cancellation kills child and removes unretained output", async () =>
     tempPrefix: "pi-search-abort-",
     signal: controller.signal,
   })
+
   controller.abort()
 
   await expect(result).rejects.toMatchObject({ name: "AbortError" })
@@ -352,6 +363,7 @@ it("output: small results pass through untouched", async () => {
     tempPrefix: "pi-fd-",
     persistFullOutput: () => Promise.reject(new Error("should not persist")),
   })
+
   expect(formatted).toEqual({
     text: "a.ts\nb.ts",
     lineCount: 2,
@@ -364,12 +376,15 @@ it("output: oversized results truncate and persist", async () => {
     { length: 3000 },
     (_, index) => `file-${index}.ts`,
   ).join("\n")
+
   let persisted: string | undefined
+
   const formatted = await formatOutput(bigOutput, {
     tempPrefix: "pi-fd-",
-    persistFullOutput: async (full) => {
+    persistFullOutput: (full) => {
       persisted = full
-      return "/tmp/fake/output.txt"
+
+      return Promise.resolve("/tmp/fake/output.txt")
     },
   })
 

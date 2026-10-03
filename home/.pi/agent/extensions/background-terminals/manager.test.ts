@@ -9,7 +9,7 @@ import type { TerminalSnapshot } from "./src/domain.ts"
 import {
   MAX_RUNNING,
   MAX_TRACKED,
-  type TerminalManagerShape,
+  type TerminalManager,
 } from "./src/manager.ts"
 import { createTerminalRuntime, runTool } from "./src/runtime.ts"
 
@@ -19,10 +19,9 @@ function nodeCmd(script: string) {
   return `node -e '${script}'`
 }
 
-async function withManager(
-  run: (manager: TerminalManagerShape) => Promise<void>,
-) {
+async function withManager(run: (manager: TerminalManager) => Promise<void>) {
   const runtime = createTerminalRuntime()
+
   try {
     await run(runtime.manager)
   } finally {
@@ -30,12 +29,15 @@ async function withManager(
   }
 }
 
-function settlement(manager: TerminalManagerShape, id: string) {
+function settlement(manager: TerminalManager, id: string) {
   return new Promise<TerminalSnapshot>((resolve) => {
     const existing = manager.view.get(id)
+
     if (existing && existing.status !== "running") return resolve(existing)
+
     const unsubscribe = manager.view.subscribeTo(id, () => {
       const snap = manager.view.get(id)
+
       if (snap && snap.status !== "running") {
         unsubscribe()
         resolve(snap)
@@ -47,6 +49,7 @@ function settlement(manager: TerminalManagerShape, id: string) {
 function processGone(pid: number) {
   try {
     process.kill(pid, 0)
+
     return false
   } catch {
     return true
@@ -55,10 +58,12 @@ function processGone(pid: number) {
 
 async function pollUntil(check: () => boolean, timeoutMs = 5_000) {
   const deadline = Date.now() + timeoutMs
+
   while (!check()) {
     if (Date.now() > deadline) return false
     await new Promise((resolve) => setTimeout(resolve, 25))
   }
+
   return true
 }
 
@@ -66,6 +71,7 @@ test("captures streams, settles once, and flushes full spill before notifying", 
   await withManager(async (manager) => {
     const settled: TerminalSnapshot[] = []
     manager.view.setOnSettled((snap) => settled.push(snap))
+
     const snap = await manager.start({
       command: nodeCmd(
         'process.stdout.write("out\\n"); process.stderr.write("err\\n")',
@@ -73,6 +79,7 @@ test("captures streams, settles once, and flushes full spill before notifying", 
       title: "happy",
       cwd,
     })
+
     const done = await settlement(manager, snap.id)
 
     assert.equal(done.status, "done")
@@ -83,6 +90,7 @@ test("captures streams, settles once, and flushes full spill before notifying", 
       settled.map(({ id, status }) => ({ id, status })),
       [{ id: snap.id, status: "done" }],
     )
+
     if (done.stdout.spillPath)
       assert.equal(fs.readFileSync(done.stdout.spillPath, "utf8"), "out\n")
   })
@@ -95,6 +103,7 @@ test("non-zero exit and spawn error settle failed with truthful details", async 
       title: "fails",
       cwd,
     })
+
     assert.equal((await settlement(manager, failed.id)).exitCode, 3)
     assert.equal((await manager.status(failed.id)).status, "failed")
 
@@ -103,6 +112,7 @@ test("non-zero exit and spawn error settle failed with truthful details", async 
       title: "bad-cwd",
       cwd: "/definitely/not/a/real/dir-12345",
     })
+
     const spawnError = await settlement(manager, badCwd.id)
     assert.equal(spawnError.status, "failed")
     assert.match(spawnError.errorText ?? "", /ENOENT/)
@@ -116,11 +126,13 @@ test("kill waits for settlement, reports repeat kills, and does not duplicate re
     manager.view.setOnSettled((_snap, wasConsumed) =>
       consumed.push(wasConsumed),
     )
+
     const snap = await manager.start({
       command: nodeCmd("setInterval(() => {}, 1000)"),
       title: "immortal",
       cwd,
     })
+
     const [first] = await manager.kill([snap.id])
     const [second] = await manager.kill([snap.id])
 
@@ -154,12 +166,15 @@ test("kill abort stops waiting but detached termination continues", async () => 
       title: "abort-race",
       cwd,
     })
+
     assert.ok(snap.pid)
     const controller = new AbortController()
+
     const kill = runTool(manager.kill([snap.id]), {
       signal: controller.signal,
       interruptMessage: "aborted",
     })
+
     controller.abort()
     await assert.rejects(kill, /aborted/)
 
@@ -179,6 +194,7 @@ test(
         title: "resistant",
         cwd,
       })
+
       assert.ok(
         await pollUntil(() =>
           (manager.view.get(snap.id)?.stdout.text ?? "").includes("ready"),
@@ -202,21 +218,26 @@ test(
       const sentinelDir = fs.mkdtempSync(
         path.join(os.tmpdir(), "bt-tree-test-"),
       )
+
       const sentinel = path.join(sentinelDir, "heartbeat")
+
       try {
         const snap = await manager.start({
           command: `node -e 'const fs = require("node:fs"); const file = ${JSON.stringify(sentinel)}; setInterval(() => fs.writeFileSync(file, String(Date.now())), 25)' & echo "child:$!"; wait`,
           title: "tree",
           cwd,
         })
+
         assert.ok(
           await pollUntil(() =>
             /child:\d+/.test(manager.view.get(snap.id)?.stdout.text ?? ""),
           ),
         )
+
         const match = /child:(\d+)/.exec(
           manager.view.get(snap.id)?.stdout.text ?? "",
         )
+
         assert.ok(match)
         const grandchild = Number(match[1])
         await manager.kill([snap.id])
@@ -239,16 +260,19 @@ test("concurrency cap is atomic and settled entries do not consume slots", async
         }),
       ),
     )
+
     await assert.rejects(
       manager.start({ command: "true", title: "extra", cwd }),
       new RegExp(`Max ${MAX_RUNNING}`),
     )
     await manager.kill([terminals[0].id])
+
     const replacement = await manager.start({
       command: "true",
       title: "replacement",
       cwd,
     })
+
     assert.equal((await settlement(manager, replacement.id)).status, "done")
   })
 })
@@ -260,16 +284,20 @@ test("pruning keeps running entries and preserves tombstone kill reports", async
       title: "keeper",
       cwd,
     })
+
     const settledIds: string[] = []
+
     for (let index = 0; index < MAX_TRACKED + 4; index++) {
       const snap = await manager.start({
         command: "true",
         title: `quick-${index}`,
         cwd,
       })
+
       settledIds.push(snap.id)
       await settlement(manager, snap.id)
     }
+
     const ids = manager.view.list().map((snap) => snap.id)
     assert.ok(ids.includes(keeper.id))
     assert.equal(ids.includes(settledIds[0]), false)
@@ -283,11 +311,13 @@ test("pruning keeps running entries and preserves tombstone kill reports", async
 
 test("dispose kills processes and removes private spill directory", async () => {
   const runtime = createTerminalRuntime()
+
   const snap = await runtime.manager.start({
     command: nodeCmd("setInterval(() => {}, 1000)"),
     title: "disposed",
     cwd,
   })
+
   assert.ok(snap.pid)
   const spillDir = path.dirname(snap.stdout.spillPath!)
   await runtime.dispose()

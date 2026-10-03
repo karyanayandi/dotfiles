@@ -11,15 +11,22 @@ import { MAX_RUNNING, type KillResult } from "./manager.ts"
 
 /** bg_status stdout tail. */
 export const STATUS_STDOUT_MAX = 16 * 1024
+
 /** bg_status stderr tail. */
 export const STATUS_STDERR_MAX = 8 * 1024
+
 /** Completion follow-up stdout tail. Keep this concise; /ps has the detailed view. */
 export const RESULT_STDOUT_MAX = 8 * 1024
+
 /** Completion follow-up stderr tail. Keep this concise; /ps has the detailed view. */
 export const RESULT_STDERR_MAX = 4 * 1024
+
 const STATUS_STDOUT_MAX_LINES = 400
+
 const STATUS_STDERR_MAX_LINES = 200
+
 const RESULT_STDOUT_MAX_LINES = 40
+
 const RESULT_STDERR_MAX_LINES = 20
 
 export const BG_START_TOOL_DESCRIPTION =
@@ -79,6 +86,7 @@ export function describeTerminal(snap: TerminalSnapshot) {
     snap.cwd,
     `stdout ${formatSize(snap.stdout.totalBytes)}, stderr ${formatSize(snap.stderr.totalBytes)}`,
   ]
+
   return `${snap.id} [${snap.status}] "${snap.title}" (${details.join(", ")})`
 }
 
@@ -90,26 +98,33 @@ function outputSection(
   maxLines: number,
 ) {
   if (view.totalBytes === 0) return `${label}: (empty)`
+
   const truncation = truncateTail(view.text, {
     maxBytes: Math.min(maxBytes, DEFAULT_MAX_BYTES),
     maxLines: Math.min(maxLines, DEFAULT_MAX_LINES),
   })
+
   let text = `${label}:\n${truncation.content}`
   const shownBytes = truncation.outputBytes
+
   if (truncation.truncated || view.truncatedBytes > 0) {
     const where = view.spillPath
       ? `Full log: ${view.spillPath}`
       : "Full output in the /ps viewer"
+
     text += `\n[${label} truncated: showing last ${formatSize(shownBytes)} of ${formatSize(view.totalBytes)}. ${where}]`
   }
+
   return text
 }
 
 export function buildStatusResult(snap: TerminalSnapshot) {
   let text = describeTerminal(snap)
+
   if (snap.errorText) text += `\nError: ${snap.errorText}`
   text += `\n\n${outputSection("stdout", snap.stdout, STATUS_STDOUT_MAX, STATUS_STDOUT_MAX_LINES)}`
   text += `\n\n${outputSection("stderr", snap.stderr, STATUS_STDERR_MAX, STATUS_STDERR_MAX_LINES)}`
+
   return text
 }
 
@@ -117,25 +132,31 @@ export function buildStatusResult(snap: TerminalSnapshot) {
 export function buildTerminalResultMessage(snap: TerminalSnapshot) {
   const how =
     snap.status === "killed" ? "was killed" : `exited (${formatExit(snap)})`
+
   let text = `Background terminal ${snap.id} "${snap.title}" ${how} after ${formatElapsed(snap)}.`
+
   if (snap.errorText) text += `\nError: ${snap.errorText}`
   text += `\n\n${outputSection("stdout", snap.stdout, RESULT_STDOUT_MAX, RESULT_STDOUT_MAX_LINES)}`
+
   if (snap.stderr.totalBytes > 0) {
     text += `\n\n${outputSection("stderr", snap.stderr, RESULT_STDERR_MAX, RESULT_STDERR_MAX_LINES)}`
   }
+
   return text
 }
 
-export function buildKillReport(results: ReadonlyArray<KillResult>) {
+export function buildKillReport(results: readonly KillResult[]) {
   return results
     .map((entry) => {
       if (entry.killed) {
         return `Killed ${entry.id} "${entry.title}" (${entry.exit}).`
       }
+
       if (entry.wasRunning) {
         // The natural exit won the race with the kill signal.
         return `${entry.id} "${entry.title}" exited on its own before the kill landed (${entry.exit}).`
       }
+
       return `${entry.id} "${entry.title}" was already ${entry.status} (${entry.exit}).`
     })
     .join("\n")

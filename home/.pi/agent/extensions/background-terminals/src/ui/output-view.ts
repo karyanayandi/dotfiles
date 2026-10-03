@@ -15,10 +15,12 @@ import { wrapTextWithAnsi } from "@earendil-works/pi-tui"
 // eslint-disable-next-line no-control-regex
 const OSC_PATTERN =
   /(?:\u001b\]|\u009d)(?:[^\u0007\u001b\u009c]|\u001b(?!\\))*(?:\u0007|\u001b\\|\u009c)/g
+
 // Standards-shaped CSI matcher: parameters are deliberately unbounded; a
 // five-digit cursor movement is still one control sequence, not visible text.
 // eslint-disable-next-line no-control-regex
 const CSI_PATTERN = /(?:\u001b\[|\u009b)[0-?]*[ -/]*[@-~]/g
+
 // Remaining two-byte/charset escape forms (for example ESC ( 0).
 // eslint-disable-next-line no-control-regex
 const ESCAPE_PATTERN = /\u001b(?:[()][0-2A-Z]|[ -/]*[@-~])/g
@@ -41,22 +43,29 @@ export function sanitizeText(text: string) {
 export function buildOutputLines(text: string, width: number) {
   const safeWidth = Math.max(10, width)
   const out: string[] = []
+
   for (const raw of text.split("\n")) {
     // Carriage-return progress lines (npm, cargo): keep only the final state.
     const segments = raw.split("\r")
     const finalSegment = segments.at(-1) ?? ""
+
     const lastSegment =
       finalSegment || [...segments].reverse().find((segment) => segment) || ""
+
     const clean = sanitizeText(lastSegment)
+
     if (clean.length === 0) {
       out.push("")
       continue
     }
+
     out.push(...wrapTextWithAnsi(clean, safeWidth))
   }
+
   // Drop one trailing empty line from a trailing "\n" so the tail pin sits
   // on the last real output line.
   if (out.length > 0 && out[out.length - 1] === "") out.pop()
+
   return out
 }
 
@@ -68,13 +77,16 @@ export function buildOutputLines(text: string, width: number) {
 export function createOutputLineCache() {
   let key: string | undefined
   let lines: string[] = []
+
   return {
     get(text: string, version: number, width: number) {
       const nextKey = `${version}:${width}`
+
       if (key !== nextKey) {
         key = nextKey
         lines = buildOutputLines(text, width)
       }
+
       return lines
     },
   }

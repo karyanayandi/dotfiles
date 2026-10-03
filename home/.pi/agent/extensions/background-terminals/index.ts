@@ -30,7 +30,7 @@ import { cacheRenderer } from "@pi/shared/render-cache"
 import { toolSchema } from "@pi/shared/schema"
 import * as v from "valibot"
 import type { TerminalSnapshot } from "./src/domain.ts"
-import type { TerminalManagerShape } from "./src/manager.ts"
+import type { TerminalManager } from "./src/manager.ts"
 import {
   BG_KILL_PARAMETER_DESCRIPTIONS,
   BG_KILL_TOOL_DESCRIPTION,
@@ -54,13 +54,21 @@ import {
   type TerminalRuntime,
 } from "./src/runtime.ts"
 import { sanitizeText } from "./src/ui/output-view.ts"
-import { openTerminalPicker } from "./src/ui/ps.ts"
+import { openTerminalPicker } from "./src/ps.ts"
 
 const WIDGET_KEY = "background-terminals"
 
+interface TerminalResultDetails {
+  id?: string
+  title?: string
+  status?: string
+  exitCode?: number
+  signal?: string
+}
+
 export default function (pi: ExtensionAPI) {
   let runtime: TerminalRuntime | undefined
-  let managerPromise: Promise<TerminalManagerShape> | undefined
+  let managerPromise: Promise<TerminalManager> | undefined
   let sessionContext: ExtensionContext | undefined
   let ui: ExtensionUIContext | undefined
   let unsubStatus: (() => void) | undefined
@@ -75,8 +83,10 @@ export default function (pi: ExtensionAPI) {
       unsubStatus?.()
       unsubStatus = manager.view.subscribe(() => updateWidget(manager))
       updateWidget(manager)
+
       return manager
     })
+
     return managerPromise
   }
 
@@ -86,18 +96,24 @@ export default function (pi: ExtensionAPI) {
    * hundreds of times a second would churn component creation for no visible
    * difference. */
   let widgetRunning = 0
-  const updateWidget = (manager: TerminalManagerShape) => {
+
+  const updateWidget = (manager: TerminalManager) => {
     if (!ui) return
+
     try {
       const running = manager.view
         .list()
         .filter((snap) => snap.status === "running").length
+
       if (running === widgetRunning) return
       widgetRunning = running
+
       if (running === 0) {
         ui.setWidget(WIDGET_KEY, undefined)
+
         return
       }
+
       ui.setWidget(WIDGET_KEY, (_tui, theme) => {
         const line =
           theme.fg("warning", "■ ") +
@@ -108,7 +124,8 @@ export default function (pi: ExtensionAPI) {
           theme.fg("dim", " • ") +
           theme.fg("accent", "/ps") +
           theme.fg("dim", " to view")
-        return { render: () => [line], invalidate: () => {} }
+
+        return { render: () => [line], invalidate: () => undefined }
       })
     } catch {
       // UI may be unavailable (print/RPC modes or teardown).
@@ -136,11 +153,13 @@ export default function (pi: ExtensionAPI) {
         // when the current run settles. Either way exactly one delivery.
         { deliverAs: "followUp", triggerTurn: true },
       )
+
       return true
     } catch (error) {
       // Session may be shutting down, but retain the snapshot so any later
       // agent-settled flush can retry instead of silently dropping it.
       console.error("background-terminals: failed to deliver result", error)
+
       return false
     }
   }
@@ -155,8 +174,10 @@ export default function (pi: ExtensionAPI) {
     if (consumed) {
       // An in-flight bg_kill is returning this settlement itself.
       resultDelivery.consume([snap.id])
+
       return
     }
+
     // Defer a deep-enough copy: the live snapshot's output views keep
     // mutating (late flushes) after settle.
     resultDelivery.defer({
@@ -164,11 +185,13 @@ export default function (pi: ExtensionAPI) {
       stdout: { ...snap.stdout },
       stderr: { ...snap.stderr },
     })
+
     if (sessionContext?.isIdle()) flushResults()
   }
 
   pi.on("session_start", (_event, ctx) => {
     sessionContext = ctx
+
     if (ctx.hasUI) ui = ctx.ui
   })
 
@@ -187,11 +210,13 @@ export default function (pi: ExtensionAPI) {
     resultDelivery.clear()
     unsubStatus?.()
     unsubStatus = undefined
+
     try {
       ui?.setWidget(WIDGET_KEY, undefined)
     } catch {
       // UI may already be gone.
     }
+
     widgetRunning = 0
     ui = undefined
     const closing = runtime
@@ -230,9 +255,11 @@ export default function (pi: ExtensionAPI) {
       const manager = await getManager()
 
       const command = params.command.trim()
+
       if (!command) throw new Error("command must not be empty.")
 
       const cwd = path.resolve(ctx.cwd, params.working_dir ?? ".")
+
       if (!fs.existsSync(cwd) || !fs.statSync(cwd).isDirectory()) {
         throw new Error(`working_dir is not a directory: ${cwd}`)
       }
@@ -241,6 +268,7 @@ export default function (pi: ExtensionAPI) {
       // TUI renderer) before bounding the length.
       const title =
         params.title.replace(/\s+/g, " ").trim().slice(0, 80) || "terminal"
+
       const snap = await runTool(manager.start({ command, title, cwd }))
 
       return {
@@ -265,6 +293,7 @@ export default function (pi: ExtensionAPI) {
     async execute(_toolCallId, params) {
       const manager = await getManager()
       const snap = manager.view.get(params.id)
+
       if (!snap) {
         const known = manager.view.list().map((s) => s.id)
         throw new Error(
@@ -297,10 +326,12 @@ export default function (pi: ExtensionAPI) {
     async execute() {
       const manager = await getManager()
       const terminals = manager.view.list()
+
       const text =
         terminals.length === 0
           ? "No background terminals."
           : terminals.map((snap) => describeTerminal(snap)).join("\n")
+
       return {
         content: [{ type: "text", text }],
         details: {
@@ -330,10 +361,12 @@ export default function (pi: ExtensionAPI) {
     async execute(_toolCallId, params, signal) {
       const manager = await getManager()
       const ids = [...new Set(params.ids)]
+
       if (ids.length === 0) throw new Error("Provide at least one terminal id.")
 
       const known = manager.view.list().map((snap) => snap.id)
       const unknown = ids.filter((id) => !manager.view.get(id))
+
       if (unknown.length > 0) {
         throw new Error(
           `Unknown terminal id(s): ${unknown.join(", ")}. Known: ${known.join(", ") || "none"}.`,
@@ -367,32 +400,30 @@ export default function (pi: ExtensionAPI) {
 
   // --- Result message rendering ------------------------------------------
 
-  pi.registerMessageRenderer(
+  pi.registerMessageRenderer<TerminalResultDetails>(
     "background-terminal-result",
     (message, { expanded }, theme) => {
-      const details = (message.details ?? {}) as {
-        id?: string
-        title?: string
-        status?: string
-        exitCode?: number
-        signal?: string
-      }
+      const details = message.details ?? {}
+
       const failed = details.status === "failed"
       const killed = details.status === "killed"
+
       const icon = failed
         ? theme.fg("error", "x")
         : killed
           ? theme.fg("muted", "■")
           : theme.fg("success", "■")
+
       const how = killed
         ? "killed"
         : (details.signal ?? `exit ${details.exitCode ?? "?"}`)
+
       const header =
         `${icon} ` +
         theme.fg("accent", theme.bold(`terminal ${details.id ?? "?"}`)) +
         theme.fg("muted", ` · ${details.title ?? ""} · ${how}`)
 
-      const content = typeof message.content === "string" ? message.content : ""
+      const content = Array.isArray(message.content) ? "" : message.content
       // Remove only the summary line; the Error line (when present) is part
       // of the actual result and must remain visible. The body carries raw
       // process output. sanitize ANSI/control chars or the transcript smears.
@@ -401,6 +432,7 @@ export default function (pi: ExtensionAPI) {
       if (expanded) {
         const md = new Markdown(`${body}`, 0, 0, getMarkdownTheme())
         const container = new Text(header, 0, 0)
+
         return cacheRenderer(
           (width) => [...container.render(width), ...md.render(width)],
           () => {
@@ -412,10 +444,13 @@ export default function (pi: ExtensionAPI) {
 
       const previewLines = body.split("\n").slice(0, 8)
       let text = header
+
       for (const line of previewLines)
         text += `\n${theme.fg("toolOutput", line)}`
+
       if (body.split("\n").length > 8)
         text += `\n${theme.fg("dim", "... (ctrl+o to expand)")}`
+
       return new Text(text, 0, 0)
     },
   )
@@ -426,6 +461,7 @@ export default function (pi: ExtensionAPI) {
     description: "List and inspect background terminals",
     handler: async (_args, ctx) => {
       const manager = await getManager()
+
       if (ctx.mode !== "tui") {
         if (ctx.hasUI) {
           const terminals = manager.view.list()
@@ -436,15 +472,19 @@ export default function (pi: ExtensionAPI) {
             "info",
           )
         }
+
         return
       }
+
       if (manager.view.size() === 0) {
         ctx.ui.notify(
           "No background terminals yet. The agent starts them with bg_start.",
           "info",
         )
+
         return
       }
+
       await openTerminalPicker(ctx, manager.view)
     },
   })

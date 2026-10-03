@@ -16,6 +16,7 @@ export function searchSkills(
   commands: readonly Pick<SlashCommandInfo, "name" | "description">[],
 ) {
   const names = commands.map((command) => command.name.slice("skill:".length))
+
   if (!query) return names
 
   const input = commands
@@ -24,14 +25,18 @@ export function searchSkills(
         `${command.name} ${command.description?.replace(/\s+/g, " ") ?? ""}`,
     )
     .join("\n")
+
   const result = spawnSync("rg", ["-n", "-i", "-F", "--", query], {
     input,
     encoding: "utf8",
   })
+
   if (result.error) throw result.error
+
   if (result.status !== 0 && result.status !== 1) {
     throw new Error(result.stderr || "Skill search failed")
   }
+
   return result.stdout
     .split("\n")
     .filter(Boolean)
@@ -40,9 +45,11 @@ export function searchSkills(
 
 export function expandDollarSkill(text: string, skillNames: string[]) {
   const match = text.match(dollarSkillPattern)
+
   if (!match || !skillNames.includes(match[2])) return
 
   const [, indent, skill, args] = match
+
   return `${indent}/skill:${skill}${args ? ` ${args}` : ""}`
 }
 
@@ -54,6 +61,7 @@ export default function dollarSkills(pi: ExtensionAPI) {
       event.text,
       skills(pi).map((command) => command.name.slice("skill:".length)),
     )
+
     return text
       ? { action: "transform" as const, text }
       : { action: "continue" as const }
@@ -65,9 +73,20 @@ export default function dollarSkills(pi: ExtensionAPI) {
       async getSuggestions(lines, line, col, options) {
         const beforeCursor = (lines[line] ?? "").slice(0, col)
         const match = beforeCursor.match(/(?:^|[ \t])\$([a-z0-9-]*)$/)
-        if (!match) return current.getSuggestions(lines, line, col, options)
+
+        if (!match) {
+          const suggestions = await current.getSuggestions(
+            lines,
+            line,
+            col,
+            options,
+          )
+
+          return suggestions
+        }
 
         const prefix = `$${match[1]}`
+
         const items: AutocompleteItem[] = searchSkills(
           match[1],
           skills(pi),
@@ -76,6 +95,7 @@ export default function dollarSkills(pi: ExtensionAPI) {
           label: `$${name}`,
           description: "Skill",
         }))
+
         return items.length > 0 ? { prefix, items } : null
       },
       applyCompletion: current.applyCompletion,

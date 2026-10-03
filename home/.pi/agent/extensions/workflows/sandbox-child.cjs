@@ -3,9 +3,10 @@
 // This file is launched by sandbox.ts in Node permission mode. It deliberately
 // has no filesystem/network/child-process permissions and receives workflow
 // source only over a validated IPC channel.
-const vm = require("node:vm")
-const sendIpc =
-  typeof process.send === "function" ? process.send.bind(process) : undefined
+const vm = process.getBuiltinModule("node:vm")
+
+const sendIpc = process.send?.bind(process)
+
 // If a future V8 escape exposes `process`, remove the convenient bridges to
 // builtins, native bindings, parent signalling, and addons before any workflow
 // source is compiled. The parent still enforces the authenticated IPC protocol.
@@ -159,7 +160,9 @@ const BOOTSTRAP = String.raw`
 `
 
 let initialized = false
+
 let token
+
 const pendingAgents = new Map()
 
 function send(message) {
@@ -172,31 +175,50 @@ function fail(error) {
 }
 
 process.on("message", (message) => {
+  // SAFETY: Node IPC is untrusted input; reject primitive envelopes before reading authenticated protocol fields. Permission mode cannot load external validators.
+  // oxlint-disable-next-line quality/no-runtime-typeof
   if (!message || typeof message !== "object") return
+
   if (!initialized) {
     if (
       message.kind !== "init" ||
+      // SAFETY: IPC token must be text before binding this child to its parent's authenticated channel.
+      // oxlint-disable-next-line quality/no-runtime-typeof
       typeof message.token !== "string" ||
+      // SAFETY: IPC source must be text before compilation in the restricted VM context.
+      // oxlint-disable-next-line quality/no-runtime-typeof
       typeof message.source !== "string" ||
+      // SAFETY: IPC argsJson must be text before the VM bootstrap parses its JSON envelope.
+      // oxlint-disable-next-line quality/no-runtime-typeof
       typeof message.argsJson !== "string"
     ) {
       process.exitCode = 1
+
       return
     }
+
     initialized = true
     token = message.token
     run(message.source, message.argsJson)
+
     return
   }
+
   if (message.token !== token || message.kind !== "agentResult") return
   const pending = pendingAgents.get(message.id)
+
   if (!pending) return
   pendingAgents.delete(message.id)
+
+  // SAFETY: Agent results cross IPC as JSON text; do not resolve VM requests with host objects or functions.
+  // oxlint-disable-next-line quality/no-runtime-typeof
   if (typeof message.resultJson === "string")
     pending.resolve(message.resultJson)
   else
     pending.reject(
       new Error(
+        // SAFETY: IPC error text is untrusted; only strings may become a host Error message.
+        // oxlint-disable-next-line quality/no-runtime-typeof
         typeof message.error === "string" ? message.error : "Agent IPC failed",
       ),
     )
@@ -209,16 +231,20 @@ function run(source, argsJson) {
     sandbox.__hostBridge = (kind, payloadJson) => {
       if (kind === "phase") {
         send({ kind: "phase", payloadJson })
+
         return undefined
       }
+
       if (kind !== "agent")
         return Promise.reject(new Error("Unknown workflow operation"))
       let id
+
       try {
         id = JSON.parse(payloadJson).id
       } catch {
         return Promise.reject(new Error("Invalid agent request"))
       }
+
       return new Promise((resolve, reject) => {
         pendingAgents.set(id, { resolve, reject })
         send({ kind: "agent", payloadJson })
@@ -229,15 +255,19 @@ function run(source, argsJson) {
       name: "pi-workflow",
       codeGeneration: { strings: false, wasm: false },
     })
+
     new vm.Script(BOOTSTRAP, {
       filename: "workflow-bootstrap.js",
     }).runInContext(context, { timeout: 1000 })
+
     const workflow = vm.compileFunction(
       `"use strict";\nreturn (async function workflow() {\n${source}\n})();`,
       ["agent", "parallel", "phase", "args"],
       { filename: "workflow-script.js", parsingContext: context },
     )
+
     context.__workflowBody = workflow
+
     const invoke = `
       (() => {
         const workflowBody = globalThis.__workflowBody;
@@ -257,6 +287,7 @@ function run(source, argsJson) {
         });
       })();
     `
+
     new vm.Script(invoke, { filename: "workflow-invoke.js" }).runInContext(
       context,
       {
@@ -265,6 +296,8 @@ function run(source, argsJson) {
     )
     Promise.resolve(context.__workflowPromise)
       .then((resultJson) => {
+        // SAFETY: VM output must be inert JSON text before it crosses into the parent's authenticated IPC protocol.
+        // oxlint-disable-next-line quality/no-runtime-typeof
         if (typeof resultJson !== "string")
           throw new Error("Workflow result was not serializable")
         send({ kind: "result", resultJson })

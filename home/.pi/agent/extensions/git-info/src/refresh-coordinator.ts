@@ -10,6 +10,7 @@ export function makeRefreshCoordinator() {
       () => undefined,
       () => undefined,
     )
+
     return result.finally(() => {
       pending -= 1
     })
@@ -17,8 +18,9 @@ export function makeRefreshCoordinator() {
 
   return {
     run,
-    runIfIdle: (task: () => Promise<unknown>) => {
+    runIfIdle: <T>(task: () => Promise<T>) => {
       if (pending > 0) return Promise.resolve()
+
       return run(task).then(() => undefined)
     },
   }

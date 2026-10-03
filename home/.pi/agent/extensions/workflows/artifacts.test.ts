@@ -3,16 +3,13 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { test } from "node:test"
+import * as v from "valibot"
 import {
   boundedArtifactTranscript,
   createWorkflowPersistence,
   persistWorkflowJson,
 } from "./artifacts.ts"
-import {
-  emptyUsage,
-  type TranscriptEntry,
-  type WorkflowDetails,
-} from "./model.ts"
+import { emptyUsage, type WorkflowDetails } from "./model.ts"
 
 function workflowDetails(): WorkflowDetails {
   return {
@@ -28,6 +25,7 @@ function workflowDetails(): WorkflowDetails {
 
 test("artifact transcript keeps the initial prompt, marker, and newest entries", () => {
   const prompt = `initial:${"p".repeat(70)}`
+
   const transcript = [
     { role: "user" as const, text: prompt },
     ...Array.from({ length: 5 }, (_, index) => ({
@@ -59,6 +57,7 @@ test("artifact transcript keeps the initial prompt, marker, and newest entries",
 
 test("live artifact persistence includes current agents and transcripts", () => {
   const directory = mkdtempSync(join(tmpdir(), "pi-workflow-artifacts-"))
+
   try {
     const details = workflowDetails()
     details.agents.push({
@@ -84,12 +83,29 @@ test("live artifact persistence includes current agents and transcripts", () => 
 
     persistWorkflowJson(directory, details)
 
-    const workflow = JSON.parse(
-      readFileSync(join(directory, "workflow.json"), "utf8"),
-    ) as WorkflowDetails
-    const transcripts = JSON.parse(
-      readFileSync(join(directory, "transcripts.json"), "utf8"),
-    ) as Record<string, TranscriptEntry[]>
+    const workflow = v.parse(
+      v.object({
+        agents: v.array(v.object({ label: v.string() })),
+      }),
+      JSON.parse(readFileSync(join(directory, "workflow.json"), "utf8")),
+    )
+
+    const transcripts = v.parse(
+      v.record(
+        v.string(),
+        v.array(
+          v.object({
+            text: v.string(),
+            toolCallId: v.optional(v.string()),
+            startedAt: v.optional(v.number()),
+            finishedAt: v.optional(v.number()),
+            durationMs: v.optional(v.number()),
+          }),
+        ),
+      ),
+      JSON.parse(readFileSync(join(directory, "transcripts.json"), "utf8")),
+    )
+
     assert.equal(workflow.agents.length, 1)
     assert.equal(workflow.agents[0]?.label, "running-fixture")
     assert.equal(transcripts["1"]?.[0]?.text, "current prompt")
@@ -115,6 +131,7 @@ test("live artifact persistence includes current agents and transcripts", () => 
 test("workflow checkpoints throttle updates and support immediate/final flushes", async () => {
   const details = workflowDetails()
   const snapshots: WorkflowDetails[] = []
+
   const persistence = createWorkflowPersistence("fixture", details, {
     intervalMs: 15,
     persist: (_runDir, current) => snapshots.push(structuredClone(current)),

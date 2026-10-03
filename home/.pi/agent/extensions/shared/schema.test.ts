@@ -1,3 +1,4 @@
+import { defineTool } from "@earendil-works/pi-coding-agent"
 import assert from "node:assert/strict"
 import { test } from "node:test"
 import * as v from "valibot"
@@ -22,6 +23,21 @@ test("toolSchema emits pi-compatible JSON Schema", () => {
     enum: ["web", "news"],
     type: "string",
   })
+
+  const tool = defineTool({
+    name: "schema-inference",
+    label: "Schema inference",
+    description: "Checks schema parameter inference",
+    parameters: schema,
+    execute(_id, params) {
+      return Promise.resolve({
+        content: [{ type: "text", text: params.count.toFixed(0) }],
+        details: params.source,
+      })
+    },
+  })
+
+  assert.deepEqual(tool.parameters, schema)
   // Must stay free of provider-rejected marker keys (Codex 500s on "~unsafe").
   assert.ok(!("~unsafe" in schema))
 })

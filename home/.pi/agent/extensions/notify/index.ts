@@ -4,11 +4,14 @@ import path from "node:path"
 import type {
   ExtensionAPI,
   ExtensionContext,
+  MessageEndEvent,
 } from "@earendil-works/pi-coding-agent"
 import type { AssistantMessage, TextContent } from "@earendil-works/pi-ai"
 
 const APP_NAME = "Pi"
+
 const DEFAULT_MIN_NOTIFY_MS = 3000
+
 const LINUX_SOUND_FILES = [
   "/usr/share/sounds/freedesktop/stereo/complete.oga",
   "/usr/share/sounds/freedesktop/stereo/message.oga",
@@ -16,7 +19,14 @@ const LINUX_SOUND_FILES = [
 ]
 
 type AgentOutcome = "success" | "error" | "aborted" | "other"
+
+interface AgentOutcomeResult {
+  outcome: AgentOutcome
+  reason?: string
+}
+
 type NotifyKind = "success" | "error"
+
 type SoundPlayback = "external" | "terminal-bell"
 
 const commandExistsCache = new Map<string, boolean>()
@@ -34,15 +44,19 @@ function appleScriptQuote(value: string): string {
 
 function commandExists(command: string): boolean {
   const cached = commandExistsCache.get(command)
+
   if (cached !== undefined) return cached
 
   const checker = process.platform === "win32" ? "where" : "which"
+
   const result = spawnSync(checker, [command], {
     stdio: "ignore",
     windowsHide: true,
   })
+
   const exists = result.status === 0
   commandExistsCache.set(command, exists)
+
   return exists
 }
 
@@ -68,23 +82,29 @@ function isLinux(): boolean {
 
 function formatDuration(ms: number): string {
   const seconds = ms / 1000
+
   if (seconds < 10) return `${seconds.toFixed(1)}s`
+
   return `${Math.round(seconds)}s`
 }
 
 function firstLine(text: string | undefined): string | undefined {
   if (!text) return undefined
+
   const line = text
     .split(/\r?\n/)
     .map((part) => part.trim())
     .find(Boolean)
+
   if (!line) return undefined
+
   return line.length > 100 ? `${line.slice(0, 97)}...` : line
 }
 
 function getProjectLabel(ctx: ExtensionContext, pi: ExtensionAPI): string {
   const cwdName = path.basename(ctx.cwd)
   const sessionName = pi.getSessionName()
+
   return sessionName ? `${sessionName} (${cwdName})` : cwdName
 }
 
@@ -126,6 +146,7 @@ function sendTerminalNotification(title: string, body: string): void {
   if (process.env.KITTY_WINDOW_ID) {
     return notifyKitty(title, body)
   }
+
   return notifyOsc777(title, body)
 }
 
@@ -139,6 +160,7 @@ async function sendDesktopNotification(
       "-Command",
       windowsToastScript(title, body),
     ])
+
     return true
   }
 
@@ -147,11 +169,13 @@ async function sendDesktopNotification(
       "-e",
       `display notification "${appleScriptQuote(body)}" with title "${appleScriptQuote(title)}"`,
     ])
+
     return true
   }
 
   if (isLinux() && hasDesktopSession() && commandExists("notify-send")) {
     await runDetached("notify-send", [title, body])
+
     return true
   }
 
@@ -169,36 +193,41 @@ function requestTerminalAttention(): void {
 async function playSound(): Promise<SoundPlayback> {
   if (canUseWindowsToast() && commandExists("rundll32.exe")) {
     await runDetached("rundll32.exe", ["user32.dll,MessageBeep"])
+
     return "external"
   }
 
   if (isMac() && commandExists("osascript")) {
     await runDetached("osascript", ["-e", "beep"])
+
     return "external"
   }
 
   if (isLinux()) {
     if (commandExists("canberra-gtk-play")) {
       await runDetached("canberra-gtk-play", ["-i", "complete"])
+
       return "external"
     }
 
     const soundFile = LINUX_SOUND_FILES.find((file) => existsSync(file))
+
     if (soundFile && commandExists("paplay")) {
       await runDetached("paplay", [soundFile])
+
       return "external"
     }
   }
 
   requestTerminalAttention()
+
   return "terminal-bell"
 }
 
-function isAssistantMessage(message: {
-  role: string
-  content?: unknown
-}): message is AssistantMessage {
-  return message.role === "assistant" && Array.isArray(message.content)
+function isAssistantMessage(
+  message: MessageEndEvent["message"],
+): message is AssistantMessage {
+  return message.role === "assistant"
 }
 
 function getTextContent(message: AssistantMessage): string {
@@ -209,7 +238,7 @@ function getTextContent(message: AssistantMessage): string {
 }
 
 function getLastAssistantMessage(
-  messages: Array<{ role: string; content?: unknown }>,
+  messages: MessageEndEvent["message"][],
 ): AssistantMessage | undefined {
   return [...messages].reverse().find(isAssistantMessage)
 }
@@ -218,8 +247,9 @@ function parseBoolean(
   value: boolean | string | undefined,
   fallback: boolean,
 ): boolean {
-  if (typeof value === "boolean") return value
-  if (typeof value !== "string") return fallback
+  if (value === true || value === false) return value
+
+  if (value === undefined) return fallback
 
   switch (value.trim().toLowerCase()) {
     case "1":
@@ -240,29 +270,36 @@ function parseBoolean(
 }
 
 function parseMinMs(value: boolean | string | undefined): number {
-  if (typeof value === "string") {
+  if (value !== undefined && value !== true && value !== false) {
     const parsed = Number.parseInt(value, 10)
+
     if (Number.isFinite(parsed) && parsed >= 0) return parsed
   }
+
   return DEFAULT_MIN_NOTIFY_MS
 }
 
 function resolveOutcome(
   lastAssistant: AssistantMessage | undefined,
   lastProviderErrorStatus: number | null,
-): { outcome: AgentOutcome; reason?: string } {
+): AgentOutcomeResult {
   const stopReason = lastAssistant?.stopReason
 
   if (stopReason === "stop") return { outcome: "success" }
+
   if (stopReason === "aborted")
     return { outcome: "aborted", reason: stopReason }
+
   if (stopReason === "error") return { outcome: "error", reason: stopReason }
+
   if (lastProviderErrorStatus && lastProviderErrorStatus >= 400) {
     return { outcome: "error", reason: `HTTP ${lastProviderErrorStatus}` }
   }
+
   if (!lastAssistant) {
     return { outcome: "other", reason: "assistant message missing" }
   }
+
   return { outcome: "other", reason: stopReason ?? "unknown" }
 }
 
@@ -278,24 +315,28 @@ async function notifyOutcome(
 ): Promise<void> {
   const label = getProjectLabel(ctx, pi)
   const duration = formatDuration(durationMs)
+
   const title =
     kind === "success" ? "Pi - Job finished" : "Pi - Agent stopped with error"
 
   let body = `${label} • ${duration}`
+
   if (kind === "error" && reason) body += ` • ${reason}`
   else if (messagePreview) body += ` • ${messagePreview}`
 
   const desktopSent = await sendDesktopNotification(title, body)
+
   if (!desktopSent) sendTerminalNotification(title, body)
 
   const soundPlayback = soundEnabled ? await playSound() : undefined
+
   if (attentionEnabled && soundPlayback !== "terminal-bell") {
     requestTerminalAttention()
   }
 }
 
 function dispatchNotification(notification: Promise<void>): void {
-  void notification.catch((error: unknown) => {
+  void notification.catch((error) => {
     console.warn("Notify dispatch failed", error)
   })
 }
@@ -333,31 +374,32 @@ export default function notifyExtension(pi: ExtensionAPI): void {
   let lastProviderErrorStatus: number | null = null
   let lastAssistantThisRun: AssistantMessage | undefined
 
-  pi.on("agent_start", async () => {
+  pi.on("agent_start", () => {
     agentStartedAt = Date.now()
     lastProviderErrorStatus = null
     lastAssistantThisRun = undefined
   })
 
-  pi.on("message_end", async (event) => {
+  pi.on("message_end", (event) => {
     if (isAssistantMessage(event.message)) {
       lastAssistantThisRun = event.message
     }
   })
 
-  pi.on("after_provider_response", async (event) => {
+  pi.on("after_provider_response", (event) => {
     if (event.status >= 400) {
       lastProviderErrorStatus = event.status
     }
   })
 
-  pi.on("agent_end", async (event, ctx) => {
+  pi.on("agent_end", (event, ctx) => {
     const startedAt = agentStartedAt
     agentStartedAt = null
 
     if (startedAt === null) return
 
     const durationMs = Date.now() - startedAt
+
     if (durationMs < parseMinMs(pi.getFlag("notify-min-ms"))) return
 
     const notifySuccess = parseBoolean(pi.getFlag("notify-success"), true)
@@ -367,15 +409,18 @@ export default function notifyExtension(pi: ExtensionAPI): void {
 
     const lastAssistant =
       lastAssistantThisRun ?? getLastAssistantMessage(event.messages)
+
     const preview = firstLine(
       lastAssistant ? getTextContent(lastAssistant) : undefined,
     )
+
     const { outcome, reason } = resolveOutcome(
       lastAssistant,
       lastProviderErrorStatus,
     )
 
     if (outcome === "aborted") return
+
     if (outcome === "success") {
       if (!notifySuccess) return
       dispatchNotification(
@@ -390,6 +435,7 @@ export default function notifyExtension(pi: ExtensionAPI): void {
           preview,
         ),
       )
+
       return
     }
 
@@ -410,14 +456,16 @@ export default function notifyExtension(pi: ExtensionAPI): void {
 
   pi.registerCommand("notify-test", {
     description: "Test notification delivery: /notify-test [success|error]",
-    handler: async (args, ctx) => {
+    handler: (args, ctx) => {
       const mode = args.trim().toLowerCase()
       const kind: NotifyKind = mode === "error" ? "error" : "success"
       const soundEnabled = parseBoolean(pi.getFlag("notify-sound"), true)
+
       const attentionEnabled = parseBoolean(
         pi.getFlag("notify-attention"),
         true,
       )
+
       dispatchNotification(
         notifyOutcome(
           pi,
@@ -434,17 +482,20 @@ export default function notifyExtension(pi: ExtensionAPI): void {
         `notify-test: ${kind}`,
         kind === "error" ? "warning" : "info",
       )
+
+      return Promise.resolve()
     },
   })
 
   pi.registerCommand("notify-status", {
     description: "Show active notification settings",
-    handler: async (_args, ctx) => {
+    handler: (_args, ctx) => {
       const minMs = parseMinMs(pi.getFlag("notify-min-ms"))
       const success = parseBoolean(pi.getFlag("notify-success"), true)
       const error = parseBoolean(pi.getFlag("notify-error"), true)
       const sound = parseBoolean(pi.getFlag("notify-sound"), true)
       const attention = parseBoolean(pi.getFlag("notify-attention"), true)
+
       const lines = [
         `notify-min-ms: ${minMs}`,
         `notify-success: ${success ? "on" : "off"}`,
@@ -453,7 +504,10 @@ export default function notifyExtension(pi: ExtensionAPI): void {
         `notify-attention: ${attention ? "on" : "off"}`,
         "hint: attention uses BEL, so supporting terminals can flash taskbar/dock/tab.",
       ]
+
       ctx.ui.notify(lines.join("\n"), "info")
+
+      return Promise.resolve()
     },
   })
 }

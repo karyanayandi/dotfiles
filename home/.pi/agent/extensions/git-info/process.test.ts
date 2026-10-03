@@ -14,6 +14,7 @@ test("captures output and tolerates command failures", async () => {
   const success = await runNode(
     'process.stdout.write("out"); process.stderr.write("err")',
   )
+
   assert.deepEqual(success, { code: 0, stderr: "err", stdout: "out" })
 
   const failure = await runNode("process.exitCode = 7")

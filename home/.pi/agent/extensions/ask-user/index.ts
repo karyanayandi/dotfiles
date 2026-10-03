@@ -19,7 +19,7 @@ import {
   visibleWidth,
 } from "@earendil-works/pi-tui"
 import * as v from "valibot"
-import { toolSchema } from "../shared/schema.ts"
+import { toolSchema } from "@pi/shared/schema"
 import {
   ASK_USER_PARAMETER_DESCRIPTIONS,
   ASK_USER_PROMPT_GUIDELINES,
@@ -29,6 +29,7 @@ import {
 } from "./prompt.ts"
 
 const MIN_OPTIONS = 2
+
 const MAX_OPTIONS = 5
 
 const OptionSchema = v.object({
@@ -56,6 +57,7 @@ const AskUserSchema = v.object({
     v.description(ASK_USER_PARAMETER_DESCRIPTIONS.options),
   ),
 })
+
 const AskUserParams = toolSchema(AskUserSchema)
 
 export type AskUserInput = v.InferOutput<typeof AskUserSchema>
@@ -88,15 +90,20 @@ interface DisplayOption {
 
 function wrapText(text: string, width: number): string[] {
   const lines: string[] = []
+
   for (const paragraph of text.split("\n")) {
     const words = paragraph.split(/\s+/).filter(Boolean)
+
     if (words.length === 0) {
       lines.push("")
       continue
     }
+
     let current = ""
+
     for (const word of words) {
       const candidate = current ? `${current} ${word}` : word
+
       if (candidate.length > width && current) {
         lines.push(current)
         current = word
@@ -104,8 +111,10 @@ function wrapText(text: string, width: number): string[] {
         current = candidate
       }
     }
+
     if (current) lines.push(current)
   }
+
   return lines
 }
 
@@ -118,7 +127,7 @@ export default function askUser(pi: ExtensionAPI) {
     autocompleteProvider = undefined
   })
 
-  pi.registerTool({
+  pi.registerTool<typeof AskUserParams, AskUserDetails>({
     name: "ask_user",
     label: "Ask User",
     description: ASK_USER_TOOL_DESCRIPTION,
@@ -162,6 +171,7 @@ export default function askUser(pi: ExtensionAPI) {
       if (!autocompleteRegistered) {
         ctx.ui.addAutocompleteProvider((provider) => {
           autocompleteProvider = provider
+
           return provider
         })
         autocompleteRegistered = true
@@ -193,6 +203,7 @@ export default function askUser(pi: ExtensionAPI) {
           }
 
           uiSignal.addEventListener("abort", cancel, { once: true })
+
           if (uiSignal.aborted) queueMicrotask(cancel)
 
           const editorTheme: EditorTheme = {
@@ -205,12 +216,15 @@ export default function askUser(pi: ExtensionAPI) {
               noMatch: (t) => theme.fg("warning", t),
             },
           }
+
           const editor = new AnswerEditor(tui, editorTheme)
+
           if (autocompleteProvider)
             editor.setAutocompleteProvider(autocompleteProvider)
 
           editor.onSubmit = (value) => {
             const trimmed = value.trim()
+
             if (trimmed) {
               finish({ answer: trimmed, wasCustom: true })
             } else {
@@ -227,6 +241,7 @@ export default function askUser(pi: ExtensionAPI) {
 
           function selectOption(index: number) {
             const selected = allOptions[index]
+
             if (selected.isOther) {
               optionIndex = index
               editMode = true
@@ -249,10 +264,13 @@ export default function askUser(pi: ExtensionAPI) {
                 editMode = false
                 editor.setText("")
                 refresh()
+
                 return
               }
+
               editor.handleInput(data)
               refresh()
+
               return
             }
 
@@ -260,11 +278,14 @@ export default function askUser(pi: ExtensionAPI) {
               optionIndex =
                 (optionIndex - 1 + allOptions.length) % allOptions.length
               refresh()
+
               return
             }
+
             if (matchesKey(data, Key.down)) {
               optionIndex = (optionIndex + 1) % allOptions.length
               refresh()
+
               return
             }
 
@@ -275,11 +296,13 @@ export default function askUser(pi: ExtensionAPI) {
               data <= String(allOptions.length)
             ) {
               selectOption(Number(data) - 1)
+
               return
             }
 
             if (matchesKey(data, Key.enter)) {
               selectOption(optionIndex)
+
               return
             }
 
@@ -302,12 +325,14 @@ export default function askUser(pi: ExtensionAPI) {
                 `─${title}${"─".repeat(Math.max(0, width - title.length - 1))}`,
               ),
             )
+
             for (const line of wrapText(
               params.question,
               Math.max(10, width - 2),
             )) {
               add(` ${theme.fg("text", theme.bold(line))}`)
             }
+
             lines.push("")
 
             for (let i = 0; i < allOptions.length; i++) {
@@ -339,17 +364,20 @@ export default function askUser(pi: ExtensionAPI) {
                   ` ╭─ Answer ${"─".repeat(Math.max(0, width - 12))}╮`,
                 ),
               )
+
               for (const line of fieldLines.slice(1).filter(Boolean)) {
                 add(
                   ` ${theme.fg("accent", "│")} ${line}${" ".repeat(Math.max(0, fieldWidth - visibleWidth(line)))} ${theme.fg("accent", "│")}`,
                 )
               }
+
               add(
                 theme.fg("accent", ` ╰${"─".repeat(Math.max(0, width - 3))}╯`),
               )
             }
 
             lines.push("")
+
             if (editMode) {
               add(theme.fg("dim", " Enter submit • Esc back to options"))
             } else {
@@ -360,10 +388,12 @@ export default function askUser(pi: ExtensionAPI) {
                 ),
               )
             }
+
             add(theme.fg("accent", "─".repeat(width)))
 
             cachedLines = lines
             cachedWidth = width
+
             return lines
           }
 
@@ -380,12 +410,14 @@ export default function askUser(pi: ExtensionAPI) {
         })
 
       let result: SelectionResult
+
       try {
         result = await showQuestion(signal ?? new AbortController().signal)
       } catch (error) {
         if (signal?.aborted) {
           return reply(buildAskUserResultMessage({ kind: "cancelled" }))
         }
+
         throw error
       }
 
@@ -418,22 +450,25 @@ export default function askUser(pi: ExtensionAPI) {
       let text = theme.fg("toolTitle", theme.bold("ask_user "))
       text += theme.fg(
         "muted",
-        typeof args.question === "string" ? args.question : "",
+        v.is(v.string(), args.question) ? args.question : "",
       )
-      const opts = Array.isArray(args.options)
-        ? (args.options as DisplayOption[])
-        : []
+
+      const opts = args.options ?? []
+
       if (opts.length > 0) {
         const numbered = opts.map((o, i) => `${i + 1}. ${o.label}`)
         text += `\n${theme.fg("dim", `  ${numbered.join("  ")}`)}`
       }
+
       return new Text(text, 0, 0)
     },
 
     renderResult(result, _options, theme, _context) {
-      const details = result.details as AskUserDetails | undefined
+      const details = result.details
+
       if (!details) {
         const first = result.content[0]
+
         return new Text(first?.type === "text" ? first.text : "", 0, 0)
       }
 
@@ -453,6 +488,7 @@ export default function askUser(pi: ExtensionAPI) {
 
       const idx = details.options.indexOf(details.answer) + 1
       const display = idx > 0 ? `${idx}. ${details.answer}` : details.answer
+
       return new Text(
         theme.fg("success", "✓ ") + theme.fg("accent", display),
         0,

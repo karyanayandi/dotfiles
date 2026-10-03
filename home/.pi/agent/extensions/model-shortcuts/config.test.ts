@@ -1,7 +1,7 @@
 import { deepStrictEqual, throws } from "node:assert"
 import { test } from "node:test"
-import { isModelShortcut } from "../index.ts"
-import { nextThinkingLevel, parseShortcuts } from "./config.ts"
+import { isModelShortcut } from "./index.ts"
+import { nextThinkingLevel, parseShortcuts } from "./src/config.ts"
 
 test("accepts Ctrl+number shortcuts", () => {
   deepStrictEqual(isModelShortcut("ctrl+1"), true)

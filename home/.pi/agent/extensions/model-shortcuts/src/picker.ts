@@ -12,7 +12,7 @@ import {
   Text,
 } from "@earendil-works/pi-tui"
 
-export async function pick(
+export function pick(
   ctx: ExtensionContext,
   title: string,
   items: SelectItem[],
@@ -21,6 +21,7 @@ export async function pick(
     const container = new Container()
     let query = ""
     const queryText = new Text("", 1, 0)
+
     const listTheme = {
       selectedPrefix: (text: string) => theme.fg("accent", text),
       selectedText: (text: string) => theme.fg("accent", text),
@@ -30,13 +31,17 @@ export async function pick(
     }
 
     let list: SelectList
+
     const updateList = () => {
       const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+
       const filtered = items.filter((item) => {
         const text =
           `${item.label} ${item.value} ${item.description ?? ""}`.toLowerCase()
+
         return terms.every((term) => text.includes(term))
       })
+
       list = new SelectList(
         filtered,
         Math.min(Math.max(filtered.length, 1), 12),
@@ -46,6 +51,7 @@ export async function pick(
       list.onCancel = () => done(null)
       queryText.setText(theme.fg("muted", `Search: ${query || "_"}`))
     }
+
     updateList()
 
     container.addChild(
@@ -53,16 +59,20 @@ export async function pick(
     )
     container.addChild(new Text(theme.fg("accent", theme.bold(title)), 1, 0))
     container.addChild(queryText)
+
     const listComponent = {
       render: (width: number) => list.render(width),
       invalidate: () => list.invalidate(),
       handleInput(data: string) {
         const isPrintable = [...data].every((character) => {
           const codePoint = character.codePointAt(0) ?? 0
+
           return codePoint >= 32 && codePoint !== 127
         })
+
         const printable =
           decodeKittyPrintable(data) ?? (isPrintable ? data : undefined)
+
         if (printable) {
           query += printable
           updateList()
@@ -74,6 +84,7 @@ export async function pick(
         }
       },
     }
+
     container.addChild(listComponent)
     container.addChild(
       new Text(

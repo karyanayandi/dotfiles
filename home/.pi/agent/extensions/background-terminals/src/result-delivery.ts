@@ -18,6 +18,7 @@ export function createDeferredResultDelivery<T extends { id: string }>() {
     drain() {
       const results = [...pending.values()]
       pending.clear()
+
       return results
     },
     clear() {

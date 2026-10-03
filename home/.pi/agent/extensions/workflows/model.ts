@@ -4,6 +4,7 @@
  */
 
 import * as os from "node:os"
+import * as v from "valibot"
 import {
   truncateHead,
   type ExtensionContext,
@@ -14,6 +15,7 @@ import { safeStringify } from "./serialization.ts"
 export type Theme = ExtensionContext["ui"]["theme"]
 
 export const RESULT_JSON_MAX_BYTES = 24 * 1024
+
 export const RESULT_JSON_MAX_LINES = 600
 
 export interface AgentUsage {
@@ -39,6 +41,7 @@ export function emptyUsage(): AgentUsage {
 }
 
 export type AgentState = "running" | "done" | "error"
+
 export type WorkflowStatus = "running" | "completed" | "failed" | "aborted"
 
 export type TranscriptRole =
@@ -105,13 +108,17 @@ export const SQUARE = "■"
 
 export function stateSquare(state: AgentState, theme: Theme): string {
   if (state === "done") return theme.fg("success", SQUARE)
+
   if (state === "error") return theme.fg("error", SQUARE)
+
   return theme.fg("warning", SQUARE)
 }
 
 export function statusSquare(status: WorkflowStatus, theme: Theme): string {
   if (status === "completed") return theme.fg("success", SQUARE)
+
   if (status === "running") return theme.fg("warning", SQUARE)
+
   return theme.fg("error", SQUARE)
 }
 
@@ -123,30 +130,42 @@ export function statusColor(
   status: WorkflowStatus,
 ): "success" | "warning" | "error" {
   if (status === "completed") return "success"
+
   if (status === "running") return "warning"
+
   return "error"
 }
 
 export function shortenHome(p: string): string {
   const home = os.homedir()
+
   return p.startsWith(home) ? `~${p.slice(home.length)}` : p
 }
 
 export function formatTokens(count: number): string {
   if (count < 1000) return count.toString()
+
   if (count < 10000) return `${(count / 1000).toFixed(1)}k`
+
   if (count < 1000000) return `${Math.round(count / 1000)}k`
+
   return `${(count / 1000000).toFixed(1)}M`
 }
 
 export function formatUsage(usage: AgentUsage, model?: string): string {
   const parts: string[] = []
+
   if (usage.turns)
     parts.push(`${usage.turns} turn${usage.turns > 1 ? "s" : ""}`)
+
   if (usage.input) parts.push(`${formatTokens(usage.input)} in`)
+
   if (usage.output) parts.push(`${formatTokens(usage.output)} out`)
+
   if (usage.cost) parts.push(`$${usage.cost.toFixed(4)}`)
+
   if (model) parts.push(model)
+
   return parts.join(" · ")
 }
 
@@ -163,8 +182,10 @@ export function formatElapsed(startedAt: number, finishedAt?: number): string {
     0,
     Math.round(((finishedAt ?? Date.now()) - startedAt) / 1000),
   )
+
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
+
   return minutes > 0
     ? `${minutes}m${seconds.toString().padStart(2, "0")}s`
     : `${seconds}s`
@@ -172,6 +193,7 @@ export function formatElapsed(startedAt: number, finishedAt?: number): string {
 
 export function aggregateUsage(agents: AgentRecord[]): AgentUsage {
   const total = emptyUsage()
+
   for (const agent of agents) {
     total.input += agent.usage.input
     total.output += agent.usage.output
@@ -180,6 +202,7 @@ export function aggregateUsage(agents: AgentRecord[]): AgentUsage {
     total.cost += agent.usage.cost
     total.turns += agent.usage.turns
   }
+
   return total
 }
 
@@ -187,11 +210,13 @@ export function countStates(details: WorkflowDetails) {
   let done = 0
   let failed = 0
   let running = 0
+
   for (const agent of details.agents) {
     if (agent.state === "done") done++
     else if (agent.state === "error") failed++
     else running++
   }
+
   return { done, failed, running }
 }
 
@@ -209,36 +234,43 @@ export function phaseGroups(
   includeEmpty = false,
 ): PhaseGroup[] {
   const byPhase = new Map<string, AgentRecord[]>()
+
   for (const agent of details.agents) {
     const key = agent.phase ?? "(unphased)"
     const list = byPhase.get(key) ?? []
     list.push(agent)
     byPhase.set(key, list)
   }
+
   const groups: PhaseGroup[] = []
+
   for (const phase of details.phases) {
     const agents = byPhase.get(phase.title)
+
     if (agents || includeEmpty)
       groups.push({ title: phase.title, agents: agents ?? [] })
     byPhase.delete(phase.title)
   }
+
   for (const [title, agents] of byPhase) groups.push({ title, agents })
+
   return groups
 }
 
-export function resultJson(value: unknown): string {
-  const text =
-    typeof value === "string"
-      ? value
-      : safeStringify(value, {
-          maxBytes: RESULT_JSON_MAX_BYTES * 2,
-          maxDepth: 16,
-          maxNodes: 10_000,
-        })
+export function resultJson<T>(value: T): string {
+  const text = v.is(v.string(), value)
+    ? value
+    : safeStringify(value, {
+        maxBytes: RESULT_JSON_MAX_BYTES * 2,
+        maxDepth: 16,
+        maxNodes: 10_000,
+      })
+
   const truncation = truncateHead(text ?? "", {
     maxLines: RESULT_JSON_MAX_LINES,
     maxBytes: RESULT_JSON_MAX_BYTES,
   })
+
   return truncation.truncated
     ? `${truncation.content}\n…[result truncated; bounded result artifact in result.json]`
     : truncation.content

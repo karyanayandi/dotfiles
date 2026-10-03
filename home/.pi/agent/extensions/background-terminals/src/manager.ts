@@ -18,30 +18,42 @@ import {
 import { OutputBuffer } from "./output.ts"
 
 export const MAX_RUNNING = 8
+
 export const MAX_TRACKED = 32
+
 const MAX_SETTLED_HISTORY = MAX_TRACKED * 4
+
 export const RETAINED_PER_STREAM = 2 * 1024 * 1024
+
 export const MAX_SPILL_BYTES_PER_STREAM = 256 * 1024 * 1024
+
 const STOP_TIMEOUT_MS = 5_000
+
 const FORCE_KILL_AFTER_MS = 2_000
+
 const SETTLE_GRACE_MS = 1_000
+
 const SPILL_FLUSH_TIMEOUT_MS = 1_500
+
 const GLOBAL_NOTIFY_INTERVAL_MS = 100
+
 const ERROR_TEXT_MAX_LENGTH = 4_096
 
 function bounded(text: string) {
   return text.slice(0, ERROR_TEXT_MAX_LENGTH)
 }
 
-function boundedError(error: unknown) {
+function boundedError<Failure>(error: Failure) {
   return bounded(error instanceof Error ? error.message : String(error))
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   let timer: number | undefined
+
   const timeout = new Promise<undefined>((resolve) => {
     timer = setTimeout(resolve, timeoutMs)
   })
+
   return Promise.race([promise, timeout]).finally(() => {
     if (timer) clearTimeout(timer)
   })
@@ -53,14 +65,17 @@ function waitForClose(
   timeoutMs: number,
 ) {
   if (closed()) return Promise.resolve(true)
+
   return new Promise<boolean>((resolve) => {
     const onClose = () => finish(true)
     const timer = setTimeout(() => finish(false), timeoutMs)
+
     const finish = (didClose: boolean) => {
       clearTimeout(timer)
       child.off("close", onClose)
       resolve(didClose)
     }
+
     child.once("close", onClose)
   })
 }
@@ -72,9 +87,11 @@ interface Deferred {
 
 function deferred(): Deferred {
   let resolve!: () => void
+
   const promise = new Promise<void>((done) => {
     resolve = done
   })
+
   return { promise, resolve }
 }
 
@@ -119,7 +136,7 @@ export interface KillResult {
 }
 
 export interface TerminalReadModel {
-  list(): ReadonlyArray<TerminalSnapshot>
+  list(): readonly TerminalSnapshot[]
   get(id: string): TerminalSnapshot | undefined
   size(): number
   subscribe(listener: () => void): () => void
@@ -130,11 +147,11 @@ export interface TerminalReadModel {
   ): void
 }
 
-export interface TerminalManagerShape {
+export interface TerminalManager {
   start(options: StartOptions): Promise<TerminalSnapshot>
   status(id: string): Promise<TerminalSnapshot>
-  kill(ids: ReadonlyArray<string>): Promise<ReadonlyArray<KillResult>>
-  list(): ReadonlyArray<TerminalSnapshot>
+  kill(ids: readonly string[]): Promise<readonly KillResult[]>
+  list(): readonly TerminalSnapshot[]
   disposeAll(): Promise<void>
   readonly view: TerminalReadModel
 }
@@ -146,6 +163,7 @@ function shellInvocation(command: string) {
       args: ["/d", "/s", "/c", command],
     }
   }
+
   return { shell: "/bin/sh", args: ["-c", command] }
 }
 
@@ -162,6 +180,7 @@ function killTree(child: ChildProcess, signal: NodeJS.Signals) {
         ],
         { stdio: "ignore", windowsHide: true },
       )
+
       const fallback = () => {
         try {
           child.kill(signal)
@@ -169,24 +188,29 @@ function killTree(child: ChildProcess, signal: NodeJS.Signals) {
           // Process already exited.
         }
       }
+
       killer.once("error", fallback)
       killer.once("exit", (code) => {
         if (code !== 0) fallback()
       })
       killer.unref()
+
       return
     } catch {
       // Fall through to direct signal.
     }
   }
+
   if (process.platform !== "win32" && child.pid) {
     try {
       process.kill(-child.pid, signal)
+
       return
     } catch {
       // Group already exited.
     }
   }
+
   try {
     child.kill(signal)
   } catch {
@@ -194,12 +218,14 @@ function killTree(child: ChildProcess, signal: NodeJS.Signals) {
   }
 }
 
-export function createTerminalManager(): TerminalManagerShape {
+export function createTerminalManager(): TerminalManager {
   const entries = new Map<string, Entry>()
+
   const settledHistory = new Map<
     string,
     Pick<KillResult, "title" | "status" | "exit">
   >()
+
   const killInterest = new Map<string, number>()
   const listeners = new Set<() => void>()
   const idListeners = new Map<string, Set<() => void>>()
@@ -210,17 +236,19 @@ export function createTerminalManager(): TerminalManagerShape {
   let reserved = 0
   let disposed = false
   let spillDir: string | undefined | null
+
   let onSettled:
     | ((snap: TerminalSnapshot, consumed: boolean) => void)
     | undefined
 
   const runCleanup = (task: Promise<void>) => {
     cleanup.add(task)
-    void task.catch(() => {}).finally(() => cleanup.delete(task))
+    void task.catch(() => undefined).finally(() => cleanup.delete(task))
   }
 
   const notifyGlobalListeners = () => {
     lastGlobalNotifyAt = Date.now()
+
     for (const listener of listeners) {
       try {
         listener()
@@ -243,6 +271,7 @@ export function createTerminalManager(): TerminalManagerShape {
         ),
       )
     }
+
     if (id) {
       for (const listener of idListeners.get(id) ?? []) {
         try {
@@ -258,13 +287,14 @@ export function createTerminalManager(): TerminalManagerShape {
     [...entries.values()].filter((entry) => entry.snapshot.status === "running")
       .length
 
-  const addKillInterest = (ids: ReadonlyArray<string>) => {
+  const addKillInterest = (ids: readonly string[]) => {
     for (const id of ids) killInterest.set(id, (killInterest.get(id) ?? 0) + 1)
   }
 
-  const releaseKillInterest = (ids: ReadonlyArray<string>) => {
+  const releaseKillInterest = (ids: readonly string[]) => {
     for (const id of ids) {
       const remaining = (killInterest.get(id) ?? 1) - 1
+
       if (remaining <= 0) killInterest.delete(id)
       else killInterest.set(id, remaining)
     }
@@ -272,6 +302,7 @@ export function createTerminalManager(): TerminalManagerShape {
 
   const pruneSettled = () => {
     if (entries.size <= MAX_TRACKED) return
+
     const candidates = [...entries.values()]
       .filter(
         (entry) =>
@@ -283,6 +314,7 @@ export function createTerminalManager(): TerminalManagerShape {
           (a.snapshot.settledAt ?? a.snapshot.createdAt) -
           (b.snapshot.settledAt ?? b.snapshot.createdAt),
       )
+
     for (const entry of candidates) {
       if (entries.size <= MAX_TRACKED) break
       entries.delete(entry.snapshot.id)
@@ -292,6 +324,7 @@ export function createTerminalManager(): TerminalManagerShape {
   const flushSpillStreams = async (entry: Entry) => {
     const streams = entry.spillStreams
     entry.spillStreams = []
+
     const flush = Promise.all(
       streams.map(
         (stream) =>
@@ -304,14 +337,18 @@ export function createTerminalManager(): TerminalManagerShape {
           }),
       ),
     )
+
     let timer: NodeJS.Timeout | undefined
+
     const completed = await Promise.race([
       flush.then(() => true),
       new Promise<false>((resolve) => {
         timer = setTimeout(() => resolve(false), SPILL_FLUSH_TIMEOUT_MS)
       }),
     ])
+
     if (timer) clearTimeout(timer)
+
     if (completed) return
     entry.stdoutBuf.spillPath = undefined
     entry.stderrBuf.spillPath = undefined
@@ -321,6 +358,7 @@ export function createTerminalManager(): TerminalManagerShape {
 
   const settle = (entry: Entry) => {
     const snap = entry.snapshot
+
     if (snap.status !== "running") return
     snap.settledAt = Date.now()
     snap.status = entry.killSignaled
@@ -335,19 +373,24 @@ export function createTerminalManager(): TerminalManagerShape {
       status: snap.status,
       exit: formatExit(snap),
     })
+
     while (settledHistory.size > MAX_SETTLED_HISTORY) {
       const oldest = settledHistory.keys().next().value
+
       if (oldest === undefined) break
       settledHistory.delete(oldest)
     }
+
     const consumed = (killInterest.get(snap.id) ?? 0) > 0
     entry.settled.resolve()
     notify(snap.id)
+
     try {
       if (!disposed) onSettled?.(snap, consumed)
     } catch {
       // Session may be gone.
     }
+
     pruneSettled()
   }
 
@@ -371,6 +414,7 @@ export function createTerminalManager(): TerminalManagerShape {
         entry.killSignaled ||=
           !entry.exited && entry.snapshot.status === "running"
         killTree(entry.child, "SIGTERM")
+
         if (
           !(await waitForClose(
             entry.child,
@@ -382,19 +426,23 @@ export function createTerminalManager(): TerminalManagerShape {
           await waitForClose(entry.child, () => entry.stdioClosed, 500)
         }
       }
+
       if (entry.snapshot.status === "running") {
         await withTimeout(entry.settled.promise, SETTLE_GRACE_MS)
       }
+
       if (entry.snapshot.status === "running" && !entry.settling) {
         if (!entry.stdioClosed) {
           entry.snapshot.errorText ??=
             "stdio did not close after termination; output may be incomplete"
         }
+
         entry.settling = true
         await flushSpillStreams(entry)
         settle(entry)
       }
     })()
+
     return entry.closing
   }
 
@@ -405,7 +453,10 @@ export function createTerminalManager(): TerminalManagerShape {
       new Promise<void>((resolve) => setTimeout(resolve, SETTLE_GRACE_MS)).then(
         () => {
           if (entry.snapshot.status !== "running" || entry.stdioClosed) return
-          return withTimeout(closeEntry(entry), STOP_TIMEOUT_MS).then(() => {})
+
+          return withTimeout(closeEntry(entry), STOP_TIMEOUT_MS).then(
+            () => undefined,
+          )
         },
       ),
     )
@@ -413,6 +464,7 @@ export function createTerminalManager(): TerminalManagerShape {
 
   const resolveSpillDir = () => {
     if (spillDir !== undefined) return spillDir ?? undefined
+
     try {
       const base = path.join(os.tmpdir(), "pi-background-terminals")
       fs.mkdirSync(base, { recursive: true, mode: 0o700 })
@@ -422,6 +474,7 @@ export function createTerminalManager(): TerminalManagerShape {
     } catch {
       spillDir = null
     }
+
     return spillDir ?? undefined
   }
 
@@ -432,8 +485,10 @@ export function createTerminalManager(): TerminalManagerShape {
     resumeSource: () => void,
   ) => {
     const dir = resolveSpillDir()
+
     if (!dir) return undefined
     const spillPath = path.join(dir, `${id}.${stream}.log`)
+
     try {
       const file = fs.createWriteStream(spillPath, { flags: "a", mode: 0o600 })
       let broken = false
@@ -443,6 +498,7 @@ export function createTerminalManager(): TerminalManagerShape {
         broken = true
         resumeSource()
         const entry = entryForId()
+
         if (!entry) return
         const buffer = stream === "stdout" ? entry.stdoutBuf : entry.stderrBuf
         buffer.spillPath = undefined
@@ -450,28 +506,36 @@ export function createTerminalManager(): TerminalManagerShape {
           `Full-log spill to ${spillPath} failed: ${boundedError(error)}`,
         )
       })
+
       return {
         spillPath,
         file,
         write: (chunk: string) => {
           if (broken || capped || file.writableEnded) return true
           const chunkBytes = Buffer.byteLength(chunk, "utf8")
+
           if (writtenBytes + chunkBytes > MAX_SPILL_BYTES_PER_STREAM) {
             capped = true
             const entry = entryForId()
+
             if (entry) {
               const buffer =
                 stream === "stdout" ? entry.stdoutBuf : entry.stderrBuf
+
               buffer.spillPath = undefined
               entry.snapshot.errorText ??= bounded(
                 `${stream} full-log spill reached the ${MAX_SPILL_BYTES_PER_STREAM}-byte safety limit`,
               )
             }
+
             return true
           }
+
           writtenBytes += chunkBytes
           const accepted = file.write(chunk)
+
           if (!accepted) file.once("drain", resumeSource)
+
           return accepted
         },
       }
@@ -483,15 +547,19 @@ export function createTerminalManager(): TerminalManagerShape {
   const start = async (options: StartOptions) => {
     if (disposed)
       throw new SpawnError("Background terminal manager is shutting down.")
+
     if (runningCount() + reserved >= MAX_RUNNING) {
       throw new ConcurrencyLimitError(
         `Max ${MAX_RUNNING} background terminals can run concurrently. Stop one with bg_kill before starting another.`,
       )
     }
+
     reserved++
+
     try {
       const { shell, args } = shellInvocation(options.command)
       let child: ChildProcess
+
       try {
         child = spawn(shell, args, {
           cwd: options.cwd,
@@ -505,22 +573,28 @@ export function createTerminalManager(): TerminalManagerShape {
 
       const id = `bt-${++counter}`
       const entryForId = () => entries.get(id)
+
       const stdoutSpill = makeSpill(entryForId, id, "stdout", () =>
         child.stdout?.resume(),
       )
+
       const stderrSpill = makeSpill(entryForId, id, "stderr", () =>
         child.stderr?.resume(),
       )
+
       const stdoutBuf = new OutputBuffer(
         RETAINED_PER_STREAM,
         stdoutSpill?.write,
       )
+
       const stderrBuf = new OutputBuffer(
         RETAINED_PER_STREAM,
         stderrSpill?.write,
       )
+
       stdoutBuf.spillPath = stdoutSpill?.spillPath
       stderrBuf.spillPath = stderrSpill?.spillPath
+
       const snapshot: MutableSnapshot = {
         id,
         command: options.command,
@@ -536,6 +610,7 @@ export function createTerminalManager(): TerminalManagerShape {
           return stderrBuf.view()
         },
       }
+
       const entry: Entry = {
         snapshot,
         child,
@@ -578,10 +653,12 @@ export function createTerminalManager(): TerminalManagerShape {
       child.once("close", (code, signal) => {
         entry.exited = true
         entry.stdioClosed = true
+
         if (!entry.processErrored) {
           snapshot.exitCode ??= code ?? undefined
           snapshot.signal ??= signal ?? undefined
         }
+
         settleAfterFlush(entry)
       })
 
@@ -591,51 +668,66 @@ export function createTerminalManager(): TerminalManagerShape {
           "Background terminal manager shut down while starting.",
         )
       }
+
       entries.set(id, entry)
       notify(id)
-      return snapshot as TerminalSnapshot
+
+      return snapshot
     } finally {
       reserved--
       notify()
     }
   }
 
-  const status = async (id: string) => {
+  function status(id: string) {
     const entry = entries.get(id)
+
     if (!entry) {
-      throw new UnknownTerminalError(
-        `Unknown terminal id "${id}". Known: ${[...entries.keys()].join(", ") || "none"}.`,
+      return Promise.reject(
+        new UnknownTerminalError(
+          `Unknown terminal id "${id}". Known: ${[...entries.keys()].join(", ") || "none"}.`,
+        ),
       )
     }
-    return entry.snapshot as TerminalSnapshot
+
+    return Promise.resolve(entry.snapshot)
   }
 
   const killEntry = (entry: Entry) => {
     if (entry.snapshot.status !== "running") return
-    runCleanup(withTimeout(closeEntry(entry), STOP_TIMEOUT_MS).then(() => {}))
+    runCleanup(
+      withTimeout(closeEntry(entry), STOP_TIMEOUT_MS).then(() => undefined),
+    )
   }
 
-  const kill = async (ids: ReadonlyArray<string>) => {
+  const kill = async (ids: readonly string[]) => {
     const unique = [...new Set(ids)]
-    const byId = new Map(
-      unique
-        .map((id) => entries.get(id))
-        .filter((entry): entry is Entry => entry !== undefined)
-        .map((entry) => [entry.snapshot.id, entry]),
-    )
+
+    const byId = new Map<string, Entry>()
+
+    for (const id of unique) {
+      const entry = entries.get(id)
+
+      if (entry) byId.set(entry.snapshot.id, entry)
+    }
+
     const running = [...byId.values()].filter(
       (entry) => entry.snapshot.status === "running",
     )
+
     const runningIds = running.map((entry) => entry.snapshot.id)
     addKillInterest(runningIds)
+
     try {
       for (const entry of running) killEntry(entry)
       await Promise.all(running.map((entry) => entry.settled.promise))
+
       return unique.map((id): KillResult => {
         const snapshot = byId.get(id)?.snapshot
         const history = settledHistory.get(id)
         const finalStatus = snapshot?.status ?? history?.status ?? "killed"
         const wasRunning = runningIds.includes(id)
+
         return {
           id,
           title: snapshot?.title ?? history?.title ?? "?",
@@ -654,6 +746,7 @@ export function createTerminalManager(): TerminalManagerShape {
   const disposeAll = async () => {
     if (disposed) return
     disposed = true
+
     if (globalNotifyTimer) clearTimeout(globalNotifyTimer)
     globalNotifyTimer = undefined
     const all = [...entries.values()]
@@ -662,11 +755,14 @@ export function createTerminalManager(): TerminalManagerShape {
       all.map((entry) => withTimeout(closeEntry(entry), STOP_TIMEOUT_MS)),
     )
     const deadline = Date.now() + STOP_TIMEOUT_MS
+
     while (cleanup.size > 0 && Date.now() < deadline) {
       await withTimeout(Promise.allSettled(cleanup), deadline - Date.now())
     }
+
     const dir = spillDir
     spillDir = null
+
     if (dir) fs.rmSync(dir, { recursive: true, force: true })
     notify()
   }
@@ -677,22 +773,28 @@ export function createTerminalManager(): TerminalManagerShape {
     size: () => entries.size,
     subscribe: (listener) => {
       listeners.add(listener)
+
       return () => listeners.delete(listener)
     },
     subscribeTo: (id, listener) => {
       let subscribers = idListeners.get(id)
+
       if (!subscribers) {
         subscribers = new Set()
         idListeners.set(id, subscribers)
       }
+
       subscribers.add(listener)
+
       return () => {
         subscribers.delete(listener)
+
         if (subscribers.size === 0) idListeners.delete(id)
       }
     },
     requestKill: (id) => {
       const entry = entries.get(id)
+
       if (entry) killEntry(entry)
     },
     setOnSettled: (hook) => {

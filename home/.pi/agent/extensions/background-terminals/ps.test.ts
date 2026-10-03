@@ -3,7 +3,7 @@ import test from "node:test"
 import {
   reconcileDashboardSelection,
   type DashboardSelection,
-} from "./src/ui/ps.ts"
+} from "./src/ps.ts"
 import {
   buildOutputLines,
   createOutputLineCache,

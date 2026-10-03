@@ -5,10 +5,15 @@ import {
   AssistantMessageComponent,
   initTheme,
   ToolExecutionComponent,
-  type Theme,
+  Theme,
+  type ExtensionAPI,
+  type AgentToolResult,
+  type ToolDefinition,
   UserMessageComponent,
 } from "@earendil-works/pi-coding-agent"
-import { type TUI, visibleWidth, Text } from "@earendil-works/pi-tui"
+import { ProcessTerminal, visibleWidth, Text } from "@earendil-works/pi-tui"
+import { TuiMainScreen } from "@earendil-works/pi-tui/dist/tui-main-screen.js"
+import { Type } from "typebox"
 
 import {
   installCompactMessages,
@@ -18,23 +23,95 @@ import {
 
 initTheme("dark")
 
-const theme = {
-  bg: (_color: string, text: string) => text,
-  bold: (text: string) => text,
-  fg: (_color: string, text: string) => text,
-  italic: (text: string) => text,
-} as unknown as Theme
+const theme = new Theme(
+  {
+    accent: "",
+    border: "",
+    borderAccent: "",
+    borderMuted: "",
+    success: "",
+    error: "",
+    warning: "",
+    muted: "",
+    dim: "",
+    text: "",
+    thinkingText: "",
+    userMessageText: "",
+    customMessageText: "",
+    customMessageLabel: "",
+    toolTitle: "",
+    toolOutput: "",
+    mdHeading: "",
+    mdLink: "",
+    mdLinkUrl: "",
+    mdCode: "",
+    mdCodeBlock: "",
+    mdCodeBlockBorder: "",
+    mdQuote: "",
+    mdQuoteBorder: "",
+    mdHr: "",
+    mdListBullet: "",
+    toolDiffAdded: "",
+    toolDiffRemoved: "",
+    toolDiffContext: "",
+    syntaxComment: "",
+    syntaxKeyword: "",
+    syntaxFunction: "",
+    syntaxVariable: "",
+    syntaxString: "",
+    syntaxNumber: "",
+    syntaxType: "",
+    syntaxOperator: "",
+    syntaxPunctuation: "",
+    thinkingOff: "",
+    thinkingMinimal: "",
+    thinkingLow: "",
+    thinkingMedium: "",
+    thinkingHigh: "",
+    thinkingXhigh: "",
+    bashMode: "",
+  },
+  {
+    selectedBg: "",
+    userMessageBg: "",
+    customMessageBg: "",
+    toolPendingBg: "",
+    toolSuccessBg: "",
+    toolErrorBg: "",
+  },
+  "truecolor",
+)
 
-const tui = { requestRender: vi.fn() } as unknown as TUI
+vi.spyOn(theme, "bg").mockImplementation((_color, text) => text)
+
+vi.spyOn(theme, "fg").mockImplementation((_color, text) => text)
+
+vi.spyOn(theme, "bold").mockImplementation((text) => text)
+
+vi.spyOn(theme, "italic").mockImplementation((text) => text)
+
+const tui = new TuiMainScreen(new ProcessTerminal())
+
+vi.spyOn(tui, "requestRender").mockImplementation(() => undefined)
 
 function createTools(getCompact: () => boolean) {
-  const tools = new Map<string, any>()
-  const pi = { registerTool: (tool: any) => tools.set(tool.name, tool) } as any
+  const tools = new Map<
+    string,
+    NonNullable<ConstructorParameters<typeof ToolExecutionComponent>[4]>
+  >()
+
+  const pi: Pick<ExtensionAPI, "registerTool"> = {
+    registerTool: (tool) => {
+      tools.set(tool.name, tool)
+    },
+  }
+
   registerCompactTools(pi, getCompact)
+
   return tools
 }
 
-function renderContext(args: unknown, state: Record<string, unknown> = {}) {
+function renderContext<TArgs>(args: TArgs, state = {}) {
   return {
     args,
     argsComplete: true,
@@ -69,7 +146,7 @@ const assistantMessage: AssistantMessage = {
   timestamp: 0,
 }
 
-const calls: Record<string, unknown> = {
+const calls = {
   bash: { command: "npm test" },
   find: { path: "src", pattern: "*.ts" },
   grep: { path: "src", pattern: "registerTool" },
@@ -78,6 +155,31 @@ const calls: Record<string, unknown> = {
 }
 
 describe("registerCompactTools", () => {
+  test("renders partial built-in args and sanitizes control bytes", () => {
+    const tools = createTools(() => true)
+
+    for (const tool of tools.values()) {
+      const args = {}
+      expect(() =>
+        tool.renderCall?.(args, theme, renderContext(args)),
+      ).not.toThrow()
+    }
+
+    const args = {
+      path: "src/\u001b[31mfile\u0000\u202e.ts",
+      offset: 2,
+      limit: 3,
+    }
+
+    const call = tools
+      .get("read")
+      ?.renderCall?.(args, theme, renderContext(args))
+
+    expect(call?.render(80).join("\n")).toContain(
+      "src/�[31mfile��.ts lines 2–4",
+    )
+  })
+
   test("registers every built-in and selects the shell by layout", () => {
     const compact = createTools(() => true)
     expect([...compact.keys()].sort()).toEqual([
@@ -87,8 +189,10 @@ describe("registerCompactTools", () => {
       "ls",
       "read",
     ])
+
     // Compact layouts use self shell. Other layouts use default shell.
     for (const tool of compact.values()) expect(tool.renderShell).toBe("self")
+
     for (const tool of createTools(() => false).values()) {
       expect(tool.renderShell).toBe("default")
     }
@@ -100,10 +204,12 @@ describe("registerCompactTools", () => {
     const args = calls.read
     const state = {}
     const call = tool?.renderCall?.(args, theme, renderContext(args, state))
-    const result = {
+
+    const result: AgentToolResult<undefined> = {
       content: [{ type: "text", text: "line one\nline two\nline three" }],
       details: undefined,
     }
+
     const collapsed = tool?.renderResult?.(
       result,
       { expanded: false, isPartial: false },
@@ -136,6 +242,7 @@ describe("registerCompactTools", () => {
 describe("installCompactMessages", () => {
   test("hides only the compact thinking-level label", () => {
     const restore = installCompactMessages(theme, () => true)
+
     try {
       const label = new Text("\u001b[2mThinking level: medium\u001b[0m", 0, 0)
       const body = new Text(`${"x".repeat(256)} Thinking level: medium`, 0, 0)
@@ -149,6 +256,7 @@ describe("installCompactMessages", () => {
   test("reuses compact user message rendering until invalidated", () => {
     const restore = installCompactMessages(theme, () => true)
     const message = new UserMessageComponent("hello")
+
     try {
       const first = message.render(80)
       expect(message.render(80)).toBe(first)
@@ -163,6 +271,7 @@ describe("installCompactMessages", () => {
   test("reuses finalized assistant rendering until invalidated", () => {
     const restore = installCompactMessages(theme, () => true)
     const message = new AssistantMessageComponent(assistantMessage)
+
     try {
       const first = message.render(80)
       expect(message.render(80)).toBe(first)
@@ -178,6 +287,7 @@ describe("installCompactMessages", () => {
 describe("installToolSpacing", () => {
   test("collapses a compact tool row to one non-empty line with a status prefix", () => {
     const tool = createTools(() => true).get("ls")
+
     const row = new ToolExecutionComponent(
       "ls",
       "tool-1",
@@ -187,6 +297,7 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     row.markExecutionStarted()
     row.updateResult(
@@ -195,6 +306,7 @@ describe("installToolSpacing", () => {
     )
 
     const restore = installToolSpacing(() => true, theme)
+
     try {
       const lines = row.render(80)
       expect(lines).toHaveLength(1)
@@ -207,6 +319,7 @@ describe("installToolSpacing", () => {
 
   test("reuses settled compact rows until invalidated", () => {
     const tool = createTools(() => true).get("ls")
+
     const row = new ToolExecutionComponent(
       "ls",
       "tool-1",
@@ -216,7 +329,9 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     const restore = installToolSpacing(() => true, theme)
+
     try {
       row.setArgsComplete()
       row.markExecutionStarted()
@@ -239,6 +354,7 @@ describe("installToolSpacing", () => {
 
   test("does not stack status prefixes when installed more than once", () => {
     const tool = createTools(() => true).get("ls")
+
     const row = new ToolExecutionComponent(
       "ls",
       "tool-1",
@@ -248,6 +364,7 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     row.markExecutionStarted()
     row.updateResult(
@@ -257,6 +374,7 @@ describe("installToolSpacing", () => {
 
     const restoreFirst = installToolSpacing(() => true, theme)
     const restoreSecond = installToolSpacing(() => true, theme)
+
     try {
       const line = row.render(80)[0] ?? ""
       expect(line.match(/✓/g)).toHaveLength(1)
@@ -268,6 +386,7 @@ describe("installToolSpacing", () => {
 
   test("leaves rows untouched when the layout is not compact", () => {
     const tool = createTools(() => true).get("ls")
+
     const row = new ToolExecutionComponent(
       "ls",
       "tool-1",
@@ -277,6 +396,7 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     row.markExecutionStarted()
     row.updateResult(
@@ -285,6 +405,7 @@ describe("installToolSpacing", () => {
     )
 
     const restore = installToolSpacing(() => false, theme)
+
     try {
       // Self-rendered compact tool still yields one content line.
       const lines = row.render(80)
@@ -297,6 +418,7 @@ describe("installToolSpacing", () => {
 
   test("truncates long rows with ellipsis on a narrow terminal", () => {
     const tool = createTools(() => true).get("grep")
+
     const row = new ToolExecutionComponent(
       "grep",
       "tool-1",
@@ -306,6 +428,7 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     row.markExecutionStarted()
     row.updateResult(
@@ -317,14 +440,17 @@ describe("installToolSpacing", () => {
     )
 
     const restore = installToolSpacing(() => true, theme)
+
     try {
       expect(row.render(0)).toEqual([])
+
       for (const width of [1, 3, 4, 8, 12, 24]) {
         const lines = row.render(width)
         expect(lines, `width ${width}`).toHaveLength(1)
         expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(width)
         expect(stripVTControlCharacters(lines[0] ?? "")).toContain("…")
       }
+
       expect(row.render(80)[0]).toContain("registerTool")
       expect(row.render(80)[0]).not.toContain("…")
     } finally {
@@ -342,10 +468,12 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     const native = row.render(24)
     let compact = true
     const restore = installToolSpacing(() => compact, theme)
+
     try {
       for (const width of [8, 24, 80]) {
         const lines = row.render(width)
@@ -353,6 +481,7 @@ describe("installToolSpacing", () => {
         expect(visibleWidth(lines[0] ?? "")).toBeLessThanOrEqual(width)
         expect(stripVTControlCharacters(lines[0] ?? "")).toContain("…")
       }
+
       row.setExpanded(true)
       expect(row.render(24)).toEqual(native)
       row.setExpanded(false)
@@ -365,6 +494,7 @@ describe("installToolSpacing", () => {
 
   test("falls back to the original renderer when compact rendering throws", () => {
     const tool = createTools(() => true).get("ls")
+
     const row = new ToolExecutionComponent(
       "ls",
       "tool-1",
@@ -374,6 +504,7 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     row.markExecutionStarted()
     row.updateResult(
@@ -388,6 +519,7 @@ describe("installToolSpacing", () => {
     })
 
     const restore = installToolSpacing(() => true, theme)
+
     try {
       expect(() => row.render(80)).not.toThrow()
       // Uses original renderer output instead of crashing.
@@ -399,6 +531,7 @@ describe("installToolSpacing", () => {
 
   test("renders workflow script as code in compact layouts and restores native rows", () => {
     const script = 'const value = "' + "x".repeat(100) + '"\nreturn value'
+
     const row = new ToolExecutionComponent(
       "workflow",
       "tool-workflow",
@@ -408,10 +541,12 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     const original = row.render(120)
     let compact = true
     const restore = installToolSpacing(() => compact, theme)
+
     try {
       for (const width of [40, 120]) {
         const lines = row.render(width)
@@ -419,6 +554,7 @@ describe("installToolSpacing", () => {
         expect(text).toContain("workflow </> javascript")
         expect(text).not.toContain("script:")
         expect(lines).toHaveLength(3)
+
         if (width === 40) {
           expect(lines[1]).toContain("…")
         } else {
@@ -430,8 +566,10 @@ describe("installToolSpacing", () => {
               .join("\n"),
           ).toBe(script)
         }
+
         expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
       }
+
       compact = false
       expect(row.render(120)).toEqual(original)
     } finally {
@@ -447,9 +585,11 @@ describe("installToolSpacing", () => {
       "",
       "",
     ]
+
     const originalRender = vi
       .spyOn(ToolExecutionComponent.prototype, "render")
       .mockReturnValue(imageLines)
+
     const row = new ToolExecutionComponent(
       "read",
       "tool-image",
@@ -459,7 +599,9 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     const restore = installToolSpacing(() => true, theme)
+
     try {
       row.updateResult({
         content: [
@@ -475,17 +617,18 @@ describe("installToolSpacing", () => {
   })
 
   test("shows executed code beneath code-tool header in compact layout", () => {
-    const tool: any = {
+    const tool = {
       name: "ctx_execute",
       label: "ctx_execute",
       description: "run code",
-      parameters: {},
+      parameters: Type.Object({}),
       renderShell: "default",
       renderCall: () => new Text("ctx_execute · ```python", 0, 0),
-      async execute() {
-        return { content: [], details: undefined }
+      execute() {
+        return Promise.resolve({ content: [], details: undefined })
       },
-    }
+    } satisfies ToolDefinition
+
     const row = new ToolExecutionComponent(
       "ctx_execute",
       "tool-1",
@@ -499,14 +642,14 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
 
     const restore = installToolSpacing(() => true, theme)
+
     try {
-      const text = row
-        .render(120)
-        .join("\n")
-        .replace(/\x1b\[[0-9;]*m/g, "")
+      const text = stripVTControlCharacters(row.render(120).join("\n"))
+
       expect(text).toContain("</> python")
       expect(text).toContain("  value = 42\n  print(value)")
       expect(text).not.toContain("```")
@@ -517,17 +660,19 @@ describe("installToolSpacing", () => {
 
   test("truncates long executed code without adding wrapped rows", () => {
     const code = `print('${"x".repeat(100)}')`
-    const tool: any = {
+
+    const tool = {
       name: "ctx_execute",
       label: "ctx_execute",
       description: "run code",
-      parameters: {},
+      parameters: Type.Object({}),
       renderShell: "default",
       renderCall: () => new Text("ctx_execute", 0, 0),
-      async execute() {
-        return { content: [], details: undefined }
+      execute() {
+        return Promise.resolve({ content: [], details: undefined })
       },
-    }
+    } satisfies ToolDefinition
+
     const row = new ToolExecutionComponent(
       "ctx_execute",
       "tool-1",
@@ -537,8 +682,10 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     const restore = installToolSpacing(() => true, theme)
+
     try {
       const lines = row.render(40)
       expect(lines).toHaveLength(2)
@@ -554,17 +701,21 @@ describe("installToolSpacing", () => {
     // Self-shell tool returns wide Text. Original renderer's Box pads it to full
     // width and compact !isBgShell branch prepends "  · ". Without truncation,
     // row overflows terminal and force-closes pi.
-    const wideTool: any = {
+    const wideTool = {
       name: "playwriter_execute",
       label: "playwriter_execute",
       description: "run playwright",
-      parameters: {},
+      parameters: Type.Object({}),
       renderShell: "self",
       renderCall: () => new Text("playwriter_execute", 0, 0),
-      async execute() {
-        return { content: [{ type: "text", text: "x" }], details: undefined }
+      execute() {
+        return Promise.resolve({
+          content: [{ type: "text", text: "x" }],
+          details: undefined,
+        })
       },
-    }
+    } satisfies ToolDefinition
+
     const row = new ToolExecutionComponent(
       "playwriter_execute",
       "tool-1",
@@ -574,14 +725,17 @@ describe("installToolSpacing", () => {
       tui,
       "/tmp/example",
     )
+
     row.setArgsComplete()
     row.markExecutionStarted()
 
     const restore = installToolSpacing(() => true, theme)
+
     try {
       for (const width of [67, 40, 20]) {
         const lines = row.render(width)
         expect(lines.length, `width ${width}`).toBeGreaterThanOrEqual(1)
+
         for (const line of lines) {
           expect(visibleWidth(line), `width ${width}`).toBeLessThanOrEqual(
             width,

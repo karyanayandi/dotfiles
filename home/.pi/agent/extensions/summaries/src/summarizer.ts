@@ -1,9 +1,11 @@
+import * as v from "valibot"
 import type { ModelRegistry } from "@earendil-works/pi-coding-agent"
 import { completeSimple } from "@earendil-works/pi-ai/compat"
 import type { SummaryConfig } from "./config.ts"
 import { buildSummaryPrompt, SUMMARY_SYSTEM_PROMPT } from "./prompt.ts"
 
 const RECAP_MAX_LENGTH = 2_400
+
 const NEXT_MAX_LENGTH = 400
 
 class SummaryError extends Error {
@@ -18,8 +20,7 @@ export interface RunRecap {
   readonly next: string
 }
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value)
+const recapSchema = v.strictObject({ recap: v.string(), next: v.string() })
 
 function cleanField(value: string, maxLength: number) {
   const cleaned = value
@@ -32,6 +33,7 @@ function cleanField(value: string, maxLength: number) {
     // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g, "")
     .trim()
+
   return cleaned.length <= maxLength
     ? cleaned
     : `${cleaned.slice(0, maxLength - 1).trimEnd()}…`
@@ -39,22 +41,21 @@ function cleanField(value: string, maxLength: number) {
 
 function parseCandidate(candidate: string) {
   try {
-    const value: unknown = JSON.parse(candidate)
-    if (
-      !isRecord(value) ||
-      Object.keys(value).sort().join(",") !== "next,recap" ||
-      typeof value.recap !== "string" ||
-      typeof value.next !== "string"
-    ) {
-      return undefined
-    }
+    const parsed = v.safeParse(recapSchema, JSON.parse(candidate))
+
+    if (!parsed.success) return undefined
+
+    const value = parsed.output
 
     const recap = cleanField(value.recap, RECAP_MAX_LENGTH)
+
     const next = cleanField(
       value.next.replace(/^next\s*:\s*/i, ""),
       NEXT_MAX_LENGTH,
     )
+
     if (!recap || !next) return undefined
+
     return { recap, next } satisfies RunRecap
   } catch {
     return undefined
@@ -64,19 +65,24 @@ function parseCandidate(candidate: string) {
 export function parseRecapResponse(text: string) {
   const trimmed = text.trim()
   const candidates = [trimmed]
+
   for (const match of trimmed.matchAll(/```(?:json)?\s*([\s\S]*?)```/gi)) {
     if (match[1]) candidates.push(match[1].trim())
   }
+
   const firstBrace = trimmed.indexOf("{")
   const lastBrace = trimmed.lastIndexOf("}")
+
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     candidates.push(trimmed.slice(firstBrace, lastBrace + 1))
   }
 
   for (const candidate of candidates) {
     const parsed = parseCandidate(candidate)
+
     if (parsed) return parsed
   }
+
   throw new SummaryError("The summary model did not return valid recap JSON.")
 }
 
@@ -107,6 +113,7 @@ export function summarizeRun(options: {
         options.config.provider,
         options.config.model,
       )
+
       if (!model) {
         throw new SummaryError(
           `Summary model is unavailable: ${options.config.provider}/${options.config.model}`,
@@ -114,6 +121,7 @@ export function summarizeRun(options: {
       }
 
       const auth = await options.modelRegistry.getApiKeyAndHeaders(model)
+
       if (!auth.ok) throw new SummaryError(auth.error)
 
       const response = await completeSimple(
@@ -148,6 +156,7 @@ export function summarizeRun(options: {
           response.errorMessage ?? "Summary model request failed.",
         )
       }
+
       return parseRecapResponse(assistantText(response.content))
     } catch (cause) {
       if (cause instanceof SummaryError) throw cause

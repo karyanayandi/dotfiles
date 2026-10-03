@@ -14,7 +14,7 @@
 
 import type { OutputView } from "./domain.ts"
 
-export class OutputBuffer {
+export class OutputBuffer<SpillResult = boolean | void> {
   private chunks: string[] = []
   /** Bytes currently retained across `chunks`. */
   private retainedBytes = 0
@@ -27,9 +27,12 @@ export class OutputBuffer {
   spillPath?: string
 
   private readonly maxRetainedBytes: number
-  private readonly spill?: (chunk: string) => unknown
+  private readonly spill?: (chunk: string) => SpillResult
 
-  constructor(maxRetainedBytes: number, spill?: (chunk: string) => unknown) {
+  constructor(
+    maxRetainedBytes: number,
+    spill?: (chunk: string) => SpillResult,
+  ) {
     this.maxRetainedBytes = maxRetainedBytes
     this.spill = spill
   }
@@ -39,6 +42,7 @@ export class OutputBuffer {
     let bytes = Buffer.byteLength(chunk, "utf8")
     this.totalBytes += bytes
     const spillAccepted = this.spill?.(chunk) !== false
+
     if (bytes > this.maxRetainedBytes) {
       // A single pathological chunk larger than the whole cap: everything
       // retained so far precedes it in the stream, so evict all of it, then
@@ -50,30 +54,37 @@ export class OutputBuffer {
       this.retainedBytes = 0
       const raw = Buffer.from(chunk, "utf8")
       let start = raw.length - this.maxRetainedBytes
+
       while (start < raw.length && (raw[start] & 0xc0) === 0x80) start++
       this.truncatedBytes += start
       chunk = raw.subarray(start).toString("utf8")
       bytes = raw.length - start
     }
+
     this.chunks.push(chunk)
     this.retainedBytes += bytes
+
     while (
       this.retainedBytes > this.maxRetainedBytes &&
       this.chunks.length > 1
     ) {
       const evicted = this.chunks.shift()
+
       if (evicted === undefined) break
       const evictedBytes = Buffer.byteLength(evicted, "utf8")
       this.retainedBytes -= evictedBytes
       this.truncatedBytes += evictedBytes
     }
+
     this.cachedText = undefined
     this.version++
+
     return spillAccepted
   }
 
   view(): OutputView {
     this.cachedText ??= this.chunks.join("")
+
     return {
       text: this.cachedText,
       totalBytes: this.totalBytes,
