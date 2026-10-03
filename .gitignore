@@ -39,3 +39,6 @@ config/swaylock/config-generated
 config/opencode/themes/matugen.json
 
 home/.pi/agent/themes/matugen.json
+
+# Turborepo task cache.
+.turbo/
