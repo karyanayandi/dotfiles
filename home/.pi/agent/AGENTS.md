@@ -14,6 +14,24 @@
   files. Put detailed plans and working documentation in gitignored `docs/`.
   Keep `README.md` focused on project overview, setup, usage, and license.
 
+## Work quality and continuity
+
+- Do not speculate about token budgets, remaining context, or time left. Do not
+  narrate internal resource accounting or invent deadlines.
+- Never use perceived token, context, or time pressure to rush work, reduce the
+  requested scope, skip investigation or validation, or settle for a partial or
+  lower-quality fix.
+- When context fills, rely on Pi's supported compaction mechanism and continue
+  working. Preserve the task, constraints, decisions, relevant files, exact
+  diagnostics, validation results, and next steps across compaction. Re-read
+  source material when needed rather than guessing from a summary.
+- Prefer the smallest complete, correct solution, not the quickest shortcut.
+  Efficiency means avoiding unnecessary work, not weakening reasoning,
+  correctness, safety, maintainability, or test coverage.
+- Continue until the requested work is complete and verified, or a concrete
+  blocker requires user input. Report actual blockers and unfinished checks
+  honestly; never claim completion because of perceived resource pressure.
+
 ## Validation
 
 - After making changes, run the project's available check, format, and lint
