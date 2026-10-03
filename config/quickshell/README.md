@@ -12,6 +12,8 @@ Desktop panels live in `modules/Island.qml`, except capture controls in `modules
 | Mod+Alt+Y | Media |
 | Mod+Alt+C | Calendar, also click bar clock |
 | Mod+Alt+D | Displays |
+| Mod+P | Clipboard history |
+| Mod+Ctrl+P | Clipboard history, images only |
 | Shift+Print, Hyprland | Start area screenshot directly |
 | Mod+Ctrl+G, Hyprland | Start screen recording directly, no audio |
 | Print | Screenshot panel, area |

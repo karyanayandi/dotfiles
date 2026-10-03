@@ -145,7 +145,7 @@ Item {
                         _score: score(path.split("/").pop(), query)
                     })).filter(item => item._score > 0));
         }
-        if (mode === "clipboard") {
+        if (mode === "clipboard" || mode === "clipboard-images") {
             results = results.concat(clipSvc.history.map((entry, index) => ({
                         kind: "clip",
                         img: entry.img || "",
@@ -157,7 +157,7 @@ Item {
                         index,
                         actionHint: "\u21b5 paste",
                         _score: score(entry.img ? "image" : entry.text, query) * 0.9
-                    })).filter(item => item._score > 0));
+                    })).filter(item => item._score > 0 && (mode !== "clipboard-images" || item.img)));
         }
         if (mode === "emoji") {
             results = results.concat(emojiSvc.emojis.map(entry => ({
@@ -207,7 +207,7 @@ Item {
             results = results.concat(devices);
         }
 
-        results.sort((left, right) => mode === "clipboard" ? (right.time || 0) - (left.time || 0) : right._score - left._score);
+        results.sort((left, right) => (mode === "clipboard" || mode === "clipboard-images") ? (right.time || 0) - (left.time || 0) : right._score - left._score);
         return results.slice(0, 200);
     }
 

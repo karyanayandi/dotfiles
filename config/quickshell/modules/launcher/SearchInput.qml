@@ -71,6 +71,9 @@ RowLayout {
             anchors.verticalCenter: parent.verticalCenter
             visible: !parent.text.length
             text: {
+                if (root.mode === "clipboard-images")
+                    return "Search clipboard images\u2026";
+
                 if (root.mode === "clipboard")
                     return "Search clipboard\u2026";
 

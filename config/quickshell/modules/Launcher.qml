@@ -155,7 +155,7 @@ Item {
                     Layout.fillHeight: true
                     model: model.results
                     selected: model.selected
-                    emptyText: model.mode === "clipboard" ? "No clipboard history yet — copy something" : model.mode === "bluetooth" ? "No devices — press Scan" : "No results"
+                    emptyText: model.mode === "clipboard-images" ? "No clipboard images yet — copy an image" : model.mode === "clipboard" ? "No clipboard history yet — copy something" : model.mode === "bluetooth" ? "No devices — press Scan" : "No results"
                     onSelectionRequested: index => {
                         return model.selected = index;
                     }
