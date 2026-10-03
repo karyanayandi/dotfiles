@@ -16,23 +16,31 @@
     "playwriter": {
       "type": "stdio",
       "command": "bunx",
-      "args": ["-y", "playwriter@latest"],
+      "args": [
+        "-y",
+        "playwriter@latest"
+      ],
       "directTools": true
     },
     "shadcn": {
       "type": "stdio",
       "command": "bunx",
-      "args": ["shadcn@latest", "mcp"],
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ],
       "directTools": true
     },
     "firecrawl": {
       "type": "remote",
-      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth",
+      "directTools": true
     },
     "codebase-memory-mcp": {
       "type": "stdio",
       "command": "/usr/sbin/codebase-memory-mcp",
-      "args": []
+      "args": [],
+      "directTools": true
     }
   }
 }

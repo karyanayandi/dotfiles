@@ -16,7 +16,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "1.0.0",
+  "lastChangelogVersion": "1.0.1",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
@@ -47,5 +47,7 @@
     "openai-codex/gpt-6.1-sol": "medium",
     "openai-codex/gpt-6-luna": "max"
   },
-  "extensions": ["-builtin:mcp"]
+  "extensions": [
+    "-builtin:mcp"
+  ]
 }
