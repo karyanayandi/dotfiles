@@ -90,7 +90,7 @@ Item {
     function autopaste(text) {
         copy(text);
         let p = Qt.createQmlObject('import Quickshell.Io; Process {}', root);
-        p.command = ['sh', '-c', 'sleep 0.13; if command -v wtype >/dev/null 2>&1; then wl-paste 2>/dev/null | wtype - 2>/dev/null; elif command -v ydotool >/dev/null 2>&1; then ydotool type --key-delay 0 "$(wl-paste)" 2>/dev/null; else notify-send -t 1800 Copied "Install wtype for autopaste: pacman -S wtype" 2>/dev/null; fi'];
+        p.command = ['sh', '-c', 'sleep 0.13; if command -v wtype >/dev/null 2>&1; then wtype -M ctrl -k v -m ctrl 2>/dev/null; elif command -v ydotool >/dev/null 2>&1; then ydotool key 29:1 47:1 47:0 29:0 2>/dev/null; else notify-send -t 1800 Copied "Install wtype for autopaste: pacman -S wtype" 2>/dev/null; fi'];
         p.running = true;
     }
     function removeAt(i) {
