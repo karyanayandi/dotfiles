@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import ".."
 import "../services" as Services
 import QtQuick
+import Quickshell
 import QtQuick.Layouts
 
 ColumnLayout {
@@ -9,7 +10,7 @@ ColumnLayout {
 
     property bool active: visible
     property string helperPath: decodeURIComponent(Qt.resolvedUrl("../scripts/codex-limits.py").toString().replace(/^file:\/\//, ""))
-    property double now: Date.now() / 1000
+    readonly property double now: clock.date.getTime() / 1000
     readonly property var limits: source.result.data || null
 
     spacing: 8
@@ -22,12 +23,10 @@ ColumnLayout {
         interval: 60000
     }
 
-    Timer {
-        interval: 1000
-        running: root.active
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.now = Date.now() / 1000
+    SystemClock {
+        id: clock
+        enabled: root.active
+        precision: SystemClock.Seconds
     }
 
     RowLayout {
@@ -62,7 +61,7 @@ ColumnLayout {
     Text {
         Layout.fillWidth: true
         visible: root.limits !== null
-        text: !root.limits ? "" : (root.limits.source === "live" ? "Live" : "Cached") + (root.now < root.limits.observedAt ? " · clock mismatch" : " · updated " + Math.floor((root.now - root.limits.observedAt) / 60) + " min ago")
+        text: !root.limits ? "" : (root.limits.source === "live" ? "Live" : "Cached") + (root.limits.observedAt - root.now > 2 ? " · clock mismatch" : " · updated " + Math.max(0, Math.floor((root.now - root.limits.observedAt) / 60)) + " min ago")
         wrapMode: Text.Wrap
         color: Theme.colFgDim
         font.family: Theme.fontUi
@@ -76,6 +75,7 @@ ColumnLayout {
             id: bucket
 
             required property var modelData
+            readonly property double remainingSeconds: Math.max(0, Math.ceil(modelData.resetsAt - root.now))
 
             Layout.fillWidth: true
 
@@ -104,7 +104,7 @@ ColumnLayout {
 
             Text {
                 Layout.fillWidth: true
-                text: root.now >= bucket.modelData.resetsAt ? "Reset passed; current usage unknown" : "Resets " + Qt.formatDateTime(new Date(bucket.modelData.resetsAt * 1000), "MMM d, HH:mm")
+                text: bucket.remainingSeconds === 0 ? "Reset passed; current usage unknown" : "Resets in " + Math.floor(bucket.remainingSeconds / 86400) + "d " + Math.floor(bucket.remainingSeconds % 86400 / 3600) + "h " + Math.floor(bucket.remainingSeconds % 3600 / 60) + "m " + bucket.remainingSeconds % 60 + "s · " + Qt.formatDateTime(new Date(bucket.modelData.resetsAt * 1000), "MMM d, HH:mm")
                 color: Theme.colFgDim
                 font.family: Theme.fontUi
                 font.pixelSize: 12

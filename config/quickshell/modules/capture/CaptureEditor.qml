@@ -15,7 +15,7 @@ ColumnLayout {
     property bool textPending: false
     property real zoom: 1
     readonly property real fitScale: preview.sourceSize.width > 0 && preview.sourceSize.height > 0 ? Math.min(viewport.width / preview.sourceSize.width, viewport.height / preview.sourceSize.height) : 1
-    property string ink: "#ef4444"
+    property string ink: Theme.colUrgent.toString()
     property var points: []
     readonly property real preferredHeight: 480 + (tool === "text" ? 52 : 0) + (exactBounds.checked ? boundsGrid.implicitHeight + 12 : 0)
 
@@ -59,27 +59,59 @@ ColumnLayout {
             textPending = true;
     }
 
-    RowLayout {
+    component EditorButton: Panels.PanelButton {
+        id: button
+
+        background: Rectangle {
+            radius: height / 2
+            color: button.checked ? Theme.colChipActive : button.down ? Theme.colActionBg : button.hovered ? Theme.colHoverAlpha : "transparent"
+            border.width: button.visualFocus ? 2 : 0
+            border.color: Theme.colFg
+        }
+    }
+
+    Rectangle {
         Layout.fillWidth: true
-        enabled: root.service.ready && !root.service.busy && !!root.service.tools.magick
+        implicitHeight: 56
+        radius: 28
+        color: Theme.colInputBg
 
-        Repeater {
-            model: ["rectangle", "marker", "arrow", "text", "pan"]
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 4
+            enabled: root.service.ready && !root.service.busy && !!root.service.tools.magick
 
-            Panels.PanelButton {
-                required property string modelData
-                objectName: "annotationTool_" + modelData
-                Layout.fillWidth: true
-                glyph: modelData === "rectangle" ? "\uf096" : modelData === "marker" ? "\uf040" : modelData === "arrow" ? "\uf178" : modelData === "text" ? "\uf031" : "\uf047"
-                Accessible.name: modelData === "rectangle" ? "Select" : modelData === "pan" ? "Move" : modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                ToolTip.visible: hovered || activeFocus
-                checkable: true
-                checked: root.tool === modelData
-                onClicked: {
-                    root.tool = modelData;
-                    root.points = [];
-                    stroke.requestPaint();
+            Repeater {
+                model: ["rectangle", "marker", "arrow", "text", "pan"]
+
+                EditorButton {
+                    required property string modelData
+                    objectName: "annotationTool_" + modelData
+                    Layout.fillWidth: true
+                    glyph: modelData === "rectangle" ? "\uf096" : modelData === "marker" ? "\uf040" : modelData === "arrow" ? "\uf178" : modelData === "text" ? "\uf031" : "\uf047"
+                    Accessible.name: modelData === "rectangle" ? "Select" : modelData === "pan" ? "Move" : modelData.charAt(0).toUpperCase() + modelData.slice(1)
+                    text: root.width >= 700 ? Accessible.name : ""
+                    autoExclusive: true
+                    checkable: true
+                    checked: root.tool === modelData
+                    onClicked: {
+                        root.tool = modelData;
+                        root.points = [];
+                        stroke.requestPaint();
+                    }
                 }
+            }
+            Rectangle {
+                implicitWidth: 1
+                implicitHeight: 24
+                color: Theme.colBorder
+            }
+            EditorButton {
+                glyph: "\uf0e2"
+                Accessible.name: "Undo edit"
+                enabled: root.service.canUndo
+                onClicked: root.service.request("undo")
             }
         }
     }
@@ -91,11 +123,12 @@ ColumnLayout {
         spacing: 8
 
         Repeater {
-            model: ["#ef4444", "#facc15", "#22c55e", "#3b82f6", "#ffffff", "#111111"]
+            model: [Theme.colUrgent.toString(), Theme.g13.toString(), Theme.g14.toString(), Theme.g9.toString(), Theme.colFg.toString(), Theme.colBg.toString()]
 
             AbstractButton {
                 id: swatch
                 required property string modelData
+                readonly property color inkColor: modelData
                 Accessible.name: "Ink " + modelData
                 Accessible.role: Accessible.RadioButton
                 checkable: true
@@ -114,7 +147,7 @@ ColumnLayout {
                     Text {
                         anchors.centerIn: parent
                         text: swatch.checked ? "✓" : ""
-                        color: swatch.modelData === "#111111" || swatch.modelData === "#3b82f6" ? "white" : "black"
+                        color: Math.abs(swatch.inkColor.hslLightness - Theme.colFg.hslLightness) > Math.abs(swatch.inkColor.hslLightness - Theme.colBg.hslLightness) ? Theme.colFg : Theme.colBg
                     }
                 }
             }
@@ -186,7 +219,9 @@ ColumnLayout {
         Layout.fillHeight: true
         Layout.minimumHeight: 120
         color: Theme.colInputBg
-        radius: 12
+        radius: 16
+        border.width: 1
+        border.color: Theme.colBorder
         clip: true
 
         Flickable {
@@ -341,18 +376,18 @@ ColumnLayout {
     RowLayout {
         Layout.fillWidth: true
         spacing: 8
-        Panels.PanelButton {
+        EditorButton {
             text: "Fit"
             checkable: true
             checked: root.zoom === 1
             onClicked: root.zoom = 1
         }
-        Panels.PanelButton {
+        EditorButton {
             text: "100%"
             enabled: root.fitScale > 0
             onClicked: root.zoom = 1 / root.fitScale
         }
-        Panels.PanelButton {
+        EditorButton {
             text: "−"
             Accessible.name: "Zoom out"
             enabled: root.zoom > 1
@@ -362,13 +397,13 @@ ColumnLayout {
             text: Math.round(root.fitScale * root.zoom * 100) + "%"
             color: Theme.colFgDim
         }
-        Panels.PanelButton {
+        EditorButton {
             text: "+"
             Accessible.name: "Zoom in"
             enabled: root.zoom < Math.max(8, 1 / root.fitScale)
             onClicked: root.zoom = Math.min(Math.max(8, 1 / root.fitScale), root.zoom * 1.25)
         }
-        Panels.PanelButton {
+        EditorButton {
             id: exactBounds
 
             visible: !!root.service.tools.magick
@@ -479,21 +514,21 @@ ColumnLayout {
         visible: !!root.service.tools.magick
         enabled: root.service.ready && !root.service.busy && preview.status === Image.Ready
 
-        Panels.PanelButton {
+        EditorButton {
             visible: root.tool === "rectangle"
             text: "Crop"
             glyph: "\uf125"
             onClicked: root.apply("crop")
         }
 
-        Panels.PanelButton {
+        EditorButton {
             visible: root.tool === "rectangle"
             text: "Outline"
             glyph: "\uf096"
             onClicked: root.apply("rectangle")
         }
 
-        Panels.PanelButton {
+        EditorButton {
             objectName: "applyAnnotation"
             text: root.tool === "text" ? "Add text" : "Draw from bounds"
             visible: root.tool !== "rectangle" && root.tool !== "pan"
@@ -502,16 +537,6 @@ ColumnLayout {
                 root.points = [[xInput.value, yInput.value], [xInput.value + widthInput.value - 1, yInput.value + heightInput.value - 1]];
                 root.apply(root.tool);
             }
-        }
-
-        Panels.PanelButton {
-            glyph: "\uf0e2"
-            Accessible.name: "Undo edit"
-            ToolTip.text: Accessible.name
-            ToolTip.visible: hovered || activeFocus
-            ToolTip.delay: 500
-            enabled: root.service.canUndo
-            onClicked: root.service.request("undo")
         }
     }
 }

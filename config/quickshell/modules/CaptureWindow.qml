@@ -19,7 +19,9 @@ PanelWindow {
 
     visible: opened && !blocked
     color: "transparent"
-    implicitWidth: Math.min(screen ? screen.width - 48 : 1200, panel.editing ? (panel.expanded ? (screen ? screen.width - 48 : 1200) : 960) : 600)
+    anchors.bottom: !panel.editing
+    margins.bottom: 64
+    implicitWidth: Math.min(screen ? screen.width - 48 : 1200, panel.editing ? (panel.expanded ? (screen ? screen.width - 48 : 1200) : 960) : 360)
     implicitHeight: panel.editing ? Math.min(screen ? screen.height - 48 : 800, panel.expanded ? (screen ? screen.height - 48 : 800) : 760) : Math.min(screen ? screen.height - 40 : 760, panel.implicitHeight)
     exclusiveZone: 0
     WlrLayershell.layer: WlrLayer.Overlay
@@ -34,7 +36,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: Theme.colBgAlpha095
-        radius: 26
+        radius: panel.editing ? 26 : 24
         border.color: Theme.colBorderStrong
         border.width: 1
 

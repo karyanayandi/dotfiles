@@ -14,7 +14,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location(
-    "capture", Path(__file__).with_name("capture.py")
+    "capture", Path(__file__).resolve().parents[1] / "scripts/capture.py"
 )
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-source = Path(__file__).resolve().parents[1] / "modules/capture/tst_captureeditor.qml"
+source = Path(__file__).with_name("tst_captureeditor.qml")
 with tempfile.TemporaryDirectory(prefix="capture-editor-test-") as directory:
     shell = Path(directory) / "shell.qml"
     shell.write_text(

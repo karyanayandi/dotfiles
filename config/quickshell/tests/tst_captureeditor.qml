@@ -1,6 +1,7 @@
 import QtQuick
 import QtTest
-import ".." as Modules
+import "../modules" as Modules
+import "../modules/capture"
 
 TestCase {
     id: test
@@ -28,6 +29,8 @@ TestCase {
         property string preview: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><rect width="200" height="100" fill="white"/></svg>')
         property var requestData: null
         signal feedback(string text, bool failed)
+        function beginSession() {
+        }
         function request(action, options) {
             requestData = {
                 action: action,

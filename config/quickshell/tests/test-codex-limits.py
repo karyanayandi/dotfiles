@@ -12,7 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location(
-    "codex_limits", Path(__file__).with_name("codex-limits.py")
+    "codex_limits", Path(__file__).parent.parent / "scripts/codex-limits.py"
 )
 codex = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(codex)
