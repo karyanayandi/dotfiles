@@ -266,7 +266,7 @@ PanelWindow {
         color: Theme.colBgAlpha095
         height: Config.barHeight + (win.view !== "" ? win.panelHeight + 8 : 0)
         radius: win.view === "" ? Config.barRadius : 26
-        width: Math.min(win.width - 24, Math.max(bar.implicitWidth, win.view === "launcher" ? Config.launcherWidth : win.activePanel ? Math.max(440, win.activePanel.implicitWidth) : 0))
+        width: Math.min(win.width - 24, win.view === "controls" || win.view === "notifications" ? 400 : Math.max(bar.implicitWidth, win.view === "launcher" ? Config.launcherWidth : win.activePanel ? Math.max(440, win.activePanel.implicitWidth) : 0))
 
         Behavior on height {
             enabled: !Config.reducedMotion

@@ -23,4 +23,14 @@ for (const panel of ['audio', 'calendar', 'capture']) {
 win.view = 'audio';
 click(win, 'calendar');
 assert.equal(win.view, 'calendar', 'Different icon switches panel');
-console.log('PASS bar panel toggle');
+const width = source.match(/        width: (Math\.min\(win\.width - 24,.*)\n/);
+assert.ok(width, 'Island width binding exists');
+const islandWidth = new Function('win', 'bar', 'Config', `return ${width[1]};`);
+for (const view of ['', 'controls', 'notifications', 'launcher', 'audio']) {
+    const state = { width: 1920, view, activePanel: { implicitWidth: 380 } };
+    assert.equal(islandWidth(state, { implicitWidth: 720 }, { launcherWidth: 680 }),
+        view === 'controls' || view === 'notifications' ? 400 : 720);
+    state.width = 360;
+    assert.equal(islandWidth(state, { implicitWidth: 720 }, { launcherWidth: 680 }), 336);
+}
+console.log('PASS bar panel toggle and width');
