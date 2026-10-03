@@ -13,7 +13,7 @@ QtObject {
     property bool polkitAgentEnabled: true
     // layout
     property int barHeight: 42
-    property int barMinWidth: 400
+    property int barMinWidth: 720
     property int barMaxWidth: 900
     property int barRadius: 14
     property int barBottomMargin: 10
