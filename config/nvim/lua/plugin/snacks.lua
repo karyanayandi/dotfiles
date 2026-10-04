@@ -439,14 +439,6 @@ return {
       mode = { "n", "i" },
       desc = "Toggle Claude",
     },
-    -- {
-    --   ";o",
-    --   function()
-    --     _OPENCODE_TOGGLE()
-    --   end,
-    --   mode = { "n", "i" },
-    --   desc = "Toggle OpenCode",
-    -- },
     {
       ";a",
       function()
