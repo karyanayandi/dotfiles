@@ -67,6 +67,7 @@ alias lg lazygit
 alias lzd lazydocker
 alias lzg lazygit
 alias oc "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
+alias ocm "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode mini"
 alias opencode "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
 alias os openspec
 alias p "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi" 
