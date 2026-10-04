@@ -16,19 +16,13 @@
     "playwriter": {
       "type": "stdio",
       "command": "bunx",
-      "args": [
-        "-y",
-        "playwriter@latest"
-      ],
+      "args": ["-y", "playwriter@latest"],
       "directTools": true
     },
     "shadcn": {
       "type": "stdio",
       "command": "bunx",
-      "args": [
-        "shadcn@latest",
-        "mcp"
-      ],
+      "args": ["shadcn@latest", "mcp"],
       "directTools": true
     },
     "firecrawl": {
