@@ -16,8 +16,8 @@ sh ./setup/tmux.sh
 sh ./setup/viteplus.sh
 sh ./setup/zram.sh
 
-cd ~/.config/dotfiles/home && stow .
-cd ~/.config/dotfiles/config && stow .
+cd ~/.config/dotfiles/home && stow --adopt .
+cd ~/.config/dotfiles/config && stow --adopt .
 
 # Seed generated includes before apps start; future wallpaper changes regenerate them.
 if [ -f "${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/wallpaper" ]; then
@@ -28,4 +28,4 @@ fi
 
 chsh -s /usr/bin/fish
 xdg-user-dirs-update
-mkdr -p ~/Pictures/Screenshots/mpv
+mkdir -p ~/Pictures/Screenshots/mpv

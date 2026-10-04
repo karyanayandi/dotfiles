@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yay -S --needed \
+paru -S --needed \
   adw-gtk-theme \
   android-tools \
   apple-fonts \
@@ -15,7 +15,6 @@ yay -S --needed \
   chafa \
   cmake \
   codebase-memory-mcp-bin \
-  codex-desktop-git \
   cowsay \
   deno \
   distrobox \
@@ -39,7 +38,7 @@ yay -S --needed \
   grim \
   gvfs \
   gzip \
-  helium-bin \
+  helium-browser-bin \
   hyprcursor \
   hyprpicker \
   imv \
@@ -52,7 +51,6 @@ yay -S --needed \
   lazygit \
   less \
   libnotify \
-  librewolf-bin \
   libxcrypt-compat \
   local-by-flywheel-bin \
   lshw \
@@ -71,7 +69,6 @@ yay -S --needed \
   noto-fonts-extra \
   ntfs-3g \
   ntfsprogs \
-  ollama \
   opencode \
   opencode-desktop-bin \
   openssh \

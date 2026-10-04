@@ -16,7 +16,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "1.0.1",
+  "lastChangelogVersion": "1.0.2",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
