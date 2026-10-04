@@ -42,3 +42,17 @@ home/.pi/agent/themes/matugen.json
 
 # Turborepo task cache.
 .turbo/
+
+id_ed25519
+id_ed25519.pub
+known_hosts
+known_hosts.old
+**/.pi/context-mode/**
+**/.pi/agent/npm/**
+**/.pi/agent/sessions/**
+**/.pi/agent/pi-subagents/**
+**/.pi/agent/git/**
+models-store.json
+mcp-cache.json
+mcp-onboarding.json
+auth.json
