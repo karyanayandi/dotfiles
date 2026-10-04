@@ -48,8 +48,7 @@
   "plugins": [
     "./local-plugins/worktrunk",
     "@tarquinen/opencode-dcp@latest",
-    "./local-plugins/context-mode",
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "./local-plugins/context-mode"
   ],
   "providers": {
     "9router": {
