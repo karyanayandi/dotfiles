@@ -48,7 +48,8 @@
   "plugins": [
     "./local-plugins/worktrunk",
     "@tarquinen/opencode-dcp@latest",
-    "./local-plugins/context-mode"
+    "./local-plugins/context-mode",
+    "./local-plugins/skill-dollar"
   ],
   "providers": {
     "9router": {
