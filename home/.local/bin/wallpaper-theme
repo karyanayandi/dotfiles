@@ -61,7 +61,7 @@ fi
 # Ghostty GTK reloads config and gtk-custom-css. Only signal processes with a handler.
 pkill --require-handler --signal USR2 --euid "$UID" --exact ghostty || true
 
-# Update the outer terminal PTYs directly, including those hosting tmux.
+# Update outer terminal and tmux pane palettes before OpenCode re-queries them.
 python3 "$config_home/theme/terminal.py"
 
 # OpenCode's system theme re-queries the terminal palette on SIGUSR2.

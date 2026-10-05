@@ -70,6 +70,89 @@ def check_prompt(home, env):
         os.close(master)
 
 
+def check_tmux(home, env, terminal, palettes):
+    shutil.copytree(ROOT / "home/.tmux/theme", home / ".tmux/theme")
+    probe = home / "palette-probe.py"
+    probe.write_text(
+        "import os, select, time, tty\n"
+        "from pathlib import Path\n"
+        "tty.setraw(0)\n"
+        "home = Path.home()\n"
+        "(home / 'probe-ready').touch()\n"
+        "for index in range(2):\n"
+        "    while not (home / f'query-{index}').exists(): time.sleep(0.01)\n"
+        "    os.write(1, b'\\x1b]4;0;?\\x1b\\\\\\x1b]10;?\\x1b\\\\\\x1b]11;?\\x1b\\\\')\n"
+        "    data = b''\n"
+        "    deadline = time.monotonic() + 3\n"
+        "    while data.count(b'\\x1b\\\\') < 3 and time.monotonic() < deadline:\n"
+        "        if select.select([0], [], [], 0.1)[0]: data += os.read(0, 4096)\n"
+        "    (home / f'reply-{index}').write_bytes(data)\n"
+        "time.sleep(10)\n"
+    )
+    tmux = ["tmux", "-L", "wallpaper-palette-check", "-f", "/dev/null"]
+
+    def run(*args):
+        return subprocess.run(
+            [*tmux, *args], env=env, check=True, capture_output=True, text=True
+        ).stdout.strip()
+
+    def wait(path):
+        deadline = time.monotonic() + 5
+        while not path.exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        assert path.exists(), f"tmux probe timed out: {path}"
+
+    run("new-session", "-d", f"python3 {shlex.quote(str(probe))}")
+    try:
+        wait(home / "probe-ready")
+        socket = run("display-message", "-p", "#{socket_path}")
+        pane = Path(run("display-message", "-p", "#{pane_tty}"))
+        for index, palette in enumerate(palettes):
+            for name, text in palette.items():
+                (home / name).write_text(text)
+            styles = (
+                "status-style",
+                "window-status-style",
+                "window-status-current-style",
+                "window-status-activity-style",
+                "window-status-bell-style",
+                "window-status-last-style",
+            )
+            for option in styles:
+                run("set-option", "-g", option, "fg=#123456,bg=#654321,reverse")
+            subprocess.run(
+                ["bash", str(home / ".tmux/theme/theme.tmux")],
+                env={**env, "TMUX": f"{socket},0,0", "THEME_NAME": "matugen"},
+                check=True,
+            )
+            for option in styles:
+                style = run("show-options", "-gv", option)
+                assert "#123456" not in style and "#654321" not in style, (option, style)
+                assert "reverse" not in style, (option, style)
+            data = terminal["sequences"](home / ".config/theme/generated/ghostty")
+            terminal["send"](pane, data)
+            (home / f"query-{index}").touch()
+            reply = home / f"reply-{index}"
+            wait(reply)
+            lines = palette[".config/theme/generated/ghostty"].splitlines()
+            colors = dict(
+                line.split(" = ", 1) for line in lines
+                if " = " in line and not line.startswith("palette")
+            )
+            ansi = next(
+                line.split("=", 2)[2] for line in lines
+                if line.startswith("palette = 0=")
+            )
+            for code, color in (
+                ("4;0", ansi), ("10", colors["foreground"]), ("11", colors["background"])
+            ):
+                rgb = "/".join(part * 2 for part in (color[1:3], color[3:5], color[5:7]))
+                expected = f"\033]{code};rgb:{rgb}\033\\".encode()
+                assert expected in reply.read_bytes(), reply.read_bytes()
+    finally:
+        run("kill-server")
+
+
 def check():
     binary = shutil.which("matugen")
     if not binary:
@@ -135,6 +218,7 @@ def check():
         test_config = home / "config.toml"
         test_config.write_text("\n".join(entries))
         previous = None
+        palettes = []
         for color in ("#ff0000", "#0000ff"):
             result = subprocess.run(
                 [
@@ -185,6 +269,11 @@ def check():
                 for path, before, after in zip(outputs, previous, rendered):
                     assert before != after, f"Palette does not change: {path}"
             previous = rendered
+            palettes.append({
+                name: (home / name).read_text() for name in (
+                    ".config/theme/generated/ghostty", ".cache/theme/tmux.sh"
+                )
+            })
         terminal = runpy.run_path(str(THEME / "terminal.py"))
         data = terminal["sequences"](home / ".config/theme/generated/ghostty")
         assert data.count(b"\x1b]4;") == 18
@@ -195,12 +284,16 @@ def check():
             (2, "ghostty", 5),
             (3, "bash", 6),
             (4, "foot-server", 4),
+            (5, "tmux: server", 7),
+            (6, "tmux: client", 8),
         ):
             info = proc / str(pid) / "fdinfo"
             info.mkdir(parents=True)
             (info.parent / "comm").write_text(name + "\n")
             (info / "12").write_text(f"tty-index:\t{index}\n")
-        assert terminal["terminals"](proc) == {Path("/dev/pts/4"), Path("/dev/pts/5")}
+        assert terminal["terminals"](proc) == {
+            Path("/dev/pts/4"), Path("/dev/pts/5"), Path("/dev/pts/7")
+        }
         master, slave = pty.openpty()
         try:
             terminal["send"](Path(os.ttyname(slave)), data)
@@ -252,6 +345,8 @@ def check():
         env.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
         env.pop("TMUX", None)
         env["TMUX_TMPDIR"] = str(home)
+        if shutil.which("tmux"):
+            check_tmux(home, env, terminal, palettes)
         if shutil.which("fish") and shutil.which("starship"):
             check_prompt(home, env)
         image = home / "wall paper.png"
@@ -282,9 +377,6 @@ def check():
         subprocess.run([str(runner)], env=env, check=True)
         assert (home / "gtk-theme").read_text() == "matugen-dark-alt"
         if shutil.which("tmux"):
-            theme_script = home / ".tmux/theme/theme.tmux"
-            theme_script.parent.mkdir(parents=True)
-            theme_script.write_text("#!/bin/sh\nexit 0\n")
             tmux = ["tmux", "-L", "wallpaper-theme-check"]
             subprocess.run([*tmux, "new-session", "-d"], env=env, check=True)
             socket = subprocess.run(
@@ -341,7 +433,7 @@ def check():
         )
         assert missing.returncode != 0
     print(
-        f"PASS: {len(outputs)} palettes render; terminal PTY delivery and runner pass; available Fish/Starship idle-repaint check passes."
+        f"PASS: {len(outputs)} palettes render; terminal PTY delivery, tmux palette queries/styles, and runner pass; available Fish/Starship idle-repaint check passes."
     )
 
 

@@ -33,8 +33,12 @@
   Truecolor subprocess output is not covered by terminal palette updates.
   Other terminals need their own palette update mechanism.
 - Foot and Ghostty receive OSC palette, foreground, background, cursor and
-  selection updates through their outer PTYs, including terminals hosting tmux.
-  Only terminal processes and devices owned by the current user are targeted.
+  selection updates through their outer PTYs. Tmux pane PTYs receive them too:
+  updating only the outer terminal leaves tmux's per-pane palette stale.
+  OpenCode's `system` theme re-queries these colors on `SIGUSR2` after delivery.
+  Tmux window-state styles also reset each generation, clearing inherited colors
+  and reverse-video attributes. Only terminal/tmux processes and devices owned
+  by the current user are targeted.
 - Fish's universal theme-change variable triggers shell color reload and an idle
   prompt repaint, including Starship. `fish --no-config` must not be used to send
   this event: it disables universal-variable persistence in the installed Fish.
@@ -71,7 +75,8 @@ Capability sources checked against installed app versions:
 - [Lazydocker ANSI and reverse attributes](https://github.com/jesseduffield/lazydocker/blob/v0.25.2/pkg/gui/gocui.go)
 
 Checks use temporary palettes and PTYs. They verify ANSI foregrounds and generated
-selection backgrounds,
+selection backgrounds, tmux OSC palette/foreground/background query replies
+across two palettes, refreshed tmux window-state styles,
 Ghostty's window theme setting, color delivery, no shell-input
 injection, Ghostty reload arguments, idle Starship repaint without a keypress,
 and Quickshell palette watching. They do not signal or recolor live terminals.

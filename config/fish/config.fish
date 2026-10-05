@@ -131,3 +131,6 @@ envsource ~/.env
 
 # opencode
 fish_add_path /home/karyana/.opencode/bin
+
+# fx CLI
+set -gx PATH /home/karyana/.local/bin $PATH

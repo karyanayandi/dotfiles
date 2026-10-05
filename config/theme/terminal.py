@@ -1,4 +1,4 @@
-"""Push generated colors to this user's running Foot/Ghostty PTYs on Linux."""
+"""Push generated colors to this user's Foot/Ghostty and tmux pane PTYs on Linux."""
 
 import os
 import re
@@ -37,7 +37,7 @@ def terminals(proc=Path("/proc")):
         try:
             if process.stat().st_uid != os.getuid() or (
                 process / "comm"
-            ).read_text().strip() not in {"foot", "foot-server", "ghostty"}:
+            ).read_text().strip() not in {"foot", "foot-server", "ghostty", "tmux: server"}:
                 continue
             for info in (process / "fdinfo").iterdir():
                 try:

@@ -2,7 +2,7 @@
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_PATH="$CURRENT_DIR/lib"
 
-source $SCRIPTS_PATH/themes.sh
+source "$SCRIPTS_PATH/themes.sh"
 
 # Persist the theme in tmux option
 tmux set -g @themes "$SELECTED_THEME"
@@ -18,7 +18,12 @@ tmux set -g message-command-style "fg=${THEME[foreground]},bg=${THEME[active]},f
 tmux set -g pane-border-style "fg=${THEME[active]}"
 tmux set -g pane-active-border-style "fg=${THEME[blue]}"
 tmux set -g pane-border-status off
-tmux set -g status-style bg="${THEME[background]}"
+tmux set -g status-style "fg=${THEME[foreground]},bg=${THEME[background]},none"
+tmux set -g window-status-style "fg=${THEME[foreground]},bg=${THEME[highlight]},none"
+tmux set -g window-status-current-style "fg=${THEME[foreground]},bg=${THEME[active]},none"
+tmux set -g window-status-activity-style "fg=${THEME[cyan]},bg=${THEME[highlight]},none"
+tmux set -g window-status-bell-style "fg=${THEME[red]},bg=${THEME[highlight]},none"
+tmux set -g window-status-last-style "fg=${THEME[foreground]},bg=${THEME[highlight]},none"
 
 # Popup/float menu styles (for tmux-fzf and other popups)
 tmux set -g popup-style "fg=${THEME[foreground]},bg=${THEME[background]}"
