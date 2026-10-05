@@ -121,6 +121,10 @@
 - When using Playwriter, prefer the current active tab. Open a new tab only when
   the task genuinely requires it.
 
+## Web research
+
+- Prioritize firecrawl MCP tools over webfetch when you need more information from the web.
+
 ## Git
 
 - Use Conventional Commits for commit message.
