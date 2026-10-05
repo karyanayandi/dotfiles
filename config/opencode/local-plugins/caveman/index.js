@@ -28,7 +28,7 @@ export default Plugin.define({
   async setup(ctx) {
     const skillPath = join(homedir(), ".agents", "skills", "caveman", "SKILL.md");
     const skillBody = stripFrontmatter(await readFile(skillPath, "utf-8"));
-    const header = skillBody.slice(0, skillBody.indexOf("## Persistence")).trimEnd();
+    const header = `${skillBody.slice(0, skillBody.indexOf("## Persistence")).trimEnd()}\n\nDefault intensity: ultra. Strip grammar and conjunctions; use fragments, standard technical abbreviations, arrows for causality, and one word when enough. Preserve every technical fact, negation, command, path, and code block. Use normal prose for security warnings, irreversible actions, ambiguous step sequences, and requests for clarification. Persist until the user changes the level or says "stop caveman" or "normal mode".`;
 
     const commandNames = ["caveman", "caveman-review", "caveman-commit"];
     const templates = new Map();
