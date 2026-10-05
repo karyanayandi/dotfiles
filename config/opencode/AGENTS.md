@@ -8,6 +8,8 @@
 - Before coding, query available codebase memory mcp for prior decisions, plans,
   blockers, and relevant implementation context.
 - Inspect existing callers, types, tests, and configuration before editing.
+- If the task uses a technology or framework matching an available skill,
+  load that skill first via the `skill` tool and follow it.
 - Make smallest complete change. Reuse existing code before adding helpers,
   abstractions, dependencies, or configuration.
 - Only `AGENTS.md`, `README.md`, and `LICENSE.md` may be committed as Markdown
