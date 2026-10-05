@@ -104,3 +104,9 @@ trust_level = "trusted"
 
 [hooks.state."/home/karyana/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:6e0810ddbc4df1a4490fe5335b707d742f1cf3f3ce7769630340603092237593"
+
+[tui]
+screen_reader_detection_done = true
+
+[tui.model_availability_nux]
+"gpt-6.1-sol" = 1

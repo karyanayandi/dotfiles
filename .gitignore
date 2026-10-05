@@ -59,3 +59,5 @@ models-store.json
 mcp-cache.json
 mcp-onboarding.json
 auth.json
+**/.codex/**
+!**/.codex/config.toml

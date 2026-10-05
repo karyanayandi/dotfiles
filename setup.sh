@@ -15,6 +15,7 @@ sh ./setup/rust.sh
 sh ./setup/tmux.sh
 sh ./setup/uv.sh
 sh ./setup/viteplus.sh
+sh ./setup/codex.sh
 sh ./setup/zram.sh
 
 cd ~/.config/dotfiles/home && stow --adopt .
