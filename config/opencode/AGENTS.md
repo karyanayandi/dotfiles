@@ -5,8 +5,7 @@
 - Read the closest project-specific `AGENTS.md` before changing code.
 - If a user asks to update `AGENTS.md` only, edit only `AGENTS.md`. Do not
   change source files, dependencies, lockfiles, or generated files.
-- Before coding, query available codebase memory mcp for prior decisions, plans,
-  blockers, and relevant implementation context.
+- FIRST: before any code read/edit/search, you MUST use `codebase-memory-mcp`: call `list_projects` to resolve the project name (`index_repository` if missing), then `manage_adr` (mode=`sections`, then `get`) for prior decisions plus `get_architecture`/`search_graph` for implementation context. Skip only for `AGENTS.md`-only edits or when the MCP is unavailable (state why).
 - Inspect existing callers, types, tests, and configuration before editing.
 - If the task uses a technology or framework matching an available skill,
   load that skill first via the `skill` tool and follow it.
