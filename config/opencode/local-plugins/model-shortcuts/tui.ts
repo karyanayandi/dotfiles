@@ -1,4 +1,3 @@
-import { writeFileSync } from "node:fs";
 import { Plugin } from "@opencode/plugin/tui";
 import {
   describeTarget,
@@ -13,17 +12,8 @@ import {
 export default Plugin.define({
   id: "model-shortcuts",
   setup(context) {
-    const initial = loadShortcuts();
     const [state, updateState] = context.storage.memory("shortcuts", {
-      initial: { version: 0, map: initial },
-    });
-    const configured = Object.keys(initial).length;
-    context.ui.toast.show({
-      message:
-        configured > 0
-          ? `model-shortcuts: ${configured} slot(s) ready`
-          : "model-shortcuts: no shortcuts configured",
-      variant: configured > 0 ? "success" : "warning",
+      initial: { version: 0, map: loadShortcuts() },
     });
 
     async function switchTo(target: ShortcutTarget, slot: string) {
@@ -33,10 +23,6 @@ export default Plugin.define({
         ...(target.variant ? { variant: target.variant } : {}),
       };
       const route = context.ui.router.current();
-      writeFileSync(
-        "/tmp/opencode-model-shortcuts-fired.txt",
-        `${new Date().toISOString()} slot=${slot} route=${route.type} model=${describeTarget(target)}\n`,
-      );
       if (route.type !== "session") {
         try {
           const created = await context.client.session.create({ model });
@@ -126,10 +112,6 @@ export default Plugin.define({
         void version;
         const current = loadShortcuts();
         const entries = Object.entries(current).sort(([a], [b]) => a.localeCompare(b));
-        writeFileSync(
-          "/tmp/opencode-model-shortcuts-render.json",
-          `${JSON.stringify({ at: new Date().toISOString(), slots: entries.map(([s]) => s) })}\n`,
-        );
         context.keymap.layer(() => ({
           mode: "global",
           // F-keys need no modifiers: no kitty/CSI-u, tmux, or compositor fights.

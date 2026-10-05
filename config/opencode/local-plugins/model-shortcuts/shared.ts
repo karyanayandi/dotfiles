@@ -13,6 +13,8 @@ export interface ShortcutTarget {
 export type Shortcuts = Record<string, ShortcutTarget>;
 
 export const slots = [
+  "f1",
+  "f2",
   "f3",
   "f4",
   "f5",
@@ -21,8 +23,6 @@ export const slots = [
   "f8",
   "f9",
   "f10",
-  "f11",
-  "f12",
 ] as const;
 
 export function slotDigit(slot: string): string {
@@ -49,7 +49,7 @@ export function parseShortcuts(value: unknown): Shortcuts {
   if (!value || typeof value !== "object") return out;
   for (const [slot, target] of Object.entries(value as Record<string, unknown>)) {
     if (!(slots as readonly string[]).includes(slot)) {
-      console.error(`model-shortcuts: only f3 through f12 are supported; got ${slot}`);
+      console.error(`model-shortcuts: only f1 through f10 are supported; got ${slot}`);
       continue;
     }
     const parsed = toTarget(target);
