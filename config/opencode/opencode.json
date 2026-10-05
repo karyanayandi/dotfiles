@@ -49,6 +49,7 @@
     "./local-plugins/caveman",
     "./local-plugins/context-mode",
     "./local-plugins/worktrunk",
+    "./local-plugins/model-shortcuts",
     "@dietrichgebert/ponytail",
     "@tarquinen/opencode-dcp@latest"
   ],
