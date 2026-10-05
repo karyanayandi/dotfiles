@@ -13,6 +13,7 @@ sh ./setup/gtk-theme.sh
 sh ./setup/js-packages.sh
 sh ./setup/rust.sh
 sh ./setup/tmux.sh
+sh ./setup/uv.sh
 sh ./setup/viteplus.sh
 sh ./setup/zram.sh
 
