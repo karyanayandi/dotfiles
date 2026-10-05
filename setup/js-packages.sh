@@ -5,6 +5,7 @@ bun add -g \
   @caveman-ai/cli \
   @earendil-works/pi-coding-agent \
   @fission-ai/openspec@latest \
+  @openai/codex \
   @playwright/cli@latest \
   @playwright/mcp@latest \
   agent-browser@latest \
