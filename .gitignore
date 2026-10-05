@@ -61,3 +61,5 @@ mcp-onboarding.json
 auth.json
 **/.codex/**
 !**/.codex/config.toml
+**/.fx/file-index/
+**/.local/bin/fx
