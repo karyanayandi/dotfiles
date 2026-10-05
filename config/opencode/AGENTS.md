@@ -14,6 +14,24 @@
   files. Put detailed plans and working documentation in gitignored `docs/`.
   Keep `README.md` focused on project overview, setup, usage, and license.
 
+## Work quality and continuity
+
+- Do not speculate about token budgets, remaining context, or time left. Do not
+  narrate internal resource accounting or invent deadlines.
+- Never use perceived token, context, or time pressure to rush work, reduce the
+  requested scope, skip investigation or validation, or settle for a partial or
+  lower-quality fix.
+- When context fills, rely on the supported compaction mechanism and continue
+  working. Preserve the task, constraints, decisions, relevant files, exact
+  diagnostics, validation results, and next steps across compaction. Re-read
+  source material when needed rather than guessing from a summary.
+- Prefer the smallest complete, correct solution, not the quickest shortcut.
+  Efficiency means avoiding unnecessary work, not weakening reasoning,
+  correctness, safety, maintainability, or test coverage.
+- Continue until the requested work is complete and verified, or a concrete
+  blocker requires user input. Report actual blockers and unfinished checks
+  honestly; never claim completion because of perceived resource pressure.
+
 ## Validation
 
 - After making changes, run the project's available check, format, and lint
@@ -75,6 +93,8 @@
 - Do not define a function and export it separately.
 - Ban `useEffect` entirely. Do not import or call it. Prefer derived values,
   event handlers, or framework APIs.
+- Ban `useCallback` and `useMemo` entirely. Do not import or call it. Let React
+  Compiler handle memoization.
 
 ## Comments and documentation
 
@@ -87,6 +107,11 @@
 - Before starting a development server, check whether one is already running.
 - If one is running, do not start another server or switch to a different port.
 - Ask the user to stop the existing process before starting a replacement.
+
+## Browser automation
+
+- When using Playwriter, prefer the current active tab. Open a new tab only when
+  the task genuinely requires it.
 
 ## Git
 
