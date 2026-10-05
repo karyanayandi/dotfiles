@@ -6,13 +6,13 @@
 - Do not guess intent. If request is vague, ambiguous, or conflicts with this file, ask with `question` tool and wait.
 - Respect scope exactly: do what was asked, nothing extra. Keep user corrections active across turns until explicitly lifted.
 - Confirm targets before broad edits: which files, what to keep unchanged.
+- FIRST: before any code read/edit/search, you MUST use `codebase-memory-mcp`: call `list_projects` to resolve the project name (`index_repository` if missing), then `manage_adr` (mode=`sections`, then `get`) for prior decisions plus `get_architecture`/`search_graph` for implementation context. Skip only for `AGENTS.md`-only edits or when the MCP is unavailable (state why).
 
 ## Scope and priority
 
 - Read the closest project-specific `AGENTS.md` before changing code.
 - If a user asks to update `AGENTS.md` only, edit only `AGENTS.md`. Do not
   change source files, dependencies, lockfiles, or generated files.
-- FIRST: before any code read/edit/search, you MUST use `codebase-memory-mcp`: call `list_projects` to resolve the project name (`index_repository` if missing), then `manage_adr` (mode=`sections`, then `get`) for prior decisions plus `get_architecture`/`search_graph` for implementation context. Skip only for `AGENTS.md`-only edits or when the MCP is unavailable (state why).
 - Inspect existing callers, types, tests, and configuration before editing.
 - If the task uses a technology or framework matching an available skill,
   load that skill first via the `skill` tool and follow it.
