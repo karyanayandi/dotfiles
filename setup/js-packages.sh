@@ -2,6 +2,7 @@
 
 bun add -g \
   9router \
+  @caveman-ai/cli \
   @earendil-works/pi-coding-agent \
   @fission-ai/openspec@latest \
   @playwright/cli@latest \
@@ -11,7 +12,6 @@ bun add -g \
   firebase-tools@latest \
   neovim@latest \
   node-gyp@latest \
-  opencode-goal-plugin \
   playwright@latest \
   playwriter@latest \
   tree-sitter@latest \

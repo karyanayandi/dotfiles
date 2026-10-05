@@ -45,7 +45,13 @@
       }
     }
   },
-  "plugins": ["@tarquinen/opencode-dcp@latest", "./local-plugins/worktrunk", "./local-plugins/context-mode"],
+  "plugins": [
+    "./local-plugins/caveman",
+    "./local-plugins/context-mode",
+    "./local-plugins/worktrunk",
+    "@dietrichgebert/ponytail",
+    "@tarquinen/opencode-dcp@latest"
+  ],
   "providers": {
     "9router": {
       "package": "@opencode/ai/providers/openai-compatible",
