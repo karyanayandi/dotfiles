@@ -1,5 +1,12 @@
 # Agent guidelines
 
+## Understand instructions first
+
+- Restate goal, constraints, and done criteria in your own words before using tools.
+- Do not guess intent. If request is vague, ambiguous, or conflicts with this file, ask with `question` tool and wait.
+- Respect scope exactly: do what was asked, nothing extra. Keep user corrections active across turns until explicitly lifted.
+- Confirm targets before broad edits: which files, what to keep unchanged.
+
 ## Scope and priority
 
 - Read the closest project-specific `AGENTS.md` before changing code.
