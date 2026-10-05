@@ -1,0 +1,16 @@
+{
+  "ctrl+1": {
+    "model": "openai/gpt-6-astra"
+  },
+  "ctrl+2": {
+    "model": "openai/gpt-6.1-sol"
+  },
+  "ctrl+3": {
+    "model": "openai/gpt-6-luna",
+    "thinkingLevel": "max"
+  },
+  "ctrl+4": {
+    "model": "openai/gpt-6-luna",
+    "thinkingLevel": "low"
+  }
+}
