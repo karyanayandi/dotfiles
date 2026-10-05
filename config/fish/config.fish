@@ -66,13 +66,13 @@ alias lsl "eza --group-directories-first -lh --icons"
 alias lg lazygit
 alias lzd lazydocker
 alias lzg lazygit
-alias oc "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
-alias ocm "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode mini"
-alias opencode "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY opencode"
+alias oc "env -u OPENROUTER_API_KEY opencode"
+alias ocm "env -u OPENROUTER_API_KEY opencode mini"
+alias opencode "env -u OPENROUTER_API_KEY opencode"
 alias os openspec
-alias p "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi" 
+alias p "env -u OPENROUTER_API_KEY pi" 
 alias pac "sudo pacman -S"
-alias pi "env -u OPENAI_API_KEY -u OPENROUTER_API_KEY pi"
+alias pi "env -u OPENROUTER_API_KEY pi"
 alias pkglist "paru -Qe"
 alias pn pnpm
 alias px pnpx
