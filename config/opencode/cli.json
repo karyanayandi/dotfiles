@@ -32,6 +32,8 @@
     "work_spinner": "block-soft-sweep"
   },
   "keybinds": {
-    "prompt.skills": "ctrl+s"
+    "prompt.skills": "ctrl+s",
+    "session.new": "alt+n",
+    "session.tab.close": "alt+q"
   }
 }
