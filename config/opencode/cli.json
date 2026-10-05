@@ -35,7 +35,7 @@
     "prompt.skills": "ctrl+s",
     "session.new": "alt+n",
     "session.tab.close": "alt+q",
-    "session.tab.next": "alt++",
+    "session.tab.next": "alt+=",
     "session.tab.previous": "alt+-",
     "model.cycle_recent": "f11"
   }
