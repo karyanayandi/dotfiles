@@ -45,12 +45,7 @@
       }
     }
   },
-  "plugins": [
-    "./local-plugins/worktrunk",
-    "@tarquinen/opencode-dcp@latest",
-    "./local-plugins/context-mode",
-    "./local-plugins/skill-dollar"
-  ],
+  "plugins": ["@tarquinen/opencode-dcp@latest", "./local-plugins/worktrunk", "./local-plugins/context-mode"],
   "providers": {
     "9router": {
       "package": "@opencode/ai/providers/openai-compatible",

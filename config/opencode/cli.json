@@ -11,7 +11,9 @@
     "scrollbar": false,
     "thinking": "show",
     "image_preview": true,
-    "permissions": "autoaccept"
+    "permissions": "autoaccept",
+    "markdown": "rendered",
+    "verbosity": "medium"
   },
   "animations": true,
   "attention": {
@@ -25,5 +27,11 @@
   },
   "prompt": {
     "image_preview": true
+  },
+  "mini": {
+    "work_spinner": "block-soft-sweep"
+  },
+  "keybinds": {
+    "prompt.skills": "ctrl+s"
   }
 }
