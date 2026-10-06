@@ -109,6 +109,10 @@
 - Do not add comments or JSDoc unless they are necessary to explain non-obvious
   behavior, a required workaround, or a public API contract.
 - Prefer clear names and straightforward code over explanatory comments.
+- When you add or update documentation, comments, JSDoc, or instructions
+  inside code, use ASD-STE100 Simplified Technical English: approved words,
+  short sentences, and active voice. Keep required technical names, code
+  identifiers, and syntax unchanged.
 
 ## Development servers
 
