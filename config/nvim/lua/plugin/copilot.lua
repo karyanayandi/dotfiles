@@ -1,4 +1,3 @@
-
 local icons = require "config.icons"
 
 local function find_auth_db()
@@ -146,8 +145,18 @@ local function generate_commit()
 
         local api = token_data.endpoints and token_data.endpoints.api or "https://api.githubcopilot.com"
         local prompt = string.format(
-          [[Generate a concise conventional commit message for this diff.
-Title under 50 characters, body wrapped at 72 characters.
+          [[Generate exactly one concise Conventional Commit for the entire diff.
+Use one title that summarizes all changes and one body that gives details.
+Do not write separate commit messages or titles for each file or change.
+Use <type>(scope): <description> for the title. Scope is optional;
+if used, enclose it in parentheses, not square brackets.
+Add ! before : for a breaking change.
+Keep the full title under 50 characters, including the type and scope.
+Separate the title and body with a blank line. Use prose or a list for the body.
+Wrap each body line at 72 characters, including list markers and indent.
+Use ASD-STE100 Simplified Technical English for the title description and body:
+use approved words, short sentences, and active voice.
+Keep required technical names and code identifiers unchanged.
 Output only the commit message, no explanation.
 ```diff
 %s
@@ -159,7 +168,19 @@ Output only the commit message, no explanation.
           messages = {
             {
               role = "system",
-              content = "You generate concise conventional commit messages. Title under 50 chars, body wrapped at 72. Only output the commit message.",
+              content = [[You generate exactly one concise Conventional Commit for the entire diff.
+Use one title that summarizes all changes and one body that gives details.
+Do not write separate commit messages or titles for each file or change.
+Use <type>(scope): <description> for the title. Scope is optional;
+if used, enclose it in parentheses, not square brackets.
+Add ! before : for a breaking change.
+Keep the full title under 50 characters, including the type and scope.
+Separate the title and body with a blank line. Use prose or a list for the body.
+Wrap each body line at 72 characters, including list markers and indent.
+Use ASD-STE100 Simplified Technical English for the title description and body:
+use approved words, short sentences, and active voice.
+Keep required technical names and code identifiers unchanged.
+Only output the commit message.]],
             },
             { role = "user", content = prompt },
           },

@@ -52,6 +52,7 @@ known_hosts.old
 **/.pi/agent/sessions/**
 **/.pi/agent/pi-subagents/**
 **/.pi/agent/git/**
+**/.pi/agent/missions/**
 **/hicolor/**
 mimeinfo.cache
 **.desktop
@@ -59,6 +60,7 @@ models-store.json
 mcp-cache.json
 mcp-onboarding.json
 auth.json
+run-history.jsonl
 **/.codex/**
 !**/.codex/config.toml
 **/.fx/file-index/

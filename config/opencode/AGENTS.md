@@ -127,4 +127,15 @@
 
 ## Git
 
-- Use Conventional Commits for commit message.
+- Use Conventional Commits: `<type>(scope): <description>`. Scope is optional;
+  if used, enclose it in parentheses, not square brackets. Add `!` before `:`
+  for a breaking change.
+- Write exactly one commit message for all changes in the commit. Use one
+  title that summarizes the complete change and one body that gives details.
+  Do not write separate commit messages for each file or change.
+- Keep the full title under 50 characters, including the type and scope.
+- Separate the title and body with a blank line. Use prose or a list for the
+  body, and wrap each line at 72 characters, including list markers and indent.
+- Use ASD-STE100 Simplified Technical English for the title description and
+  body: use approved words, short sentences, and active voice. Keep required
+  technical names and code identifiers unchanged.
