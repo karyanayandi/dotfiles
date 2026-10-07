@@ -65,3 +65,4 @@ run-history.jsonl
 !**/.codex/config.toml
 **/.fx/file-index/
 **/.local/bin/fx
+.local/bin/fx
