@@ -32,7 +32,10 @@ function input() {
 
 function run_workmux() {
     local command removed_path= windows= window
-    if [[ $1 == remove ]]; then
+    if [[ $1 == merge ]]; then
+        set -- "$@" --cleanup
+    fi
+    if [[ $1 == remove || $1 == merge ]]; then
         removed_path=$(workmux path "$2")
         windows=$(tmux list-panes -a -F $'#{window_id}\t#{pane_current_path}' |
             jq -Rrs --arg path "$removed_path" '
@@ -51,7 +54,7 @@ function run_workmux() {
     fi
 }
 
-action=$(printf '%s\n' 'add' 'add w/branch' 'add w/prompt' 'open' 'remove' 'close' 'dashboard' 'sidebar' 'quit' |
+action=$(printf '%s\n' 'add' 'add w/branch' 'add w/prompt' 'open' 'merge' 'remove' 'close' 'dashboard' 'sidebar' 'quit' |
     fzf-tmux -p 80%,40% -- --prompt='workmux> ' --no-multi) || exit 0
 
 case "$action" in
@@ -69,7 +72,7 @@ case "$action" in
         prompt=$(input 'Prompt') || exit 0
         run_workmux add "$branch" --prompt "$prompt"
         ;;
-    open|remove|close)
+    open|merge|remove|close)
         worktrees=$(workmux list --json | jq -r --arg action "$action" \
             '.[] | select($action == "open" or (.is_main | not)) | .handle')
         if [[ -z $worktrees ]]; then
