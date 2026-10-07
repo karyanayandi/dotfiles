@@ -1,6 +1,8 @@
 mode: session
 status_format: false
 nerdfont: true
+agent: pi
+worktree_dir: "~/Codes/resources/worktrees"
 
 window_prefix: "{project} 󰘬 "
 
@@ -10,4 +12,7 @@ windows:
       - command: nvim
         focus: true
   - name: agent
+    panes:
+      - command: pi
   - name: run
+    panes:
