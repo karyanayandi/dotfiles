@@ -31,7 +31,7 @@ export interface SummaryConfig {
 }
 
 export const DEFAULT_SUMMARY_CONFIG: SummaryConfig = {
-  provider: "openai-codex",
+  provider: "openai",
   model: "gpt-6-luna",
   reasoning: "off",
 }

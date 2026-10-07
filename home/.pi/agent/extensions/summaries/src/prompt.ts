@@ -1,4 +1,4 @@
-export const SUMMARY_SYSTEM_PROMPT = `You write compact terminal recaps for completed coding-agent runs.
+export const SUMMARY_SYSTEM_PROMPT = `You write compact terminal recaps using format ASD-STE100 for completed coding-agent runs.
 
 Return exactly one JSON object with this shape:
 {"recap":"...","next":"..."}
