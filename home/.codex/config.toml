@@ -64,6 +64,7 @@ enabled = true
 
 [features]
 js_repl = false
+hooks = true
 
 [mcp_servers.node_repl]
 args = []

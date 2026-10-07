@@ -111,7 +111,7 @@ paru -S --needed \
   wget \
   wiremix \
   wl-clipboard \
-  worktrunk \
+  workmux \
   wtype \
   xdg-desktop-portal \
   xdg-desktop-portal-hyprland \
@@ -125,4 +125,3 @@ paru -S --needed \
   zip
 
 rustup toolchain install stable
-wt config plugins opencode install

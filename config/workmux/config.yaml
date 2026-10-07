@@ -1,0 +1,13 @@
+mode: session
+status_format: false
+nerdfont: true
+
+window_prefix: "{project} 󰘬 "
+
+windows:
+  - name: editor
+    panes:
+      - command: nvim
+        focus: true
+  - name: agent
+  - name: run

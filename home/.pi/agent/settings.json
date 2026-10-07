@@ -16,7 +16,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "1.0.3",
+  "lastChangelogVersion": "1.0.4",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
@@ -25,11 +25,9 @@
     "npm:pi-mcp-adapter",
     "npm:pi-nvim",
     "npm:pi-observational-memory",
-    "npm:pi-skill-palette",
     "npm:pi-tool-display",
-    "npm:pi-worktrunk",
     "npm:pi-autoresearch",
-    "npm:pi-subagents"
+    "npm:@gotgenes/pi-subagents"
   ],
   "quietStartup": true,
   "showHardwareCursor": true,
