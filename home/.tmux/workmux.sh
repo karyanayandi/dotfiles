@@ -16,22 +16,30 @@ function merge_in_progress() {
 }
 
 function resolve_merge() {
-    local directory candidate directories
+    local directory candidate directories worktrees
     if ! command -v lazygit >/dev/null; then
         printf '%s\n' 'Merge resolution requires lazygit.' >&2
         return 1
     fi
     directory=$(workmux path "$1")
     if ! merge_in_progress "$directory"; then
-        directories=$(workmux list --json < /dev/null | jq -r '.[].path')
+        worktrees=$(workmux list --json < /dev/null)
+        directories=$(jq -r '.[].path' <<< "$worktrees")
         while IFS= read -r candidate; do
             if merge_in_progress "$candidate"; then
                 directory=$candidate
                 break
             fi
         done <<< "$directories"
+        if ! merge_in_progress "$directory" &&
+            [[ $(jq -r --arg path "$directory" '.[] | select(.path == $path) | .is_main' <<< "$worktrees") == false ]]; then
+            if ! workmux rebase "$1" && ! merge_in_progress "$directory"; then
+                read -r -p 'Rebase failed. Press Enter to close.' || true
+                return 1
+            fi
+        fi
     fi
-    lazygit -p "$directory"
+    lazygit -p "$directory" status
 }
 
 if [[ ${1:-} == run ]]; then
@@ -51,7 +59,7 @@ if [[ ${1:-} == run ]]; then
                 merge_in_progress "$(workmux path "$2")"
         }; then
             resolve_merge "$2"
-            printf '%s\n' 'Resolve and commit in LazyGit, then retry Workmux Merge.'
+            printf '%s\n' 'Finish merge or rebase in LazyGit, then retry Workmux Merge.'
         fi
         read -r -p 'Workmux failed. Press Enter to close.' || true
         exit "$status"
@@ -78,7 +86,7 @@ function run_workmux() {
         height=85%
     fi
     if [[ $1 == merge ]]; then
-        set -- "$@" --cleanup
+        set -- "$@" --rebase --cleanup
     fi
     if [[ $1 == remove || $1 == merge ]]; then
         removed_path=$(workmux path "$2")
