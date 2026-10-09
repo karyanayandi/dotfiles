@@ -1,11 +1,6 @@
 ---@type vim.lsp.Config
 return {
   cmd = { "tsc", "--lsp", "--stdio" },
-  cmd_env = {
-    GOMEMLIMIT = "2GiB",
-    GOMAXPROCS = "2",
-    NODE_OPTIONS = "--max-old-space-size=4096",
-  },
   filetypes = {
     "javascript",
     "javascriptreact",
