@@ -70,7 +70,7 @@ alias oc "env -u OPENROUTER_API_KEY opencode"
 alias ocm "env -u OPENROUTER_API_KEY opencode mini"
 alias opencode "env -u OPENROUTER_API_KEY opencode"
 alias os openspec
-alias p "env -u OPENROUTER_API_KEY pi" 
+alias p "env -u OPENROUTER_API_KEY pi"
 alias pac "sudo pacman -S"
 alias pi "env -u OPENROUTER_API_KEY pi"
 alias pkglist "paru -Qe"
@@ -128,6 +128,7 @@ set fzf_preview_dir_cmd eza --all --color=always
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 envsource ~/.env
+envsource ~/.config/environment.d/60-runtime-memory.conf
 
 # opencode
 fish_add_path /home/karyana/.opencode/bin
