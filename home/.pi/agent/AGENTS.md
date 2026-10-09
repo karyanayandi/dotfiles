@@ -5,8 +5,19 @@
 - Read the closest project-specific `AGENTS.md` before changing code.
 - If a user asks to update `AGENTS.md` only, edit only `AGENTS.md`. Do not
   change source files, dependencies, lockfiles, or generated files.
-- Before coding, query available codebase memory mcp for prior decisions, plans,
-  blockers, and relevant implementation context.
+- Before code search, use `code-index-mcp`. Select the project with
+  `set_project_path`. Check `get_settings_info`.
+- Keep the file watcher off. Call `configure_file_watcher` with `enabled=false`,
+  then call `set_project_path` again for the same project. Check that
+  `get_file_watcher_status` reports `active=false` before you build a deep index.
+- Use `search_code_advanced` and `find_files` for code context. Follow search
+  pagination with `start_index` when `has_more=true`. Use `refresh_index` when
+  the file list is stale.
+- Use `build_deep_index` with `max_workers=1` only when you need symbol data.
+  Then use `get_file_summary` and `get_symbol_body`. Do not rebuild before each
+  search. Rebuild symbol data after source changes if you need current symbols.
+- Hidden paths and some languages have limited coverage. Use native search when
+  required files are absent or the server is unavailable. State the reason.
 - Inspect existing callers, types, tests, and configuration before editing.
 - Make smallest complete change. Reuse existing code before adding helpers,
   abstractions, dependencies, or configuration.

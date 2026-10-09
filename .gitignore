@@ -66,3 +66,8 @@ run-history.jsonl
 **/.fx/file-index/
 **/.local/bin/fx
 .local/bin/fx
+
+# MCP runtime files and uv tool entry points.
+.mcp-index/
+mcp_server.log
+home/.local/bin/code-index-mcp

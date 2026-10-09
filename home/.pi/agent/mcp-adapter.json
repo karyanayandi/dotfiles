@@ -30,9 +30,9 @@
       "url": "https://mcp.firecrawl.dev/v2/mcp-oauth",
       "directTools": true
     },
-    "codebase-memory-mcp": {
+    "code-index-mcp": {
       "type": "stdio",
-      "command": "/usr/sbin/codebase-memory-mcp",
+      "command": "/home/karyana/.local/bin/code-index-mcp",
       "args": [],
       "directTools": true
     }

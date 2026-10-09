@@ -28,9 +28,9 @@
       "restart_limit": 2,
       "enabled": true
     },
-    "codebase-memory-mcp": {
+    "code-index-mcp": {
       "type": "local",
-      "command": ["/usr/sbin/codebase-memory-mcp"],
+      "command": ["/home/karyana/.local/bin/code-index-mcp"],
       "startup_timeout_ms": 60000,
       "operation_timeout_ms": 30000,
       "restart_limit": 2

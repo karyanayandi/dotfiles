@@ -6,7 +6,20 @@
 - Do not guess intent. If request is vague, ambiguous, or conflicts with this file, ask with `question` tool and wait.
 - Respect scope exactly: do what was asked, nothing extra. Keep user corrections active across turns until explicitly lifted.
 - Confirm targets before broad edits: which files, what to keep unchanged.
-- FIRST: before any code read/edit/search, you MUST use `codebase-memory-mcp`: call `list_projects` to resolve the project name (`index_repository` if missing), then `manage_adr` (mode=`sections`, then `get`) for prior decisions plus `get_architecture`/`search_graph` for implementation context. Skip only for `AGENTS.md`-only edits or when the MCP is unavailable (state why).
+- FIRST: before code read/edit/search, use `code-index-mcp`. Select the project
+  with `set_project_path`. Check `get_settings_info`. Skip for `AGENTS.md`-only
+  edits.
+- Keep the file watcher off. Call `configure_file_watcher` with `enabled=false`,
+  then call `set_project_path` again for the same project. Check that
+  `get_file_watcher_status` reports `active=false` before you build a deep index.
+- Use `search_code_advanced` and `find_files` for code context. Follow search
+  pagination with `start_index` when `has_more=true`. Use `refresh_index` when
+  the file list is stale.
+- Use `build_deep_index` with `max_workers=1` only when you need symbol data.
+  Then use `get_file_summary` and `get_symbol_body`. Do not rebuild before each
+  search. Rebuild symbol data after source changes if you need current symbols.
+- Hidden paths and some languages have limited coverage. Use native search when
+  required files are absent or the server is unavailable. State the reason.
 
 ## Scope and priority
 

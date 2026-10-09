@@ -39,9 +39,9 @@
         "command": ["bun", "x", "shadcn@latest", "mcp"],
         "type": "local"
       },
-      "codebase-memory-mcp": {
+      "code-index-mcp": {
         "type": "local",
-        "command": ["/usr/sbin/codebase-memory-mcp"]
+        "command": ["/home/karyana/.local/bin/code-index-mcp"]
       }
     }
   },
