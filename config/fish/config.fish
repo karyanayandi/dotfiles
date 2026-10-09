@@ -129,6 +129,11 @@ set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 envsource ~/.env
 
+# Go uses a soft memory target. Node limits only its JavaScript heap.
+set -gx GOMEMLIMIT 2GiB
+set -gx GOMAXPROCS 2
+set -gx NODE_OPTIONS --max-old-space-size=4096
+
 # opencode
 fish_add_path /home/karyana/.opencode/bin
 

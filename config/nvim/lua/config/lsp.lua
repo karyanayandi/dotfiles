@@ -61,7 +61,6 @@ local servers = {
   "vue_ls",
   "yamlls",
   -- "nil_ls",
-  "tsc",
 }
 
 vim.filetype.add { extension = { templ = "templ" } }
