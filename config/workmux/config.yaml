@@ -7,12 +7,13 @@ worktree_dir: "~/Codes/resources/worktrees"
 window_prefix: "{project} 󰘬 "
 
 windows:
-  - name: editor
+  - name: code
     panes:
-      - command: nvim
-        focus: true
+      - command: lazygit
   - name: agent
     panes:
       - command: pi
+        focus: true
   - name: run
     panes:
+      - command: pwd
