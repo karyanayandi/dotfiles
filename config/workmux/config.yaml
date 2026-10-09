@@ -6,6 +6,13 @@ worktree_dir: "~/Codes/resources/worktrees"
 
 window_prefix: "{project} 󰘬 "
 
+files:
+  copy:
+    - .env
+    - .env.local
+  symlink:
+    - node_modules
+
 windows:
   - name: code
     panes:

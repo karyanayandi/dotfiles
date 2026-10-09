@@ -15,7 +15,7 @@ class LiveUnavailable(Exception):
     pass
 
 
-def live_limits(command=None, timeout=8):
+def live_limits(command=None, timeout=30):
     """Use CLI-owned authentication. Never request accounts, threads, or login."""
     deadline = time.monotonic() + timeout
     process = None
