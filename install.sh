@@ -121,6 +121,7 @@ paru -S --needed \
   yazi \
   yt-dlp \
   zen-browser-bin \
-  zip
+  zip \
+  zoxide
 
 rustup toolchain install stable
