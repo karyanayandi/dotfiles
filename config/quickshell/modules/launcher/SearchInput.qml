@@ -8,10 +8,11 @@ RowLayout {
     property string mode: "all"
 
     signal queryChanged(string query)
-    signal escapePressed()
+    signal escapePressed
     signal selectionMoved(string direction)
     signal selected(bool ctrl)
-    signal cycleWallpaperInterval()
+    signal cycleWallpaperInterval
+    signal toggleWallpaperMonochrome
 
     function focusInput() {
         input.forceActiveFocus();
@@ -49,9 +50,11 @@ RowLayout {
         clip: true
         focus: true
         onTextChanged: root.queryChanged(text)
-        Keys.onPressed: (event) => {
+        Keys.onPressed: event => {
             if (root.mode === "wallpaper" && event.key === Qt.Key_B && (event.modifiers & Qt.ControlModifier))
                 root.cycleWallpaperInterval();
+            else if (root.mode === "wallpaper" && event.key === Qt.Key_M && (event.modifiers & Qt.ControlModifier))
+                root.toggleWallpaperMonochrome();
             else if (event.key === Qt.Key_Escape)
                 root.escapePressed();
             else if (event.key === Qt.Key_Down)
@@ -63,7 +66,7 @@ RowLayout {
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                 root.selected(!!(event.modifiers & Qt.ControlModifier));
             else
-                return ;
+                return;
             event.accepted = true;
         }
 
@@ -98,7 +101,6 @@ RowLayout {
             font.family: Theme.fontUi
             font.pixelSize: 17
         }
-
     }
 
     Rectangle {
@@ -127,7 +129,6 @@ RowLayout {
                 root.focusInput();
             }
         }
-
     }
 
     Text {
@@ -148,7 +149,5 @@ RowLayout {
             border.color: Theme.colBorder
             border.width: 1
         }
-
     }
-
 }

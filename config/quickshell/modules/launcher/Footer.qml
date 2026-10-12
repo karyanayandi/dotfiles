@@ -56,6 +56,34 @@ RowLayout {
     }
 
     Rectangle {
+        visible: root.mode === "wallpaper"
+        implicitHeight: 24
+        radius: 8
+        color: root.wallpaper.monochrome ? Theme.g7 : Theme.colChipBg
+        Accessible.role: Accessible.Button
+        Accessible.name: "Mono colors"
+        Accessible.checkable: true
+        Accessible.checked: root.wallpaper.monochrome
+        Accessible.onPressAction: root.wallpaper.toggleMonochrome()
+        border.color: Theme.colBorder
+        border.width: 1
+        implicitWidth: colorLabel.implicitWidth + 20
+        Text {
+            id: colorLabel
+            anchors.centerIn: parent
+            text: "ctrl+m  " + (root.wallpaper.monochrome ? "Mono" : "Color")
+            color: root.wallpaper.monochrome ? Theme.colBg : Theme.colFg
+            font.family: Theme.fontUi
+            font.pixelSize: 11
+        }
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.wallpaper.toggleMonochrome()
+        }
+    }
+
+    Rectangle {
         visible: root.mode === "bluetooth"
         height: 24
         radius: 8

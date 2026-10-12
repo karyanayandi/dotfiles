@@ -10,6 +10,7 @@ Item {
     property var wallpapers: []
     property string current: ""
     property string pendingTheme: ""
+    property bool monochrome: false
     property bool restored: false
     property int rotationInterval: 1.08e+07
     readonly property var intervalOptions: [0, 1.8e+06, 3.6e+06, 1.08e+07, 2.16e+07, 4.32e+07]
@@ -26,19 +27,28 @@ Item {
     function save() {
         store.setText(JSON.stringify({
             "wallpaper": root.current,
-            "interval": root.rotationInterval
+            "interval": root.rotationInterval,
+            "monochrome": root.monochrome
         }));
     }
 
     function setWallpaper(path) {
         if (!path)
-            return ;
+            return;
 
         root.current = path;
         root.save();
         if (root.rotationInterval > 0)
             rotation.restart();
+    }
 
+    function toggleMonochrome() {
+        root.monochrome = !root.monochrome;
+        root.save();
+        if (root.current) {
+            root.pendingTheme = root.current;
+            themeDelay.restart();
+        }
     }
 
     function cycleInterval() {
@@ -53,9 +63,9 @@ Item {
 
     function randomize() {
         if (!root.wallpapers.length)
-            return ;
+            return;
 
-        const choices = root.wallpapers.filter((path) => {
+        const choices = root.wallpapers.filter(path => {
             return path !== root.current;
         });
         root.setWallpaper((choices.length ? choices : root.wallpapers)[Math.floor(Math.random() * (choices.length || root.wallpapers.length))]);
@@ -74,9 +84,9 @@ Item {
         try {
             const state = JSON.parse(saved);
             root.current = state.wallpaper || "";
+            root.monochrome = state.monochrome === true;
             if (root.intervalOptions.includes(state.interval))
                 root.rotationInterval = state.interval;
-
         } catch (error) {
             root.current = saved;
         }
@@ -99,18 +109,15 @@ Item {
         onExited: {
             if (!root.wallpapers.includes(root.current))
                 root.randomize();
-
         }
 
         stdout: SplitParser {
-            onRead: (data) => {
+            onRead: data => {
                 const path = (data || "").trim();
                 if (path)
                     root.wallpapers = root.wallpapers.concat([path]);
-
             }
         }
-
     }
 
     // Coalesce fast selections; finish each render before starting the newest one.
@@ -120,7 +127,7 @@ Item {
         interval: 150
         onTriggered: {
             if (!themeProcess.running && root.pendingTheme) {
-                themeProcess.command = [Quickshell.env("HOME") + "/.local/bin/wallpaper-theme", root.pendingTheme];
+                themeProcess.command = [Quickshell.env("HOME") + "/.local/bin/wallpaper-theme", root.pendingTheme, root.monochrome ? "mono" : "color"];
                 root.pendingTheme = "";
                 themeProcess.running = true;
             }
@@ -136,7 +143,6 @@ Item {
 
             if (root.pendingTheme)
                 themeDelay.restart();
-
         }
     }
 
@@ -148,5 +154,4 @@ Item {
         repeat: true
         onTriggered: root.randomize()
     }
-
 }

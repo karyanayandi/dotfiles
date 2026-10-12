@@ -139,6 +139,7 @@ Item {
                         return model.triggerSelected(ctrl);
                     }
                     onCycleWallpaperInterval: win.wallpaper.cycleInterval()
+                    onToggleWallpaperMonochrome: win.wallpaper.toggleMonochrome()
                 }
 
                 Rectangle {

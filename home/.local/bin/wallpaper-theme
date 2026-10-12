@@ -4,17 +4,30 @@ set -euo pipefail
 
 config_home=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_home=${XDG_CACHE_HOME:-$HOME/.cache}
-if (($# > 1)); then
-  echo 'Usage: wallpaper-theme [IMAGE]' >&2
+if (($# > 2)); then
+  echo 'Usage: wallpaper-theme [IMAGE] [color|mono]' >&2
   exit 2
 fi
 image=${1:-}
-if [[ -z $image ]]; then
-  store=$cache_home/quickshell/wallpaper
-  if [[ -f $store ]]; then
+mode=${2:-}
+store=$cache_home/quickshell/wallpaper
+if [[ -f $store ]]; then
+  if [[ -z $image ]]; then
     image=$(jq -r 'if type == "object" then .wallpaper // empty else empty end' "$store" 2>/dev/null || head -n 1 "$store")
   fi
+  if [[ -z $mode ]]; then
+    mode=$(jq -r 'if type == "object" and .monochrome == true then "mono" else "color" end' "$store" 2>/dev/null || echo color)
+  fi
 fi
+mode=${mode:-color}
+case $mode in
+  monochrome) mode=mono ;;
+  color | mono) ;;
+  *)
+    echo 'wallpaper-theme: mode must be color or mono.' >&2
+    exit 2
+    ;;
+esac
 if [[ ! -f $image ]]; then
   echo 'wallpaper-theme: supply an existing wallpaper image, or select one in Quickshell.' >&2
   exit 1
@@ -27,7 +40,84 @@ mkdir -p "$cache_home/theme"
 # Serialize generation so two wallpaper changes cannot interleave output files.
 exec 9>"$cache_home/theme/generate.lock"
 flock 9
-matugen --config "$config_home/theme/config.toml" --mode dark --source-color-index 0 image "$(realpath -- "$image")"
+matugen_args=(--config "$config_home/theme/config.toml" --mode dark --type scheme-tonal-spot --source-color-index 0)
+image=$(realpath -- "$image")
+if [[ $mode == mono ]]; then
+  palette=$(mktemp "$cache_home/theme/monochrome.XXXXXX.json")
+  trap 'rm -f -- "$palette"' EXIT
+  matugen "${matugen_args[@]}" --dry-run --json hex image "$image" >"$palette"
+  python3 - "$palette" <<'PY'
+import colorsys
+import json
+import re
+import sys
+from pathlib import Path
+
+
+def rgb(color):
+    return [int(color[index : index + 2], 16) / 255 for index in (1, 3, 5)]
+
+
+def luminance(channels):
+    linear = [
+        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels
+    ]
+    return sum(c * weight for c, weight in zip(linear, (0.2126, 0.7152, 0.0722)))
+
+
+def mono_colors(value):
+    if isinstance(value, dict):
+        return {key: mono_colors(color) for key, color in value.items()}
+    if isinstance(value, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        target = luminance(rgb(value))
+        low, high = 0.0, 1.0
+        # Match luminance without changing the background hue or saturation.
+        for _ in range(24):
+            lightness = (low + high) / 2
+            channels = colorsys.hls_to_rgb(hue, lightness, saturation)
+            if luminance(channels) < target:
+                low = lightness
+            else:
+                high = lightness
+        return "#" + bytes(round(c * 255) for c in channels).hex()
+    return value
+
+
+palette = Path(sys.argv[1])
+data = json.loads(palette.read_text())
+anchor = data["colors"]["background"]["default"]["color"]
+if not isinstance(anchor, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", anchor):
+    raise ValueError("wallpaper-theme: invalid Matugen terminal background color")
+hue, _, saturation = colorsys.rgb_to_hls(*rgb(anchor))
+# Use different Matugen tones when generated accents have the same lightness.
+for variant in ("dark", "light", "default"):
+    dark = variant != "light"
+    neutral_tones = (
+        (5, 10, 15, 20, 35, 70, 90, 98) if dark else (98, 95, 90, 80, 60, 30, 20, 5)
+    )
+    for index, tone in enumerate(neutral_tones):
+        data["base16"][f"base{index:02x}"][variant]["color"] = data["palettes"][
+            "neutral"
+        ][str(tone)]["color"]
+    tones = (
+        (60, 70, 80, 90, 95, 98, 99, 100) if dark else (5, 10, 15, 20, 25, 30, 35, 40)
+    )
+    for index, tone in enumerate(tones, 8):
+        data["base16"][f"base{index:02x}"][variant]["color"] = data["palettes"][
+            "primary"
+        ][str(tone)]["color"]
+    for role, tone in zip(
+        ("primary", "secondary", "tertiary"), (80, 90, 95) if dark else (40, 30, 20)
+    ):
+        data["colors"][role][variant]["color"] = data["palettes"]["primary"][str(tone)][
+            "color"
+        ]
+palette.write_text(json.dumps(mono_colors(data)))
+PY
+  matugen "${matugen_args[@]}" json "$palette"
+else
+  matugen "${matugen_args[@]}" image "$image"
+fi
 
 # qt5ct/qt6ct watch the directory, not symlinked config/palette targets.
 # Creating then removing a temporary entry triggers their 3-second reload timer.

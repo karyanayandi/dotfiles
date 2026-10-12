@@ -171,7 +171,7 @@ export default function ui(pi: ExtensionAPI) {
     if (layout === "lite") {
       // Lite uses built-in "Working..." indicator in response area, not footer
       // spinner.
-      ctx.ui.setFooter((tui, theme) => ({
+      ctx.ui.setFooter((_tui, theme) => ({
         dispose() {
           return undefined
         },

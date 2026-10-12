@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 """Render every template in a temporary home, never touching live app configs."""
 
+import colorsys
 import json
 import os
 import pty
+import re
 import runpy
 import select
 import shlex
 import shutil
 import signal
+import struct
 import subprocess
 import tempfile
 import time
-import xml.etree.ElementTree as ET
-from pathlib import Path
-
 import tomllib
+import xml.etree.ElementTree as ET
+import zlib
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 THEME = ROOT / "config/theme"
@@ -127,7 +130,10 @@ def check_tmux(home, env, terminal, palettes):
             )
             for option in styles:
                 style = run("show-options", "-gv", option)
-                assert "#123456" not in style and "#654321" not in style, (option, style)
+                assert "#123456" not in style and "#654321" not in style, (
+                    option,
+                    style,
+                )
                 assert "reverse" not in style, (option, style)
             data = terminal["sequences"](home / ".config/theme/generated/ghostty")
             terminal["send"](pane, data)
@@ -136,17 +142,23 @@ def check_tmux(home, env, terminal, palettes):
             wait(reply)
             lines = palette[".config/theme/generated/ghostty"].splitlines()
             colors = dict(
-                line.split(" = ", 1) for line in lines
+                line.split(" = ", 1)
+                for line in lines
                 if " = " in line and not line.startswith("palette")
             )
             ansi = next(
-                line.split("=", 2)[2] for line in lines
+                line.split("=", 2)[2]
+                for line in lines
                 if line.startswith("palette = 0=")
             )
             for code, color in (
-                ("4;0", ansi), ("10", colors["foreground"]), ("11", colors["background"])
+                ("4;0", ansi),
+                ("10", colors["foreground"]),
+                ("11", colors["background"]),
             ):
-                rgb = "/".join(part * 2 for part in (color[1:3], color[3:5], color[5:7]))
+                rgb = "/".join(
+                    part * 2 for part in (color[1:3], color[3:5], color[5:7])
+                )
                 expected = f"\033]{code};rgb:{rgb}\033\\".encode()
                 assert expected in reply.read_bytes(), reply.read_bytes()
     finally:
@@ -193,8 +205,14 @@ def check():
             assert fields == docker_fields, "Lazydocker supports only four theme fields"
     # Pi's native watcher ignores externally registered theme paths.
     assert config["templates"]["pi"]["output_path"] == "~/.pi/agent/themes/matugen.json"
-    assert json.loads((ROOT / "config/opencode/cli.json").read_text())["theme"]["name"] == "system"
-    assert config["templates"]["fzf"]["output_path"] == "~/.config/theme/generated/fzf.opts"
+    assert (
+        json.loads((ROOT / "config/opencode/cli.json").read_text())["theme"]["name"]
+        == "system"
+    )
+    assert (
+        config["templates"]["fzf"]["output_path"]
+        == "~/.config/theme/generated/fzf.opts"
+    )
     with tempfile.TemporaryDirectory(prefix="wallpaper-theme-test-") as directory:
         home = Path(directory)
         entries = ["[config]"]
@@ -252,7 +270,9 @@ def check():
             if shutil.which("fzf"):
                 fzf_env = {
                     **os.environ,
-                    "FZF_DEFAULT_OPTS_FILE": str(home / ".config/theme/generated/fzf.opts"),
+                    "FZF_DEFAULT_OPTS_FILE": str(
+                        home / ".config/theme/generated/fzf.opts"
+                    ),
                 }
                 fzf_env.pop("FZF_DEFAULT_OPTS", None)
                 filtered = subprocess.run(
@@ -269,11 +289,15 @@ def check():
                 for path, before, after in zip(outputs, previous, rendered):
                     assert before != after, f"Palette does not change: {path}"
             previous = rendered
-            palettes.append({
-                name: (home / name).read_text() for name in (
-                    ".config/theme/generated/ghostty", ".cache/theme/tmux.sh"
-                )
-            })
+            palettes.append(
+                {
+                    name: (home / name).read_text()
+                    for name in (
+                        ".config/theme/generated/ghostty",
+                        ".cache/theme/tmux.sh",
+                    )
+                }
+            )
         terminal = runpy.run_path(str(THEME / "terminal.py"))
         data = terminal["sequences"](home / ".config/theme/generated/ghostty")
         assert data.count(b"\x1b]4;") == 18
@@ -292,7 +316,9 @@ def check():
             (info.parent / "comm").write_text(name + "\n")
             (info / "12").write_text(f"tty-index:\t{index}\n")
         assert terminal["terminals"](proc) == {
-            Path("/dev/pts/4"), Path("/dev/pts/5"), Path("/dev/pts/7")
+            Path("/dev/pts/4"),
+            Path("/dev/pts/5"),
+            Path("/dev/pts/7"),
         }
         master, slave = pty.openpty()
         try:
@@ -312,12 +338,26 @@ def check():
         bindir.mkdir()
         fake = bindir / "matugen"
         fake.write_text(
-            '#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/args"\nexit "${FAIL:-0}"\n'
+            '#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/args"\n'
+            'if [ "${FAIL:-0}" != 0 ]; then exit "$FAIL"; fi\n'
+            'case " $* " in *" json "*)\n'
+            '  for arg in "$@"; do palette=$arg; done\n'
+            '  cp "$palette" "$HOME/render-palette.json";; esac\n'
+            'case " $* " in *" --dry-run "*)\n'
+            '  if [ "${INVALID_PALETTE:-0}" != 0 ]; then printf "invalid"; exit 0; fi\n'
+            f'  {shlex.quote(binary)} "$@" > "$HOME/source-palette.json" || exit $?\n'
+            '  if [ "${MISSING_ANCHOR:-0}" != 0 ]; then\n'
+            '    jq "del(.colors.background.default)" "$HOME/source-palette.json"\n'
+            '  else cat "$HOME/source-palette.json"; fi\n'
+            "  exit;; esac\n"
+            f'if [ "${{RENDER:-0}}" = 1 ]; then exec {shlex.quote(binary)} "$@"; fi\n'
         )
         fake.chmod(0o755)
         # Never signal the user's Ghostty during isolated runner tests.
         signal_stub = bindir / "pkill"
-        signal_stub.write_text('#!/bin/sh\nprintf "%s\\n" "$@" >> "$HOME/signal-args"\n')
+        signal_stub.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$@" >> "$HOME/signal-args"\n'
+        )
         signal_stub.chmod(0o755)
         settings_stub = bindir / "gsettings"
         settings_stub.write_text(
@@ -350,8 +390,261 @@ def check():
         if shutil.which("fish") and shutil.which("starship"):
             check_prompt(home, env)
         image = home / "wall paper.png"
-        image.touch()
+        shutil.copyfile(ROOT / "wallpapers/arch-linux.png", image)
         runner = ROOT / "home/.local/bin/wallpaper-theme"
+        (home / ".config/theme/config.toml").write_text(test_config.read_text())
+        wallpaper_images = [
+            ROOT / "wallpapers" / name
+            for name in (
+                "forest.jpg",
+                "aesthetic_blue_jupiter.jpg",
+                "sunforest.jpg",
+                "galaxy.png",
+                "spaceman-in-sace.jpeg",
+            )
+        ]
+        for name, rgb in (
+            ("black", bytes((0, 0, 0))),
+            ("white", bytes((255, 255, 255))),
+        ):
+            path = home / f"{name}.png"
+            png = b"\x89PNG\r\n\x1a\n"
+            for kind, payload in (
+                (b"IHDR", struct.pack(">IIBBBBB", 16, 16, 8, 2, 0, 0, 0)),
+                (b"IDAT", zlib.compress((b"\0" + rgb * 16) * 16)),
+                (b"IEND", b""),
+            ):
+                png += struct.pack(">I", len(payload)) + kind + payload
+                png += struct.pack(">I", zlib.crc32(kind + payload))
+            path.write_bytes(png)
+            wallpaper_images.append(path)
+        monochrome_outputs = {}
+        monochrome_palettes = {}
+        monochrome_seeds = {}
+        render_cases = [("monochrome", wallpaper_images[0])]
+        render_cases += [("mono", path) for path in wallpaper_images]
+        render_cases += [("mono", wallpaper_images[0]), ("color", image)]
+        for mode, wallpaper_image in render_cases:
+            subprocess.run(
+                [str(runner), str(wallpaper_image), mode],
+                env={**env, "RENDER": "1"},
+                check=True,
+            )
+            if mode != "color":
+                original_palette = json.loads(
+                    (home / "source-palette.json").read_text()
+                )
+                seed = original_palette["colors"]["background"]["default"]["color"]
+                seed_rgb = [int(seed[i : i + 2], 16) for i in (1, 3, 5)]
+                hue, _, saturation = colorsys.rgb_to_hls(*(c / 255 for c in seed_rgb))
+            colors = []
+            for output in outputs:
+                text = output.read_text()
+                assert "{{" not in text, output
+                if output.name == "manifest.json":
+                    matches = [
+                        "".join(f"{channel:02x}" for channel in rgb)
+                        for rgb in json.loads(text)["theme"]["colors"].values()
+                    ]
+                else:
+                    matches = re.findall(
+                        r"(?<![\w])#?([0-9a-fA-F]{8}|[0-9a-fA-F]{6})(?![\w])", text
+                    )
+                    matches = [
+                        color[-6:]
+                        if output.name == "colors-generated.conf"
+                        else color[:6]
+                        for color in matches
+                    ]
+                assert matches, f"No colors checked: {output}"
+                colors.extend(matches)
+                if mode != "color":
+                    chromatic = any(c[:2] != c[2:4] or c[2:4] != c[4:] for c in matches)
+                    assert chromatic == (len(set(seed_rgb)) > 1), (
+                        f"Incorrect background color: {wallpaper_image.name}; {seed}; {output}"
+                    )
+            assert not list((home / ".cache/theme").glob("monochrome.*.json"))
+            if mode == "color":
+                assert any(c[:2] != c[2:4] or c[2:4] != c[4:] for c in colors)
+            else:
+                rendered = [output.read_text() for output in outputs]
+                quickshell = json.loads(
+                    (home / ".config/quickshell/colors.json").read_text()
+                )
+                if wallpaper_image.name in monochrome_palettes:
+                    assert rendered == monochrome_outputs[wallpaper_image.name], (
+                        "Monochrome render is not repeatable"
+                    )
+                else:
+                    for previous_image, previous_outputs in monochrome_outputs.items():
+                        if monochrome_seeds[previous_image] == seed:
+                            continue
+                        for path, before, after in zip(
+                            outputs, previous_outputs, rendered
+                        ):
+                            assert before != after, (
+                                f"Monochrome palette is fixed: {path}; "
+                                f"{previous_image} and {wallpaper_image.name}"
+                            )
+                    monochrome_outputs[wallpaper_image.name] = rendered
+                    monochrome_palettes[wallpaper_image.name] = quickshell
+                    monochrome_seeds[wallpaper_image.name] = seed
+                tinted_palette = json.loads((home / "render-palette.json").read_text())
+                assert (
+                    tinted_palette["colors"]["background"]["default"]["color"] == seed
+                ), "Mono changed the terminal background"
+                foot = (home / ".config/theme/generated/foot.ini").read_text()
+                ghostty = (home / ".config/theme/generated/ghostty").read_text()
+                assert f"background={seed[1:]}\n" in foot
+                assert f"background = {seed}\n" in ghostty
+                order = sorted(range(3), key=seed_rgb.__getitem__)
+                for color in colors:
+                    rgb = [int(color[i : i + 2], 16) for i in (0, 2, 4)]
+                    assert rgb[order[0]] <= rgb[order[1]] <= rgb[order[2]], (
+                        "Colors do not share terminal background hue",
+                        seed,
+                        color,
+                    )
+                    _, lightness, _ = colorsys.rgb_to_hls(*(c / 255 for c in rgb))
+                    expected = colorsys.hls_to_rgb(hue, lightness, saturation)
+                    assert (
+                        max(
+                            abs(actual / 255 - target)
+                            for actual, target in zip(rgb, expected)
+                        )
+                        <= 1.001 / 255
+                    ), (
+                        "Mono must keep background hue and saturation, with no gray mixing",
+                        wallpaper_image.name,
+                        seed,
+                        color,
+                    )
+                for group in ("colors", "base16"):
+                    for role, variants in original_palette[group].items():
+                        for variant, original in variants.items():
+                            dark = variant != "light"
+                            reference = original["color"]
+                            if group == "base16" and int(role[4:], 16) < 8:
+                                tones = (
+                                    (5, 10, 15, 20, 35, 70, 90, 98)
+                                    if dark
+                                    else (98, 95, 90, 80, 60, 30, 20, 5)
+                                )
+                                tone = tones[int(role[4:], 16)]
+                                reference = original_palette["palettes"]["neutral"][
+                                    str(tone)
+                                ]["color"]
+                            elif group == "base16" and int(role[4:], 16) >= 8:
+                                tones = (
+                                    (60, 70, 80, 90, 95, 98, 99, 100)
+                                    if dark
+                                    else (5, 10, 15, 20, 25, 30, 35, 40)
+                                )
+                                tone = tones[int(role[4:], 16) - 8]
+                                reference = original_palette["palettes"]["primary"][
+                                    str(tone)
+                                ]["color"]
+                            elif group == "colors" and role in (
+                                "primary",
+                                "secondary",
+                                "tertiary",
+                            ):
+                                tones = (80, 90, 95) if dark else (40, 30, 20)
+                                tone = tones[
+                                    ("primary", "secondary", "tertiary").index(role)
+                                ]
+                                reference = original_palette["palettes"]["primary"][
+                                    str(tone)
+                                ]["color"]
+                            original_rgb = [
+                                int(reference[i : i + 2], 16) / 255 for i in (1, 3, 5)
+                            ]
+                            tinted = tinted_palette[group][role][variant]["color"]
+                            tinted_rgb = [
+                                int(tinted[i : i + 2], 16) / 255 for i in (1, 3, 5)
+                            ]
+                            values = [
+                                sum(
+                                    (
+                                        c / 12.92
+                                        if c <= 0.04045
+                                        else ((c + 0.055) / 1.055) ** 2.4
+                                    )
+                                    * w
+                                    for c, w in zip(rgb, (0.2126, 0.7152, 0.0722))
+                                )
+                                for rgb in (original_rgb, tinted_rgb)
+                            ]
+                            assert abs(values[0] - values[1]) < 0.01, (
+                                role,
+                                variant,
+                                values,
+                            )
+                base16 = [
+                    variants["dark"]["color"]
+                    for variants in tinted_palette["base16"].values()
+                ]
+                assert len(set(base16)) >= 12, "Base16 shades collapsed into one color"
+                palette = tinted_palette["colors"]
+                for foreground, background in (
+                    ("on_background", "background"),
+                    ("on_surface", "surface_bright"),
+                    ("on_surface_variant", "surface_bright"),
+                    ("on_primary", "primary"),
+                    ("on_primary_container", "primary_container"),
+                    ("on_secondary", "secondary"),
+                    ("on_secondary_container", "secondary_container"),
+                    ("on_tertiary", "tertiary"),
+                    ("on_tertiary_container", "tertiary_container"),
+                    ("on_error", "error"),
+                    ("on_error_container", "error_container"),
+                    ("inverse_on_surface", "inverse_surface"),
+                    ("on_primary_fixed", "primary_fixed_dim"),
+                    ("on_primary_fixed_variant", "primary_fixed_dim"),
+                    ("on_secondary_fixed", "secondary_fixed_dim"),
+                    ("on_secondary_fixed_variant", "secondary_fixed_dim"),
+                    ("on_tertiary_fixed", "tertiary_fixed_dim"),
+                    ("on_tertiary_fixed_variant", "tertiary_fixed_dim"),
+                ):
+                    for variant in ("dark", "light"):
+                        rgb_values = [
+                            [
+                                int(palette[role][variant]["color"][i : i + 2], 16)
+                                / 255
+                                for i in (1, 3, 5)
+                            ]
+                            for role in (foreground, background)
+                        ]
+                        luminance = [
+                            sum(
+                                (
+                                    c / 12.92
+                                    if c <= 0.04045
+                                    else ((c + 0.055) / 1.055) ** 2.4
+                                )
+                                * w
+                                for c, w in zip(rgb, (0.2126, 0.7152, 0.0722))
+                            )
+                            for rgb in rgb_values
+                        ]
+                        contrast = (max(luminance) + 0.05) / (min(luminance) + 0.05)
+                        assert contrast >= 4.5, (
+                            wallpaper_image.name,
+                            variant,
+                            foreground,
+                            background,
+                            contrast,
+                        )
+        for role in ("g0", "g5", "g7"):
+            assert len(
+                {monochrome_palettes[path.name][role] for path in wallpaper_images[:5]}
+            ) >= len({monochrome_seeds[path.name] for path in wallpaper_images[:5]}), (
+                f"Terminal background hue does not vary: {role}"
+            )
+        Path("/tmp/wallpaper-mono-colors.json").write_text(
+            json.dumps(monochrome_palettes, indent=2) + "\n"
+        )
+        (home / "signal-args").unlink()
         subprocess.run([str(runner), str(image)], env=env, check=True)
         assert (home / "args").read_text().splitlines()[-1] == str(image)
         assert (home / "gtk-theme").read_text() == "matugen-dark"
@@ -366,16 +659,45 @@ def check():
             assert not list(qt_config.parent.glob(".matugen-reload.*"))
             assert qt_config.read_text() == "[Appearance]\ncustom_palette=true\n"
         assert (home / "signal-args").read_text().splitlines() == [
-            "--require-handler", "--signal", "USR2", "--euid", str(os.getuid()),
-            "--exact", "ghostty",
-            "--require-handler", "--signal", "USR2", "--euid", str(os.getuid()),
-            "--exact", "opencode",
+            "--require-handler",
+            "--signal",
+            "USR2",
+            "--euid",
+            str(os.getuid()),
+            "--exact",
+            "ghostty",
+            "--require-handler",
+            "--signal",
+            "USR2",
+            "--euid",
+            str(os.getuid()),
+            "--exact",
+            "opencode",
         ]
         store = home / ".cache/quickshell/wallpaper"
         store.parent.mkdir(parents=True)
         store.write_text(json.dumps({"wallpaper": str(image), "interval": 0}))
         subprocess.run([str(runner)], env=env, check=True)
         assert (home / "gtk-theme").read_text() == "matugen-dark-alt"
+        assert "scheme-tonal-spot" in (home / "args").read_text().splitlines()
+        for saved in (str(image), {"wallpaper": str(image), "interval": 0}):
+            store.write_text(saved if isinstance(saved, str) else json.dumps(saved))
+            subprocess.run([str(runner)], env=env, check=True)
+            assert "scheme-tonal-spot" in (home / "args").read_text().splitlines()
+        store.write_text(
+            json.dumps({"wallpaper": str(image), "interval": 0, "monochrome": True})
+        )
+        subprocess.run([str(runner)], env=env, check=True)
+        assert "json" in (home / "args").read_text().splitlines()
+        subprocess.run([str(runner), str(image), "color"], env=env, check=True)
+        assert "scheme-tonal-spot" in (home / "args").read_text().splitlines()
+        invalid = subprocess.run(
+            [str(runner), str(image), "invalid"],
+            env=env,
+            capture_output=True,
+            check=False,
+        )
+        assert invalid.returncode == 2
         if shutil.which("tmux"):
             tmux = ["tmux", "-L", "wallpaper-theme-check"]
             subprocess.run([*tmux, "new-session", "-d"], env=env, check=True)
@@ -425,6 +747,20 @@ def check():
             [str(runner), str(image)], env={**env, "FAIL": "7"}, check=False
         )
         assert failed.returncode == 7
+        for failure_env in ({"INVALID_PALETTE": "1"}, {"MISSING_ANCHOR": "1"}):
+            before = [output.read_bytes() for output in outputs]
+            signals = (home / "signal-args").read_bytes()
+            failed = subprocess.run(
+                [str(runner), str(image), "mono"],
+                env={**env, **failure_env},
+                capture_output=True,
+                check=False,
+            )
+            assert failed.returncode != 0, "Invalid Matugen palette must fail"
+            assert [output.read_bytes() for output in outputs] == before
+            assert (home / "signal-args").read_bytes() == signals
+            assert not list((home / ".cache/theme").glob("monochrome.*.json"))
+        assert not list((home / ".cache/theme").glob("monochrome.*.json"))
         missing = subprocess.run(
             [str(runner), str(home / "missing")],
             env=env,
@@ -433,7 +769,7 @@ def check():
         )
         assert missing.returncode != 0
     print(
-        f"PASS: {len(outputs)} palettes render; terminal PTY delivery, tmux palette queries/styles, and runner pass; available Fish/Starship idle-repaint check passes."
+        f"PASS: {len(outputs)} palettes use terminal background hue and saturation without gray mixing, with varied Base16 shades; Foot/Ghostty background stays unchanged, different background seeds vary, luminance is preserved, legacy mode works, repeated renders match, and text contrast stays >= 4.5; terminal PTY delivery, tmux palette queries/styles, and runner pass; available Fish/Starship idle-repaint check passes."
     )
 
 

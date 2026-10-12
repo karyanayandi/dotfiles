@@ -186,6 +186,6 @@ ShellRoot {
                 assert palette.stat().st_ino != inode
         assert process.wait() == 0, "Quickshell failed or timed out waiting for colors"
         assert stages == len(expected), f"Only {stages} palette stages completed"
-    assert json.loads(store.read_text()) == {"wallpaper": "/test-wallpaper.png", "interval": 1800000}
+    assert json.loads(store.read_text()) == {"wallpaper": "/test-wallpaper.png", "interval": 1800000, "monochrome": False}
     print("PASS wallpaper save, matugen render, external overwrite, repeated atomic replacement")
 PY

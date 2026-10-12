@@ -2,6 +2,26 @@
 
 `~/.local/bin/wallpaper-theme` renders colors, then refreshes running consumers.
 
+In the wallpaper switcher, click **Color / Mono** or press **Ctrl+M**.
+The change applies to the current wallpaper and all existing Matugen outputs.
+Quickshell saves the mode for later wallpaper changes and restarts. Mono uses
+Matugen's `background.default` color for the wallpaper. Foot and Ghostty use
+this color for their background. Mono keeps this background unchanged. Text,
+accents, errors, and Base16 colors use its hue and saturation. Only lightness
+changes.
+There is no grayscale step or gray mixing. Each shade keeps its luminance for
+readable contrast. Base16 shades and UI accents use separate Matugen tone steps,
+so equal input colors do not make one flat palette. Wallpaper changes can change
+the background color. Wallpapers with the same background color share the same
+Mono color family. Matugen's fallback color can give similar Mono palettes for
+grayscale images. The wallpaper image stays unchanged. Error text uses the Mono
+color instead of red; labels and icons stay unchanged.
+
+`wallpaper-theme [IMAGE] [color|mono]` can override the mode for one render.
+Without a mode, the command uses the saved Quickshell mode. It does not change
+the saved mode. `monochrome` remains an alias for `mono`. Existing saved modes
+still work.
+
 - GTK3 alternates generated `matugen-dark` themes through GSettings after each
   render. Colors belong to the named theme, not the startup-only user CSS.
   Log out/in once to drop the old `GTK_THEME` override and cached user CSS.
@@ -64,7 +84,8 @@ Checks:
 ```sh
 python3 config/theme/check.py
 python3 config/theme/test-ghostty.py
-sh config/quickshell/scripts/test-theme.sh
+sh config/quickshell/tests/test-theme.sh
+python3 config/quickshell/tests/test-monochrome.py
 ```
 
 Capability sources checked against installed app versions:
@@ -79,4 +100,12 @@ selection backgrounds, tmux OSC palette/foreground/background query replies
 across two palettes, refreshed tmux window-state styles,
 Ghostty's window theme setting, color delivery, no shell-input
 injection, Ghostty reload arguments, idle Starship repaint without a keypress,
-and Quickshell palette watching. They do not signal or recolor live terminals.
+and Quickshell palette watching. The checks cover five color wallpapers and
+black/white test images. They verify terminal background hue and saturation
+without gray mixing, unchanged Foot/Ghostty backgrounds, varied Base16 shades,
+luminance, and wallpaper-dependent colors.
+Repeated renders must match. The old CLI mode name must still work.
+Dark and light text/background role pairs must keep a contrast ratio of at least
+4.5:1. The check saves palette samples in
+`/tmp/wallpaper-mono-colors.json`. Checks do not signal or recolor live
+terminals.
