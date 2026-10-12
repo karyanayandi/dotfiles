@@ -73,6 +73,17 @@
 
 ## Testing
 
+- Never run the test suite for the whole project. Run only test files needed
+  for the requested changes, including new or generated test files and existing
+  test files for affected behavior. Use explicit file paths or test filters to
+  avoid unrelated tests and reduce test time. Report which files you tested.
+- Do not exclude relevant test files to hide failures. If the test command
+  cannot select specific files, report this limit instead of running all tests.
+- Complete all requested code and features before you run tests. Test runs take
+  time. Do not run tests while the requested implementation is incomplete.
+- Define required tests before implementation, as specified below. Run them
+  after all requested code and features are complete. Fix failures and rerun
+  tests before you report completion.
 - Never write unit tests after writing implementation code. If unit tests are
   necessary, define them before implementation, not as a retrospective check.
 - Strongly prefer end-to-end (E2E) tests as the sole testing mechanism. Exercise

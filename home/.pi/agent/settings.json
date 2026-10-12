@@ -27,7 +27,8 @@
     "npm:pi-observational-memory",
     "npm:pi-tool-display",
     "npm:pi-autoresearch",
-    "npm:@gotgenes/pi-subagents"
+    "npm:@gotgenes/pi-subagents",
+    "npm:pi-tmux-images"
   ],
   "quietStartup": true,
   "showHardwareCursor": true,
