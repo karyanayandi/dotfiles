@@ -6,6 +6,7 @@ appearanceTheme = "dark"
 appearanceDarkCodeThemeId = "codex"
 reduced-motion-preference = "on"
 conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = true
 
 [desktop.appearanceDarkChromeTheme]
 accent = "#0169cc"
@@ -28,7 +29,6 @@ source_type = "local"
 source = "/home/karyana/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-09-08T03:57:16Z"
 source_type = "local"
 source = "/home/karyana/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -82,8 +82,8 @@ BROWSER_USE_TINYSKY_ENABLED = "1"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.930.31428"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.930.31428/scripts/browser-service.mjs"}'
+BROWSER_USE_CODEX_APP_VERSION = "26.1007.21434"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/karyana/.codex/plugins/cache/openai-bundled/browser/26.1007.21434/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
 
 [shell_environment_policy.set]
