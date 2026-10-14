@@ -1,0 +1,19 @@
+<* include "workmux-base" *>
+theme:
+  mode: dark
+  custom:
+    current_row_bg: 18
+    highlight_row_bg: 19
+    current_worktree_fg: 2
+    dimmed: 7
+    text: 15
+    border: 8
+    help_border: 8
+    help_muted: 7
+    header: 2
+    keycap: 4
+    info: 4
+    success: 3
+    warning: 4
+    danger: 1
+    accent: 2

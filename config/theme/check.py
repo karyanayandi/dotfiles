@@ -24,6 +24,52 @@ ROOT = Path(__file__).resolve().parents[2]
 THEME = ROOT / "config/theme"
 
 
+def check_workmux(home):
+    path = home / ".config/theme/generated/workmux/config.yaml"
+    text = path.read_text()
+    base = (ROOT / "config/workmux/base.yaml").read_text()
+    assert text.startswith(base), "Workmux settings changed during generation"
+    fields = {
+        key: int(value)
+        for key, value in re.findall(r"^    (\w+): (\d+)$", text, re.MULTILINE)
+    }
+    assert fields == {
+        "current_row_bg": 18,
+        "highlight_row_bg": 19,
+        "current_worktree_fg": 2,
+        "dimmed": 7,
+        "text": 15,
+        "border": 8,
+        "help_border": 8,
+        "help_muted": 7,
+        "header": 2,
+        "keycap": 4,
+        "info": 4,
+        "success": 3,
+        "warning": 4,
+        "danger": 1,
+        "accent": 2,
+    }, fields
+    config = home / ".config/workmux/config.yaml"
+    config.parent.mkdir(parents=True, exist_ok=True)
+    if not config.is_symlink():
+        config.symlink_to(path)
+    if shutil.which("workmux"):
+        subprocess.run(
+            ["workmux", "list", "--json"],
+            cwd=ROOT,
+            env={
+                **os.environ,
+                "HOME": str(home),
+                "XDG_CONFIG_HOME": str(home / ".config"),
+                "XDG_STATE_HOME": str(home / ".local/state"),
+            },
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+
 def check_prompt(home, env):
     config = home / ".config/theme/generated/starship.toml"
     config.write_text(
@@ -84,10 +130,10 @@ def check_tmux(home, env, terminal, palettes):
         "(home / 'probe-ready').touch()\n"
         "for index in range(2):\n"
         "    while not (home / f'query-{index}').exists(): time.sleep(0.01)\n"
-        "    os.write(1, b'\\x1b]4;0;?\\x1b\\\\\\x1b]10;?\\x1b\\\\\\x1b]11;?\\x1b\\\\')\n"
+        "    os.write(1, b'\\x1b]4;0;?\\x1b\\\\\\x1b]4;18;?\\x1b\\\\\\x1b]4;19;?\\x1b\\\\\\x1b]10;?\\x1b\\\\\\x1b]11;?\\x1b\\\\')\n"
         "    data = b''\n"
         "    deadline = time.monotonic() + 3\n"
-        "    while data.count(b'\\x1b\\\\') < 3 and time.monotonic() < deadline:\n"
+        "    while data.count(b'\\x1b\\\\') < 5 and time.monotonic() < deadline:\n"
         "        if select.select([0], [], [], 0.1)[0]: data += os.read(0, 4096)\n"
         "    (home / f'reply-{index}').write_bytes(data)\n"
         "time.sleep(10)\n"
@@ -110,6 +156,29 @@ def check_tmux(home, env, terminal, palettes):
         wait(home / "probe-ready")
         socket = run("display-message", "-p", "#{socket_path}")
         pane = Path(run("display-message", "-p", "#{pane_tty}"))
+        dashboard = None
+        if shutil.which("workmux"):
+            capture = home / "workmux-live.ansi"
+            dashboard = run(
+                "new-window",
+                "-d",
+                "-P",
+                "-F",
+                "#{pane_id}",
+                "-c",
+                str(ROOT),
+                "sleep 1; exec workmux dashboard --tab worktrees",
+            )
+            run("pipe-pane", "-t", dashboard, f"cat > {shlex.quote(str(capture))}")
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                if capture.exists() and b"48;5;19m" in capture.read_bytes():
+                    break
+                time.sleep(0.05)
+            assert b"48;5;19m" in capture.read_bytes(), (
+                "Workmux did not render indexed highlight color"
+            )
+            dashboard_pid = run("display-message", "-p", "-t", dashboard, "#{pane_pid}")
         for index, palette in enumerate(palettes):
             for name, text in palette.items():
                 (home / name).write_text(text)
@@ -137,6 +206,18 @@ def check_tmux(home, env, terminal, palettes):
                 assert "reverse" not in style, (option, style)
             data = terminal["sequences"](home / ".config/theme/generated/ghostty")
             terminal["send"](pane, data)
+            if dashboard is not None:
+                dashboard_tty = Path(
+                    run("display-message", "-p", "-t", dashboard, "#{pane_tty}")
+                )
+                terminal["send"](dashboard_tty, data)
+                assert (
+                    run("display-message", "-p", "-t", dashboard, "#{pane_pid}")
+                    == dashboard_pid
+                )
+                assert (
+                    run("display-message", "-p", "-t", dashboard, "#{pane_dead}") == "0"
+                )
             (home / f"query-{index}").touch()
             reply = home / f"reply-{index}"
             wait(reply)
@@ -146,13 +227,15 @@ def check_tmux(home, env, terminal, palettes):
                 for line in lines
                 if " = " in line and not line.startswith("palette")
             )
-            ansi = next(
-                line.split("=", 2)[2]
+            ansi = {
+                int(line.split("=", 2)[1]): line.split("=", 2)[2]
                 for line in lines
-                if line.startswith("palette = 0=")
-            )
+                if line.startswith("palette = ")
+            }
             for code, color in (
-                ("4;0", ansi),
+                ("4;0", ansi[0]),
+                ("4;18", ansi[18]),
+                ("4;19", ansi[19]),
                 ("10", colors["foreground"]),
                 ("11", colors["background"]),
             ):
@@ -161,6 +244,13 @@ def check_tmux(home, env, terminal, palettes):
                 )
                 expected = f"\033]{code};rgb:{rgb}\033\\".encode()
                 assert expected in reply.read_bytes(), reply.read_bytes()
+        if dashboard is not None:
+            shutil.copyfile(
+                capture, Path(tempfile.gettempdir()) / "workmux-live-theme.ansi"
+            )
+            print(
+                "PASS: running Workmux uses indexed row colors and survives both palette updates"
+            )
     finally:
         run("kill-server")
 
@@ -265,6 +355,7 @@ def check():
                     ET.fromstring(text)
                 elif output.suffix == ".fish" and shutil.which("fish"):
                     subprocess.run(["fish", "--no-execute", str(output)], check=True)
+            check_workmux(home)
             fzf_opts = (home / ".config/theme/generated/fzf.opts").read_text()
             assert fzf_opts.startswith("--color=bg:#")
             if shutil.which("fzf"):
@@ -287,7 +378,12 @@ def check():
             rendered = [p.read_text() for p in outputs]
             if previous is not None:
                 for path, before, after in zip(outputs, previous, rendered):
-                    assert before != after, f"Palette does not change: {path}"
+                    if path == home / ".config/theme/generated/workmux/config.yaml":
+                        assert before == after, (
+                            "Workmux must keep terminal palette indices"
+                        )
+                    else:
+                        assert before != after, f"Palette does not change: {path}"
             previous = rendered
             palettes.append(
                 {
@@ -300,7 +396,7 @@ def check():
             )
         terminal = runpy.run_path(str(THEME / "terminal.py"))
         data = terminal["sequences"](home / ".config/theme/generated/ghostty")
-        assert data.count(b"\x1b]4;") == 18
+        assert data.count(b"\x1b]4;") == 20
         assert all(f"\033]{code};".encode() in data for code in (10, 11, 12, 17, 19))
         proc = home / "proc"
         for pid, name, index in (
@@ -430,6 +526,7 @@ def check():
                 env={**env, "RENDER": "1"},
                 check=True,
             )
+            check_workmux(home)
             if mode != "color":
                 original_palette = json.loads(
                     (home / "source-palette.json").read_text()
@@ -441,6 +538,8 @@ def check():
             for output in outputs:
                 text = output.read_text()
                 assert "{{" not in text, output
+                if output == home / ".config/theme/generated/workmux/config.yaml":
+                    text = (home / ".config/theme/generated/ghostty").read_text()
                 if output.name == "manifest.json":
                     matches = [
                         "".join(f"{channel:02x}" for channel in rgb)
@@ -482,10 +581,18 @@ def check():
                         for path, before, after in zip(
                             outputs, previous_outputs, rendered
                         ):
-                            assert before != after, (
-                                f"Monochrome palette is fixed: {path}; "
-                                f"{previous_image} and {wallpaper_image.name}"
-                            )
+                            if (
+                                path
+                                == home / ".config/theme/generated/workmux/config.yaml"
+                            ):
+                                assert before == after, (
+                                    "Workmux indices must stay fixed"
+                                )
+                            else:
+                                assert before != after, (
+                                    f"Monochrome palette is fixed: {path}; "
+                                    f"{previous_image} and {wallpaper_image.name}"
+                                )
                     monochrome_outputs[wallpaper_image.name] = rendered
                     monochrome_palettes[wallpaper_image.name] = quickshell
                     monochrome_seeds[wallpaper_image.name] = seed

@@ -62,6 +62,15 @@ still work.
 - Fish's universal theme-change variable triggers shell color reload and an idle
   prompt repaint, including Starship. `fish --no-config` must not be used to send
   this event: it disables universal-variable persistence in the installed Fish.
+- Workmux uses terminal palette indices in Color and Mono modes. Running
+  dashboards change colors when the switcher updates Foot, Ghostty and tmux.
+  Slots 18 and 19 supply theme-matched row backgrounds. No restart is needed
+  after the indexed config is loaded. Reopen existing dashboards once to load
+  this change. Other terminals need their own palette update mechanism.
+  Edit `~/.config/workmux/base.yaml` to change settings. The switcher renders
+  these settings into `~/.config/theme/generated/workmux/config.yaml`.
+  `~/.config/workmux/config.yaml` links to this output. Generated config edits
+  do not survive the next render.
 - Pi watches `~/.pi/agent/themes/matugen.json`. It does not watch external cache
   theme paths. Run `/reload` once after this migration; choose `matugen` in
   `/settings` if needed. Later palette changes reload natively.

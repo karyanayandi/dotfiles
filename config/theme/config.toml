@@ -126,6 +126,13 @@ output_path = "~/.config/theme/generated/imv.conf"
 input_path = "./templates/fastfetch.jsonc"
 output_path = "~/.config/theme/generated/fastfetch.jsonc"
 
+[templates.workmux-base]
+input_path = "../workmux/base.yaml"
+
+[templates.workmux]
+input_path = "./templates/workmux.yaml"
+output_path = "~/.config/theme/generated/workmux/config.yaml"
+
 [templates.wiremix]
 input_path = "./templates/wiremix.toml"
 output_path = "~/.config/theme/generated/wiremix.toml"

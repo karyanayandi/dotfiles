@@ -26,7 +26,7 @@ def sequences(config):
         17: "selection-background",
         19: "selection-foreground",
     }
-    result = "".join(f"\033]4;{index};{palette[index]}\033\\" for index in range(18))
+    result = "".join(f"\033]4;{index};{palette[index]}\033\\" for index in range(20))
     result += "".join(f"\033]{code};{colors[key]}\033\\" for code, key in codes.items())
     return result.encode("ascii")
 
@@ -37,7 +37,12 @@ def terminals(proc=Path("/proc")):
         try:
             if process.stat().st_uid != os.getuid() or (
                 process / "comm"
-            ).read_text().strip() not in {"foot", "foot-server", "ghostty", "tmux: server"}:
+            ).read_text().strip() not in {
+                "foot",
+                "foot-server",
+                "ghostty",
+                "tmux: server",
+            }:
                 continue
             for info in (process / "fdinfo").iterdir():
                 try:
