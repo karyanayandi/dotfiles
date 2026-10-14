@@ -45,6 +45,16 @@ tmux set -g window-status-current-format "$RESET#[fg=${THEME[yellow]},bg=${THEME
 # Unfocused Window
 tmux set -g window-status-format "$RESET#[fg=${THEME[foreground]}] #{?#{==:#{pane_current_command},ssh},󰣀,}${RESET} #W#[nobold,dim]#{?window_zoomed_flag, $zoom_number, $custom_pane} #[fg=${THEME[yellow]}]#{?window_last_flag,, }"
 
+# Old Workmux formats keep icons and colors after global theme changes.
+while IFS= read -r window; do
+  for option in window-status-format window-status-current-format; do
+    format=$(tmux show-options -wqv -t "$window" "$option")
+    if [[ $format == *'@workmux_status'* ]]; then
+      tmux set-option -wu -t "$window" "$option"
+    fi
+  done
+done < <(tmux list-windows -a -F '#{window_id}')
+
 # Right Bars
 tmux set -g status-right ""
 tmux set -g window-status-separator ""

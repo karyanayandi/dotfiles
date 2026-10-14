@@ -26,7 +26,7 @@ def sequences(config):
         17: "selection-background",
         19: "selection-foreground",
     }
-    result = "".join(f"\033]4;{index};{palette[index]}\033\\" for index in range(20))
+    result = "".join(f"\033]4;{index};{palette[index]}\033\\" for index in range(21))
     result += "".join(f"\033]{code};{colors[key]}\033\\" for code, key in codes.items())
     return result.encode("ascii")
 

@@ -57,16 +57,20 @@ still work.
   updating only the outer terminal leaves tmux's per-pane palette stale.
   OpenCode's `system` theme re-queries these colors on `SIGUSR2` after delivery.
   Tmux window-state styles also reset each generation, clearing inherited colors
-  and reverse-video attributes. Only terminal/tmux processes and devices owned
+  and reverse-video attributes. Old per-window Workmux formats are removed
+  so window names use current colors without agent status icons. Agent status
+  tracking stays active. Only terminal/tmux processes and devices owned
   by the current user are targeted.
 - Fish's universal theme-change variable triggers shell color reload and an idle
   prompt repaint, including Starship. `fish --no-config` must not be used to send
   this event: it disables universal-variable persistence in the installed Fish.
 - Workmux uses terminal palette indices in Color and Mono modes. Running
   dashboards change colors when the switcher updates Foot, Ghostty and tmux.
-  Slots 18 and 19 supply theme-matched row backgrounds. No restart is needed
-  after the indexed config is loaded. Reopen existing dashboards once to load
-  this change. Other terminals need their own palette update mechanism.
+  Slots 18 and 20 match tmux's active and inactive row backgrounds. The
+  switcher changes the config symlink's timestamp so running sidebars reload
+  settings without restart. Dashboards need one reopen to load changed index
+  mappings. Later palette changes need no reopen. Other terminals need their
+  own palette update mechanism.
   Edit `~/.config/workmux/base.yaml` to change settings. The switcher renders
   these settings into `~/.config/theme/generated/workmux/config.yaml`.
   `~/.config/workmux/config.yaml` links to this output. Generated config edits

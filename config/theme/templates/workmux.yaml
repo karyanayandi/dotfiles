@@ -2,8 +2,8 @@
 theme:
   mode: dark
   custom:
-    current_row_bg: 18
-    highlight_row_bg: 19
+    current_row_bg: 20
+    highlight_row_bg: 18
     current_worktree_fg: 2
     dimmed: 7
     text: 15

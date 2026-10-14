@@ -34,8 +34,8 @@ def check_workmux(home):
         for key, value in re.findall(r"^    (\w+): (\d+)$", text, re.MULTILINE)
     }
     assert fields == {
-        "current_row_bg": 18,
-        "highlight_row_bg": 19,
+        "current_row_bg": 20,
+        "highlight_row_bg": 18,
         "current_worktree_fg": 2,
         "dimmed": 7,
         "text": 15,
@@ -50,6 +50,16 @@ def check_workmux(home):
         "danger": 1,
         "accent": 2,
     }, fields
+    ghostty = (home / ".config/theme/generated/ghostty").read_text()
+    tmux = (home / ".cache/theme/tmux.sh").read_text()
+    for slot, role in (
+        (20, "highlight"),
+        (18, "active"),
+        (15, "foreground"),
+        (2, "blue"),
+    ):
+        color = re.search(rf'\[{role}\]="(#[0-9a-fA-F]{{6}})"', tmux)[1]
+        assert f"palette = {slot}={color}" in ghostty, (slot, role)
     config = home / ".config/workmux/config.yaml"
     config.parent.mkdir(parents=True, exist_ok=True)
     if not config.is_symlink():
@@ -130,7 +140,7 @@ def check_tmux(home, env, terminal, palettes):
         "(home / 'probe-ready').touch()\n"
         "for index in range(2):\n"
         "    while not (home / f'query-{index}').exists(): time.sleep(0.01)\n"
-        "    os.write(1, b'\\x1b]4;0;?\\x1b\\\\\\x1b]4;18;?\\x1b\\\\\\x1b]4;19;?\\x1b\\\\\\x1b]10;?\\x1b\\\\\\x1b]11;?\\x1b\\\\')\n"
+        "    os.write(1, b'\\x1b]4;0;?\\x1b\\\\\\x1b]4;18;?\\x1b\\\\\\x1b]4;20;?\\x1b\\\\\\x1b]10;?\\x1b\\\\\\x1b]11;?\\x1b\\\\')\n"
         "    data = b''\n"
         "    deadline = time.monotonic() + 3\n"
         "    while data.count(b'\\x1b\\\\') < 5 and time.monotonic() < deadline:\n"
@@ -172,13 +182,77 @@ def check_tmux(home, env, terminal, palettes):
             run("pipe-pane", "-t", dashboard, f"cat > {shlex.quote(str(capture))}")
             deadline = time.monotonic() + 8
             while time.monotonic() < deadline:
-                if capture.exists() and b"48;5;19m" in capture.read_bytes():
+                if capture.exists() and b"48;5;18m" in capture.read_bytes():
                     break
                 time.sleep(0.05)
-            assert b"48;5;19m" in capture.read_bytes(), (
+            assert b"48;5;18m" in capture.read_bytes(), (
                 "Workmux did not render indexed highlight color"
             )
             dashboard_pid = run("display-message", "-p", "-t", dashboard, "#{pane_pid}")
+        sidebar = None
+        if shutil.which("workmux"):
+            generated = home / ".config/theme/generated/workmux/config.yaml"
+            indexed_config = generated.read_text()
+            generated.write_text(
+                indexed_config.replace("text: 15", 'text: "#654321"').replace(
+                    "header: 2", 'header: "#123456"'
+                )
+            )
+            host = run(
+                "new-window",
+                "-d",
+                "-P",
+                "-F",
+                "#{pane_id}",
+                "-c",
+                str(ROOT),
+                "sleep 120",
+            )
+            sidebar_env = {**env, "TMUX": f"{socket},0,0", "TMUX_PANE": host}
+            for args in (
+                ("set-window-status", "working"),
+                ("sidebar", "on", "--width", "40"),
+            ):
+                subprocess.run(
+                    ["workmux", *args],
+                    cwd=ROOT,
+                    env=sidebar_env,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                panes = run(
+                    "list-panes", "-a", "-F", "#{pane_id} #{@workmux_role}"
+                ).splitlines()
+                sidebar = next(
+                    (line.split()[0] for line in panes if line.endswith(" sidebar")),
+                    None,
+                )
+                if sidebar is not None:
+                    break
+                time.sleep(0.05)
+            assert sidebar is not None, "Workmux sidebar did not start"
+            sidebar_pid = run("display-message", "-p", "-t", sidebar, "#{pane_pid}")
+            sidebar_capture = home / "workmux-sidebar-live.ansi"
+            run(
+                "pipe-pane", "-t", sidebar, f"cat > {shlex.quote(str(sidebar_capture))}"
+            )
+            run("resize-pane", "-t", sidebar, "-x", "39")
+            deadline = time.monotonic() + 8
+            while time.monotonic() < deadline:
+                if (
+                    sidebar_capture.exists()
+                    and b"38;2;101;67;33" in sidebar_capture.read_bytes()
+                ):
+                    break
+                time.sleep(0.05)
+            assert b"38;2;101;67;33" in sidebar_capture.read_bytes(), (
+                "Sidebar did not load stale RGB config"
+            )
+            sidebar_offset = sidebar_capture.stat().st_size
+            generated.write_text(indexed_config)
         for index, palette in enumerate(palettes):
             for name, text in palette.items():
                 (home / name).write_text(text)
@@ -192,11 +266,44 @@ def check_tmux(home, env, terminal, palettes):
             )
             for option in styles:
                 run("set-option", "-g", option, "fg=#123456,bg=#654321,reverse")
+            for option in ("window-status-format", "window-status-current-format"):
+                run(
+                    "set-option",
+                    "-w",
+                    option,
+                    "#[fg=#123456]#W#{?@workmux_status, #{@workmux_status},}",
+                )
+            run("set-option", "-w", "@workmux_status", "🤖")
             subprocess.run(
-                ["bash", str(home / ".tmux/theme/theme.tmux")],
-                env={**env, "TMUX": f"{socket},0,0", "THEME_NAME": "matugen"},
+                [
+                    str(ROOT / "home/.local/bin/wallpaper-theme"),
+                    str(ROOT / "wallpapers/arch-linux.png"),
+                ],
+                env={**env, "TMUX": f"{socket},0,0"},
                 check=True,
+                capture_output=True,
+                text=True,
             )
+            if sidebar is not None:
+                deadline = time.monotonic() + 8
+                while time.monotonic() < deadline:
+                    if (
+                        sidebar_capture.exists()
+                        and b"38;5;15" in sidebar_capture.read_bytes()[sidebar_offset:]
+                    ):
+                        break
+                    time.sleep(0.05)
+                assert b"38;5;15" in sidebar_capture.read_bytes()[sidebar_offset:], (
+                    "Sidebar did not reload indexed text color"
+                )
+                assert (
+                    run("display-message", "-p", "-t", sidebar, "#{pane_pid}")
+                    == sidebar_pid
+                )
+                terminal["send"](
+                    Path(run("display-message", "-p", "-t", sidebar, "#{pane_tty}")),
+                    terminal["sequences"](home / ".config/theme/generated/ghostty"),
+                )
             for option in styles:
                 style = run("show-options", "-gv", option)
                 assert "#123456" not in style and "#654321" not in style, (
@@ -204,6 +311,11 @@ def check_tmux(home, env, terminal, palettes):
                     style,
                 )
                 assert "reverse" not in style, (option, style)
+            for option in ("window-status-format", "window-status-current-format"):
+                assert run("show-options", "-wqv", option) == ""
+                inherited = run("show-options", "-wv", option)
+                assert "@workmux_status" not in inherited and "#123456" not in inherited
+            assert run("show-options", "-wqv", "@workmux_status") == "🤖"
             data = terminal["sequences"](home / ".config/theme/generated/ghostty")
             terminal["send"](pane, data)
             if dashboard is not None:
@@ -235,7 +347,7 @@ def check_tmux(home, env, terminal, palettes):
             for code, color in (
                 ("4;0", ansi[0]),
                 ("4;18", ansi[18]),
-                ("4;19", ansi[19]),
+                ("4;20", ansi[20]),
                 ("10", colors["foreground"]),
                 ("11", colors["background"]),
             ):
@@ -244,6 +356,14 @@ def check_tmux(home, env, terminal, palettes):
                 )
                 expected = f"\033]{code};rgb:{rgb}\033\\".encode()
                 assert expected in reply.read_bytes(), reply.read_bytes()
+        if sidebar is not None:
+            shutil.copyfile(
+                sidebar_capture,
+                Path(tempfile.gettempdir()) / "workmux-sidebar-live-theme.ansi",
+            )
+            print(
+                "PASS: running Workmux sidebar reloads symlinked config without restart"
+            )
         if dashboard is not None:
             shutil.copyfile(
                 capture, Path(tempfile.gettempdir()) / "workmux-live-theme.ansi"
@@ -396,7 +516,7 @@ def check():
             )
         terminal = runpy.run_path(str(THEME / "terminal.py"))
         data = terminal["sequences"](home / ".config/theme/generated/ghostty")
-        assert data.count(b"\x1b]4;") == 20
+        assert data.count(b"\x1b]4;") == 21
         assert all(f"\033]{code};".encode() in data for code in (10, 11, 12, 17, 19))
         proc = home / "proc"
         for pid, name, index in (
@@ -476,6 +596,7 @@ def check():
             "XDG_CONFIG_HOME": str(home / ".config"),
             "XDG_CACHE_HOME": str(home / ".cache"),
             "XDG_DATA_HOME": str(home / ".local/share"),
+            "XDG_STATE_HOME": str(home / ".local/state"),
             "PATH": str(bindir) + os.pathsep + os.environ["PATH"],
         }
         env.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
