@@ -19,7 +19,7 @@ windows:
       - command: lazygit
   - name: agent
     panes:
-      - command: pi
+      - command: pi-bolt
         focus: true
   - name: run
     panes:
