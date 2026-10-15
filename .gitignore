@@ -53,6 +53,7 @@ known_hosts.old
 **/.pi/agent/pi-subagents/**
 **/.pi/agent/git/**
 **/.pi/agent/missions/**
+**/.pi/agent/cache/**
 **/hicolor/**
 mimeinfo.cache
 **.desktop

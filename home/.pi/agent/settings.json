@@ -49,5 +49,19 @@
   "extensions": [
     "-builtin:mcp"
   ],
-  "deviceId": "3dcc8fa1-0ae2-46c9-99f9-a0a6e55df560"
+  "deviceId": "3dcc8fa1-0ae2-46c9-99f9-a0a6e55df560",
+  "piBolt": {
+    "packages": [
+      "git:github.com/DietrichGebert/ponytail",
+      "npm:context-mode",
+      "npm:pi-caveman",
+      "npm:pi-mcp-adapter",
+      "npm:pi-nvim",
+      "npm:pi-observational-memory",
+      "npm:pi-tool-display",
+      "npm:pi-autoresearch",
+      "npm:@gotgenes/pi-subagents",
+      "npm:pi-tmux-images"
+    ]
+  }
 }
