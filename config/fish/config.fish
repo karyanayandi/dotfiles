@@ -73,6 +73,7 @@ alias os openspec
 alias p "env -u OPENROUTER_API_KEY pi"
 alias pac "sudo pacman -S"
 alias pi "env -u OPENROUTER_API_KEY pi"
+alias pb "env -u OPENROUTER_API_KEY pi-bolt"
 alias pkglist "paru -Qe"
 alias pn pnpm
 alias px pnpx
