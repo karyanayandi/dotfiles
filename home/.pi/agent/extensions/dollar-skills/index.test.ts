@@ -1,25 +1,52 @@
 import assert from "node:assert/strict"
 import test from "node:test"
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 
 import { expandDollarSkill, searchSkills } from "./index.ts"
 
-test("expands recognized dollar skills", () => {
-  assert.equal(
-    expandDollarSkill("$react-doctor src", ["react-doctor"]),
-    "/skill:react-doctor src",
+test("expands dollar skills throughout prompts using native skill blocks", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "dollar-skills-"))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
+  const commands = ["react-doctor", "accessibility"].map((name) => {
+    const path = join(directory, `${name}.md`)
+    writeFileSync(
+      path,
+      `---\nname: ${name}\ndescription: Test skill\n---\n\nUse ${name}.\n`,
+    )
+    return { name: `skill:${name}`, sourceInfo: { path } }
+  })
+  const blocks = commands.map(
+    ({ name, sourceInfo }) =>
+      `<skill name="${name.slice(6)}" location="${sourceInfo.path}">\nReferences are relative to ${directory}.\n\nUse ${name.slice(6)}.\n</skill>`,
   )
-  assert.equal(
-    expandDollarSkill("  $react-doctor", ["react-doctor"]),
-    "  /skill:react-doctor",
-  )
-})
 
-test("leaves unknown or inline dollar text alone", () => {
-  assert.equal(expandDollarSkill("$missing", ["react-doctor"]), undefined)
-  assert.equal(
-    expandDollarSkill("Use $react-doctor", ["react-doctor"]),
-    undefined,
-  )
+  for (const [input, expected] of [
+    ["$react-doctor src", `${blocks[0]} src`],
+    ["  $react-doctor", `  ${blocks[0]}`],
+    [
+      "Use $react-doctor and $accessibility.",
+      `Use ${blocks[0]} and ${blocks[1]}.`,
+    ],
+    ["$react-doctor\n$accessibility", `${blocks[0]}\n${blocks[1]}`],
+    ["$react-doctor $react-doctor", `${blocks[0]} ${blocks[0]}`],
+    ["$missing $accessibility", `$missing ${blocks[1]}`],
+  ]) {
+    assert.equal(expandDollarSkill(input, commands), expected)
+  }
+
+  for (const input of [
+    "$missing",
+    "cost $100",
+    "x$react-doctor",
+    "$react-doctor-extra",
+    "$react-doctor_suffix",
+  ]) {
+    assert.equal(expandDollarSkill(input, commands), undefined)
+  }
+  rmSync(commands[0].sourceInfo.path)
+  assert.throws(() => expandDollarSkill("$react-doctor", commands), /ENOENT/)
 })
 
 test("searches skill names and descriptions with literal case-insensitive terms", () => {

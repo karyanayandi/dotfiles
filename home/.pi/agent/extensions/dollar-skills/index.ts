@@ -1,11 +1,14 @@
 import { spawnSync } from "node:child_process"
+import { readFileSync } from "node:fs"
+import { dirname } from "node:path"
+import { stripFrontmatter } from "@earendil-works/pi-coding-agent"
 import type {
   ExtensionAPI,
   SlashCommandInfo,
 } from "@earendil-works/pi-coding-agent"
 import type { AutocompleteItem } from "@earendil-works/pi-tui"
 
-const dollarSkillPattern = /^(\s*)\$([a-z0-9-]+)(?:\s+(.*))?$/
+const dollarSkillPattern = /(^|\s)\$([a-z0-9-]+)(?![a-zA-Z0-9_-])/g
 
 function skills(pi: ExtensionAPI) {
   return pi.getCommands().filter((command) => command.source === "skill")
@@ -43,24 +46,32 @@ export function searchSkills(
     .map((line) => names[Number(line.slice(0, line.indexOf(":"))) - 1])
 }
 
-export function expandDollarSkill(text: string, skillNames: string[]) {
-  const match = text.match(dollarSkillPattern)
+export function expandDollarSkill(
+  text: string,
+  commands: readonly { name: string; sourceInfo: { path: string } }[],
+) {
+  const expanded = text.replace(
+    dollarSkillPattern,
+    (match: string, prefix: string, name: string) => {
+      const command = commands.find(
+        (command) => command.name === `skill:${name}`,
+      )
+      if (!command) return match
 
-  if (!match || !skillNames.includes(match[2])) return
+      const path = command.sourceInfo.path
+      const body = stripFrontmatter(readFileSync(path, "utf8")).trim()
+      return `${prefix}<skill name="${name}" location="${path}">\nReferences are relative to ${dirname(path)}.\n\n${body}\n</skill>`
+    },
+  )
 
-  const [, indent, skill, args] = match
-
-  return `${indent}/skill:${skill}${args ? ` ${args}` : ""}`
+  return expanded === text ? undefined : expanded
 }
 
 export default function dollarSkills(pi: ExtensionAPI) {
   pi.on("input", (event) => {
     if (event.source === "extension") return { action: "continue" as const }
 
-    const text = expandDollarSkill(
-      event.text,
-      skills(pi).map((command) => command.name.slice("skill:".length)),
-    )
+    const text = expandDollarSkill(event.text, skills(pi))
 
     return text
       ? { action: "transform" as const, text }
