@@ -1,0 +1,9 @@
+{
+  "harness": "pi",
+  "models": {
+    "pi": "openai/gpt-6-luna"
+  },
+  "reasoningEfforts": {
+    "pi": "max"
+  }
+}
