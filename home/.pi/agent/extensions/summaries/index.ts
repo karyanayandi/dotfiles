@@ -19,7 +19,7 @@ import {
 
 const RECAP_ENTRY_TYPE = "summary-recap"
 
-const STATUS_KEY = "summaries"
+const WIDGET_KEY = "summaries"
 
 const SHUTDOWN_WAIT_MS = 1_000
 
@@ -52,14 +52,15 @@ export default function summariesExtension(
   const runBoundary = createRunBoundary()
   const activeSummaries = new Map<AbortController, Promise<void>>()
   let sessionActive = false
-  let statusContext: ExtensionContext | undefined
+  let widgetContext: ExtensionContext | undefined
 
-  const updateStatus = () => {
-    statusContext?.ui.setStatus(
-      STATUS_KEY,
+  const updateWidget = () => {
+    widgetContext?.ui.setWidget(
+      WIDGET_KEY,
       activeSummaries.size > 0
-        ? statusContext.ui.theme.fg("muted", "✦ summarizing run…")
+        ? [widgetContext.ui.theme.fg("muted", "✦ summarizing run…")]
         : undefined,
+      { placement: "aboveEditor" },
     )
   }
 
@@ -70,7 +71,7 @@ export default function summariesExtension(
 
   pi.on("session_start", (_event, ctx) => {
     sessionActive = ctx.mode === "tui"
-    statusContext = ctx
+    widgetContext = ctx
     runBoundary.reset()
   })
 
@@ -93,7 +94,7 @@ export default function summariesExtension(
 
     const config = loadSummaryConfig()
     const controller = new AbortController()
-    statusContext = ctx
+    widgetContext = ctx
 
     const task = (async () => {
       let recap: RecapEntryData
@@ -125,11 +126,11 @@ export default function summariesExtension(
       pi.appendEntry(RECAP_ENTRY_TYPE, recap)
     })().finally(() => {
       activeSummaries.delete(controller)
-      updateStatus()
+      updateWidget()
     })
 
     activeSummaries.set(controller, task)
-    updateStatus()
+    updateWidget()
     // Keep the next prompt responsive while the inexpensive recap model runs.
     // The recap is a custom entry, so it cannot affect a later agent turn.
     void task
@@ -146,8 +147,8 @@ export default function summariesExtension(
       SHUTDOWN_WAIT_MS,
     )
     activeSummaries.clear()
-    statusContext?.ui.setStatus(STATUS_KEY, undefined)
-    statusContext = undefined
+    updateWidget()
+    widgetContext = undefined
   })
 
   pi.registerCommand("summary-model", {

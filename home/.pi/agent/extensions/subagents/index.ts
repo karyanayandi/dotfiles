@@ -31,7 +31,7 @@ import {
   REASONING_EFFORTS,
   type SubagentSnapshot,
 } from "./src/domain.ts"
-import { formatActivityStatus, formatContextUtilization } from "./src/format.ts"
+import { formatActivityStatus } from "./src/format.ts"
 import type { SubagentManager } from "./src/manager.ts"
 import {
   buildSubagentResultMessage,
@@ -77,7 +77,6 @@ interface BtwResultData {
 function describeSubagent(snap: SubagentSnapshot) {
   const details = [
     `${snap.backend}: ${snap.meta.modelLabel ?? "?"}`,
-    formatContextUtilization(snap.usage),
     formatElapsed(snap),
     snap.cwd,
   ].filter(Boolean)

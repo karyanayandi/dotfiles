@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import { stripVTControlCharacters } from "node:util"
 import test from "node:test"
 import { theme } from "./test-theme.ts"
 import type { SubagentSnapshot } from "./src/domain.ts"
@@ -7,6 +8,49 @@ import {
   reconcileDashboardSelection,
   type DashboardSelection,
 } from "./src/ui/takeover.ts"
+
+void test("detail transcript follows compact Pi message spacing", () => {
+  const snapshot: SubagentSnapshot = {
+    id: "sa-1",
+    origin: "model",
+    backend: "pi",
+    title: "spacing demo",
+    prompt: "show spacing",
+    cwd: "/tmp/project",
+    status: "done",
+    createdAt: 0,
+    meta: { backend: "pi" },
+    usage: {},
+    transcript: [
+      { kind: "user", text: "prompt" },
+      {
+        kind: "assistant",
+        parts: [
+          { type: "thinking", text: "reasoning" },
+          { type: "text", text: "answer" },
+        ],
+      },
+      { kind: "user", text: "follow-up" },
+    ],
+    liveTools: [],
+    queued: [],
+    finalText: "answer",
+    turns: 1,
+  }
+
+  const lines = buildTranscriptLines(snapshot, 80, theme).map((line) =>
+    stripVTControlCharacters(line).trimEnd(),
+  )
+
+  assert.deepEqual(lines, [
+    "  User: prompt",
+    "",
+    " reasoning",
+    "",
+    " answer",
+    "  User: follow-up",
+  ])
+})
 
 void test("dashboard selection follows its subagent id and falls back by row", () => {
   const selection: DashboardSelection = { id: "sa-7", index: 6 }

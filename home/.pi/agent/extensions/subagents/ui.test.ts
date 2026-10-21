@@ -87,6 +87,49 @@ function setup(initial = snapshot()) {
   }
 }
 
+void test("dashboard and detail hide context metrics but keep metadata and usage tracking", () => {
+  const snap = {
+    ...snapshot(),
+    usage: { tokens: 12_000, contextWindow: 100_000 },
+  }
+  const { tui, keys, view } = setup(snap)
+  const dashboard = new SubagentDashboard(
+    tui,
+    theme,
+    keys,
+    view,
+    { index: 0 },
+    () => undefined,
+  )
+  const takeover = new TakeoverView(
+    tui,
+    theme,
+    keys,
+    snap.id,
+    view,
+    () => undefined,
+  )
+  try {
+    for (const component of [dashboard, takeover]) {
+      const text = component
+        .render(200)
+        .map(stripVTControlCharacters)
+        .join("\n")
+      assert.doesNotMatch(text, /12%|100k|12[,.]?000|context|tokens/i)
+      assert.match(text, /pi/)
+      assert.match(text, /model/)
+      assert.match(text, /running/)
+    }
+    assert.deepEqual(view.get(snap.id)?.usage, {
+      tokens: 12_000,
+      contextWindow: 100_000,
+    })
+  } finally {
+    dashboard.dispose()
+    takeover.dispose()
+  }
+})
+
 for (const width of [0, 1, 2, 8, 24, 80, 160]) {
   void test(`dashboard and takeover fit width ${width}`, () => {
     const { tui, keys, view } = setup()

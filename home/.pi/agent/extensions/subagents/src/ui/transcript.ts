@@ -93,6 +93,17 @@ function renderUserText(
   }
 }
 
+function visibleAssistantText(part: TranscriptPart): string | undefined {
+  if (part.type === "text") return sanitizeText(part.text).trim() || undefined
+  if (part.type === "thinking")
+    return (
+      sanitizeText(part.redacted ? "[redacted reasoning]" : part.text).trim() ||
+      undefined
+    )
+
+  return undefined
+}
+
 function renderThinking(
   theme: Theme,
   text: string,
@@ -102,7 +113,7 @@ function renderThinking(
   const reasoning = sanitizeText(text).trim()
 
   if (!reasoning) return
-  for (const line of new Markdown(reasoning, 0, 0, getMarkdownTheme()).render(
+  for (const line of new Markdown(reasoning, 1, 0, getMarkdownTheme()).render(
     width,
   )) {
     out.push(truncateToWidth(theme.fg("muted", theme.italic(line)), width))
@@ -118,19 +129,41 @@ function renderAssistantItem(
   results: ReadonlyMap<string, Extract<TranscriptItem, { kind: "toolResult" }>>,
   renderedResults: Set<string>,
 ) {
-  for (const part of item.parts) {
-    if (part.type === "text") {
-      const text = sanitizeText(part.text).trim()
+  if (item.parts.some((part) => visibleAssistantText(part) !== undefined))
+    out.push("")
 
-      if (!text) continue
-      out.push(...new Markdown(text, 0, 0, getMarkdownTheme()).render(width))
+  for (let index = 0; index < item.parts.length; index++) {
+    const part = item.parts[index]
+
+    if (part.type === "text") {
+      const text = visibleAssistantText(part)
+
+      if (text)
+        out.push(...new Markdown(text, 1, 0, getMarkdownTheme()).render(width))
     } else if (part.type === "thinking") {
-      renderThinking(
-        theme,
-        part.redacted ? "[redacted reasoning]" : part.text,
-        width,
-        out,
+      const thinking: string[] = []
+
+      for (; index < item.parts.length; index++) {
+        const thinkingPart = item.parts[index]
+
+        if (thinkingPart.type !== "thinking") break
+
+        const text = visibleAssistantText(thinkingPart)
+
+        if (text) thinking.push(text)
+      }
+
+      index--
+      if (thinking.length === 0) continue
+
+      renderThinking(theme, thinking.join("\n\n"), width, out)
+
+      if (
+        item.parts
+          .slice(index + 1)
+          .some((next) => visibleAssistantText(next) !== undefined)
       )
+        out.push("")
     } else if (part.type === "toolCall") {
       const result = results.get(part.toolId)
 
@@ -214,8 +247,6 @@ export function buildTranscriptLines(
   const renderedResults = new Set<string>()
 
   for (const item of snap.transcript) {
-    const before = out.length
-
     if (item.kind === "user") {
       renderUserText(theme, item.text, width, out)
     } else if (item.kind === "assistant") {
@@ -231,38 +262,24 @@ export function buildTranscriptLines(
     } else if (!renderedResults.has(item.toolId)) {
       renderToolResultItem(theme, item, width, out)
     }
-
-    if (out.length > before) out.push("")
   }
-
-  while (out.length > 0 && out[out.length - 1] === "") out.pop()
 
   // Live streaming assistant buffers (cleared when the finalized message lands).
   if (snap.liveAssistant) {
-    const { thinking, text } = snap.liveAssistant
-    const before = out.length
+    const thinking = sanitizeText(snap.liveAssistant.thinking).trim()
+    const text = sanitizeText(snap.liveAssistant.text).trim()
 
-    if (out.length > 0) out.push("")
+    if (thinking || text) out.push("")
 
-    if (thinking.trim()) renderThinking(theme, thinking, width, out)
+    if (thinking) renderThinking(theme, thinking, width, out)
+    if (thinking && text) out.push("")
 
-    if (text.trim())
-      out.push(
-        ...new Markdown(
-          sanitizeText(text).trim(),
-          0,
-          0,
-          getMarkdownTheme(),
-        ).render(width),
-      )
-
-    if (out.length === before + 1) out.pop()
+    if (text)
+      out.push(...new Markdown(text, 1, 0, getMarkdownTheme()).render(width))
   }
 
   // Live tool executions (present until the ToolEnd lands in the transcript).
   for (const tool of snap.liveTools) {
-    if (out.length > 0) out.push("")
-
     const marker = activityIndicator(
       theme,
       tool.done ? (tool.isError ? "error" : "done") : "running",

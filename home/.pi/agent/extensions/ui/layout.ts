@@ -97,9 +97,9 @@ export function renderExtensionStatuses(
     if (key === "background-terminals") {
       text = `>_  ${text.replace(/ background terminals? running/g, "")}`
     } else if (key === "subagents") {
-      text = text.replace("subagents:", "⌘  ")
+      text = text.replace("subagents:", "⌘ ")
     } else if (key === "workflows") {
-      text = text.replace("workflows:", "⑂  ")
+      text = text.replace("workflows:", "⑂ ")
     } else {
       return text
     }

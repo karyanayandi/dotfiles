@@ -61,8 +61,8 @@ describe("renderExtensionStatuses", () => {
     )
     const compactText = stripVTControlCharacters(compact.join(""))
     expect(compactText).toContain(">_  ◜ 2")
-    expect(compactText).toContain("/ps ↗    ⌘   ◝ 3")
-    expect(compactText).toContain("/subagents ↗    ⑂   ◞ 6")
+    expect(compactText).toContain("/ps ↗    ⌘  ◝ 3")
+    expect(compactText).toContain("/subagents ↗    ⑂  ◞ 6")
     expect(compactText).toContain("/workflows ↗")
     expect(compactText).not.toMatch(/\/\w+ {2,}↗/)
     for (const width of [1, 2, 4, 8, 12, 20, 40, 60, 80, 100, 160]) {
@@ -85,7 +85,7 @@ describe("renderExtensionStatuses", () => {
     expect(renderExtensionStatuses(statuses, 0)).toEqual([])
   })
 
-  test("aligns section icons, indicators, counts, and commands on wrapped rows", () => {
+  test("uses two spaces after every section icon on wrapped rows", () => {
     const lines = renderExtensionStatuses(
       new Map([
         [
@@ -99,13 +99,10 @@ describe("renderExtensionStatuses", () => {
     ).map(stripVTControlCharacters)
     expect(lines).toEqual([
       ">_  ◜ 1 · /ps ↗",
-      "⌘   ◜ 1 · /subagents ↗",
-      "⑂   ◜ 1 · /workflows ↗",
+      "⌘  ◜ 1 · /subagents ↗",
+      "⑂  ◜ 1 · /workflows ↗",
     ])
-    for (const line of lines) {
-      expect(visibleWidth(line.slice(0, line.indexOf("◜")))).toBe(4)
-      expect(visibleWidth(line.slice(0, line.indexOf("/")))).toBe(10)
-    }
+    for (const line of lines) expect(line).toMatch(/^(?:>_|⌘|⑂) {2}◜/)
   })
 
   test("dims separators and view arrows without changing other colors or width", () => {

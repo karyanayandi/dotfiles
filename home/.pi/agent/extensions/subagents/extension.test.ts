@@ -75,7 +75,7 @@ void test("footer animates idle running agents and stops after completion and sh
   const directory = await mkdtemp(join(tmpdir(), "pi-subagent-status-"))
   const events = new AsyncEventQueue<SubagentEvent>()
   context.mock.method(piBackend, "spawn", async () => ({
-    meta: () => ({ backend: "pi" as const }),
+    meta: () => ({ backend: "pi" as const, contextWindow: 100_000 }),
     events,
     send: async () => undefined,
     interrupt: async () => undefined,
@@ -127,6 +127,21 @@ void test("footer animates idle running agents and stops after completion and sh
     ])
     context.mock.timers.tick(100)
     assert.match(statuses.at(-1) ?? "", /◜.*1 running/)
+    for (const [name, args] of [
+      ["subagent_list", {}],
+      ["subagent_check", { id: "sa-1" }],
+    ] as const) {
+      const tool = extension.tools.get(name)?.definition
+      assert.ok(tool)
+      const result = await Reflect.apply(tool.execute, tool, [
+        name,
+        args,
+        undefined,
+        undefined,
+        ctx,
+      ])
+      assert.doesNotMatch(JSON.stringify(result), /%\/100k/)
+    }
     const updates = statuses.length
     context.mock.timers.tick(ACTIVITY_FRAME_MS)
     assert.equal(statuses.length, updates + 1)

@@ -19,7 +19,6 @@ import {
   inputActivityIndicator,
 } from "@pi/shared/activity-status"
 import { formatElapsed, type SubagentSnapshot } from "#subagents/domain"
-import { formatContextUtilization } from "#subagents/format"
 import type { SubagentReadModel } from "#subagents/manager"
 import { buildTranscriptLines } from "./transcript.ts"
 import { sanitizeTerminalText } from "ui/layout.ts"
@@ -299,14 +298,11 @@ export class SubagentDashboard implements Component {
 
       const left = `${isSelected ? theme.fg("accent", "› ") : "  "}${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
 
-      // Right: backend · model · context utilization · elapsed · status
-      const utilization = formatContextUtilization(snap.usage)
       const dot = theme.fg("dim", " · ")
 
       const rightParts = [
         theme.fg("muted", snap.backend),
         theme.fg("muted", sanitizeTerminalText(snap.meta.modelLabel ?? "?")),
-        ...(utilization ? [theme.fg("muted", utilization)] : []),
         theme.fg("muted", formatElapsed(snap)),
         statusWord(snap, theme),
       ]
@@ -519,7 +515,6 @@ export class TakeoverView implements Component, Focusable {
       return lines
     }
 
-    const utilization = formatContextUtilization(snap.usage)
     const indicator = statusGlyph(snap, theme)
 
     const header =
@@ -535,7 +530,6 @@ export class TakeoverView implements Component, Focusable {
 
     const metadata =
       `${snap.backend} · ${sanitizeTerminalText(snap.meta.modelLabel ?? "?")}` +
-      (utilization ? ` · ${utilization}` : "") +
       (this.options?.badge
         ? ` · ${sanitizeTerminalText(this.options.badge)}`
         : "")

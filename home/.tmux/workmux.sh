@@ -2,7 +2,12 @@
 set -euo pipefail
 
 if [[ ${1:-} == menu ]]; then
-    cd -- "$(tmux display-message -p '#{pane_current_path}')"
+    directory=$(git -C "$(tmux display-message -p '#{pane_start_path}')" rev-parse --show-toplevel 2>/dev/null) ||
+        directory=$(git -C "$(tmux display-message -p '#{pane_current_path}')" rev-parse --show-toplevel 2>/dev/null) || {
+        tmux display-message 'Cannot find Git worktree for this pane'
+        exit 1
+    }
+    cd -- "$directory"
 fi
 
 function merge_in_progress() {
