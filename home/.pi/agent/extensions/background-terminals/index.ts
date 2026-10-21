@@ -26,6 +26,10 @@ import type {
 } from "@earendil-works/pi-coding-agent"
 import { getMarkdownTheme } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
+import {
+  ACTIVITY_FRAME_MS,
+  activityIndicator,
+} from "@pi/shared/activity-status"
 import { cacheRenderer } from "@pi/shared/render-cache"
 import { toolSchema } from "@pi/shared/schema"
 import * as v from "valibot"
@@ -114,18 +118,23 @@ export default function (pi: ExtensionAPI) {
         return
       }
 
-      ui.setWidget(WIDGET_KEY, (_tui, theme) => {
-        const line =
-          theme.fg("warning", "■ ") +
-          theme.fg(
-            "text",
-            `${running} background terminal${running === 1 ? "" : "s"} running`,
-          ) +
-          theme.fg("dim", " • ") +
-          theme.fg("accent", "/ps") +
-          theme.fg("dim", " to view")
+      ui.setWidget(WIDGET_KEY, (tui, theme) => {
+        const ticker = setInterval(() => tui.requestRender(), ACTIVITY_FRAME_MS)
 
-        return { render: () => [line], invalidate: () => undefined }
+        return {
+          render: () => [
+            activityIndicator(theme, "running") +
+              theme.fg(
+                "text",
+                ` ${running} background terminal${running === 1 ? "" : "s"} running`,
+              ) +
+              theme.fg("dim", " • ") +
+              theme.fg("accent", "/ps") +
+              theme.fg("dim", " to view"),
+          ],
+          invalidate: () => undefined,
+          dispose: () => clearInterval(ticker),
+        }
       })
     } catch {
       // UI may be unavailable (print/RPC modes or teardown).

@@ -22,6 +22,7 @@ import {
   createOutputLineCache,
   sanitizeText,
 } from "./src/ui/output-view.ts"
+import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
 import { theme } from "../subagents/test-theme.ts"
 
 interface CapturedComponent extends Component {
@@ -85,7 +86,10 @@ function terminal(
   return { ...base, ...overrides }
 }
 
-function createHarness(initial: readonly TerminalSnapshot[]) {
+function createHarness(
+  initial: readonly TerminalSnapshot[],
+  renderTheme: Theme = theme,
+) {
   const snapshots = new Map(initial.map((snap) => [snap.id, snap]))
   const components: CapturedComponent[] = []
   const killed: string[] = []
@@ -148,7 +152,7 @@ function createHarness(initial: readonly TerminalSnapshot[]) {
           resolve(value)
         }
 
-        Promise.resolve(factory(tui, theme, keybindings, done)).then(
+        Promise.resolve(factory(tui, renderTheme, keybindings, done)).then(
           (created) => {
             component = created
             components.push(created)
@@ -219,6 +223,18 @@ function plainText(component: Component, width = 80) {
   return plainLines(component, width).join("\n")
 }
 
+function withBoldAnsi(): Theme {
+  return new Proxy(theme, {
+    get(target, property, receiver) {
+      if (property === "bold") {
+        return (text: string) => `\u001b[1m${text}\u001b[22m`
+      }
+
+      return Reflect.get(target, property, receiver)
+    },
+  })
+}
+
 function assertBounded(lines: readonly string[], width: number) {
   for (const line of lines) {
     assert.ok(
@@ -279,14 +295,18 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
     const dashboardText = plainText(dashboard)
     assert.match(dashboardText, /^  /)
     assert.match(dashboardText, /1\/4 running/)
-    assert.match(dashboardText, /› · Running 界/)
+    assert.match(dashboardText, /[◜◝◞◟] Running 界/)
     assert.match(dashboardText, /✓ Finished/)
     assert.match(dashboardText, /✕ Broken/)
-    assert.match(dashboardText, /Stopped.*killed/)
+    assert.match(dashboardText, /▪ Stopped.*killed/)
+    assert.doesNotMatch(dashboardText, /›/)
 
     const detailLines = plainLines(detail, 80)
     assert.equal(detailLines.length, 23)
-    assert.match(detailLines[0], /^  · bt-running · Running 界/)
+    assert.match(
+      detailLines[0],
+      /^  [◜◝◞◟] Background process · bt-running · Running 界/,
+    )
     assert.match(detailLines[1], /running.*pid 1234.*worker 界/)
     assert.match(detailLines[2], /^  \$ printf 'hello world'/)
     assert.ok(detailLines.some((line) => /stdout \(/.test(line)))
@@ -315,18 +335,31 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
 })
 
 test("dashboard navigation opens and returns from selected detail, and kills running terminal", async () => {
-  const harness = createHarness([
-    terminal("bt-running"),
-    terminal("bt-done", "done", { title: "Finished" }),
-    terminal("bt-other"),
-  ])
+  const harness = createHarness(
+    [
+      terminal("bt-running"),
+      terminal("bt-done", "done", { title: "Finished" }),
+      terminal("bt-other"),
+    ],
+    withBoldAnsi(),
+  )
   const run = harness.run()
 
   try {
     const dashboard = await componentAt(harness, 0)
     send(dashboard, "x")
     send(dashboard, "j")
-    assert.match(plainText(dashboard), /› ✓ Finished/)
+    const dashboardText = plainText(dashboard)
+    const selectedLine =
+      dashboard
+        .render(80)
+        .find((line) => stripVTControlCharacters(line).includes("Finished")) ??
+      ""
+    assert.match(dashboardText, /✓ Finished/)
+    assert.doesNotMatch(dashboardText, /›/)
+    assert.match(selectedLine, /\u001b\[49m/)
+    assert.match(selectedLine, /\u001b\[1m/)
+    assert.match(selectedLine, /\u001b\[39m/)
     send(dashboard, "\r")
 
     const detail = await componentAt(harness, 1)
@@ -340,6 +373,77 @@ test("dashboard navigation opens and returns from selected detail, and kills run
     assert.deepEqual(harness.killed, ["bt-running"])
     assert.equal(harness.globalUnsubscribes, 2)
     assert.equal(harness.detailUnsubscribes, 1)
+  } finally {
+    for (const component of harness.components) component.dispose?.()
+  }
+})
+
+test("status indicators animate while running and stop their tickers on cleanup", async (context) => {
+  context.mock.timers.enable({ apis: ["Date", "setInterval"], now: 0 })
+  const running = terminal("bt-running", "running", { title: "Running" })
+  const harness = createHarness([
+    running,
+    terminal("bt-done", "done", { title: "Finished" }),
+    terminal("bt-failed", "failed", { title: "Broken" }),
+    terminal("bt-killed", "killed", { title: "Stopped" }),
+  ])
+  const run = harness.run()
+
+  try {
+    const dashboard = await componentAt(harness, 0)
+    assert.match(plainText(dashboard), /◜ Running/)
+    const beforeDashboardTick = harness.renderRequests
+    context.mock.timers.tick(ACTIVITY_FRAME_MS)
+    assert.equal(harness.renderRequests, beforeDashboardTick + 1)
+
+    const dashboardText = plainText(dashboard)
+    assert.match(dashboardText, /◝ Running/)
+    assert.match(dashboardText, /✓ Finished/)
+    assert.match(dashboardText, /✕ Broken/)
+    assert.match(dashboardText, /▪ Stopped.*killed/)
+    assert.doesNotMatch(dashboardText, /›/)
+
+    send(dashboard, "\r")
+    const detail = await componentAt(harness, 1)
+    assert.match(
+      plainLines(detail, 80)[0],
+      /^  ◝ Background process · bt-running · Running$/,
+    )
+
+    const beforeDetailTick = harness.renderRequests
+    context.mock.timers.tick(ACTIVITY_FRAME_MS)
+    assert.equal(harness.renderRequests, beforeDetailTick + 1)
+    assert.match(
+      plainLines(detail, 80)[0],
+      /^  ◞ Background process · bt-running · Running$/,
+    )
+
+    harness.setSnapshot({
+      ...running,
+      status: "done",
+      settledAt: Date.now(),
+      exitCode: 0,
+    })
+    await new Promise<void>((resolve) => setTimeout(resolve, 60))
+    assert.match(
+      plainLines(detail, 80)[0],
+      /^  ✓ Background process · bt-running · Running$/,
+    )
+    const settledRequests = harness.renderRequests
+    context.mock.timers.tick(ACTIVITY_FRAME_MS)
+    assert.equal(harness.renderRequests, settledRequests)
+
+    send(detail, "\u001b")
+    const reopened = await componentAt(harness, 2)
+    const idleRequests = harness.renderRequests
+    context.mock.timers.tick(ACTIVITY_FRAME_MS)
+    assert.equal(harness.renderRequests, idleRequests)
+    send(reopened, "\u001b")
+    await run
+
+    const closedRequests = harness.renderRequests
+    context.mock.timers.tick(ACTIVITY_FRAME_MS * 2)
+    assert.equal(harness.renderRequests, closedRequests)
   } finally {
     for (const component of harness.components) component.dispose?.()
   }

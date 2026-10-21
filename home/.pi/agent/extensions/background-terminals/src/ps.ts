@@ -15,6 +15,10 @@ import type {
 import { formatSize } from "@earendil-works/pi-coding-agent"
 import type { Component, TUI } from "@earendil-works/pi-tui"
 import { truncateToWidth } from "@earendil-works/pi-tui"
+import {
+  ACTIVITY_FRAME_MS,
+  activityIndicator,
+} from "@pi/shared/activity-status"
 import { formatElapsed, formatExit, type TerminalSnapshot } from "./domain.ts"
 import type { TerminalReadModel } from "./manager.ts"
 import { createOutputLineCache, sanitizeText } from "./ui/output-view.ts"
@@ -57,13 +61,13 @@ function configuredKeys(
 function statusGlyph(snap: TerminalSnapshot, theme: Theme) {
   switch (snap.status) {
     case "running":
-      return theme.fg("warning", "·")
+      return activityIndicator(theme, "running")
     case "done":
-      return theme.fg("success", "✓")
+      return activityIndicator(theme, "done")
     case "failed":
-      return theme.fg("error", "✕")
+      return activityIndicator(theme, "error")
     case "killed":
-      return theme.fg("muted", "·")
+      return activityIndicator(theme, "stopped")
   }
 }
 
@@ -165,8 +169,11 @@ class TerminalDashboard implements Component {
     this.view = view
     this.selection = selection
     this.done = done
-    // Elapsed times and output sizes tick along at 1Hz.
-    this.ticker = setInterval(() => this.tui.requestRender(), 1000)
+    // Refresh running status and elapsed time at spinner cadence.
+    this.ticker = setInterval(() => {
+      if (this.terminals().some((snap) => snap.status === "running"))
+        this.tui.requestRender()
+    }, ACTIVITY_FRAME_MS)
     this.unsubChange = view.subscribe(() => this.tui.requestRender())
   }
 
@@ -291,9 +298,8 @@ class TerminalDashboard implements Component {
     const lines = visible.map((snap, offset) => {
       const index = start + offset
       const selected = index === this.selection.index
-      const marker = selected ? this.theme.fg("accent", "›") : " "
       const title = selected
-        ? this.theme.fg("accent", oneLine(snap.title))
+        ? this.theme.fg("accent", this.theme.bold(oneLine(snap.title)))
         : this.theme.fg("text", oneLine(snap.title))
       const exit = snap.status === "running" ? "" : ` · ${formatExit(snap)}`
       const metadata = [
@@ -302,10 +308,12 @@ class TerminalDashboard implements Component {
         `${statusWord(snap, this.theme)}${exit}`,
       ].join(this.theme.fg("dim", " · "))
 
-      return truncateToWidth(
-        `${GUTTER}${marker} ${statusGlyph(snap, this.theme)} ${title} ${this.theme.fg("dim", snap.id)} ${this.theme.fg("muted", metadata)}`,
+      const row = truncateToWidth(
+        `${GUTTER}${statusGlyph(snap, this.theme)} ${title} ${this.theme.fg("dim", snap.id)} ${this.theme.fg("muted", metadata)}`,
         width,
       )
+
+      return selected ? this.theme.bg("selectedBg", row) : row
     })
 
     if (start > 0) {
@@ -365,8 +373,10 @@ class TerminalDetailView implements Component {
     this.view = view
     this.done = done
     this.unsubscribe = view.subscribeTo(id, () => this.scheduleRender())
-    // Elapsed time in the header ticks along at 1Hz.
-    this.ticker = setInterval(() => this.tui.requestRender(), 1000)
+    // Refresh the running indicator and elapsed time at spinner cadence.
+    this.ticker = setInterval(() => {
+      if (this.snap()?.status === "running") this.tui.requestRender()
+    }, ACTIVITY_FRAME_MS)
   }
 
   private snap(): TerminalSnapshot | undefined {
@@ -513,7 +523,7 @@ class TerminalDetailView implements Component {
 
     const lines = [
       truncateToWidth(
-        `${GUTTER}${statusGlyph(snap, this.theme)} ${this.theme.fg("accent", this.theme.bold(`${snap.id} · ${oneLine(snap.title)}`))}`,
+        `${GUTTER}${statusGlyph(snap, this.theme)} ${this.theme.fg("accent", this.theme.bold(`Background process · ${snap.id} · ${oneLine(snap.title)}`))}`,
         width,
       ),
       truncateToWidth(
