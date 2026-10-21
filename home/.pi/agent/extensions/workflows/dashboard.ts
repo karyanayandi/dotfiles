@@ -851,11 +851,11 @@ export class WorkflowDashboard {
         const details = entry.details
         const label = oneLine(details.name ?? details.runId)
         const title = selected
-          ? theme.bold(theme.fg("accent", label))
+          ? theme.fg("accent", label)
           : theme.fg("text", label)
         const { done, failed } = countStates(details)
         const settled = done + failed
-        const left = `${GUTTER}${statusGlyph(details.status, theme)} ${title} ${theme.fg("dim", oneLine(details.runId))}`
+        const left = `${selected ? theme.fg("accent", "› ") : GUTTER}${statusGlyph(details.status, theme)} ${title} ${theme.fg("dim", oneLine(details.runId))}`
         const right = theme.fg(
           "muted",
           `${settled}/${details.agents.length} · ${formatElapsed(details.startedAt, details.finishedAt)} · ${statusWord(details.status)}`,
@@ -865,9 +865,7 @@ export class WorkflowDashboard {
           width >= 64
             ? this.split(left, right, width)
             : truncateToWidth(`${left} ${right}`, width, "…")
-        const padded = `${line}${" ".repeat(Math.max(0, width - visibleWidth(line)))}`
-
-        body.push(selected ? theme.bg("selectedBg", padded) : line)
+        body.push(line)
       }
     }
 
@@ -884,22 +882,22 @@ export class WorkflowDashboard {
     ).length
     const title = oneLine(group.title)
     const styledTitle = focused
-      ? this.theme.bold(this.theme.fg("accent", title))
+      ? this.theme.fg("accent", title)
       : this.theme.fg("text", title)
     const count = group.agents.length
       ? `${done}/${group.agents.length}`
       : "empty"
 
-    const row = `${groupGlyph(group, this.theme)} ${styledTitle} ${this.theme.fg("dim", count)}`
+    const row = `${focused ? this.theme.fg("accent", "› ") : "  "}${groupGlyph(group, this.theme)} ${styledTitle} ${this.theme.fg("dim", count)}`
 
-    return focused ? this.theme.bg("selectedBg", row) : row
+    return row
   }
 
   private agentRow(agent: AgentRecord, index: number): string {
     const selected = index === this.agentIndex
     const focused = selected && this.detailFocus === "agents"
     const label = focused
-      ? this.theme.bold(this.theme.fg("accent", oneLine(agent.label)))
+      ? this.theme.fg("accent", oneLine(agent.label))
       : this.theme.fg("text", oneLine(agent.label))
     const metadata = [
       oneLine(agent.model ?? ""),
@@ -910,9 +908,9 @@ export class WorkflowDashboard {
       .filter(Boolean)
       .join(" · ")
 
-    const row = `${stateGlyph(agent.state, this.theme)} ${label}${metadata ? this.theme.fg("dim", ` · ${metadata}`) : ""}`
+    const row = `${focused ? this.theme.fg("accent", "› ") : "  "}${stateGlyph(agent.state, this.theme)} ${label}${metadata ? this.theme.fg("dim", ` · ${metadata}`) : ""}`
 
-    return focused ? this.theme.bg("selectedBg", row) : row
+    return row
   }
 
   private renderDetailFocus(

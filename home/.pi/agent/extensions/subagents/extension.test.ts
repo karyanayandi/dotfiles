@@ -8,6 +8,11 @@ import {
   SettingsManager,
 } from "@earendil-works/pi-coding-agent"
 import subagents from "./index.ts"
+import { AsyncEventQueue } from "./src/backend.ts"
+import { piBackend } from "./src/backends/pi.ts"
+import type { SubagentEvent } from "./src/domain.ts"
+import { theme } from "./test-theme.ts"
+import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
 
 void test("SDK loads Pi-only subagent tools without a harness parameter", async () => {
   const directory = await mkdtemp(join(tmpdir(), "pi-subagents-extension-"))
@@ -62,6 +67,98 @@ void test("SDK loads Pi-only subagent tools without a harness parameter", async 
     assert.ok(commands.includes("subagents"))
     assert.ok(commands.includes("btw"))
   } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})
+
+void test("footer animates idle running agents and stops after completion and shutdown", async (context) => {
+  const directory = await mkdtemp(join(tmpdir(), "pi-subagent-status-"))
+  const events = new AsyncEventQueue<SubagentEvent>()
+  context.mock.method(piBackend, "spawn", async () => ({
+    meta: () => ({ backend: "pi" as const }),
+    events,
+    send: async () => undefined,
+    interrupt: async () => undefined,
+    dispose: async () => events.close(),
+  }))
+  const statuses: (string | undefined)[] = []
+  const ctx = {
+    cwd: directory,
+    hasUI: true,
+    isIdle: () => false,
+    isProjectTrusted: () => false,
+    ui: {
+      theme,
+      setStatus: (_key: string, text: string | undefined) =>
+        statuses.push(text),
+    },
+  }
+  const loader = new DefaultResourceLoader({
+    cwd: directory,
+    agentDir: join(directory, "agent"),
+    settingsManager: SettingsManager.inMemory(undefined, {
+      projectTrusted: false,
+    }),
+    extensionFactories: [subagents],
+  })
+  await loader.reload()
+  const loaded = loader.getExtensions()
+  context.mock.method(loaded.runtime, "getThinkingLevel", () => "off")
+  const extension = loaded.extensions[0]
+  assert.ok(extension)
+  async function emit(event: string) {
+    for (const handler of extension.handlers.get(event) ?? [])
+      await handler({ type: event }, ctx)
+  }
+  try {
+    await emit("session_start")
+    const spawn = extension.tools.get("subagent_spawn")?.definition
+    assert.ok(spawn)
+    context.mock.timers.enable({
+      apis: ["Date", "setInterval", "setTimeout"],
+      now: 0,
+    })
+    await Reflect.apply(spawn.execute, spawn, [
+      "demo",
+      { name: "status demo", prompt: "hold" },
+      undefined,
+      undefined,
+      ctx,
+    ])
+    context.mock.timers.tick(100)
+    assert.match(statuses.at(-1) ?? "", /◜.*1 running/)
+    const updates = statuses.length
+    context.mock.timers.tick(ACTIVITY_FRAME_MS)
+    assert.equal(statuses.length, updates + 1)
+    assert.match(statuses.at(-1) ?? "", /◝.*1 running/)
+    events.push({
+      _tag: "RunSettled",
+      outcome: { _tag: "Completed", finalText: "done" },
+    })
+    await new Promise<void>((resolve) => setImmediate(resolve))
+    context.mock.timers.tick(100)
+    assert.match(statuses.at(-1) ?? "", /1 done/)
+    const settledUpdates = statuses.length
+    context.mock.timers.tick(ACTIVITY_FRAME_MS * 3)
+    assert.equal(statuses.length, settledUpdates)
+    await Reflect.apply(spawn.execute, spawn, [
+      "demo-2",
+      { name: "shutdown demo", prompt: "hold" },
+      undefined,
+      undefined,
+      ctx,
+    ])
+    context.mock.timers.tick(100)
+    const beforeShutdown = statuses.length
+    context.mock.timers.tick(ACTIVITY_FRAME_MS)
+    assert.equal(statuses.length, beforeShutdown + 1)
+    await emit("session_shutdown")
+    assert.equal(statuses.at(-1), undefined)
+    const shutdownUpdates = statuses.length
+    context.mock.timers.tick(ACTIVITY_FRAME_MS * 3)
+    assert.equal(statuses.length, shutdownUpdates)
+  } finally {
+    await emit("session_shutdown")
     await rm(directory, { recursive: true, force: true })
   }
 })

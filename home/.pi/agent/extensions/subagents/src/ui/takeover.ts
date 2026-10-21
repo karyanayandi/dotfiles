@@ -294,10 +294,10 @@ export class SubagentDashboard implements Component {
       const isSelected = index === this.selection.index
 
       const title = isSelected
-        ? theme.fg("accent", theme.bold(sanitizeTerminalText(snap.title)))
+        ? theme.fg("accent", sanitizeTerminalText(snap.title))
         : theme.fg("text", sanitizeTerminalText(snap.title))
 
-      const left = `  ${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
+      const left = `${isSelected ? theme.fg("accent", "› ") : "  "}${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
 
       // Right: backend · model · context utilization · elapsed · status
       const utilization = formatContextUtilization(snap.usage)
@@ -322,7 +322,7 @@ export class SubagentDashboard implements Component {
         leftTruncated + " ".repeat(gap) + right,
         width,
       )
-      out.push(isSelected ? theme.bg("selectedBg", row) : row)
+      out.push(row)
     }
 
     if (start > 0) {

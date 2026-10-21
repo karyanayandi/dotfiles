@@ -299,7 +299,7 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
     assert.match(dashboardText, /✓ Finished/)
     assert.match(dashboardText, /✕ Broken/)
     assert.match(dashboardText, /▪ Stopped.*killed/)
-    assert.doesNotMatch(dashboardText, /›/)
+    assert.equal((dashboardText.match(/›/g) ?? []).length, 1)
 
     const detailLines = plainLines(detail, 80)
     assert.equal(detailLines.length, 23)
@@ -356,9 +356,9 @@ test("dashboard navigation opens and returns from selected detail, and kills run
         .find((line) => stripVTControlCharacters(line).includes("Finished")) ??
       ""
     assert.match(dashboardText, /✓ Finished/)
-    assert.doesNotMatch(dashboardText, /›/)
-    assert.match(selectedLine, /\u001b\[49m/)
-    assert.match(selectedLine, /\u001b\[1m/)
+    assert.equal((dashboardText.match(/›/g) ?? []).length, 1)
+    assert.match(stripVTControlCharacters(selectedLine), /^› ✓ Finished/)
+    assert.doesNotMatch(selectedLine, /\u001b\[(?:1|4\d)m/)
     assert.match(selectedLine, /\u001b\[39m/)
     send(dashboard, "\r")
 
@@ -401,7 +401,7 @@ test("status indicators animate while running and stop their tickers on cleanup"
     assert.match(dashboardText, /✓ Finished/)
     assert.match(dashboardText, /✕ Broken/)
     assert.match(dashboardText, /▪ Stopped.*killed/)
-    assert.doesNotMatch(dashboardText, /›/)
+    assert.equal((dashboardText.match(/›/g) ?? []).length, 1)
 
     send(dashboard, "\r")
     const detail = await componentAt(harness, 1)

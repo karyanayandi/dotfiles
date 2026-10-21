@@ -299,7 +299,7 @@ class TerminalDashboard implements Component {
       const index = start + offset
       const selected = index === this.selection.index
       const title = selected
-        ? this.theme.fg("accent", this.theme.bold(oneLine(snap.title)))
+        ? this.theme.fg("accent", oneLine(snap.title))
         : this.theme.fg("text", oneLine(snap.title))
       const exit = snap.status === "running" ? "" : ` · ${formatExit(snap)}`
       const metadata = [
@@ -309,11 +309,11 @@ class TerminalDashboard implements Component {
       ].join(this.theme.fg("dim", " · "))
 
       const row = truncateToWidth(
-        `${GUTTER}${statusGlyph(snap, this.theme)} ${title} ${this.theme.fg("dim", snap.id)} ${this.theme.fg("muted", metadata)}`,
+        `${selected ? this.theme.fg("accent", "› ") : GUTTER}${statusGlyph(snap, this.theme)} ${title} ${this.theme.fg("dim", snap.id)} ${this.theme.fg("muted", metadata)}`,
         width,
       )
 
-      return selected ? this.theme.bg("selectedBg", row) : row
+      return row
     })
 
     if (start > 0) {

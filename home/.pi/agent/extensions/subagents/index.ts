@@ -19,6 +19,7 @@ import {
 } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text, truncateToWidth } from "@earendil-works/pi-tui"
 import { cacheRenderer } from "@pi/shared/render-cache"
+import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
 import { toolSchema } from "@pi/shared/schema"
 import * as v from "valibot"
 import { pick } from "model-shortcuts/src/picker.ts"
@@ -133,6 +134,7 @@ export default function (pi: ExtensionAPI) {
   let sessionContext: ExtensionContext | undefined
   let ui: ExtensionUIContext | undefined
   let unsubStatus: (() => void) | undefined
+  let statusTimer: ReturnType<typeof setInterval> | undefined
   const resultDelivery = createDeferredResultDelivery<SubagentSnapshot>()
 
   const getRuntime = () => (runtime ??= createSubagentRuntime())
@@ -155,13 +157,21 @@ export default function (pi: ExtensionAPI) {
     if (!ui) return
     const subs = manager.view.list()
 
+    const running = subs.filter((snap) => snap.status === "running").length
+
+    if (running > 0 && statusTimer === undefined) {
+      statusTimer = setInterval(() => updateStatus(manager), ACTIVITY_FRAME_MS)
+    } else if (running === 0 && statusTimer !== undefined) {
+      clearInterval(statusTimer)
+      statusTimer = undefined
+    }
+
     if (subs.length === 0) {
       ui.setStatus("subagents", undefined)
 
       return
     }
 
-    const running = subs.filter((snap) => snap.status === "running").length
     const failed = subs.filter((snap) => snap.status === "error").length
     const done = subs.length - running - failed
     ui.setStatus(
@@ -252,6 +262,8 @@ export default function (pi: ExtensionAPI) {
     resultDelivery.clear()
     unsubStatus?.()
     unsubStatus = undefined
+    clearInterval(statusTimer)
+    statusTimer = undefined
     ui?.setStatus("subagents", undefined)
     ui = undefined
     const closing = runtime

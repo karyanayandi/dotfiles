@@ -283,12 +283,20 @@ void test("takeover keeps metadata and an unboxed input", () => {
   }
 })
 
-void test("subagent state drives header, selection, and input without arrows", (context) => {
+void test("subagent state keeps status icons and marks selection with an arrow", (context) => {
   context.mock.timers.enable({ apis: ["Date", "setInterval"], now: 0 })
   context.mock.method(
     theme,
     "bold",
     (text: string) => `\u001b[1m${text}\u001b[22m`,
+  )
+  context.mock.method(
+    theme,
+    "bg",
+    (color: Parameters<typeof theme.bg>[0], text: string) => {
+      assert.notEqual(color, "selectedBg")
+      return text
+    },
   )
   const { tui, keys, view, setSnapshot } = setup({
     ...snapshot(),
@@ -334,6 +342,15 @@ void test("subagent state drives header, selection, and input without arrows", (
       assert.match(lines.at(-2) ?? "", new RegExp(`^  ${frames[index]} `))
       context.mock.timers.tick(120)
     }
+    const selectedRow = dashboard
+      .render(160)
+      .find((line) => line.includes("sa-1"))
+    assert.ok(selectedRow)
+    assert.match(
+      stripVTControlCharacters(selectedRow),
+      /^› [◜◝◞◟] Wide 界 agent/,
+    )
+    assert.doesNotMatch(selectedRow, /\u001b\[1m/)
     assert.ok(dashboard.render(160).some((line) => line.includes("\u001b[1m")))
     for (const [status, glyph] of [
       ["done", "✓"],
@@ -439,4 +456,34 @@ void test("tool renderers wrap calls and show result and errors", () => {
     ),
     /failure/,
   )
+})
+
+void test("dashboard running icons request redraws and stop after settle or disposal", (context) => {
+  context.mock.timers.enable({ apis: ["Date", "setInterval"], now: 0 })
+  const { tui, keys, view, setSnapshot } = setup()
+  const redraw = context.mock.method(tui, "requestRender", () => undefined)
+  const dashboard = new SubagentDashboard(
+    tui,
+    theme,
+    keys,
+    view,
+    { index: 0 },
+    () => undefined,
+  )
+  try {
+    assert.match(dashboard.render(160).join("\n"), /◜/)
+    context.mock.timers.tick(120)
+    assert.equal(redraw.mock.callCount(), 1)
+    assert.match(dashboard.render(160).join("\n"), /◝/)
+    setSnapshot({ ...snapshot(), status: "done" })
+    context.mock.timers.tick(120)
+    assert.equal(redraw.mock.callCount(), 1)
+    assert.match(dashboard.render(160).join("\n"), /✓/)
+    setSnapshot(snapshot())
+    dashboard.dispose()
+    context.mock.timers.tick(120)
+    assert.equal(redraw.mock.callCount(), 1)
+  } finally {
+    dashboard.dispose()
+  }
 })

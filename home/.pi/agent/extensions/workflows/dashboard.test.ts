@@ -208,13 +208,12 @@ function assertSelectedRow(dashboard: WorkflowDashboard, text: string) {
     .render(80)
     .find(
       (line) =>
-        line.includes("\u001b[44m") &&
+        stripVTControlCharacters(line).includes("›") &&
         stripVTControlCharacters(line).includes(text),
     )
 
   assert.ok(row, `missing selected row containing ${text}`)
-  assert.match(row, /\u001b\[44m/)
-  assert.match(row, /\u001b\[1m/)
+  assert.doesNotMatch(row, /\u001b\[(?:1|4\d)m/)
   assert.match(row, /\u001b\[35m/)
 }
 
@@ -336,13 +335,13 @@ test("workflow screens stay borderless, bounded, and fixed-height", () => {
     const list = plainText(dashboard)
     assert.match(list, /^  Workflows/m)
     assert.match(list, /✓ Build plan 界/)
-    assert.doesNotMatch(list, /›/)
+    assert.equal((list.match(/›/g) ?? []).length, 1)
     assert.doesNotMatch(list, /■/)
     assertSelectedRow(dashboard, "Build plan 界")
     setRows(tui, 4)
     const shortList = dashboard.render(80).map(stripVTControlCharacters)
     assert.match(shortList.join("\n"), /✓ Build plan 界/)
-    assert.doesNotMatch(shortList.join("\n"), /›/)
+    assert.equal((shortList.join("\n").match(/›/g) ?? []).length, 1)
     assert.match(shortList.at(-1) ?? "", /select/)
 
     dashboard.handleInput("\r")
@@ -359,12 +358,12 @@ test("workflow screens stay borderless, bounded, and fixed-height", () => {
     assert.match(detail, /Verify/)
     assert.match(detail, /gpt-5/)
     assert.match(detail, /1\.2k in/)
-    assert.doesNotMatch(detail, /›/)
+    assert.equal((detail.match(/›/g) ?? []).length, 1)
     assertSelectedRow(dashboard, "Gather")
     setRows(tui, 4)
     const shortDetail = dashboard.render(80).map(stripVTControlCharacters)
     assert.match(shortDetail.join("\n"), /Gather/)
-    assert.doesNotMatch(shortDetail.join("\n"), /›/)
+    assert.equal((shortDetail.join("\n").match(/›/g) ?? []).length, 1)
     assert.match(shortDetail.at(-1) ?? "", /back/)
   } finally {
     harness.dispose()
@@ -411,11 +410,11 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     dashboard.handleInput("\r")
     dashboard.handleInput("j")
     assert.match(plainText(dashboard), /Verify/)
-    assert.doesNotMatch(plainText(dashboard), /›/)
+    assert.equal((plainText(dashboard).match(/›/g) ?? []).length, 1)
     assert.match(plainText(dashboard), /verifier/)
     assertSelectedRow(dashboard, "Verify")
     dashboard.handleInput("l")
-    assert.doesNotMatch(plainText(dashboard), /›/)
+    assert.equal((plainText(dashboard).match(/›/g) ?? []).length, 1)
     assertSelectedRow(dashboard, "verifier")
     dashboard.handleInput("\r")
     assert.match(plainText(dashboard), /transcript unavailable/)
@@ -425,11 +424,11 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     dashboard.handleInput("k")
     dashboard.handleInput("l")
     assert.match(plainText(dashboard), /planner 界/)
-    assert.doesNotMatch(plainText(dashboard), /›/)
+    assert.equal((plainText(dashboard).match(/›/g) ?? []).length, 1)
     assertSelectedRow(dashboard, "planner 界")
     dashboard.handleInput("j")
     assert.match(plainText(dashboard), /broken worker/)
-    assert.doesNotMatch(plainText(dashboard), /›/)
+    assert.equal((plainText(dashboard).match(/›/g) ?? []).length, 1)
     assertSelectedRow(dashboard, "broken worker")
     assert.match(plainText(dashboard), /tool failed/)
     dashboard.handleInput("\r")
@@ -469,7 +468,7 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     dashboard.handleInput("\u001b")
     assert.match(plainText(dashboard), /planner 界/)
     dashboard.handleInput("h")
-    assert.doesNotMatch(plainText(dashboard), /›/)
+    assert.equal((plainText(dashboard).match(/›/g) ?? []).length, 1)
     assertSelectedRow(dashboard, "Gather")
   } finally {
     harness.dispose()
