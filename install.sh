@@ -15,7 +15,6 @@ paru -S --needed \
   chafa \
   cmake \
   cowsay \
-  deno \
   distrobox \
   eglinfo \
   eza \
