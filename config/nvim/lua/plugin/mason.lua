@@ -89,7 +89,7 @@ function M.config()
 
   require("mason-lspconfig").setup {
     automatic_installation = true,
-    automatic_enable = true,
+    automatic_enable = { exclude = { "tsc", "tsgo", "ts_ls", "vtsls" } },
   }
 
   local tools = {}
