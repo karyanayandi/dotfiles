@@ -17,12 +17,7 @@ import { formatElapsed, type SubagentSnapshot } from "#subagents/domain"
 import { formatContextUtilization } from "#subagents/format"
 import type { SubagentReadModel } from "#subagents/manager"
 import { buildTranscriptLines } from "./transcript.ts"
-import {
-  addBorderLabels,
-  addBottomLabel,
-  addSideBorders,
-  sanitizeTerminalText,
-} from "ui/layout.ts"
+import { sanitizeTerminalText } from "ui/layout.ts"
 
 function configuredKeys(
   keybindings: Pick<KeybindingsManager, "getKeys" | "matches">,
@@ -238,29 +233,26 @@ export class SubagentDashboard implements Component {
     // Render exactly terminal rows - 1 so the overlay covers the header,
     // chat, editor, and extra footer lines while leaving pi's final footer
     // row visible.
-    const bodyHeight = Math.max(6, rows - 4)
+    const bodyHeight = Math.max(0, rows - 5)
 
     if (width <= 0) return []
-    const innerWidth = Math.max(0, width - 2)
-    const border = (text: string) => theme.fg("borderMuted", text)
-    const settled = subs.filter((snap) => snap.status !== "running").length
+    const running = subs.filter((snap) => snap.status === "running").length
 
     const lines = [
-      addBorderLabels(
+      truncateToWidth(
+        `  ${theme.fg("accent", theme.bold("Subagents"))}${theme.fg("muted", ` · ${running}/${subs.length} running`)}`,
         width,
-        theme.fg("accent", theme.bold("Subagents")),
-        theme.fg("muted", `${settled}/${subs.length} settled`),
-        border,
       ),
+      "",
     ]
 
-    const rowLines = this.renderRows(subs, innerWidth, bodyHeight)
+    const rowLines = this.renderRows(subs, width, bodyHeight)
 
     for (let i = 0; i < bodyHeight; i++) {
-      lines.push(addSideBorders(` ${rowLines[i] ?? ""} `, width, border))
+      lines.push(rowLines[i] ?? "")
     }
 
-    lines.push(addBottomLabel(width, "", border))
+    lines.push("")
 
     // Hints
     lines.push(
@@ -273,7 +265,7 @@ export class SubagentDashboard implements Component {
       ),
     )
 
-    return lines
+    return lines.slice(0, Math.max(0, rows - 1))
   }
 
   private renderRows(
@@ -308,7 +300,7 @@ export class SubagentDashboard implements Component {
         ? theme.fg("accent", sanitizeTerminalText(snap.title))
         : theme.fg("text", sanitizeTerminalText(snap.title))
 
-      const left = ` ${marker} ${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
+      const left = `  ${marker} ${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
 
       // Right: backend · model · context utilization · elapsed · status
       const utilization = formatContextUtilization(snap.usage)
@@ -502,30 +494,25 @@ export class TakeoverView implements Component, Focusable {
   private viewportHeight(): number {
     const rows = this.tui.terminal.rows || 30
 
-    // The complete view renders viewport + 6 chrome rows. Using rows - 7
-    // makes the overlay exactly terminal rows - 1.
-    return Math.max(6, rows - 7)
+    // Six rows hold the header, metadata, spacing, input, and hints.
+    return Math.max(0, rows - 7)
   }
 
   render(width: number): string[] {
     const theme = this.theme
 
     if (width <= 0) return []
-    const border = (text: string) => theme.fg("borderMuted", text)
-    const contentWidth = Math.max(0, width - 4)
+    const contentWidth = Math.max(0, width - 2)
     const lines: string[] = []
     const snap = this.snap()
 
     if (!snap) {
-      lines.push(addBorderLabels(width, "Subagent", "", border))
       lines.push(
-        addSideBorders(
-          `  ${theme.fg("muted", `${this.id} is no longer tracked`)}  `,
+        truncateToWidth(
+          `  ${theme.fg("muted", `${sanitizeTerminalText(this.id)} is no longer tracked`)}`,
           width,
-          border,
         ),
       )
-      lines.push(addBottomLabel(width, "", border))
 
       return lines
     }
@@ -538,17 +525,21 @@ export class TakeoverView implements Component, Focusable {
         "accent",
         theme.bold(`${snap.id} · ${sanitizeTerminalText(snap.title)}`),
       ) +
-      theme.fg("muted", ` · ${snap.status} · ${formatElapsed(snap)}`) +
-      (this.options?.badge
-        ? theme.fg("muted", ` · ${this.options.badge}`)
-        : "") +
-      theme.fg(
-        "dim",
-        ` · ${snap.backend}: ${sanitizeTerminalText(snap.meta.modelLabel ?? "?")}`,
-      ) +
-      (utilization ? theme.fg("dim", ` · ${utilization}`) : "")
+      ` · ${statusWord(snap, theme)}` +
+      theme.fg("muted", ` · ${formatElapsed(snap)}`)
 
-    lines.push(addBorderLabels(width, header, "", border))
+    const metadata =
+      `${snap.backend} · ${sanitizeTerminalText(snap.meta.modelLabel ?? "?")}` +
+      (utilization ? ` · ${utilization}` : "") +
+      (this.options?.badge
+        ? ` · ${sanitizeTerminalText(this.options.badge)}`
+        : "")
+
+    lines.push(
+      truncateToWidth(`  ${header}`, width),
+      truncateToWidth(`  ${theme.fg("dim", metadata)}`, width),
+      "",
+    )
 
     // Fixed-height transcript viewport. Error and scroll status consume rows
     // inside the viewport so streaming/scrolling never changes overlay height.
@@ -593,35 +584,23 @@ export class TakeoverView implements Component, Focusable {
     }
 
     while (body.length < viewport) body.push("")
-    lines.push(
-      ...body
-        .slice(0, viewport)
-        .map((line) => addSideBorders(`  ${line}  `, width, border)),
-    )
+    lines.push(...body.slice(0, viewport))
+    lines.push("")
+    const input = this.input
+      .render(Math.max(1, contentWidth))
+      .map((line) => `  ${line}`)
+    const height = Math.max(0, (this.tui.terminal.rows || 30) - 1)
 
-    lines.push(addBottomLabel(width, "", border))
-    lines.push(addBorderLabels(width, theme.fg("muted", "Message"), "", border))
-    lines.push(
-      ...this.input
-        .render(Math.max(1, contentWidth))
-        .map((line) => addSideBorders(`  ${line}  `, width, border)),
-    )
-    lines.push(
-      addSideBorders(
-        `  ${truncateToWidth(
-          theme.fg(
-            "dim",
-            `${configuredKeys(this.keybindings, "tui.input.submit")} send · ${configuredKeys(this.keybindings, "app.interrupt")} back · ${configuredKeys(this.keybindings, "app.clear")} abort run · ${configuredKeys(this.keybindings, "tui.editor.cursorUp")}/${configuredKeys(this.keybindings, "tui.editor.cursorDown")} scroll · ${configuredKeys(this.keybindings, "tui.editor.pageUp")}/${configuredKeys(this.keybindings, "tui.editor.pageDown")} page`,
-          ),
-          contentWidth,
-        )}  `,
-        width,
-        border,
+    return [
+      ...lines.slice(0, Math.max(0, height - input.length - 1)),
+      ...input,
+      theme.fg(
+        "dim",
+        `  ${configuredKeys(this.keybindings, "tui.input.submit")} send · ${configuredKeys(this.keybindings, "app.interrupt")} back · ${configuredKeys(this.keybindings, "app.clear")} abort run · ${configuredKeys(this.keybindings, "tui.editor.cursorUp")}/${configuredKeys(this.keybindings, "tui.editor.cursorDown")} scroll · ${configuredKeys(this.keybindings, "tui.editor.pageUp")}/${configuredKeys(this.keybindings, "tui.editor.pageDown")} page`,
       ),
-    )
-    lines.push(addBottomLabel(width, "", border))
-
-    return lines.map((line) => truncateToWidth(line, width))
+    ]
+      .slice(0, height)
+      .map((line) => truncateToWidth(line, width))
   }
 
   invalidate(): void {

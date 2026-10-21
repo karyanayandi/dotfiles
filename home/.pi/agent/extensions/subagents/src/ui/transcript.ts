@@ -4,8 +4,9 @@
  * v1, with the session-poking replaced by snapshot reads.
  */
 
-import type { Theme } from "@earendil-works/pi-coding-agent"
+import { getMarkdownTheme, type Theme } from "@earendil-works/pi-coding-agent"
 import {
+  Markdown,
   truncateToWidth,
   visibleWidth,
   wrapTextWithAnsi,
@@ -98,16 +99,10 @@ function renderThinking(
   const reasoning = sanitizeText(text).trim()
 
   if (!reasoning) return
-  const prefix = theme.fg("dim", "~ ")
-  const wrapped = wrapTextWithAnsi(reasoning, Math.max(1, width - 4))
-
-  for (let i = 0; i < wrapped.length; i++) {
-    out.push(
-      truncateToWidth(
-        (i === 0 ? prefix : "  ") + theme.fg("muted", theme.italic(wrapped[i])),
-        width,
-      ),
-    )
+  for (const line of new Markdown(reasoning, 0, 0, getMarkdownTheme()).render(
+    width,
+  )) {
+    out.push(truncateToWidth(theme.fg("muted", theme.italic(line)), width))
   }
 }
 
@@ -125,7 +120,7 @@ function renderAssistantItem(
       const text = sanitizeText(part.text).trim()
 
       if (!text) continue
-      out.push(...wrapTextWithAnsi(text, width))
+      out.push(...new Markdown(text, 0, 0, getMarkdownTheme()).render(width))
     } else if (part.type === "thinking") {
       renderThinking(
         theme,
@@ -250,7 +245,14 @@ export function buildTranscriptLines(
     if (thinking.trim()) renderThinking(theme, thinking, width, out)
 
     if (text.trim())
-      out.push(...wrapTextWithAnsi(sanitizeText(text).trim(), width))
+      out.push(
+        ...new Markdown(
+          sanitizeText(text).trim(),
+          0,
+          0,
+          getMarkdownTheme(),
+        ).render(width),
+      )
 
     if (out.length === before + 1) out.pop()
   }

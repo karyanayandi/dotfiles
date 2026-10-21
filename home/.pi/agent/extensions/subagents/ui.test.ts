@@ -52,8 +52,8 @@ function snapshot(): SubagentSnapshot {
   }
 }
 
-function setup() {
-  const snap = snapshot()
+function setup(initial = snapshot()) {
+  let snap = initial
   const sent: string[] = []
   const aborted: string[] = []
 
@@ -76,7 +76,9 @@ function setup() {
   tui.requestRender = () => undefined
 
   return {
-    snap,
+    setSnapshot(next: SubagentSnapshot) {
+      snap = next
+    },
     sent,
     aborted,
     view,
@@ -85,7 +87,7 @@ function setup() {
   }
 }
 
-for (const width of [0, 1, 2, 8, 24, 80]) {
+for (const width of [0, 1, 2, 8, 24, 80, 160]) {
   void test(`dashboard and takeover fit width ${width}`, () => {
     const { tui, keys, view } = setup()
 
@@ -116,14 +118,13 @@ for (const width of [0, 1, 2, 8, 24, 80]) {
 
         if (width === 0) assert.deepEqual(lines, [])
 
-        if (width >= 8) {
-          assert.ok(stripVTControlCharacters(lines[0]).startsWith("┌"))
-          assert.ok(
-            lines.some((line) =>
-              stripVTControlCharacters(line).startsWith("└"),
-            ),
-          )
-          assert.doesNotMatch(lines.join("\n"), /[╭╮╰╯]/)
+        assert.doesNotMatch(
+          stripVTControlCharacters(lines.join("\n")),
+          /[┌┐└┘│─╭╮╰╯]/,
+        )
+
+        if (width >= 24) {
+          assert.ok(stripVTControlCharacters(lines[0]).startsWith("  "))
         }
       }
 
@@ -188,6 +189,148 @@ void test("transcript uses compact tool and message gutters", () => {
   assert.match(text, / {2}saved output/)
   assert.match(text, / {2}· bash/)
   assert.match(text, /queued steer/)
+})
+
+void test("borderless views keep fixed height across resize, scroll, and updates", () => {
+  const snap: SubagentSnapshot = {
+    ...snapshot(),
+    transcript: Array.from({ length: 100 }, (_, index) => ({
+      kind: "user",
+      text: `message ${index}`,
+    })),
+    liveTools: [],
+    queued: [],
+  }
+  const { tui, keys, view, setSnapshot } = setup(snap)
+  const dashboard = new SubagentDashboard(
+    tui,
+    theme,
+    keys,
+    view,
+    { index: 0 },
+    () => undefined,
+  )
+  const takeover = new TakeoverView(
+    tui,
+    theme,
+    keys,
+    "sa-1",
+    view,
+    () => undefined,
+  )
+
+  try {
+    for (const rows of [4, 8, 24, 40]) {
+      Object.defineProperty(tui.terminal, "rows", {
+        value: rows,
+        configurable: true,
+      })
+      for (const component of [dashboard, takeover]) {
+        const lines = component.render(100)
+        assert.equal(lines.length, rows - 1)
+        assert.ok(lines.every((line) => visibleWidth(line) <= 100))
+      }
+      if (rows < 24) continue
+      const tail = takeover.render(100).map(stripVTControlCharacters).join("\n")
+      assert.match(tail, /message 99/)
+      takeover.handleInput("\u001b[A")
+      const scrolled = takeover
+        .render(100)
+        .map(stripVTControlCharacters)
+        .join("\n")
+      assert.match(scrolled, /lines below/)
+      takeover.handleInput("\u001b[B")
+      assert.match(
+        takeover.render(100).map(stripVTControlCharacters).join("\n"),
+        /message 99/,
+      )
+      setSnapshot({ ...snap, errorText: "backend failed" })
+      assert.match(
+        takeover.render(100).map(stripVTControlCharacters).join("\n"),
+        /error: backend failed/,
+      )
+      setSnapshot(snap)
+    }
+  } finally {
+    dashboard.dispose()
+    takeover.dispose()
+  }
+})
+
+void test("takeover keeps metadata and an unboxed input", () => {
+  const { tui, keys, view } = setup()
+  const takeover = new TakeoverView(
+    tui,
+    theme,
+    keys,
+    "sa-1",
+    view,
+    () => undefined,
+    { badge: "side task" },
+  )
+  try {
+    const lines = takeover.render(160).map(stripVTControlCharacters)
+    assert.match(lines[0], /Wide 界 agent/)
+    assert.match(lines[0], /running/)
+    assert.match(lines[1], /pi.*model.*side task/)
+    assert.doesNotMatch(lines.join("\n"), /Message/)
+    assert.match(lines.at(-2) ?? "", /^  > /)
+    assert.match(lines.at(-1) ?? "", /send.*back.*abort run.*scroll/)
+  } finally {
+    takeover.dispose()
+  }
+})
+
+void test("missing subagents render a bounded borderless notice", () => {
+  const { tui, keys, view } = setup()
+  const missing = { ...view, get: () => undefined }
+  const takeover = new TakeoverView(
+    tui,
+    theme,
+    keys,
+    "sa-missing",
+    missing,
+    () => undefined,
+  )
+  try {
+    for (const width of [0, 1, 8, 80]) {
+      const lines = takeover.render(width)
+      assert.ok(lines.every((line) => visibleWidth(line) <= width))
+      assert.doesNotMatch(lines.join("\n"), /[┌┐└┘│─╭╮╰╯]/)
+      if (width === 80)
+        assert.match(lines.join("\n"), /sa-missing is no longer tracked/)
+    }
+  } finally {
+    takeover.dispose()
+  }
+})
+
+void test("transcript renders assistant Markdown without raw emphasis", () => {
+  const snap: SubagentSnapshot = {
+    ...snapshot(),
+    transcript: [
+      {
+        kind: "assistant",
+        parts: [
+          { type: "thinking", text: "**Checking bindings**" },
+          { type: "text", text: "**Result** uses `model`." },
+        ],
+      },
+    ],
+    liveTools: [],
+    queued: [],
+    liveAssistant: { thinking: "**Next step**", text: "**Working**" },
+  }
+  const lines = buildTranscriptLines(snap, 80, theme).map(
+    stripVTControlCharacters,
+  )
+  const text = lines.join("\n")
+  assert.match(text, /Checking bindings/)
+  assert.match(text, /Result uses model/)
+  assert.match(text, /Next step/)
+  assert.match(text, /Working/)
+  assert.doesNotMatch(text, /\*\*|`/)
+  assert.doesNotMatch(text, /~ /)
 })
 
 void test("tool renderers wrap calls and show result and errors", () => {

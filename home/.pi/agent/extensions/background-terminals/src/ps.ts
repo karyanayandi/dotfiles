@@ -14,10 +14,32 @@ import type {
 } from "@earendil-works/pi-coding-agent"
 import { formatSize } from "@earendil-works/pi-coding-agent"
 import type { Component, TUI } from "@earendil-works/pi-tui"
-import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui"
+import { truncateToWidth } from "@earendil-works/pi-tui"
 import { formatElapsed, formatExit, type TerminalSnapshot } from "./domain.ts"
 import type { TerminalReadModel } from "./manager.ts"
 import { createOutputLineCache, sanitizeText } from "./ui/output-view.ts"
+
+const GUTTER = "  "
+const OUTPUT_SCROLL_STEP = 6
+
+type PickerKeybindings = Pick<KeybindingsManager, "getKeys" | "matches">
+
+type PickerContext = {
+  ui: {
+    custom<T>(
+      factory: (
+        tui: TUI,
+        theme: Theme,
+        keybindings: PickerKeybindings,
+        done: (result: T) => void,
+      ) =>
+        | (Component & { dispose?(): void })
+        | Promise<Component & { dispose?(): void }>,
+      options?: Parameters<ExtensionCommandContext["ui"]["custom"]>[1],
+    ): Promise<T>
+    notify: ExtensionCommandContext["ui"]["notify"]
+  }
+}
 
 /** One-line-safe rendering of model-provided text (titles, commands): a
  * newline or control char inside a fixed-height row desyncs the renderer. */
@@ -26,7 +48,7 @@ function oneLine(text: string) {
 }
 
 function configuredKeys(
-  keybindings: KeybindingsManager,
+  keybindings: PickerKeybindings,
   binding: Parameters<KeybindingsManager["getKeys"]>[0],
 ) {
   return keybindings.getKeys(binding).join("/") || "unbound"
@@ -35,13 +57,13 @@ function configuredKeys(
 function statusGlyph(snap: TerminalSnapshot, theme: Theme) {
   switch (snap.status) {
     case "running":
-      return theme.fg("warning", "■")
+      return theme.fg("warning", "·")
     case "done":
-      return theme.fg("success", "■")
+      return theme.fg("success", "✓")
     case "failed":
-      return theme.fg("error", "■")
+      return theme.fg("error", "✕")
     case "killed":
-      return theme.fg("muted", "■")
+      return theme.fg("muted", "·")
   }
 }
 
@@ -58,10 +80,8 @@ function statusWord(snap: TerminalSnapshot, theme: Theme) {
   }
 }
 
-// --- Entry point ---------------------------------------------------------------
-
 export async function openTerminalPicker(
-  ctx: ExtensionCommandContext,
+  ctx: PickerContext,
   view: TerminalReadModel,
 ) {
   const selection: DashboardSelection = { index: 0 }
@@ -94,11 +114,8 @@ export async function openTerminalPicker(
         overlayOptions: { anchor: "center", width: "100%", maxHeight: "100%" },
       },
     )
-    // After leaving the detail view, fall back to the dashboard.
   }
 }
-
-// --- Dashboard (fullscreen overlay) ----------------------------------------------
 
 export interface DashboardSelection {
   id?: string
@@ -126,11 +143,10 @@ export function reconcileDashboardSelection(
 class TerminalDashboard implements Component {
   private tui: TUI
   private theme: Theme
-  private keybindings: KeybindingsManager
+  private keybindings: PickerKeybindings
   private view: TerminalReadModel
   private selection: DashboardSelection
   private done: (value: string | null) => void
-
   private closed = false
   private ticker: ReturnType<typeof setInterval>
   private unsubChange: () => void
@@ -138,7 +154,7 @@ class TerminalDashboard implements Component {
   constructor(
     tui: TUI,
     theme: Theme,
-    keybindings: KeybindingsManager,
+    keybindings: PickerKeybindings,
     view: TerminalReadModel,
     selection: DashboardSelection,
     done: (value: string | null) => void,
@@ -217,106 +233,42 @@ class TerminalDashboard implements Component {
     if (data === "x") {
       const snap = terminals[this.selection.index]
 
-      if (snap && snap.status === "running") this.view.requestKill(snap.id)
-
-      return
+      if (snap?.status === "running") this.view.requestKill(snap.id)
     }
-  }
-
-  private pad(text: string, width: number): string {
-    const truncated = truncateToWidth(text, width)
-
-    return truncated + " ".repeat(Math.max(0, width - visibleWidth(truncated)))
-  }
-
-  private borderSegment(width: number, title: string): string {
-    const theme = this.theme
-
-    const label = title
-      ? ` ${truncateToWidth(title, Math.max(0, width - 3))} `
-      : ""
-
-    const labelWidth = visibleWidth(label)
-
-    return (
-      theme.fg("border", "─") +
-      (label ? theme.fg("text", label) : "") +
-      theme.fg("border", "─".repeat(Math.max(0, width - 1 - labelWidth)))
-    )
   }
 
   render(width: number): string[] {
-    const theme = this.theme
+    if (width <= 0) return []
+
     const terminals = this.terminals()
     reconcileDashboardSelection(this.selection, terminals)
 
-    const rows = this.tui.terminal.rows || 30
-    // Render exactly terminal rows - 1 so the overlay covers the header,
-    // chat, editor, and extra footer lines while leaving pi's final footer
-    // row visible.
-    const bodyHeight = Math.max(6, rows - 5)
-    const innerWidth = width - 2
+    const height = Math.max(0, (this.tui.terminal.rows || 30) - 1)
+    if (height === 0) return []
 
-    const lines: string[] = []
+    const running = terminals.filter((snap) => snap.status === "running").length
+    const heading =
+      this.theme.fg("accent", this.theme.bold("Background terminals")) +
+      this.theme.fg("muted", ` · ${running}/${terminals.length} running`)
+    const rowHeight = Math.max(0, height - 3)
+    const lines = [truncateToWidth(`${GUTTER}${heading}`, width)]
 
-    // Header: title left, count right
-    const headerLeft = theme.fg("accent", theme.bold("Background terminals"))
+    if (height > 1) lines.push("")
+    lines.push(...this.renderRows(terminals, width, rowHeight))
 
-    const headerRight = theme.fg(
-      "muted",
-      `${terminals.length} terminal${terminals.length === 1 ? "" : "s"}`,
-    )
-
-    const headerPad = Math.max(
-      1,
-      width - visibleWidth(headerLeft) - visibleWidth(headerRight) - 4,
-    )
-
-    lines.push(
-      truncateToWidth(
-        `  ${headerLeft}${" ".repeat(headerPad)}${headerRight}  `,
-        width,
-      ),
-    )
-
-    // Top border with panel title
-    const running = terminals.filter((s) => s.status === "running").length
-    lines.push(
-      theme.fg("border", "╭") +
-        this.borderSegment(
-          innerWidth,
-          `terminals · ${running} running / ${terminals.length}`,
-        ) +
-        theme.fg("border", "╮"),
-    )
-
-    // Rows
-    const divider = theme.fg("border", "│")
-    const rowLines = this.renderRows(terminals, innerWidth, bodyHeight)
-
-    for (let i = 0; i < bodyHeight; i++) {
-      lines.push(divider + this.pad(rowLines[i] ?? "", innerWidth) + divider)
+    if (height > 2) {
+      lines.push(
+        truncateToWidth(
+          this.theme.fg(
+            "dim",
+            `${GUTTER}${configuredKeys(this.keybindings, "tui.select.up")}/${configuredKeys(this.keybindings, "tui.select.down")}/jk select · ${configuredKeys(this.keybindings, "tui.select.confirm")} inspect · x kill · ${configuredKeys(this.keybindings, "tui.select.cancel")} close`,
+          ),
+          width,
+        ),
+      )
     }
 
-    // Bottom border
-    lines.push(
-      theme.fg("border", "╰") +
-        theme.fg("border", "─".repeat(Math.max(0, innerWidth))) +
-        theme.fg("border", "╯"),
-    )
-
-    // Hints
-    lines.push(
-      truncateToWidth(
-        theme.fg(
-          "dim",
-          `  ${configuredKeys(this.keybindings, "tui.select.up")}/${configuredKeys(this.keybindings, "tui.select.down")}/jk select · ${configuredKeys(this.keybindings, "tui.select.confirm")} inspect · x kill · ${configuredKeys(this.keybindings, "tui.select.cancel")} close`,
-        ),
-        width,
-      ),
-    )
-
-    return lines
+    return lines.slice(0, height)
   }
 
   private renderRows(
@@ -324,10 +276,8 @@ class TerminalDashboard implements Component {
     width: number,
     height: number,
   ): string[] {
-    const theme = this.theme
-    const out: string[] = []
+    if (height === 0) return []
 
-    // Scroll window around selection
     let start = 0
 
     if (terminals.length > height) {
@@ -338,53 +288,46 @@ class TerminalDashboard implements Component {
     }
 
     const visible = terminals.slice(start, start + height)
+    const lines = visible.map((snap, offset) => {
+      const index = start + offset
+      const selected = index === this.selection.index
+      const marker = selected ? this.theme.fg("accent", "›") : " "
+      const title = selected
+        ? this.theme.fg("accent", oneLine(snap.title))
+        : this.theme.fg("text", oneLine(snap.title))
+      const exit = snap.status === "running" ? "" : ` · ${formatExit(snap)}`
+      const metadata = [
+        `pid ${snap.pid ?? "?"}`,
+        formatElapsed(snap),
+        `${statusWord(snap, this.theme)}${exit}`,
+      ].join(this.theme.fg("dim", " · "))
 
-    for (let i = 0; i < visible.length; i++) {
-      const snap = visible[i]
-      const index = start + i
-      const isSelected = index === this.selection.index
-
-      // Left: marker, status square, title, dim id
-      const marker = isSelected ? theme.fg("accent", "❯") : " "
-
-      const title = isSelected
-        ? theme.fg("accent", oneLine(snap.title))
-        : theme.fg("text", oneLine(snap.title))
-
-      const left = ` ${marker} ${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
-
-      // Right: pid · elapsed · exit/status
-      const dot = theme.fg("dim", " · ")
-
-      const rightParts = [
-        theme.fg("muted", `pid ${snap.pid ?? "?"}`),
-        theme.fg("muted", formatElapsed(snap)),
-        snap.status === "running"
-          ? statusWord(snap, theme)
-          : theme.fg("muted", formatExit(snap)),
-      ]
-
-      const right = `${rightParts.join(dot)} `
-
-      const rightWidth = visibleWidth(right)
-      const leftMax = Math.max(0, width - rightWidth - 2)
-      const leftTruncated = truncateToWidth(left, leftMax)
-      const gap = Math.max(2, width - visibleWidth(leftTruncated) - rightWidth)
-      out.push(truncateToWidth(leftTruncated + " ".repeat(gap) + right, width))
-    }
+      return truncateToWidth(
+        `${GUTTER}${marker} ${statusGlyph(snap, this.theme)} ${title} ${this.theme.fg("dim", snap.id)} ${this.theme.fg("muted", metadata)}`,
+        width,
+      )
+    })
 
     if (start > 0) {
-      out[0] = truncateToWidth(theme.fg("dim", `   ... ${start} more`), width)
-    }
-
-    if (start + height < terminals.length) {
-      out[out.length - 1] = truncateToWidth(
-        theme.fg("dim", `   ... ${terminals.length - start - height} more`),
+      lines[0] = truncateToWidth(
+        this.theme.fg("dim", `${GUTTER}... ${start} more`),
         width,
       )
     }
 
-    return out
+    if (start + height < terminals.length) {
+      lines[lines.length - 1] = truncateToWidth(
+        this.theme.fg(
+          "dim",
+          `${GUTTER}... ${terminals.length - start - height} more`,
+        ),
+        width,
+      )
+    }
+
+    while (lines.length < height) lines.push("")
+
+    return lines
   }
 
   invalidate(): void {
@@ -392,21 +335,14 @@ class TerminalDashboard implements Component {
   }
 }
 
-// --- Detail view (read-only inspector) --------------------------------------------
-
-const OUTPUT_SCROLL_STEP = 6
-
 class TerminalDetailView implements Component {
   private tui: TUI
   private theme: Theme
-  private keybindings: KeybindingsManager
+  private keybindings: PickerKeybindings
   private id: string
   private view: TerminalReadModel
   private done: (value: null) => void
-
-  /** Active output stream shown in the viewport; `t` toggles. */
   private stream: "stdout" | "stderr" = "stdout"
-  /** Scroll offset in lines from the bottom. 0 = pinned to bottom (live tail). */
   private scrollOffset = 0
   private lineCache = createOutputLineCache()
   private unsubscribe: () => void
@@ -417,7 +353,7 @@ class TerminalDetailView implements Component {
   constructor(
     tui: TUI,
     theme: Theme,
-    keybindings: KeybindingsManager,
+    keybindings: PickerKeybindings,
     id: string,
     view: TerminalReadModel,
     done: (value: null) => void,
@@ -527,7 +463,7 @@ class TerminalDetailView implements Component {
     }
 
     if (data === "g") {
-      this.scrollOffset = Number.MAX_SAFE_INTEGER // clamped to top in render
+      this.scrollOffset = Number.MAX_SAFE_INTEGER
       this.tui.requestRender()
 
       return
@@ -536,90 +472,93 @@ class TerminalDetailView implements Component {
     if (data === "G") {
       this.scrollOffset = 0
       this.tui.requestRender()
-
-      return
     }
   }
 
-  private viewportHeight(): number {
-    const rows = this.tui.terminal.rows || 30
+  private screenHeight(): number {
+    return Math.max(0, (this.tui.terminal.rows || 30) - 1)
+  }
 
-    // The complete view renders viewport + 8 chrome rows (borders, header,
-    // command, tab, hints). rows - 9 makes the overlay ~terminal rows - 1.
-    return Math.max(6, rows - 9)
+  private viewportHeight(): number {
+    return Math.max(0, this.screenHeight() - 6)
   }
 
   render(width: number): string[] {
-    const theme = this.theme
-    const border = theme.fg("borderAccent", "─".repeat(Math.max(1, width)))
-    const lines: string[] = []
+    if (width <= 0) return []
+
+    const height = this.screenHeight()
+    if (height === 0) return []
+
     const snap = this.snap()
 
     if (!snap) {
-      lines.push(border)
-      lines.push(theme.fg("dim", `${this.id} is no longer tracked`))
-      lines.push(border)
+      const lines = Array.from({ length: height }, () => "")
+      lines[0] = truncateToWidth(
+        `${GUTTER}${this.id} is no longer tracked`,
+        width,
+      )
+
+      if (height > 1) {
+        lines[height - 1] = truncateToWidth(
+          this.theme.fg(
+            "dim",
+            `${GUTTER}${configuredKeys(this.keybindings, "tui.select.cancel")} back`,
+          ),
+          width,
+        )
+      }
 
       return lines
     }
 
-    lines.push(border)
-
-    const header =
-      `${statusGlyph(snap, theme)} ` +
-      theme.fg("accent", theme.bold(`${snap.id} · ${oneLine(snap.title)}`)) +
-      theme.fg(
-        "muted",
-        ` · ${snap.status} · ${formatElapsed(snap)} · pid ${snap.pid ?? "?"}`,
-      ) +
-      (snap.status !== "running"
-        ? theme.fg("muted", ` · ${formatExit(snap)}`)
-        : "") +
-      theme.fg("dim", ` · ${snap.cwd}`)
-
-    lines.push(truncateToWidth(header, width))
-    lines.push(
+    const lines = [
       truncateToWidth(
-        theme.fg("dim", "$ ") + theme.fg("text", oneLine(snap.command)),
+        `${GUTTER}${statusGlyph(snap, this.theme)} ${this.theme.fg("accent", this.theme.bold(`${snap.id} · ${oneLine(snap.title)}`))}`,
         width,
       ),
-    )
-    lines.push(border)
+      truncateToWidth(
+        this.theme.fg(
+          "muted",
+          `${GUTTER}${statusWord(snap, this.theme)} · ${formatElapsed(snap)} · pid ${snap.pid ?? "?"}${snap.status === "running" ? "" : ` · ${formatExit(snap)}`} · ${oneLine(snap.cwd)}`,
+        ),
+        width,
+      ),
+      truncateToWidth(
+        `${GUTTER}${this.theme.fg("dim", "$ ")}${this.theme.fg("text", oneLine(snap.command))}`,
+        width,
+      ),
+      "",
+    ]
 
-    // Stream tab line: which stream is active, both sizes.
     const active = this.stream
-    const viewData = active === "stdout" ? snap.stdout : snap.stderr
-
+    const buffer = active === "stdout" ? snap.stdout : snap.stderr
     const tab = (name: "stdout" | "stderr", size: number) =>
       name === active
-        ? theme.fg("accent", theme.bold(`${name} (${formatSize(size)})`))
-        : theme.fg("dim", `${name} (${formatSize(size)})`)
+        ? this.theme.fg(
+            "accent",
+            this.theme.bold(`${name} (${formatSize(size)})`),
+          )
+        : this.theme.fg("muted", `${name} (${formatSize(size)})`)
 
     lines.push(
       truncateToWidth(
-        `  ${tab("stdout", snap.stdout.totalBytes)}${theme.fg("dim", " | ")}${tab("stderr", snap.stderr.totalBytes)}${theme.fg("dim", " . t to switch")}`,
+        `${GUTTER}${tab("stdout", snap.stdout.totalBytes)}${this.theme.fg("dim", " · ")}${tab("stderr", snap.stderr.totalBytes)}${this.theme.fg("dim", " · t switch")}`,
         width,
       ),
     )
 
-    // Fixed-height output viewport. Notes and scroll status consume rows
-    // inside the viewport so streaming/scrolling never changes overlay height.
-    const buffer = viewData
-
-    const version =
-      // The cached view text identity changes with the buffer; totalBytes is a
-      // monotonically increasing proxy for a version counter.
-      buffer.totalBytes
-
-    const output = this.lineCache.get(buffer.text, version, width - 2)
+    const output = this.lineCache.get(
+      buffer.text,
+      buffer.totalBytes,
+      width - GUTTER.length,
+    )
     const viewport = this.viewportHeight()
-
     const noteRows: string[] = []
 
     if (snap.errorText) {
       noteRows.push(
         truncateToWidth(
-          theme.fg("error", `error: ${oneLine(snap.errorText)}`),
+          this.theme.fg("error", `${GUTTER}error: ${oneLine(snap.errorText)}`),
           width,
         ),
       )
@@ -628,16 +567,16 @@ class TerminalDetailView implements Component {
     if (buffer.truncatedBytes > 0) {
       noteRows.push(
         truncateToWidth(
-          theme.fg(
+          this.theme.fg(
             "dim",
-            `first ${formatSize(buffer.truncatedBytes)} dropped from view. full log: ${buffer.spillPath ?? "(unavailable)"}`,
+            `${GUTTER}first ${formatSize(buffer.truncatedBytes)} dropped from view. full log: ${buffer.spillPath ?? "(unavailable)"}`,
           ),
           width,
         ),
       )
     }
 
-    const body: string[] = [...noteRows]
+    const body = [...noteRows]
     const scrollRows = this.scrollOffset > 0 ? 1 : 0
     const capacity = Math.max(1, viewport - body.length - scrollRows)
     const maxOffset = Math.max(0, output.length - capacity)
@@ -648,17 +587,20 @@ class TerminalDetailView implements Component {
     const visible = output.slice(Math.max(0, end - capacity), end)
 
     if (visible.length === 0) {
-      body.push(theme.fg("dim", `(no ${active} yet)`))
+      body.push(this.theme.fg("dim", `${GUTTER}(no ${active} yet)`))
     } else {
       for (const line of visible) {
-        body.push(truncateToWidth(`  ${line}`, width))
+        body.push(truncateToWidth(`${GUTTER}${line}`, width))
       }
     }
 
     if (this.scrollOffset > 0) {
       body.push(
         truncateToWidth(
-          theme.fg("dim", `... ${this.scrollOffset} lines below · ↓/pgdn`),
+          this.theme.fg(
+            "dim",
+            `${GUTTER}... ${this.scrollOffset} lines below · ↓/pgdn`,
+          ),
           width,
         ),
       )
@@ -666,20 +608,17 @@ class TerminalDetailView implements Component {
 
     while (body.length < viewport) body.push("")
     lines.push(...body.slice(0, viewport))
-
-    lines.push(border)
     lines.push(
       truncateToWidth(
-        theme.fg(
+        this.theme.fg(
           "dim",
-          `${configuredKeys(this.keybindings, "tui.select.cancel")} back · t stdout/stderr · x kill · ${configuredKeys(this.keybindings, "tui.editor.cursorUp")}/${configuredKeys(this.keybindings, "tui.editor.cursorDown")}/jk scroll · ${configuredKeys(this.keybindings, "tui.editor.pageUp")}/${configuredKeys(this.keybindings, "tui.editor.pageDown")} page · g/G top/bottom`,
+          `${GUTTER}${configuredKeys(this.keybindings, "tui.select.cancel")} back · t stdout/stderr · x kill · ${configuredKeys(this.keybindings, "tui.editor.cursorUp")}/${configuredKeys(this.keybindings, "tui.editor.cursorDown")}/jk scroll · ${configuredKeys(this.keybindings, "tui.editor.pageUp")}/${configuredKeys(this.keybindings, "tui.editor.pageDown")} page · g/G top/bottom`,
         ),
         width,
       ),
     )
-    lines.push(border)
 
-    return lines
+    return lines.slice(0, height)
   }
 
   invalidate(): void {
