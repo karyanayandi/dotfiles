@@ -11,6 +11,7 @@ import {
   visibleWidth,
   wrapTextWithAnsi,
 } from "@earendil-works/pi-tui"
+import { activityIndicator } from "@pi/shared/activity-status"
 import type {
   SubagentSnapshot,
   TranscriptItem,
@@ -82,10 +83,12 @@ function renderUserText(
   const clean = sanitizeText(text).trim()
 
   if (!clean) return
-  const wrapped = wrapTextWithAnsi(clean, Math.max(1, width - 4))
+  const prefixWidth = 8
+  const wrapped = wrapTextWithAnsi(clean, Math.max(1, width - prefixWidth))
 
   for (let i = 0; i < wrapped.length; i++) {
-    const prefix = i === 0 ? theme.fg("dim", "  › ") : "    "
+    const prefix =
+      i === 0 ? theme.fg("dim", "  User: ") : " ".repeat(prefixWidth)
     out.push(truncateToWidth(prefix + theme.fg("dim", wrapped[i]), width))
   }
 }
@@ -148,11 +151,10 @@ function renderAssistantItem(
 
       const preview = part.argsPreview ? sanitizeText(part.argsPreview) : ""
 
-      const marker = result
-        ? result.isError
-          ? theme.fg("error", "✕")
-          : theme.fg("success", "✓")
-        : theme.fg("muted", "·")
+      const marker = activityIndicator(
+        theme,
+        result ? (result.isError ? "error" : "done") : "running",
+      )
 
       const line =
         `${marker} ${theme.fg("toolTitle", theme.bold(sanitizeText(part.name)))}` +
@@ -261,11 +263,10 @@ export function buildTranscriptLines(
   for (const tool of snap.liveTools) {
     if (out.length > 0) out.push("")
 
-    const marker = tool.done
-      ? tool.isError
-        ? theme.fg("error", "✕")
-        : theme.fg("success", "✓")
-      : theme.fg("muted", "·")
+    const marker = activityIndicator(
+      theme,
+      tool.done ? (tool.isError ? "error" : "done") : "running",
+    )
 
     let line = `  ${marker} ${theme.fg("toolTitle", theme.bold(sanitizeText(tool.name)))}`
     const preview = tool.outputPreview && sanitizeText(tool.outputPreview)
@@ -278,7 +279,10 @@ export function buildTranscriptLines(
   // visibly acknowledges the user's input instead of appearing to do nothing.
   for (const message of snap.queued) {
     if (out.length > 0) out.push("")
-    const prefix = theme.fg("warning", `  › [queued ${message.kind}] `)
+    const prefix = theme.fg(
+      "warning",
+      `  ${activityIndicator(theme, "queued")} [queued ${message.kind}] `,
+    )
 
     const wrapped = wrapTextWithAnsi(
       sanitizeText(message.text),

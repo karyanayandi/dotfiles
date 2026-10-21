@@ -5,6 +5,7 @@
 
 import * as v from "valibot"
 import type { Theme } from "@earendil-works/pi-coding-agent"
+import { formatActivityStatus as sharedActivityStatus } from "@pi/shared/activity-status"
 
 export interface ContextUtilization {
   /** Current conversation context occupancy; undefined while unknown. */
@@ -64,21 +65,5 @@ interface ActivityCounts {
 }
 
 export function formatActivityStatus(theme: Theme, counts: ActivityCounts) {
-  const parts: string[] = []
-
-  if (counts.running > 0) {
-    parts.push(theme.fg("warning", `· ${counts.running} running`))
-  }
-
-  if (counts.done > 0) {
-    parts.push(theme.fg("success", `✓ ${counts.done} done`))
-  }
-
-  if (counts.failed > 0) {
-    parts.push(theme.fg("error", `✕ ${counts.failed} failed`))
-  }
-
-  parts.push(theme.fg("accent", "/subagents") + theme.fg("dim", " to view"))
-
-  return `${theme.fg("muted", "subagents:")} ${parts.join(theme.fg("dim", " · "))}`
+  return sharedActivityStatus(theme, "subagents", counts)
 }

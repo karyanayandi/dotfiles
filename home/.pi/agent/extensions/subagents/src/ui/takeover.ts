@@ -13,6 +13,11 @@ import type {
 } from "@earendil-works/pi-coding-agent"
 import type { Component, Focusable, TUI } from "@earendil-works/pi-tui"
 import { Input, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui"
+import {
+  ACTIVITY_FRAME_MS,
+  activityIndicator,
+  inputActivityIndicator,
+} from "@pi/shared/activity-status"
 import { formatElapsed, type SubagentSnapshot } from "#subagents/domain"
 import { formatContextUtilization } from "#subagents/format"
 import type { SubagentReadModel } from "#subagents/manager"
@@ -27,14 +32,7 @@ function configuredKeys(
 }
 
 function statusGlyph(snap: SubagentSnapshot, theme: Theme): string {
-  switch (snap.status) {
-    case "running":
-      return theme.fg("muted", "·")
-    case "done":
-      return theme.fg("success", "✓")
-    case "error":
-      return theme.fg("error", "✕")
-  }
+  return activityIndicator(theme, snap.status)
 }
 
 function statusWord(snap: SubagentSnapshot, theme: Theme): string {
@@ -150,8 +148,10 @@ export class SubagentDashboard implements Component {
     this.view = view
     this.selection = selection
     this.done = done
-    // Elapsed times, token counts, and statuses tick along at 1Hz.
-    this.ticker = setInterval(() => this.tui.requestRender(), 1000)
+    this.ticker = setInterval(() => {
+      if (this.view.list().some((snap) => snap.status === "running"))
+        this.tui.requestRender()
+    }, ACTIVITY_FRAME_MS)
     this.unsubChange = view.subscribe(() => this.tui.requestRender())
   }
 
@@ -293,14 +293,11 @@ export class SubagentDashboard implements Component {
       const index = start + i
       const isSelected = index === this.selection.index
 
-      // Left: marker, status square, title, dim id
-      const marker = isSelected ? theme.fg("accent", "›") : " "
-
       const title = isSelected
-        ? theme.fg("accent", sanitizeTerminalText(snap.title))
+        ? theme.fg("accent", theme.bold(sanitizeTerminalText(snap.title)))
         : theme.fg("text", sanitizeTerminalText(snap.title))
 
-      const left = `  ${marker} ${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
+      const left = `  ${statusGlyph(snap, theme)} ${title} ${theme.fg("dim", snap.id)}`
 
       // Right: backend · model · context utilization · elapsed · status
       const utilization = formatContextUtilization(snap.usage)
@@ -321,7 +318,11 @@ export class SubagentDashboard implements Component {
       const leftMax = Math.max(0, width - rightWidth - 2)
       const leftTruncated = truncateToWidth(left, leftMax)
       const gap = Math.max(2, width - visibleWidth(leftTruncated) - rightWidth)
-      out.push(truncateToWidth(leftTruncated + " ".repeat(gap) + right, width))
+      const row = truncateToWidth(
+        leftTruncated + " ".repeat(gap) + right,
+        width,
+      )
+      out.push(isSelected ? theme.bg("selectedBg", row) : row)
     }
 
     if (start > 0) {
@@ -356,7 +357,7 @@ export class TakeoverView implements Component, Focusable {
   private done: (value: null) => void
   private options?: TakeoverOptions
 
-  private input = new Input()
+  private input = new Input({ prompt: "" })
   /** Scroll offset in lines from the bottom of the transcript. 0 = pinned to bottom. */
   private scrollOffset = 0
   private unsubscribe: () => void
@@ -390,8 +391,9 @@ export class TakeoverView implements Component, Focusable {
     this.done = done
     this.options = options
     this.unsubscribe = view.subscribeTo(id, () => this.scheduleRender())
-    // Elapsed time in the header ticks along at 1Hz.
-    this.ticker = setInterval(() => this.tui.requestRender(), 1000)
+    this.ticker = setInterval(() => {
+      if (this.snap()?.status === "running") this.tui.requestRender()
+    }, ACTIVITY_FRAME_MS)
     this.input.onSubmit = (value: string) => {
       const text = value.trim()
 
@@ -518,12 +520,15 @@ export class TakeoverView implements Component, Focusable {
     }
 
     const utilization = formatContextUtilization(snap.usage)
+    const indicator = statusGlyph(snap, theme)
 
     const header =
-      `${statusGlyph(snap, theme)} ` +
+      `${indicator} ` +
       theme.fg(
         "accent",
-        theme.bold(`${snap.id} · ${sanitizeTerminalText(snap.title)}`),
+        theme.bold(
+          `Subagent · ${snap.id} · ${sanitizeTerminalText(snap.title)}`,
+        ),
       ) +
       ` · ${statusWord(snap, theme)}` +
       theme.fg("muted", ` · ${formatElapsed(snap)}`)
@@ -586,9 +591,13 @@ export class TakeoverView implements Component, Focusable {
     while (body.length < viewport) body.push("")
     lines.push(...body.slice(0, viewport))
     lines.push("")
+    const inputIndicator = inputActivityIndicator(
+      theme,
+      snap.status === "running",
+    )
     const input = this.input
-      .render(Math.max(1, contentWidth))
-      .map((line) => `  ${line}`)
+      .render(Math.max(1, width - 4))
+      .map((line) => `  ${inputIndicator} ${line}`)
     const height = Math.max(0, (this.tui.terminal.rows || 30) - 1)
 
     return [

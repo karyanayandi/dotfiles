@@ -184,10 +184,11 @@ void test("transcript uses compact tool and message gutters", () => {
     .map(stripVTControlCharacters)
     .join("\n")
 
-  assert.match(text, / {2}› hello/)
+  assert.match(text, / {2}User: hello/)
+  assert.doesNotMatch(text, /›|❯|> /)
   assert.match(text, / {2}✓ read file.ts/)
   assert.match(text, / {2}saved output/)
-  assert.match(text, / {2}· bash/)
+  assert.match(text, / {2}[◜◝◞◟] bash/)
   assert.match(text, /queued steer/)
 })
 
@@ -270,13 +271,83 @@ void test("takeover keeps metadata and an unboxed input", () => {
   )
   try {
     const lines = takeover.render(160).map(stripVTControlCharacters)
-    assert.match(lines[0], /Wide 界 agent/)
+    assert.match(lines[0], /Subagent.*sa-1.*Wide 界 agent/)
     assert.match(lines[0], /running/)
     assert.match(lines[1], /pi.*model.*side task/)
     assert.doesNotMatch(lines.join("\n"), /Message/)
-    assert.match(lines.at(-2) ?? "", /^  > /)
+    assert.match(lines.at(-2) ?? "", /^  [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] /)
+    assert.doesNotMatch(lines.join("\n"), /›|❯|> /)
     assert.match(lines.at(-1) ?? "", /send.*back.*abort run.*scroll/)
   } finally {
+    takeover.dispose()
+  }
+})
+
+void test("subagent state drives header, selection, and input without arrows", (context) => {
+  context.mock.timers.enable({ apis: ["Date", "setInterval"], now: 0 })
+  context.mock.method(
+    theme,
+    "bold",
+    (text: string) => `\u001b[1m${text}\u001b[22m`,
+  )
+  const { tui, keys, view, setSnapshot } = setup({
+    ...snapshot(),
+    createdAt: 0,
+  })
+  const dashboard = new SubagentDashboard(
+    tui,
+    theme,
+    keys,
+    view,
+    { index: 0 },
+    () => undefined,
+  )
+  const takeover = new TakeoverView(
+    tui,
+    theme,
+    keys,
+    "sa-1",
+    view,
+    () => undefined,
+  )
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+  const taskFrames = ["◜", "◝", "◞", "◟"]
+  try {
+    setSnapshot({
+      ...snapshot(),
+      status: "done",
+      transcript: [],
+      liveTools: [],
+    })
+    assert.match(
+      takeover.render(160).map(stripVTControlCharacters).at(-2) ?? "",
+      /^  ┃ /,
+    )
+    setSnapshot({ ...snapshot(), createdAt: 0 })
+    for (let index = 0; index < frames.length; index++) {
+      const lines = takeover.render(160).map(stripVTControlCharacters)
+      assert.match(lines[0], new RegExp(taskFrames[index % taskFrames.length]))
+      assert.match(
+        dashboard.render(160).map(stripVTControlCharacters).join("\n"),
+        new RegExp(taskFrames[index % taskFrames.length]),
+      )
+      assert.match(lines.at(-2) ?? "", new RegExp(`^  ${frames[index]} `))
+      context.mock.timers.tick(120)
+    }
+    assert.ok(dashboard.render(160).some((line) => line.includes("\u001b[1m")))
+    for (const [status, glyph] of [
+      ["done", "✓"],
+      ["error", "✕"],
+    ] as const) {
+      setSnapshot({ ...snapshot(), status })
+      const lines = takeover.render(160).map(stripVTControlCharacters)
+      assert.match(lines[0], new RegExp(glyph))
+      assert.match(lines.at(-2) ?? "", /^  ┃ /)
+      assert.doesNotMatch(lines.at(-2) ?? "", /✓|✕/)
+      assert.doesNotMatch(lines.join("\n"), /›|❯|> /)
+    }
+  } finally {
+    dashboard.dispose()
     takeover.dispose()
   }
 })
