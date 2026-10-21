@@ -56,10 +56,10 @@ import {
   formatUsage,
   phaseGroups,
   resultJson,
-  stateSquare,
+  stateGlyph,
   statusColor,
+  statusGlyph,
   statusWord,
-  SQUARE,
   type AgentRecord,
   type WorkflowDetails,
 } from "./model.ts"
@@ -841,7 +841,7 @@ export default function workflows(pi: ExtensionAPI) {
       if (description) text += `\n  ${theme.fg("dim", description)}`
 
       for (const phase of meta.phases.slice(0, 8)) {
-        text += `\n  ${theme.fg("dim", SQUARE)} ${theme.fg("accent", phase.title)}${
+        text += `\n  ${theme.fg("dim", "·")} ${theme.fg("accent", phase.title)}${
           phase.detail ? theme.fg("dim", `. ${phase.detail}`) : ""
         }`
       }
@@ -867,7 +867,7 @@ export default function workflows(pi: ExtensionAPI) {
       const elapsed = formatElapsed(details.startedAt, details.finishedAt)
 
       let header =
-        `${theme.fg(statusColor(details.status), SQUARE)} ${theme.fg("toolTitle", theme.bold("workflow "))}` +
+        `${statusGlyph(details.status, theme)} ${theme.fg("toolTitle", theme.bold("workflow "))}` +
         `${theme.fg("accent", details.name ?? details.runId)} ` +
         theme.fg(
           "dim",
@@ -890,7 +890,7 @@ export default function workflows(pi: ExtensionAPI) {
 
         for (const agent of details.agents) {
           const context = agentContext(agent)
-          text += `\n  ${stateSquare(agent.state, theme)} ${theme.fg("accent", agent.label)}${
+          text += `\n  ${stateGlyph(agent.state, theme)} ${theme.fg("accent", agent.label)}${
             agent.phase ? theme.fg("dim", ` (${agent.phase})`) : ""
           }${theme.fg(
             "dim",
@@ -917,14 +917,14 @@ export default function workflows(pi: ExtensionAPI) {
       for (const group of phaseGroups(details)) {
         container.addChild(new Spacer(1))
         container.addChild(
-          new Text(theme.fg("muted", `─── ${group.title} ───`), 0, 0),
+          new Text(theme.fg("muted", theme.bold(group.title)), 0, 0),
         )
 
         for (const agent of group.agents) {
           const usage = formatUsage(agent.usage, agent.model)
           const context = agentContext(agent)
 
-          let line = `${stateSquare(agent.state, theme)} ${theme.fg("accent", agent.label)} ${theme.fg(
+          let line = `${stateGlyph(agent.state, theme)} ${theme.fg("accent", agent.label)} ${theme.fg(
             "dim",
             [context, formatElapsed(agent.startedAt, agent.finishedAt)]
               .filter(Boolean)
@@ -954,7 +954,9 @@ export default function workflows(pi: ExtensionAPI) {
 
       if (details.result !== undefined) {
         container.addChild(new Spacer(1))
-        container.addChild(new Text(theme.fg("muted", "─── result ───"), 0, 0))
+        container.addChild(
+          new Text(theme.fg("muted", theme.bold("Result")), 0, 0),
+        )
         container.addChild(
           new Markdown(
             `\`\`\`json\n${resultJson(details.result)}\n\`\`\``,

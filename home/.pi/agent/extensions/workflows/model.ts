@@ -103,23 +103,20 @@ export interface WorkflowDetails {
   error?: string
 }
 
-/** Colored square state indicator (no emojis/glyphs). */
-export const SQUARE = "■"
+export function stateGlyph(state: AgentState, theme: Theme): string {
+  if (state === "done") return theme.fg("success", "✓")
 
-export function stateSquare(state: AgentState, theme: Theme): string {
-  if (state === "done") return theme.fg("success", SQUARE)
+  if (state === "error") return theme.fg("error", "✕")
 
-  if (state === "error") return theme.fg("error", SQUARE)
-
-  return theme.fg("warning", SQUARE)
+  return theme.fg("warning", "·")
 }
 
-export function statusSquare(status: WorkflowStatus, theme: Theme): string {
-  if (status === "completed") return theme.fg("success", SQUARE)
+export function statusGlyph(status: WorkflowStatus, theme: Theme): string {
+  if (status === "completed") return theme.fg("success", "✓")
 
-  if (status === "running") return theme.fg("warning", SQUARE)
+  if (status === "running") return theme.fg("warning", "·")
 
-  return theme.fg("error", SQUARE)
+  return theme.fg("error", "✕")
 }
 
 export function statusWord(status: WorkflowStatus): string {

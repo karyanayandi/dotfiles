@@ -1,14 +1,6 @@
 /**
- * /workflows dashboard: a full-screen overlay with a run list and a per-run
- * detail view (phases sidebar + agents panel), modeled after:
- *
- *   name                                             5/5 agents · 31m18s · done
- *   description
- *   ╭ Phases ────────────╮ ╭ Gather · 3 agents ──────────────────────────────╮
- *   │ ❯ ■ Gather     3/3 │ │ ■ CodeRabbit feedback   gpt-5 · 7%/372k  5m37s│
- *   │   ■ Verify     1/1 │ │ ■ Other bot feedback    gpt-5 · 9%/372k  4m43s│
- *   ╰────────────────────╯ ╰─────────────────────────────────────────────────╯
- *   up/down select · esc back · s save report
+ * /workflows dashboard: a borderless run list, phase and agent view, and
+ * compact conversation transcript.
  */
 
 import * as fs from "node:fs"
@@ -16,15 +8,17 @@ import * as path from "node:path"
 import * as v from "valibot"
 import {
   getAgentDir,
+  getMarkdownTheme,
   type ExtensionContext,
-  type KeybindingsManager,
 } from "@earendil-works/pi-coding-agent"
 import {
   Key,
+  Markdown,
   matchesKey,
   truncateToWidth,
   visibleWidth,
   wrapTextWithAnsi,
+  type KeybindingsManager,
   type TUI,
 } from "@earendil-works/pi-tui"
 import {
@@ -36,22 +30,32 @@ import {
   phaseGroups,
   resultJson,
   shortenHome,
-  stateSquare,
+  stateGlyph,
   statusColor,
+  statusGlyph,
   statusWord,
-  SQUARE,
   type Theme,
   type AgentRecord,
   type PhaseGroup,
   type TranscriptEntry,
   type WorkflowDetails,
 } from "./model.ts"
+import { sanitizeText } from "../background-terminals/src/ui/output-view.ts"
+import { sanitizeTerminalText } from "../ui/layout.ts"
+
+const GUTTER = "  "
 
 const NOTICE_TTL_MS = 4000
 
-const MIN_HEIGHT = 10
-
 const TRANSCRIPT_SCROLL_STEP = 20
+
+function terminalText(text: string): string {
+  return sanitizeTerminalText(sanitizeText(text))
+}
+
+function oneLine(text: string): string {
+  return terminalText(text.replace(/\s+/g, " ")).trim()
+}
 
 function wrapSelection(index: number, delta: number, length: number): number {
   if (length === 0) return 0
@@ -466,7 +470,7 @@ export class WorkflowDashboard {
   private timer: ReturnType<typeof setInterval>
   private tui: TUI
   private theme: Theme
-  private keybindings: KeybindingsManager
+  private keybindings: Pick<KeybindingsManager, "getKeys" | "matches">
   private getActive: () => Map<string, WorkflowDetails>
   private sessionId: string
   private referencedRunIds: ReadonlySet<string>
@@ -475,7 +479,7 @@ export class WorkflowDashboard {
   constructor(
     tui: TUI,
     theme: Theme,
-    keybindings: KeybindingsManager,
+    keybindings: Pick<KeybindingsManager, "getKeys" | "matches">,
     getActive: () => Map<string, WorkflowDetails>,
     sessionId: string,
     referencedRunIds: ReadonlySet<string>,
@@ -723,68 +727,44 @@ export class WorkflowDashboard {
   }
 
   render(width: number): string[] {
-    const height = Math.max(MIN_HEIGHT, this.tui.terminal.rows - 1)
+    if (width <= 0) return []
+
+    const height = Math.max(0, this.tui.terminal.rows - 1)
+    if (height === 0) return []
+
+    const agent = this.selectedAgent()
     let lines: string[]
 
-    if (this.view === "transcript" && this.current && this.selectedAgent()) {
-      lines = this.renderTranscript(
-        this.current.details,
-        this.selectedAgent()!,
-        width,
-        height,
-      )
+    if (this.view === "transcript" && this.current && agent) {
+      lines = this.renderTranscript(this.current.details, agent, width, height)
     } else if (this.view === "detail" && this.current) {
       lines = this.renderDetail(this.current.details, width, height)
     } else {
       lines = this.renderList(width, height)
     }
 
-    return lines.map((line) => truncateToWidth(line, width, ""))
-  }
-
-  /** Compose `left ... right` within `width`, truncating left when needed. */
-  private split(left: string, right: string, width: number): string {
-    const rightWidth = visibleWidth(right)
-    let text = left
-
-    if (visibleWidth(text) + rightWidth + 1 > width) {
-      text = truncateToWidth(text, Math.max(0, width - rightWidth - 2), "…")
-    }
-
-    const pad = Math.max(1, width - visibleWidth(text) - rightWidth)
-
-    return text + " ".repeat(pad) + right
-  }
-
-  /** Bordered panel with a title in the top border, padded to exact height. */
-  private panel(
-    title: string,
-    rows: string[],
-    width: number,
-    height: number,
-  ): string[] {
-    const theme = this.theme
-    const inner = Math.max(0, width - 2)
-    const border = (s: string) => theme.fg("borderMuted", s)
-    const titleText = truncateToWidth(` ${title} `, Math.max(0, inner - 2))
-    const dashes = Math.max(0, inner - visibleWidth(titleText) - 1)
-
-    const lines: string[] = [
-      border("╭─") + titleText + border("─".repeat(dashes) + "╮"),
-    ]
-
-    const bodyHeight = Math.max(0, height - 2)
-
-    for (let i = 0; i < bodyHeight; i++) {
-      const row = rows[i] ?? ""
-      const clipped = truncateToWidth(row, inner, "…")
-      const pad = Math.max(0, inner - visibleWidth(clipped))
-      lines.push(border("│") + clipped + " ".repeat(pad) + border("│"))
-    }
-
-    lines.push(border("╰" + "─".repeat(inner) + "╯"))
-
     return lines
+      .slice(0, height)
+      .map((line) => truncateToWidth(line, width, ""))
+  }
+
+  private split(left: string, right: string, width: number): string {
+    if (width <= 0) return ""
+
+    if (width < 64) return truncateToWidth(`${left} ${right}`, width, "…")
+
+    const rightText = truncateToWidth(right, width, "…")
+    const leftText = truncateToWidth(
+      left,
+      Math.max(0, width - visibleWidth(rightText) - 1),
+      "…",
+    )
+    const pad = Math.max(
+      1,
+      width - visibleWidth(leftText) - visibleWidth(rightText),
+    )
+
+    return leftText + " ".repeat(pad) + rightText
   }
 
   /** Scroll window keeping `selected` visible. */
@@ -804,295 +784,327 @@ export class WorkflowDashboard {
   }
 
   private hintLine(hint: string, width: number): string {
-    const theme = this.theme
+    const text = this.notice ? oneLine(this.notice) : hint
+    const color = this.notice ? "accent" : "dim"
 
-    if (this.notice)
-      return truncateToWidth(theme.fg("accent", ` ${this.notice}`), width)
-
-    return truncateToWidth(theme.fg("dim", ` ${hint}`), width)
+    return truncateToWidth(this.theme.fg(color, `${GUTTER}${text}`), width)
   }
 
   private renderList(width: number, height: number): string[] {
     const theme = this.theme
-    const lines: string[] = []
-
+    const footer = this.hintLine(
+      `${this.keys("tui.select.up")}/${this.keys("tui.select.down")} select · ${this.keys("tui.select.confirm")} open · ${this.keys("tui.select.cancel")} close`,
+      width,
+    )
     const header = this.split(
-      " " + theme.bold(theme.fg("accent", "Workflows")),
+      `${GUTTER}${theme.bold(theme.fg("accent", "Workflows"))}`,
       theme.fg(
         "dim",
-        `${this.entries.length} run${this.entries.length === 1 ? "" : "s"} `,
+        `${this.entries.length} run${this.entries.length === 1 ? "" : "s"}`,
       ),
       width,
     )
 
-    lines.push(header)
-
-    const panelHeight = height - 2
-    const bodyHeight = Math.max(0, panelHeight - 2)
+    if (height === 1) return [footer]
+    const bodyHeight = Math.max(0, height - 2)
+    const body: string[] = []
 
     if (this.entries.length === 0) {
-      lines.push(
-        ...this.panel(
-          "Runs",
-          [theme.fg("dim", " no workflow runs yet")],
-          width,
-          panelHeight,
-        ),
-      )
-      lines.push(
-        this.hintLine(`${this.keys("tui.select.cancel")} close`, width),
+      body.push(theme.fg("dim", `${GUTTER}no workflow runs yet`))
+    } else {
+      const { items, offset } = this.windowed(
+        this.entries,
+        this.listIndex,
+        bodyHeight,
       )
 
-      return lines
+      for (const [visibleIndex, entry] of items.entries()) {
+        const index = offset + visibleIndex
+        const selected = index === this.listIndex
+        const details = entry.details
+        const marker = selected ? theme.fg("accent", "›") : " "
+        const label = oneLine(details.name ?? details.runId)
+        const title = theme.fg(selected ? "accent" : "text", label)
+        const { done, failed } = countStates(details)
+        const settled = done + failed
+        const left = `${GUTTER}${marker} ${statusGlyph(details.status, theme)} ${title} ${theme.fg("dim", oneLine(details.runId))}`
+        const right = theme.fg(
+          "muted",
+          `${settled}/${details.agents.length} · ${formatElapsed(details.startedAt, details.finishedAt)} · ${statusWord(details.status)}`,
+        )
+
+        body.push(
+          width >= 64
+            ? this.split(left, right, width)
+            : truncateToWidth(`${left} ${right}`, width, "…"),
+        )
+      }
     }
 
-    const { items, offset } = this.windowed(
-      this.entries,
-      this.listIndex,
-      bodyHeight,
+    while (body.length < bodyHeight) body.push("")
+
+    return [header, ...body.slice(0, bodyHeight), footer]
+  }
+
+  private phaseRow(group: PhaseGroup, index: number): string {
+    const selected = index === this.phaseIndex
+    const marker = selected
+      ? this.theme.fg(this.detailFocus === "phases" ? "accent" : "muted", "›")
+      : " "
+    const done = group.agents.filter(
+      (agent) => agent.state !== "running",
+    ).length
+    const title = oneLine(group.title)
+    const styledTitle = this.theme.fg(
+      selected && this.detailFocus === "phases" ? "accent" : "text",
+      title,
     )
+    const count = group.agents.length
+      ? `${done}/${group.agents.length}`
+      : "empty"
 
-    const rows = items.map((entry, i) => {
-      const index = offset + i
-      const selected = index === this.listIndex
-      const d = entry.details
-      const marker = selected ? theme.fg("accent", "❯") : " "
-      const name = d.name ?? d.runId
-      const label = selected ? theme.fg("accent", name) : theme.fg("text", name)
-      const { done, failed } = countStates(d)
-      const settled = done + failed
+    return `${marker} ${groupGlyph(group, this.theme)} ${styledTitle} ${this.theme.fg("dim", count)}`
+  }
 
-      const right =
-        theme.fg(
-          "dim",
-          `${settled}/${d.agents.length} agents · ${formatElapsed(d.startedAt, d.finishedAt)} · `,
-        ) +
-        theme.fg(statusColor(d.status), statusWord(d.status)) +
-        " "
-
-      const left = ` ${marker} ${statusSquareFor(d, theme)} ${label} ${theme.fg("dim", d.runId)}`
-
-      return this.split(left, right, width - 2)
-    })
-
-    lines.push(...this.panel("Runs", rows, width, panelHeight))
-    lines.push(
-      this.hintLine(
-        `${this.keys("tui.select.up")}/${this.keys("tui.select.down")} select · ${this.keys("tui.select.confirm")} open · ${this.keys("tui.select.cancel")} close`,
-        width,
-      ),
+  private agentRow(agent: AgentRecord, index: number): string {
+    const selected = index === this.agentIndex
+    const marker =
+      selected && this.detailFocus === "agents"
+        ? this.theme.fg("accent", "›")
+        : " "
+    const label = this.theme.fg(
+      selected && this.detailFocus === "agents" ? "accent" : "text",
+      oneLine(agent.label),
     )
+    const metadata = [
+      oneLine(agent.model ?? ""),
+      agentContext(agent),
+      formatElapsed(agent.startedAt, agent.finishedAt),
+      formatUsage(agent.usage),
+    ]
+      .filter(Boolean)
+      .join(" · ")
+
+    return `${marker} ${stateGlyph(agent.state, this.theme)} ${label}${metadata ? this.theme.fg("dim", ` · ${metadata}`) : ""}`
+  }
+
+  private renderDetailFocus(
+    groups: PhaseGroup[],
+    selectedGroup: PhaseGroup | undefined,
+    bodyHeight: number,
+  ): string[] {
+    const theme = this.theme
+
+    if (this.detailFocus === "phases") {
+      if (groups.length === 0)
+        return [theme.fg("dim", `${GUTTER}no agents or phases yet`)]
+
+      const visible = this.windowed(groups, this.phaseIndex, bodyHeight)
+
+      return visible.items.map(
+        (group, index) =>
+          `${GUTTER}${this.phaseRow(group, visible.offset + index)}`,
+      )
+    }
+
+    const agents = selectedGroup?.agents ?? []
+
+    if (agents.length === 0)
+      return [theme.fg("dim", `${GUTTER}no agents in this phase yet`)]
+
+    const visible = this.windowed(agents, this.agentIndex, bodyHeight)
+    const rows: string[] = []
+
+    for (const [visibleIndex, agent] of visible.items.entries()) {
+      rows.push(
+        `${GUTTER}${this.agentRow(agent, visible.offset + visibleIndex)}`,
+      )
+      if (agent.error)
+        rows.push(
+          theme.fg("error", `${GUTTER}  error: ${oneLine(agent.error)}`),
+        )
+    }
+
+    return rows
+  }
+
+  private renderDetailColumns(
+    groups: PhaseGroup[],
+    selectedGroup: PhaseGroup | undefined,
+    width: number,
+    bodyHeight: number,
+  ): string[] {
+    const hasHeadings = bodyHeight > 2
+    const dataHeight = Math.max(0, bodyHeight - Number(hasHeadings))
+    const leftWidth = Math.floor((width - GUTTER.length - 2) / 3)
+    const rightWidth = Math.max(0, width - GUTTER.length - 2 - leftWidth)
+    const phaseWindow = this.windowed(groups, this.phaseIndex, dataHeight)
+    const agentList = selectedGroup?.agents ?? []
+    const agentWindow = this.windowed(agentList, this.agentIndex, dataHeight)
+    const phaseRows = groups.length
+      ? phaseWindow.items.map((group, index) =>
+          this.phaseRow(group, phaseWindow.offset + index),
+        )
+      : [this.theme.fg("dim", "no agents or phases yet")]
+    const agentRows = agentList.length
+      ? agentWindow.items.flatMap((agent, index) => [
+          this.agentRow(agent, agentWindow.offset + index),
+          ...(agent.error
+            ? [this.theme.fg("error", `error: ${oneLine(agent.error)}`)]
+            : []),
+        ])
+      : [
+          this.theme.fg(
+            "dim",
+            groups.length ? "no agents in this phase yet" : "",
+          ),
+        ]
+    const lines: string[] = []
+
+    for (let index = 0; index < bodyHeight; index++) {
+      const isHeading = hasHeadings && index === 0
+      const rowIndex = index - Number(hasHeadings)
+      const left = isHeading
+        ? this.theme.fg("muted", this.theme.bold("Phases"))
+        : (phaseRows[rowIndex] ?? "")
+      const right = isHeading
+        ? this.theme.fg(
+            "muted",
+            this.theme.bold(
+              selectedGroup
+                ? `${oneLine(selectedGroup.title)} · ${agentList.length} agents`
+                : "Agents",
+            ),
+          )
+        : (agentRows[rowIndex] ?? "")
+      const leftText = truncateToWidth(left, leftWidth, "…")
+      const rightText = truncateToWidth(right, rightWidth, "…")
+
+      lines.push(
+        `${GUTTER}${leftText}${" ".repeat(Math.max(0, leftWidth - visibleWidth(leftText)))}  ${rightText}`,
+      )
+    }
 
     return lines
   }
 
   private renderDetail(
-    d: WorkflowDetails,
+    details: WorkflowDetails,
     width: number,
     height: number,
   ): string[] {
     const theme = this.theme
-    const lines: string[] = []
-
-    const { done, failed } = countStates(d)
+    const { done, failed } = countStates(details)
     const settled = done + failed
-
-    const right =
+    const summary =
       theme.fg(
-        "dim",
-        `${settled}/${d.agents.length} agents · ${formatElapsed(d.startedAt, d.finishedAt)} · `,
-      ) +
-      theme.fg(statusColor(d.status), statusWord(d.status)) +
-      " "
+        "muted",
+        `${settled}/${details.agents.length} agents · ${formatElapsed(details.startedAt, details.finishedAt)} · `,
+      ) + theme.fg(statusColor(details.status), statusWord(details.status))
+    const header = this.split(
+      `${GUTTER}${statusGlyph(details.status, theme)} ${theme.bold(theme.fg("accent", oneLine(details.name ?? details.runId)))}`,
+      summary,
+      width,
+    )
+    const totals = formatUsage(aggregateUsage(details.agents))
+    const metadata = [
+      oneLine(details.description ?? details.runId),
+      totals,
+      details.error ? `error: ${oneLine(details.error)}` : "",
+    ]
+      .filter(Boolean)
+      .join(" · ")
+    const headerHeight = height >= 4 ? 2 : 1
+    const headers = [header]
 
-    lines.push(
-      this.split(
-        " " + theme.bold(theme.fg("accent", d.name ?? d.runId)),
-        right,
-        width,
-      ),
-    )
-    const totals = formatUsage(aggregateUsage(d.agents))
-    const subLeft = " " + theme.fg("muted", d.description ?? d.runId)
-    lines.push(
-      this.split(subLeft, totals ? theme.fg("dim", `${totals} `) : " ", width),
-    )
+    if (headerHeight === 2)
+      headers.push(
+        truncateToWidth(`${GUTTER}${theme.fg("dim", metadata)}`, width),
+      )
 
     const groups = this.groups()
     this.phaseIndex = Math.min(this.phaseIndex, Math.max(0, groups.length - 1))
     const selectedGroup = groups[this.phaseIndex]
     this.clampAgentIndex()
+    const bodyHeight = Math.max(0, height - headerHeight - 1)
+    const body =
+      width >= 80
+        ? this.renderDetailColumns(groups, selectedGroup, width, bodyHeight)
+        : this.renderDetailFocus(groups, selectedGroup, bodyHeight)
 
-    const panelHeight = height - 3
-    const bodyHeight = Math.max(0, panelHeight - 2)
-
-    // Left: phases sidebar.
-    const maxTitle = Math.max(8, ...groups.map((g) => g.title.length))
-
-    const sidebarWidth = Math.min(
-      Math.max(maxTitle + 12, 20),
-      Math.floor(width / 3),
-    )
-
-    const sidebarInner = sidebarWidth - 2
-    const phaseWindow = this.windowed(groups, this.phaseIndex, bodyHeight)
-
-    const phaseRows = phaseWindow.items.map((group, i) => {
-      const index = phaseWindow.offset + i
-      const selected = index === this.phaseIndex
-
-      const marker = selected
-        ? theme.fg(this.detailFocus === "phases" ? "accent" : "muted", "❯")
-        : " "
-
-      const groupDone = group.agents.filter((a) => a.state !== "running").length
-      const square = groupSquare(group, theme)
-
-      const title =
-        selected && this.detailFocus === "phases"
-          ? theme.fg("accent", group.title)
-          : theme.fg("text", group.title)
-
-      const counts =
-        group.agents.length > 0
-          ? theme.fg("dim", `${groupDone}/${group.agents.length} `)
-          : theme.fg("dim", "- ")
-
-      return this.split(` ${marker} ${square} ${title}`, counts, sidebarInner)
-    })
-
-    // Right: agents in the selected phase.
-    const agentsWidth = width - sidebarWidth - 1
-    const agentsInner = agentsWidth - 2
-    const agentRows: string[] = []
-
-    if (selectedGroup) {
-      const maxLabel = Math.max(
-        0,
-        ...selectedGroup.agents.map((a) => a.label.length),
-      )
-
-      const agentWindow = this.windowed(
-        selectedGroup.agents,
-        this.agentIndex,
-        bodyHeight,
-      )
-
-      for (const [visibleIndex, agent] of agentWindow.items.entries()) {
-        const index = agentWindow.offset + visibleIndex
-        const selected = index === this.agentIndex
-
-        const marker =
-          selected && this.detailFocus === "agents"
-            ? theme.fg("accent", "❯")
-            : " "
-
-        const stats = [agent.model, agentContext(agent)]
-          .filter(Boolean)
-          .join(" · ")
-
-        const label =
-          selected && this.detailFocus === "agents"
-            ? theme.fg("accent", agent.label.padEnd(Math.min(maxLabel, 40)))
-            : theme.fg("text", agent.label.padEnd(Math.min(maxLabel, 40)))
-
-        const left = ` ${marker} ${stateSquare(agent.state, theme)} ${label}  ${theme.fg("dim", stats)}`
-
-        const right = theme.fg(
-          "dim",
-          `${formatElapsed(agent.startedAt, agent.finishedAt)} `,
-        )
-
-        agentRows.push(this.split(left, right, agentsInner))
-
-        if (agent.error) {
-          agentRows.push(
-            truncateToWidth(
-              `       ${theme.fg("error", agent.error)}`,
-              agentsInner,
-              "…",
-            ),
-          )
-        }
-      }
-
-      if (selectedGroup.agents.length === 0) {
-        agentRows.push(theme.fg("dim", " no agents in this phase yet"))
-      }
-    }
-
-    if (d.error) {
-      agentRows.push("")
-      agentRows.push(
-        truncateToWidth(
-          ` ${theme.fg("error", `workflow error: ${d.error}`)}`,
-          agentsInner,
-          "…",
-        ),
-      )
-    }
-
-    const agentCount = selectedGroup?.agents.length ?? 0
-
-    const agentsTitle = selectedGroup
-      ? `${selectedGroup.title} · ${agentCount} agent${agentCount === 1 ? "" : "s"}`
-      : "Agents"
-
-    const leftPanel = this.panel("Phases", phaseRows, sidebarWidth, panelHeight)
-
-    const rightPanel = this.panel(
-      agentsTitle,
-      agentRows,
-      agentsWidth,
-      panelHeight,
-    )
-
-    for (let i = 0; i < panelHeight; i++) {
-      lines.push(`${leftPanel[i] ?? ""} ${rightPanel[i] ?? ""}`)
-    }
+    while (body.length < bodyHeight) body.push("")
 
     const hint =
       this.detailFocus === "phases"
         ? `j/k select phase · l/${this.keys("tui.editor.cursorRight")}/${this.keys("tui.select.confirm")} agents · ${this.keys("tui.select.cancel")} back · s save report`
         : `j/k select agent · h/${this.keys("tui.editor.cursorLeft")}/${this.keys("tui.select.cancel")} phases · ${this.keys("tui.select.confirm")} transcript · s save report`
 
-    lines.push(this.hintLine(hint, width))
-
-    return lines
+    return [
+      ...headers,
+      ...body.slice(0, bodyHeight),
+      this.hintLine(hint, width),
+    ]
   }
 
   private transcriptRows(agent: AgentRecord, width: number): string[] {
     const theme = this.theme
+    const contentWidth = Math.max(1, width - GUTTER.length)
     const rows: string[] = []
 
-    if (agent.transcript.length === 0) {
+    if (agent.transcript.length === 0)
       return [
         theme.fg(
           "dim",
-          " transcript unavailable (this run predates transcript capture)",
+          `${GUTTER}transcript unavailable (this run predates transcript capture)`,
         ),
       ]
-    }
 
     for (const entry of agent.transcript) {
-      const label = transcriptLabel(entry)
-      const color = transcriptColor(entry)
-      rows.push(
-        ` ${theme.fg(color, SQUARE)} ${theme.bold(theme.fg(color, label))}`,
-      )
-      const contentWidth = Math.max(8, width - 4)
+      if (entry.role === "assistant" || entry.role === "thinking") {
+        const text = terminalText(entry.text).trim()
 
-      const styled = theme.fg(
-        entry.role === "thinking" ? "dim" : entry.isError ? "error" : "text",
-        entry.text,
-      )
+        if (text) {
+          const markdown = new Markdown(text, 0, 0, getMarkdownTheme()).render(
+            contentWidth,
+          )
 
-      for (const line of wrapTextWithAnsi(styled, contentWidth)) {
-        rows.push(`   ${line}`)
+          for (const line of markdown) {
+            rows.push(
+              truncateToWidth(
+                `${GUTTER}${entry.role === "thinking" ? theme.fg("muted", theme.italic(line)) : line}`,
+                width,
+              ),
+            )
+          }
+        }
+      } else {
+        const text = terminalText(entry.text).trim()
+        const prefix =
+          entry.role === "user"
+            ? `${theme.fg("accent", "›")} `
+            : entry.role === "tool"
+              ? `${theme.fg("warning", "·")} `
+              : `${theme.fg(entry.isError ? "error" : "success", entry.isError ? "✕" : "✓")} `
+        const label = entry.role === "tool" ? oneLine(entry.name ?? "tool") : ""
+        const body =
+          entry.role === "tool"
+            ? `${theme.fg("toolTitle", theme.bold(label))}${text ? ` ${theme.fg("toolOutput", text)}` : ""}`
+            : theme.fg(entry.isError ? "error" : "dim", text)
+        const wrapped = wrapTextWithAnsi(
+          body,
+          Math.max(1, width - GUTTER.length - visibleWidth(prefix)),
+        )
+
+        for (let index = 0; index < wrapped.length; index++) {
+          const lead = index === 0 ? prefix : " ".repeat(visibleWidth(prefix))
+          rows.push(truncateToWidth(`${GUTTER}${lead}${wrapped[index]}`, width))
+        }
       }
 
-      rows.push("")
+      if (rows.length > 0 && rows.at(-1) !== "") rows.push("")
     }
+
+    while (rows.length > 0 && rows.at(-1) === "") rows.pop()
 
     return rows
   }
@@ -1104,106 +1116,57 @@ export class WorkflowDashboard {
     height: number,
   ): string[] {
     const theme = this.theme
-    const lines: string[] = []
-
-    const right = theme.fg(
-      "dim",
-      [
-        agent.model,
-        agentContext(agent),
-        formatElapsed(agent.startedAt, agent.finishedAt),
-      ]
-        .filter(Boolean)
-        .join(" · ") + " ",
-    )
-
-    lines.push(
-      this.split(
-        ` ${stateSquare(agent.state, theme)} ${theme.bold(theme.fg("accent", agent.label))}`,
-        right,
-        width,
-      ),
-    )
-    lines.push(
-      this.split(
-        ` ${theme.fg("muted", `${details.name ?? details.runId} · ${agent.phase ?? "unphased"}`)}`,
-        theme.fg("dim", `${agent.transcript.length} entries `),
-        width,
-      ),
-    )
-
-    const panelHeight = height - 3
-    const bodyHeight = Math.max(1, panelHeight - 2)
-    const rows = this.transcriptRows(agent, width - 2)
+    const rows = this.transcriptRows(agent, width)
+    const headerHeight = height >= 4 ? 2 : 1
+    const bodyHeight = Math.max(0, height - headerHeight - 1)
     this.transcriptRowCount = rows.length
     this.transcriptViewportSize = bodyHeight
     const maxScroll = Math.max(0, rows.length - bodyHeight)
     this.transcriptScroll = Math.min(this.transcriptScroll, maxScroll)
-
     const visible = rows.slice(
       this.transcriptScroll,
       this.transcriptScroll + bodyHeight,
     )
+    const last = Math.min(rows.length, this.transcriptScroll + bodyHeight)
+    const position = `${rows.length ? this.transcriptScroll + 1 : 0}-${last}/${rows.length}`
+    const header = `${GUTTER}${stateGlyph(agent.state, theme)} ${theme.bold(theme.fg("accent", oneLine(agent.label)))}`
+    const metadata = [
+      oneLine(details.name ?? details.runId),
+      oneLine(agent.phase ?? "unphased"),
+      oneLine(agent.model ?? ""),
+      agentContext(agent),
+      formatUsage(agent.usage),
+      formatElapsed(agent.startedAt, agent.finishedAt),
+      `${agent.transcript.length} entries`,
+      `Transcript ${position}`,
+    ]
+      .filter(Boolean)
+      .join(" · ")
+    const headers = [header]
 
-    const position =
-      rows.length > bodyHeight
-        ? `Transcript · ${this.transcriptScroll + 1}-${Math.min(rows.length, this.transcriptScroll + bodyHeight)}/${rows.length}`
-        : "Transcript"
+    if (headerHeight === 2)
+      headers.push(
+        truncateToWidth(`${GUTTER}${theme.fg("muted", metadata)}`, width),
+      )
 
-    lines.push(...this.panel(position, visible, width, panelHeight))
-    lines.push(
-      this.hintLine(
-        "j/k scroll · ctrl-u/d page · g/G top/bottom · h/left/esc back",
-        width,
-      ),
-    )
+    while (visible.length < bodyHeight) visible.push("")
 
-    return lines
+    const hint = `${this.keys("tui.select.up")}/${this.keys("tui.select.down")}/jk scroll · ctrl-u/d page · g/G top/bottom · h/${this.keys("tui.editor.cursorLeft")}/${this.keys("tui.select.cancel")} back`
+
+    return [...headers, ...visible, this.hintLine(hint, width)]
   }
 }
 
-function transcriptLabel(entry: TranscriptEntry): string {
-  if (entry.role === "user") return "USER"
+function groupGlyph(group: PhaseGroup, theme: Theme): string {
+  if (group.agents.some((agent) => agent.state === "running"))
+    return stateGlyph("running", theme)
 
-  if (entry.role === "assistant") return "ASSISTANT"
+  if (group.agents.some((agent) => agent.state === "error"))
+    return stateGlyph("error", theme)
 
-  if (entry.role === "thinking") return "THINKING"
-
-  if (entry.role === "tool") return `TOOL ${entry.name ?? "unknown"}`
-
-  return `RESULT ${entry.name ?? "unknown"}`
-}
-
-function transcriptColor(
-  entry: TranscriptEntry,
-): "accent" | "success" | "dim" | "warning" | "error" | "muted" {
-  if (entry.isError) return "error"
-
-  if (entry.role === "user") return "accent"
-
-  if (entry.role === "assistant") return "success"
-
-  if (entry.role === "thinking") return "dim"
-
-  if (entry.role === "tool") return "warning"
-
-  return "muted"
-}
-
-function statusSquareFor(details: WorkflowDetails, theme: Theme): string {
-  return theme.fg(statusColor(details.status), SQUARE)
-}
-
-function groupSquare(group: PhaseGroup, theme: Theme): string {
-  if (group.agents.length === 0) return theme.fg("dim", SQUARE)
-
-  if (group.agents.some((a) => a.state === "running"))
-    return theme.fg("warning", SQUARE)
-
-  if (group.agents.some((a) => a.state === "error"))
-    return theme.fg("error", SQUARE)
-
-  return theme.fg("success", SQUARE)
+  return group.agents.length === 0
+    ? theme.fg("dim", "·")
+    : stateGlyph("done", theme)
 }
 
 /** Open the dashboard as a full-screen overlay. */
