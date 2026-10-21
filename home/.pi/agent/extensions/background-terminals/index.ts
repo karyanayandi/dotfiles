@@ -9,7 +9,7 @@
  * - bg_list: list all tracked terminals (running and settled).
  * - bg_kill: SIGTERM→SIGKILL the whole process tree; returns final state.
  *
- * While ≥1 process runs, a one-line widget above the editor shows
+ * While ≥1 process runs, the footer status shows
  * "N background terminal(s) running • /ps to view". `/ps` opens a two-stage
  * full-screen overlay (list → read-only detail with stdout/stderr toggle).
  *
@@ -60,7 +60,7 @@ import {
 import { sanitizeText } from "./src/ui/output-view.ts"
 import { openTerminalPicker } from "./src/ps.ts"
 
-const WIDGET_KEY = "background-terminals"
+const STATUS_KEY = "background-terminals"
 
 interface TerminalResultDetails {
   id?: string
@@ -85,8 +85,8 @@ export default function (pi: ExtensionAPI) {
     managerPromise ??= Promise.resolve(getRuntime().manager).then((manager) => {
       manager.view.setOnSettled(onSettled)
       unsubStatus?.()
-      unsubStatus = manager.view.subscribe(() => updateWidget(manager))
-      updateWidget(manager)
+      unsubStatus = manager.view.subscribe(() => updateStatus(manager))
+      updateStatus(manager)
 
       return manager
     })
@@ -94,14 +94,9 @@ export default function (pi: ExtensionAPI) {
     return managerPromise
   }
 
-  /** One-line widget directly above the editor, only while ≥1 is running.
-   * Called on every manager notification (including per-output-chunk), so it
-   * only touches setWidget when running count changes. Replacing widget factory
-   * hundreds of times a second would churn component creation for no visible
-   * difference. */
-  let widgetRunning = 0
+  let statusTimer: ReturnType<typeof setInterval> | undefined
 
-  const updateWidget = (manager: TerminalManager) => {
+  const updateStatus = (manager: TerminalManager) => {
     if (!ui) return
 
     try {
@@ -109,33 +104,34 @@ export default function (pi: ExtensionAPI) {
         .list()
         .filter((snap) => snap.status === "running").length
 
-      if (running === widgetRunning) return
-      widgetRunning = running
+      if (running > 0 && statusTimer === undefined) {
+        statusTimer = setInterval(
+          () => updateStatus(manager),
+          ACTIVITY_FRAME_MS,
+        )
+      } else if (running === 0 && statusTimer !== undefined) {
+        clearInterval(statusTimer)
+        statusTimer = undefined
+      }
 
       if (running === 0) {
-        ui.setWidget(WIDGET_KEY, undefined)
+        ui.setStatus(STATUS_KEY, undefined)
 
         return
       }
 
-      ui.setWidget(WIDGET_KEY, (tui, theme) => {
-        const ticker = setInterval(() => tui.requestRender(), ACTIVITY_FRAME_MS)
-
-        return {
-          render: () => [
-            activityIndicator(theme, "running") +
-              theme.fg(
-                "text",
-                ` ${running} background terminal${running === 1 ? "" : "s"} running`,
-              ) +
-              theme.fg("dim", " • ") +
-              theme.fg("accent", "/ps") +
-              theme.fg("dim", " to view"),
-          ],
-          invalidate: () => undefined,
-          dispose: () => clearInterval(ticker),
-        }
-      })
+      const theme = ui.theme
+      ui.setStatus(
+        STATUS_KEY,
+        activityIndicator(theme, "running") +
+          theme.fg(
+            "text",
+            ` ${running} background terminal${running === 1 ? "" : "s"} running`,
+          ) +
+          theme.fg("dim", " • ") +
+          theme.fg("accent", "/ps") +
+          theme.fg("dim", " to view"),
+      )
     } catch {
       // UI may be unavailable (print/RPC modes or teardown).
     }
@@ -219,14 +215,15 @@ export default function (pi: ExtensionAPI) {
     resultDelivery.clear()
     unsubStatus?.()
     unsubStatus = undefined
+    clearInterval(statusTimer)
+    statusTimer = undefined
 
     try {
-      ui?.setWidget(WIDGET_KEY, undefined)
+      ui?.setStatus(STATUS_KEY, undefined)
     } catch {
       // UI may already be gone.
     }
 
-    widgetRunning = 0
     ui = undefined
     const closing = runtime
     runtime = undefined

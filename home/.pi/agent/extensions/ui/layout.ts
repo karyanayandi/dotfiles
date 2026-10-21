@@ -1,4 +1,8 @@
-import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui"
+import {
+  truncateToWidth,
+  visibleWidth,
+  wrapTextWithAnsi,
+} from "@earendil-works/pi-tui"
 
 // SAFETY: Remove C0/C1 controls and bidi overrides from untrusted model IDs and git branches before terminal rendering.
 const unsafeTerminalCharacters =
@@ -65,21 +69,64 @@ export function addBorderLabels(
 export function renderExtensionStatuses(
   statuses: ReadonlyMap<string, string>,
   width: number,
+  dim?: (text: string) => string,
 ) {
   if (width <= 0) return []
 
-  const line = [...statuses.entries()]
+  const entries = [...statuses.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, text]) =>
-      text
-        .replace(/[\r\n\t]/g, " ")
-        .replace(/ +/g, " ")
-        .trim(),
+    .map(
+      ([key, text]) =>
+        [
+          key,
+          text
+            .replace(/[\r\n\t]/g, " ")
+            .replace(/ +/g, " ")
+            .replace(/ to view/g, " ↗")
+            .replace(/[·•↗]/g, (symbol) => dim?.(symbol) ?? symbol)
+            .trim(),
+        ] as const,
     )
-    .filter(Boolean)
-    .join(" ")
+    .filter(([, text]) => Boolean(text))
+  const full = entries.map(([, text]) => text).join("    ")
 
-  return line ? [truncateToWidth(line, width, "…")] : []
+  if (!full) return []
+  if (visibleWidth(full) <= width) return [full]
+
+  const compact = entries.map(([key, text]) => {
+    if (key === "background-terminals") {
+      text = `>_  ${text.replace(/ background terminals? running/g, "")}`
+    } else if (key === "subagents") {
+      text = text.replace("subagents:", "⌘  ")
+    } else if (key === "workflows") {
+      text = text.replace("workflows:", "⑂  ")
+    } else {
+      return text
+    }
+
+    return text.replace(/ (?:running|done|failed)\b/g, "")
+  })
+
+  const lines: string[] = []
+  let row = ""
+
+  for (const entry of compact) {
+    const next = row ? `${row}    ${entry}` : entry
+
+    if (visibleWidth(next) <= width) {
+      row = next
+      continue
+    }
+
+    if (row) lines.push(row)
+    const wrapped = wrapTextWithAnsi(entry, width)
+    row = wrapped.pop() ?? ""
+    lines.push(...wrapped)
+  }
+
+  if (row) lines.push(row)
+
+  return lines
 }
 
 export function addBottomLabel(

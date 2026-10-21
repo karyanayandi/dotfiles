@@ -42,10 +42,11 @@ class EmptyFooter implements Component {
 class MinimalFooter implements Component {
   constructor(
     private readonly getStatuses: () => ReadonlyMap<string, string>,
+    private readonly dim: (text: string) => string,
   ) {}
 
   render(width: number) {
-    return renderExtensionStatuses(this.getStatuses(), width)
+    return renderExtensionStatuses(this.getStatuses(), width, this.dim)
   }
 
   invalidate(): void {
@@ -221,8 +222,11 @@ export default function ui(pi: ExtensionAPI) {
       // Minimal replaces pi footer. Keep extension activity indicators in one
       // row.
       ctx.ui.setFooter(
-        (_tui, _theme, footerData) =>
-          new MinimalFooter(() => footerData.getExtensionStatuses()),
+        (_tui, theme, footerData) =>
+          new MinimalFooter(
+            () => footerData.getExtensionStatuses(),
+            (text) => theme.fg("dim", text),
+          ),
       )
     } else {
       ctx.ui.setFooter(layout === "off" ? undefined : () => new EmptyFooter())
