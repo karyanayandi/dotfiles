@@ -4,72 +4,41 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { getAgentDir } from "@earendil-works/pi-coding-agent"
 import {
-  BACKEND_NAMES,
   type JsonValue,
-  type JsonRecord,
   REASONING_EFFORTS,
-  type BackendName,
   type ReasoningEffort,
 } from "./domain.ts"
 
 const configPath = join(getAgentDir(), "subagent-defaults.json")
 
 export interface SubagentDefaults {
-  readonly harness: BackendName
-  readonly models: Partial<Record<BackendName, string>>
-  readonly reasoningEfforts: Partial<Record<BackendName, ReasoningEffort>>
+  model?: string
+  reasoningEffort?: ReasoningEffort
 }
 
-export const DEFAULT_SUBAGENT_DEFAULTS: SubagentDefaults = {
-  harness: "pi",
-  models: {},
-  reasoningEfforts: {},
-}
+export const DEFAULT_SUBAGENT_DEFAULTS: SubagentDefaults = {}
 
-function isRecord(value: JsonValue): value is JsonRecord {
-  return v.is(jsonRecordSchema, value)
-}
+export function parseSubagentDefaults(value: JsonValue): SubagentDefaults {
+  if (!v.is(jsonRecordSchema, value)) return DEFAULT_SUBAGENT_DEFAULTS
 
-function isBackendName(value: JsonValue): value is BackendName {
-  return v.is(v.picklist(BACKEND_NAMES), value)
-}
+  const model =
+    value.model ??
+    (v.is(jsonRecordSchema, value.models) ? value.models.pi : undefined)
 
-function isReasoningEffort(value: JsonValue): value is ReasoningEffort {
-  return v.is(v.picklist(REASONING_EFFORTS), value)
-}
+  const reasoningEffort =
+    value.reasoningEffort ??
+    (v.is(jsonRecordSchema, value.reasoningEfforts)
+      ? value.reasoningEfforts.pi
+      : undefined)
 
-export function parseSubagentDefaults(value: JsonValue) {
-  if (!isRecord(value) || !isBackendName(value.harness)) {
-    return DEFAULT_SUBAGENT_DEFAULTS
-  }
+  const defaults: SubagentDefaults = {}
 
-  const modelValues = value.models
+  if (v.is(v.string(), model) && model.trim()) defaults.model = model.trim()
 
-  const models = isRecord(modelValues)
-    ? Object.fromEntries(
-        BACKEND_NAMES.flatMap((harness) => {
-          const model = modelValues[harness]
+  if (v.is(v.picklist(REASONING_EFFORTS), reasoningEffort))
+    defaults.reasoningEffort = reasoningEffort
 
-          return v.is(v.string(), model) && model.trim()
-            ? [[harness, model.trim()]]
-            : []
-        }),
-      )
-    : {}
-
-  const reasoningEffortValues = value.reasoningEfforts
-
-  const reasoningEfforts = isRecord(reasoningEffortValues)
-    ? Object.fromEntries(
-        BACKEND_NAMES.flatMap((harness) => {
-          const effort = reasoningEffortValues[harness]
-
-          return isReasoningEffort(effort) ? [[harness, effort]] : []
-        }),
-      )
-    : {}
-
-  return { harness: value.harness, models, reasoningEfforts }
+  return defaults
 }
 
 export function loadSubagentDefaults() {

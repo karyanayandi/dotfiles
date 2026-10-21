@@ -1,26 +1,18 @@
 /**
  * Domain model for subagents.
  *
- * Everything downstream of a backend (manager, tools, UI) speaks only these
- * types. Backends translate their native streams (pi session events, Codex
- * app-server JSON-RPC notifications) into the normalized `SubagentEvent` union.
+ * Everything downstream of the Pi backend speaks only these types. Pi session
+ * events become the normalized `SubagentEvent` union.
  */
 
 import type { ModelRegistry } from "@earendil-works/pi-coding-agent"
 
-export const BACKEND_NAMES = ["pi", "codex"] as const
-
-export type BackendName = (typeof BACKEND_NAMES)[number]
+export type BackendName = "pi"
 
 /** Who initiated the session. User asides stay out of model-facing tooling. */
 export type SubagentOrigin = "model" | "btw"
 
-/**
- * Shared reasoning-effort scale (pi's thinking levels). Each backend maps a
- * value to its nearest native equivalent: pi uses it directly and Codex
- * translates it to its reasoning-effort slugs. Omitted = backend default
- * (pi inherits the parent level).
- */
+/** Pi's thinking levels. Omitted = Pi's default (inherits the parent level). */
 export const REASONING_EFFORTS = [
   "off",
   "minimal",
@@ -52,13 +44,9 @@ export interface SpawnTask {
   readonly prompt: string
   readonly title: string
   readonly cwd: string
-  /**
-   * Generic model hint, interpreted per backend:
-   * pi: "provider/model-id" or bare model id; codex: model slug.
-   * Omitted = backend default / inherit.
-   */
+  /** Pi model hint: "provider/model-id" or bare model id. Omitted = default / inherit. */
   readonly model?: string
-  /** Shared effort scale; each backend maps it to its native equivalent. */
+  /** Pi thinking level. */
   readonly reasoningEffort?: ReasoningEffort
   readonly parent: ParentContext
 }
@@ -69,10 +57,8 @@ export interface SubagentMeta {
   readonly modelLabel?: string
   /** Context window capacity for utilization display, when known. */
   readonly contextWindow?: number
-  /** pi session file / Codex rollout path. */
+  /** Pi session file path. */
   readonly sessionFilePath?: string
-  /** Codex conversation id. */
-  readonly nativeSessionId?: string
 }
 
 // --- Transcript ------------------------------------------------------------

@@ -174,11 +174,7 @@ export interface CancelResult {
 }
 
 export interface SubagentManager {
-  spawn(
-    backend: BackendName,
-    task: SpawnTask,
-    signal?: AbortSignal,
-  ): Promise<SubagentSnapshot>
+  spawn(task: SpawnTask, signal?: AbortSignal): Promise<SubagentSnapshot>
   waitFor(
     ids: readonly string[],
     onPending?: (pending: string[]) => void,
@@ -196,7 +192,7 @@ export interface SubagentManager {
 }
 
 export function createSubagentManager(
-  registry: ReadonlyMap<BackendName, SubagentBackend>,
+  backend: SubagentBackend,
 ): SubagentManager {
   const entries = new Map<string, Entry>()
   const waitInterest = new Map<string, number>()
@@ -496,11 +492,7 @@ export function createSubagentManager(
     }
   }
 
-  const spawn = async (
-    backendName: BackendName,
-    task: SpawnTask,
-    signal?: AbortSignal,
-  ) => {
+  const spawn = async (task: SpawnTask, signal?: AbortSignal) => {
     throwIfAborted(signal)
 
     if (disposed)
@@ -513,16 +505,9 @@ export function createSubagentManager(
     reserved++
 
     try {
-      const backend = registry.get(backendName)
-
-      if (!backend)
-        throw new BackendUnavailableError({
-          message: `Unknown backend "${backendName}".`,
-        })
-
       if (!(await raceAbort(backend.available(), signal)))
         throw new BackendUnavailableError({
-          message: `Backend "${backendName}" is not available on this machine (binary/SDK/credentials missing).`,
+          message: `Backend "${backend.name}" is not available on this machine (SDK/credentials missing).`,
         })
 
       const session = await raceAbort(
@@ -551,7 +536,7 @@ export function createSubagentManager(
         snapshot: {
           id,
           origin,
-          backend: backendName,
+          backend: backend.name,
           title: task.title,
           prompt: task.prompt,
           cwd: task.cwd,

@@ -1,9 +1,7 @@
 /** Promise entry points for subagent tools. */
 
 import type { SubagentBackend } from "./backend.ts"
-import { codexBackend } from "./backends/codex.ts"
 import { piBackend } from "./backends/pi.ts"
-import type { BackendName } from "./domain.ts"
 import { createSubagentManager, type SubagentManager } from "./manager.ts"
 
 export interface SubagentRuntime {
@@ -12,13 +10,9 @@ export interface SubagentRuntime {
 }
 
 export function createSubagentRuntime(
-  backends: readonly SubagentBackend[] = [piBackend, codexBackend],
+  backend: SubagentBackend = piBackend,
 ): SubagentRuntime {
-  const registry = new Map<BackendName, SubagentBackend>(
-    backends.map((backend) => [backend.name, backend]),
-  )
-
-  const manager = createSubagentManager(registry)
+  const manager = createSubagentManager(backend)
 
   return { manager, dispose: () => manager.disposeAll() }
 }

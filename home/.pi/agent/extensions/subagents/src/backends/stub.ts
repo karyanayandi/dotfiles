@@ -95,7 +95,6 @@ async function makeStubSession(
       modelLabel: task.model ?? profile.defaultModelLabel,
       contextWindow: profile.contextWindow,
       sessionFilePath: sessionFile,
-      nativeSessionId: sessionId,
     } satisfies SubagentMeta,
     pending: [],
     turnCount: 0,

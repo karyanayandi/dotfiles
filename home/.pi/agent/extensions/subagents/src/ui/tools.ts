@@ -14,19 +14,14 @@ export function subagentToolRenderers(name: string) {
   return {
     renderShell: "self" as const,
     renderCall(
-      args: { name?: string; id?: string; ids?: string[]; harness?: string },
+      args: { name?: string; id?: string; ids?: string[] },
       theme: Theme,
     ) {
       const subject = args.name ?? args.id ?? args.ids?.join(", ") ?? ""
 
       const text =
         theme.fg("toolTitle", theme.bold(name)) +
-        (subject
-          ? ` ${theme.fg("accent", sanitizeTerminalText(subject))}`
-          : "") +
-        (args.harness
-          ? theme.fg("muted", ` ${sanitizeTerminalText(args.harness)}`)
-          : "")
+        (subject ? ` ${theme.fg("accent", sanitizeTerminalText(subject))}` : "")
 
       return new SubagentToolText(text, 0, 0)
     },

@@ -1,23 +1,4 @@
-/**
- * Subagents. spawn background subagents on one of three backends
- * (pi, Codex) unified behind one promise-based interface.
- *
- * Tools (for the parent LLM):
- * - subagent_spawn: fire-and-forget spawn (prompt, title, agent, working_dir,
- *   model, reasoning_effort). Max 4 running at once across all backends.
- * - subagent_wait: block until the listed subagents settle, return results.
- * - subagent_cancel: stop one or more running subagents.
- * - subagent_check: peek at a subagent's status and recent activity.
- * - subagent_list: list all subagents.
- *
- * Unawaited subagents queue their result as a follow-up message when they
- * settle. `/subagents` opens a picker + full interactive takeover view.
- *
- * Architecture: promises throughout (backends -> manager -> runtime). All
- * backends are real: pi runs
- * in-process SDK sessions; Codex speaks JSON-RPC to a scoped `codex app-server`
- * process.
- */
+/** Background Pi SDK sessions run in this process with separate context windows. */
 
 import * as fs from "node:fs"
 import * as path from "node:path"
@@ -44,7 +25,6 @@ import { pick } from "model-shortcuts/src/picker.ts"
 import { deriveBtwTitle, isModelVisible } from "./src/by-the-way.ts"
 import { loadSubagentDefaults, saveSubagentDefaults } from "./src/defaults.ts"
 import {
-  BACKEND_NAMES,
   formatElapsed,
   latestText,
   REASONING_EFFORTS,
@@ -277,8 +257,7 @@ export default function (pi: ExtensionAPI) {
     const closing = runtime
     runtime = undefined
     managerPromise = undefined
-    // Disposing the runtime runs the manager finalizer, which tears down all
-    // subagent scopes (and, later, their real child processes).
+    // Dispose child SDK sessions before the parent runtime closes.
     await closing?.dispose()
   })
 
@@ -300,12 +279,6 @@ export default function (pi: ExtensionAPI) {
         name: v.pipe(
           v.string(),
           v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.name),
-        ),
-        harness: v.optional(
-          v.pipe(
-            v.picklist(BACKEND_NAMES),
-            v.description(SUBAGENT_SPAWN_PARAMETER_DESCRIPTIONS.harness),
-          ),
         ),
         working_dir: v.optional(
           v.pipe(
@@ -332,11 +305,10 @@ export default function (pi: ExtensionAPI) {
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       const manager = await getManager()
       const defaults = loadSubagentDefaults()
-      const harness = params.harness ?? defaults.harness
-      const model = params.model ?? defaults.models[harness]
+      const model = params.model ?? defaults.model
 
       const reasoningEffort =
-        params.reasoning_effort ?? defaults.reasoningEfforts[harness]
+        params.reasoning_effort ?? defaults.reasoningEffort
 
       const cwd = path.resolve(ctx.cwd, params.working_dir ?? ".")
 
@@ -348,7 +320,6 @@ export default function (pi: ExtensionAPI) {
 
       const snap = await runTool(
         manager.spawn(
-          harness,
           {
             prompt: params.prompt,
             title,
@@ -381,7 +352,6 @@ export default function (pi: ExtensionAPI) {
             text: buildSubagentSpawnResult({
               id: snap.id,
               title: snap.title,
-              harness,
               modelLabel: snap.meta.modelLabel ?? "?",
               cwd,
             }),
@@ -391,7 +361,6 @@ export default function (pi: ExtensionAPI) {
           id: snap.id,
           title: snap.title,
           cwd,
-          harness,
           model: snap.meta.modelLabel,
         },
       }
@@ -646,7 +615,6 @@ export default function (pi: ExtensionAPI) {
           subagents: subs.map((snap) => ({
             id: snap.id,
             title: snap.title,
-            harness: snap.backend,
             status: snap.status,
           })),
         },
@@ -801,7 +769,7 @@ export default function (pi: ExtensionAPI) {
 
     try {
       snap = await runTool(
-        manager.spawn("pi", {
+        manager.spawn({
           origin: "btw",
           prompt,
           title: deriveBtwTitle(prompt),
@@ -838,7 +806,8 @@ export default function (pi: ExtensionAPI) {
   })
 
   pi.registerCommand("subagent-defaults", {
-    description: "Configure default harness and model for subagents",
+    description:
+      "Configure default Pi model and reasoning effort for subagents",
     handler: async (_args, ctx) => {
       if (ctx.mode !== "tui") {
         if (ctx.hasUI)
@@ -852,66 +821,27 @@ export default function (pi: ExtensionAPI) {
 
       const current = loadSubagentDefaults()
 
-      const selectedHarness = await ctx.ui.select(
-        `Default subagent harness (current: ${current.harness})`,
-        [...BACKEND_NAMES],
-      )
+      const models = ctx.modelRegistry
+        .getAvailable()
+        .filter((candidate) => candidate.provider !== "anthropic")
+        .map((candidate) => `${candidate.provider}/${candidate.id}`)
+        .sort((left, right) => left.localeCompare(right))
 
-      const harness = BACKEND_NAMES.find((name) => name === selectedHarness)
+      const selected = await pick(ctx, "Pi subagent model", [
+        {
+          value: "",
+          label: "Inherit parent model",
+          description: "Use current parent model",
+        },
+        ...models.map((value) => ({ value, label: value })),
+      ])
 
-      if (!harness) return
-
-      let model: string | undefined
-
-      if (harness === "pi") {
-        const models = ctx.modelRegistry
-          .getAvailable()
-          .filter((candidate) => candidate.provider !== "anthropic")
-          .map((candidate) => `${candidate.provider}/${candidate.id}`)
-          .sort((left, right) => left.localeCompare(right))
-
-        const selected = await pick(ctx, "Pi subagent model", [
-          {
-            value: "",
-            label: "Inherit parent model",
-            description: "Use current parent model",
-          },
-          ...models.map((value) => ({ value, label: value })),
-        ])
-
-        if (selected === null) return
-        model = selected.length > 0 ? selected : undefined
-      } else {
-        const selected = await ctx.ui.select("Codex subagent model", [
-          "Use Codex CLI default",
-          "gpt-6.1-sol",
-          "gpt-6-luna",
-          "Custom…",
-        ])
-
-        if (!selected) return
-
-        if (selected === "Custom…") {
-          const custom = await ctx.ui.input(
-            "Codex model",
-            current.models.codex ?? "gpt-6.1-sol",
-          )
-
-          if (!custom?.trim()) return
-          model = custom.trim()
-        } else if (selected !== "Use Codex CLI default") {
-          model = selected
-        }
-      }
+      if (selected === null) return
+      const model = selected.length > 0 ? selected : undefined
 
       const selectedEffort = await ctx.ui.select(
-        `Subagent reasoning effort (current: ${current.reasoningEfforts[harness] ?? "default"})`,
-        [
-          harness === "pi"
-            ? "Inherit parent reasoning effort"
-            : "Use Codex CLI default",
-          ...REASONING_EFFORTS,
-        ],
+        `Subagent reasoning effort (current: ${current.reasoningEffort ?? "inherit parent"})`,
+        ["Inherit parent reasoning effort", ...REASONING_EFFORTS],
       )
 
       if (!selectedEffort) return
@@ -920,17 +850,9 @@ export default function (pi: ExtensionAPI) {
         (effort) => effort === selectedEffort,
       )
 
-      const models = { ...current.models }
-
-      if (model) models[harness] = model
-      else delete models[harness]
-      const reasoningEfforts = { ...current.reasoningEfforts }
-
-      if (reasoningEffort) reasoningEfforts[harness] = reasoningEffort
-      else delete reasoningEfforts[harness]
-      saveSubagentDefaults({ harness, models, reasoningEfforts })
+      saveSubagentDefaults({ model, reasoningEffort })
       ctx.ui.notify(
-        `Subagent defaults: ${harness} · ${model ?? (harness === "pi" ? "inherit parent model" : "Codex CLI default")} · ${reasoningEffort ?? "default effort"}`,
+        `Subagent defaults: ${model ?? "inherit parent model"} · ${reasoningEffort ?? "inherit parent reasoning effort"}`,
         "info",
       )
     },
