@@ -17,10 +17,16 @@ import {
   visibleWidth,
 } from "@earendil-works/pi-tui"
 import { TuiMainScreen } from "@earendil-works/pi-tui/dist/tui-main-screen.js"
+import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
 import { theme } from "../subagents/test-theme.ts"
-import { WorkflowDashboard, loadRunEntries } from "./dashboard.ts"
+import {
+  WorkflowDashboard,
+  loadRunEntries,
+  normalizeDetails,
+} from "./dashboard.ts"
+import type { WorkflowDetails } from "./model.ts"
 
-function workflowArtifact() {
+function workflowArtifact(status: "completed" | "running" = "completed") {
   const transcript = [
     {
       role: "user",
@@ -41,7 +47,7 @@ function workflowArtifact() {
 
   return {
     sessionId: "fixture-session",
-    status: "completed",
+    status,
     startedAt: 1_000,
     finishedAt: 61_000,
     name: "Build plan 界",
@@ -53,7 +59,7 @@ function workflowArtifact() {
         index: 1,
         label: "planner 界",
         phase: "Gather",
-        state: "done",
+        state: status === "running" ? "running" : "done",
         model: "gpt-5",
         contextWindow: 128_000,
         startedAt: 2_000,
@@ -100,7 +106,11 @@ function workflowArtifact() {
   }
 }
 
-function createDashboardHarness(includeRuns = true) {
+function createDashboardHarness(
+  includeRuns = true,
+  active = new Map<string, WorkflowDetails>(),
+  displayTheme = theme,
+) {
   const directory = mkdtempSync(join(tmpdir(), "pi-workflow-dashboard-ui-"))
   const previous = process.env.PI_CODING_AGENT_DIR
   process.env.PI_CODING_AGENT_DIR = directory
@@ -131,12 +141,15 @@ function createDashboardHarness(includeRuns = true) {
   }
 
   const tui = new TuiMainScreen(new ProcessTerminal())
-  tui.requestRender = () => undefined
+  const renderRequests = { count: 0 }
+  tui.requestRender = () => {
+    renderRequests.count++
+  }
   const dashboard = new WorkflowDashboard(
     tui,
-    theme,
+    displayTheme,
     new KeybindingsManager(TUI_KEYBINDINGS),
-    () => new Map(),
+    () => active,
     "fixture-session",
     new Set(),
     () => undefined,
@@ -146,6 +159,7 @@ function createDashboardHarness(includeRuns = true) {
     dashboard,
     tui,
     directory,
+    renderRequests,
     dispose() {
       dashboard.dispose()
       if (previous === undefined) delete process.env.PI_CODING_AGENT_DIR
@@ -164,6 +178,44 @@ function setRows(tui: TuiMainScreen, rows: number) {
 
 function plainText(dashboard: WorkflowDashboard, width = 80) {
   return dashboard.render(width).map(stripVTControlCharacters).join("\n")
+}
+
+function selectedStyleTheme() {
+  return new Proxy(theme, {
+    get(target, property, receiver) {
+      if (property === "bg")
+        return (color: Parameters<typeof target.bg>[0], text: string) =>
+          color === "selectedBg"
+            ? `\u001b[44m${text}\u001b[49m`
+            : target.bg(color, text)
+
+      if (property === "fg")
+        return (color: Parameters<typeof target.fg>[0], text: string) =>
+          color === "accent"
+            ? `\u001b[35m${text}\u001b[39m`
+            : target.fg(color, text)
+
+      if (property === "bold")
+        return (text: string) => `\u001b[1m${text}\u001b[22m`
+
+      return Reflect.get(target, property, receiver)
+    },
+  })
+}
+
+function assertSelectedRow(dashboard: WorkflowDashboard, text: string) {
+  const row = dashboard
+    .render(80)
+    .find(
+      (line) =>
+        line.includes("\u001b[44m") &&
+        stripVTControlCharacters(line).includes(text),
+    )
+
+  assert.ok(row, `missing selected row containing ${text}`)
+  assert.match(row, /\u001b\[44m/)
+  assert.match(row, /\u001b\[1m/)
+  assert.match(row, /\u001b\[35m/)
 }
 
 function assertScreen(
@@ -271,7 +323,7 @@ test("dashboard loads legacy artifacts, filters sessions, and recovers stale run
 })
 
 test("workflow screens stay borderless, bounded, and fixed-height", () => {
-  const harness = createDashboardHarness()
+  const harness = createDashboardHarness(true, new Map(), selectedStyleTheme())
   const { dashboard, tui } = harness
 
   try {
@@ -283,11 +335,14 @@ test("workflow screens stay borderless, bounded, and fixed-height", () => {
 
     const list = plainText(dashboard)
     assert.match(list, /^  Workflows/m)
-    assert.match(list, /› ✓ Build plan 界/)
+    assert.match(list, /✓ Build plan 界/)
+    assert.doesNotMatch(list, /›/)
     assert.doesNotMatch(list, /■/)
+    assertSelectedRow(dashboard, "Build plan 界")
     setRows(tui, 4)
     const shortList = dashboard.render(80).map(stripVTControlCharacters)
-    assert.match(shortList.join("\n"), /› ✓ Build plan 界/)
+    assert.match(shortList.join("\n"), /✓ Build plan 界/)
+    assert.doesNotMatch(shortList.join("\n"), /›/)
     assert.match(shortList.at(-1) ?? "", /select/)
 
     dashboard.handleInput("\r")
@@ -298,31 +353,70 @@ test("workflow screens stay borderless, bounded, and fixed-height", () => {
     }
 
     const detail = plainText(dashboard)
+    assert.match(detail, /Workflow · Build plan 界/)
     assert.match(detail, /Gather/)
     assert.match(detail, /planner 界/)
     assert.match(detail, /Verify/)
     assert.match(detail, /gpt-5/)
     assert.match(detail, /1\.2k in/)
+    assert.doesNotMatch(detail, /›/)
+    assertSelectedRow(dashboard, "Gather")
     setRows(tui, 4)
     const shortDetail = dashboard.render(80).map(stripVTControlCharacters)
-    assert.match(shortDetail.join("\n"), /› .*Gather/)
+    assert.match(shortDetail.join("\n"), /Gather/)
+    assert.doesNotMatch(shortDetail.join("\n"), /›/)
     assert.match(shortDetail.at(-1) ?? "", /back/)
   } finally {
     harness.dispose()
   }
 })
 
+test("running workflow indicators animate and request live renders", async () => {
+  const activeWorkflow = normalizeDetails(
+    "wf_fixture",
+    workflowArtifact("running"),
+  )
+  assert.ok(activeWorkflow)
+
+  const originalNow = Date.now
+  let now = 0
+  Date.now = () => now
+  const harness = createDashboardHarness(
+    true,
+    new Map([["wf_fixture", activeWorkflow]]),
+  )
+  setRows(harness.tui, 24)
+
+  try {
+    assert.match(plainText(harness.dashboard), /◜ Build plan 界/)
+    now = ACTIVITY_FRAME_MS
+    assert.match(plainText(harness.dashboard), /◝ Build plan 界/)
+
+    await new Promise<void>((resolve) =>
+      setTimeout(resolve, ACTIVITY_FRAME_MS + 20),
+    )
+    assert.ok(harness.renderRequests.count > 0)
+  } finally {
+    harness.dispose()
+    Date.now = originalNow
+  }
+})
+
 test("phase and agent focus navigate to a compact Markdown transcript", () => {
-  const harness = createDashboardHarness()
+  const harness = createDashboardHarness(true, new Map(), selectedStyleTheme())
   const { dashboard, tui } = harness
   setRows(tui, 24)
 
   try {
     dashboard.handleInput("\r")
     dashboard.handleInput("j")
-    assert.match(plainText(dashboard), /› .*Verify/)
+    assert.match(plainText(dashboard), /Verify/)
+    assert.doesNotMatch(plainText(dashboard), /›/)
     assert.match(plainText(dashboard), /verifier/)
+    assertSelectedRow(dashboard, "Verify")
     dashboard.handleInput("l")
+    assert.doesNotMatch(plainText(dashboard), /›/)
+    assertSelectedRow(dashboard, "verifier")
     dashboard.handleInput("\r")
     assert.match(plainText(dashboard), /transcript unavailable/)
     dashboard.handleInput("\u001b")
@@ -330,9 +424,13 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     dashboard.handleInput("h")
     dashboard.handleInput("k")
     dashboard.handleInput("l")
-    assert.match(plainText(dashboard), /› .*planner 界/)
+    assert.match(plainText(dashboard), /planner 界/)
+    assert.doesNotMatch(plainText(dashboard), /›/)
+    assertSelectedRow(dashboard, "planner 界")
     dashboard.handleInput("j")
-    assert.match(plainText(dashboard), /› .*broken worker/)
+    assert.match(plainText(dashboard), /broken worker/)
+    assert.doesNotMatch(plainText(dashboard), /›/)
+    assertSelectedRow(dashboard, "broken worker")
     assert.match(plainText(dashboard), /tool failed/)
     dashboard.handleInput("\r")
     assert.match(plainText(dashboard), /permission denied/)
@@ -348,7 +446,9 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     setRows(tui, 24)
 
     const top = plainText(dashboard)
-    assert.match(top, /Please inspect src/)
+    assert.match(top, /User.*Please inspect src/)
+    assert.doesNotMatch(top, /›/)
+    assert.match(top, /Workflow agent · planner 界/)
     assert.match(top, /A result/)
     assert.match(top, /Check assumptions/)
     assert.match(top, /read.*src\/main\.ts/)
@@ -369,7 +469,8 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     dashboard.handleInput("\u001b")
     assert.match(plainText(dashboard), /planner 界/)
     dashboard.handleInput("h")
-    assert.match(plainText(dashboard), /› .*Gather/)
+    assert.doesNotMatch(plainText(dashboard), /›/)
+    assertSelectedRow(dashboard, "Gather")
   } finally {
     harness.dispose()
   }

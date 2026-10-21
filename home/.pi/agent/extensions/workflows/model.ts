@@ -9,6 +9,7 @@ import {
   truncateHead,
   type ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
+import { activityIndicator } from "@pi/shared/activity-status"
 import { formatContextUtilization } from "@pi/shared/context-utilization"
 import { safeStringify } from "./serialization.ts"
 
@@ -104,19 +105,17 @@ export interface WorkflowDetails {
 }
 
 export function stateGlyph(state: AgentState, theme: Theme): string {
-  if (state === "done") return theme.fg("success", "✓")
-
-  if (state === "error") return theme.fg("error", "✕")
-
-  return theme.fg("warning", "·")
+  return activityIndicator(theme, state)
 }
 
 export function statusGlyph(status: WorkflowStatus, theme: Theme): string {
-  if (status === "completed") return theme.fg("success", "✓")
+  if (status === "completed") return activityIndicator(theme, "done")
 
-  if (status === "running") return theme.fg("warning", "·")
+  if (status === "running") return activityIndicator(theme, "running")
 
-  return theme.fg("error", "✕")
+  if (status === "failed") return activityIndicator(theme, "error")
+
+  return activityIndicator(theme, "stopped")
 }
 
 export function statusWord(status: WorkflowStatus): string {

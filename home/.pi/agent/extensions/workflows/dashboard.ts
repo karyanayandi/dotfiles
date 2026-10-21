@@ -21,6 +21,7 @@ import {
   type KeybindingsManager,
   type TUI,
 } from "@earendil-works/pi-tui"
+import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
 import {
   agentContext,
   countStates,
@@ -46,6 +47,8 @@ import { sanitizeTerminalText } from "../ui/layout.ts"
 const GUTTER = "  "
 
 const NOTICE_TTL_MS = 4000
+
+const ARTIFACT_REFRESH_MS = 500
 
 const TRANSCRIPT_SCROLL_STEP = 20
 
@@ -467,7 +470,8 @@ export class WorkflowDashboard {
   private notice?: string
   private noticeAt = 0
   private disposed = false
-  private timer: ReturnType<typeof setInterval>
+  private timer?: ReturnType<typeof setInterval>
+  private lastRefreshAt = 0
   private tui: TUI
   private theme: Theme
   private keybindings: Pick<KeybindingsManager, "getKeys" | "matches">
@@ -507,26 +511,46 @@ export class WorkflowDashboard {
       }
     }
 
-    this.timer = setInterval(() => {
-      if (
-        this.entries.some((e) => e.live) ||
-        this.current?.live ||
-        this.notice
-      ) {
-        this.refresh()
-        this.tui.requestRender()
-      }
-    }, 500)
+    this.syncTimer()
   }
 
   dispose() {
     if (this.disposed) return
     this.disposed = true
-    clearInterval(this.timer)
+    if (this.timer) clearInterval(this.timer)
+    this.timer = undefined
   }
 
   invalidate() {
     // Rendering is derived on every call; no cached content to invalidate.
+  }
+
+  private needsTimer(): boolean {
+    return (
+      this.entries.some((entry) => entry.live) ||
+      this.current?.live === true ||
+      this.notice !== undefined
+    )
+  }
+
+  private syncTimer() {
+    if (this.disposed) return
+
+    if (!this.needsTimer()) {
+      if (this.timer) clearInterval(this.timer)
+      this.timer = undefined
+
+      return
+    }
+
+    if (this.timer) return
+
+    this.timer = setInterval(() => {
+      if (this.disposed) return
+      if (Date.now() - this.lastRefreshAt >= ARTIFACT_REFRESH_MS) this.refresh()
+      this.tui.requestRender()
+      this.syncTimer()
+    }, ACTIVITY_FRAME_MS)
   }
 
   private refresh() {
@@ -558,6 +582,8 @@ export class WorkflowDashboard {
 
     if (this.notice && Date.now() - this.noticeAt > NOTICE_TTL_MS)
       this.notice = undefined
+
+    this.lastRefreshAt = Date.now()
   }
 
   private groups(): PhaseGroup[] {
@@ -587,7 +613,7 @@ export class WorkflowDashboard {
 
     try {
       fs.writeFileSync(target, buildReport(entry.details), "utf8")
-      this.notice = `saved ${shortenHome(target)}`
+      this.notice = `saved report.md · ${shortenHome(target)}`
     } catch (error) {
       this.notice = `save failed: ${error instanceof Error ? error.message : String(error)}`
     }
@@ -723,6 +749,7 @@ export class WorkflowDashboard {
       }
     }
 
+    this.syncTimer()
     this.tui.requestRender()
   }
 
@@ -822,22 +849,25 @@ export class WorkflowDashboard {
         const index = offset + visibleIndex
         const selected = index === this.listIndex
         const details = entry.details
-        const marker = selected ? theme.fg("accent", "›") : " "
         const label = oneLine(details.name ?? details.runId)
-        const title = theme.fg(selected ? "accent" : "text", label)
+        const title = selected
+          ? theme.bold(theme.fg("accent", label))
+          : theme.fg("text", label)
         const { done, failed } = countStates(details)
         const settled = done + failed
-        const left = `${GUTTER}${marker} ${statusGlyph(details.status, theme)} ${title} ${theme.fg("dim", oneLine(details.runId))}`
+        const left = `${GUTTER}${statusGlyph(details.status, theme)} ${title} ${theme.fg("dim", oneLine(details.runId))}`
         const right = theme.fg(
           "muted",
           `${settled}/${details.agents.length} · ${formatElapsed(details.startedAt, details.finishedAt)} · ${statusWord(details.status)}`,
         )
 
-        body.push(
+        const line =
           width >= 64
             ? this.split(left, right, width)
-            : truncateToWidth(`${left} ${right}`, width, "…"),
-        )
+            : truncateToWidth(`${left} ${right}`, width, "…")
+        const padded = `${line}${" ".repeat(Math.max(0, width - visibleWidth(line)))}`
+
+        body.push(selected ? theme.bg("selectedBg", padded) : line)
       }
     }
 
@@ -848,34 +878,29 @@ export class WorkflowDashboard {
 
   private phaseRow(group: PhaseGroup, index: number): string {
     const selected = index === this.phaseIndex
-    const marker = selected
-      ? this.theme.fg(this.detailFocus === "phases" ? "accent" : "muted", "›")
-      : " "
+    const focused = selected && this.detailFocus === "phases"
     const done = group.agents.filter(
       (agent) => agent.state !== "running",
     ).length
     const title = oneLine(group.title)
-    const styledTitle = this.theme.fg(
-      selected && this.detailFocus === "phases" ? "accent" : "text",
-      title,
-    )
+    const styledTitle = focused
+      ? this.theme.bold(this.theme.fg("accent", title))
+      : this.theme.fg("text", title)
     const count = group.agents.length
       ? `${done}/${group.agents.length}`
       : "empty"
 
-    return `${marker} ${groupGlyph(group, this.theme)} ${styledTitle} ${this.theme.fg("dim", count)}`
+    const row = `${groupGlyph(group, this.theme)} ${styledTitle} ${this.theme.fg("dim", count)}`
+
+    return focused ? this.theme.bg("selectedBg", row) : row
   }
 
   private agentRow(agent: AgentRecord, index: number): string {
     const selected = index === this.agentIndex
-    const marker =
-      selected && this.detailFocus === "agents"
-        ? this.theme.fg("accent", "›")
-        : " "
-    const label = this.theme.fg(
-      selected && this.detailFocus === "agents" ? "accent" : "text",
-      oneLine(agent.label),
-    )
+    const focused = selected && this.detailFocus === "agents"
+    const label = focused
+      ? this.theme.bold(this.theme.fg("accent", oneLine(agent.label)))
+      : this.theme.fg("text", oneLine(agent.label))
     const metadata = [
       oneLine(agent.model ?? ""),
       agentContext(agent),
@@ -885,7 +910,9 @@ export class WorkflowDashboard {
       .filter(Boolean)
       .join(" · ")
 
-    return `${marker} ${stateGlyph(agent.state, this.theme)} ${label}${metadata ? this.theme.fg("dim", ` · ${metadata}`) : ""}`
+    const row = `${stateGlyph(agent.state, this.theme)} ${label}${metadata ? this.theme.fg("dim", ` · ${metadata}`) : ""}`
+
+    return focused ? this.theme.bg("selectedBg", row) : row
   }
 
   private renderDetailFocus(
@@ -1002,7 +1029,7 @@ export class WorkflowDashboard {
         `${settled}/${details.agents.length} agents · ${formatElapsed(details.startedAt, details.finishedAt)} · `,
       ) + theme.fg(statusColor(details.status), statusWord(details.status))
     const header = this.split(
-      `${GUTTER}${statusGlyph(details.status, theme)} ${theme.bold(theme.fg("accent", oneLine(details.name ?? details.runId)))}`,
+      `${GUTTER}${statusGlyph(details.status, theme)} ${theme.bold(theme.fg("accent", `Workflow · ${oneLine(details.name ?? details.runId)}`))}`,
       summary,
       width,
     )
@@ -1081,7 +1108,7 @@ export class WorkflowDashboard {
         const text = terminalText(entry.text).trim()
         const prefix =
           entry.role === "user"
-            ? `${theme.fg("accent", "›")} `
+            ? `${theme.fg("accent", theme.bold("User"))} `
             : entry.role === "tool"
               ? `${theme.fg("warning", "·")} `
               : `${theme.fg(entry.isError ? "error" : "success", entry.isError ? "✕" : "✓")} `
@@ -1129,7 +1156,7 @@ export class WorkflowDashboard {
     )
     const last = Math.min(rows.length, this.transcriptScroll + bodyHeight)
     const position = `${rows.length ? this.transcriptScroll + 1 : 0}-${last}/${rows.length}`
-    const header = `${GUTTER}${stateGlyph(agent.state, theme)} ${theme.bold(theme.fg("accent", oneLine(agent.label)))}`
+    const header = `${GUTTER}${stateGlyph(agent.state, theme)} ${theme.bold(theme.fg("accent", `Workflow agent · ${oneLine(agent.label)}`))}`
     const metadata = [
       oneLine(details.name ?? details.runId),
       oneLine(agent.phase ?? "unphased"),

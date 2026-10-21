@@ -32,7 +32,10 @@ import {
   type ExtensionContext,
 } from "@earendil-works/pi-coding-agent"
 import { Container, Markdown, Spacer, Text } from "@earendil-works/pi-tui"
-import { formatActivityStatus } from "@pi/shared/activity-status"
+import {
+  ACTIVITY_FRAME_MS,
+  formatActivityStatus,
+} from "@pi/shared/activity-status"
 import { toolSchema } from "@pi/shared/schema"
 import * as v from "valibot"
 import { createWorkflowPersistence, persistWorkflowJson } from "./artifacts.ts"
@@ -285,6 +288,7 @@ export default function workflows(pi: ExtensionAPI) {
   let lastUi: ExtensionContext["ui"] | undefined
   let completedRuns = 0
   let failedRuns = 0
+  let activityTimer: ReturnType<typeof setInterval> | undefined
 
   const updateIndicator = () => {
     const ui = lastUi
@@ -293,6 +297,13 @@ export default function workflows(pi: ExtensionAPI) {
 
     try {
       const running = activeRuns.size
+
+      if (running > 0 && !activityTimer)
+        activityTimer = setInterval(updateIndicator, ACTIVITY_FRAME_MS)
+      else if (running === 0 && activityTimer) {
+        clearInterval(activityTimer)
+        activityTimer = undefined
+      }
 
       if (running === 0 && completedRuns === 0 && failedRuns === 0) {
         ui.setStatus("workflows", undefined)
@@ -324,6 +335,10 @@ export default function workflows(pi: ExtensionAPI) {
   })
 
   pi.on("session_shutdown", async () => {
+    const ui = lastUi
+    if (activityTimer) clearInterval(activityTimer)
+    activityTimer = undefined
+    lastUi = undefined
     const runs = [...activeRuns.values()]
 
     for (const run of runs) run.controller.abort("Session is shutting down")
@@ -346,8 +361,7 @@ export default function workflows(pi: ExtensionAPI) {
       if (timer) clearTimeout(timer)
     }
 
-    lastUi?.setStatus("workflows", undefined)
-    lastUi = undefined
+    ui?.setStatus("workflows", undefined)
   })
 
   pi.registerCommand("workflows", {
