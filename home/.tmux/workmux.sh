@@ -97,7 +97,7 @@ function run_workmux() {
                     (.[1] == $path or (.[1] | startswith($path + "/"))))) | .[0][0]')
     fi
     printf -v command '%q ' bash "$0" run "$@"
-    tmux display-popup -E -w 80% -h "$height" "$command"
+    tmux display-popup -E -w 80% -h "$height" -d "$PWD" "$command"
     if [[ -n $removed_path && ! -d $removed_path ]]; then
         while IFS= read -r window; do
             if [[ -n $window ]] && tmux display-message -p -t "$window" '#{window_id}' >/dev/null 2>&1; then
@@ -141,7 +141,7 @@ case "$action" in
         fi
         ;;
     dashboard)
-        tmux display-popup -E -w 90% -h 90% 'workmux dashboard'
+        tmux display-popup -E -w 90% -h 90% -d "$PWD" 'workmux dashboard'
         ;;
     sidebar)
         workmux sidebar
