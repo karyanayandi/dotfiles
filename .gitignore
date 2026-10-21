@@ -51,6 +51,7 @@ known_hosts.old
 **/.pi/agent/npm/**
 **/.pi/agent/sessions/**
 **/.pi/agent/pi-subagents/**
+**/.pi/agent/workflows/**
 **/.pi/agent/git/**
 **/.pi/agent/missions/**
 **/.pi/agent/cache/**
