@@ -88,12 +88,12 @@ export function renderExtensionStatuses(
         ] as const,
     )
     .filter(([, text]) => Boolean(text))
-  const full = entries.map(([, text]) => text).join("    ")
+  const full = entries.map(([, text]) => text).join("  ")
 
   if (!full) return []
   if (visibleWidth(full) <= width) return [full]
 
-  const compact = entries.map(([key, text]) => {
+  const sections = entries.map(([key, text]) => {
     if (key === "background-terminals") {
       text = `>_  ${text.replace(/ background terminals? running/g, "")}`
     } else if (key === "subagents") {
@@ -110,8 +110,8 @@ export function renderExtensionStatuses(
   const lines: string[] = []
   let row = ""
 
-  for (const entry of compact) {
-    const next = row ? `${row}    ${entry}` : entry
+  for (const entry of sections) {
+    const next = row ? `${row}  ${entry}` : entry
 
     if (visibleWidth(next) <= width) {
       row = next
