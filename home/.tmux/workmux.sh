@@ -44,6 +44,16 @@ function resolve_merge() {
 
 if [[ ${1:-} == run ]]; then
     shift
+    if [[ $1 == pr ]]; then
+        if gh pr create; then
+            printf '%s\n' created > "$2"
+        else
+            status=$?
+            read -r -p 'Pull request failed. Press Enter to close.' || true
+            exit "$status"
+        fi
+        exit 0
+    fi
     if [[ $1 == resolve ]]; then
         resolve_merge "$2"
         exit 0
@@ -107,7 +117,7 @@ function run_workmux() {
     fi
 }
 
-action=$(printf '%s\n' 'add' 'add w/branch' 'add w/prompt' 'open' 'merge' 'resolve merge' 'remove' 'close' 'dashboard' 'sidebar' 'quit' |
+action=$(printf '%s\n' 'add' 'add w/branch' 'add w/prompt' 'open' 'create pull request' 'merge' 'resolve merge' 'remove' 'close' 'dashboard' 'sidebar' 'quit' |
     fzf-tmux -p 80%,40% -- --prompt='workmux> ' --no-multi) || exit 0
 
 case "$action" in
@@ -139,6 +149,26 @@ case "$action" in
         else
             run_workmux "$action" "$target"
         fi
+        ;;
+    'create pull request')
+        if ! command -v gh >/dev/null; then
+            tmux display-message 'Pull request creation requires gh'
+            exit 1
+        fi
+        directory=$(git rev-parse --show-toplevel)
+        target=$(workmux list --json | jq -r --arg path "$directory" \
+            '.[] | select(.path == $path and (.is_main | not)) | .handle')
+        result=$(mktemp)
+        trap 'rm -f -- "$result"' EXIT
+        printf -v command '%q ' bash "$0" run pr "$result"
+        tmux display-popup -E -w 80% -h 85% -d "$PWD" "$command"
+        [[ -s $result && -n $target ]] || exit 0
+        cleanup=$(printf '%s\n' 'Keep session and branch' 'Remove session, keep branch' 'Remove session and branch' |
+            fzf-tmux -p 80%,30% -- --prompt='PR created. Cleanup> ' --no-multi) || exit 0
+        case "$cleanup" in
+            'Remove session, keep branch') run_workmux remove "$target" --keep-branch ;;
+            'Remove session and branch') run_workmux remove "$target" ;;
+        esac
         ;;
     dashboard)
         tmux display-popup -E -w 90% -h 90% -d "$PWD" 'workmux dashboard'
