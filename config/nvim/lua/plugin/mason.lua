@@ -14,7 +14,6 @@ M.servers = {
   "bashls",
   "biome",
   "clangd",
-  "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
@@ -35,7 +34,7 @@ M.servers = {
   "tailwindcss",
   "taplo",
   "templ",
-  "tsc",
+  "tsrs",
   "vue_ls",
   "yamlls",
 }
@@ -81,6 +80,7 @@ function M.config()
         package_uninstalled = icons.ui.Uninstalled,
       },
     },
+    registries = { "lua:config.mason-registry", "github:mason-org/mason-registry" },
     log_level = vim.log.levels.INFO,
     max_concurrent_installers = 4,
   }
@@ -89,6 +89,7 @@ function M.config()
 
   require("mason-lspconfig").setup {
     automatic_installation = true,
+    automatic_enable = true,
   }
 
   local tools = {}

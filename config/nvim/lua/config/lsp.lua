@@ -26,16 +26,11 @@ local function should_enable_eslint()
     or vim.fn.glob "eslint.config.mjs" ~= ""
 end
 
-local function should_enable_deno()
-  return vim.fn.glob "deno.json" ~= "" or vim.fn.glob "deno.jsonc" ~= ""
-end
-
 -- Build server list
 local servers = {
   "astro",
   "bashls",
   "clangd",
-  "denols",
   "docker_compose_language_service",
   "dockerls",
   "emmet_ls",
@@ -57,7 +52,7 @@ local servers = {
   "taplo",
   "templ",
   "templ",
-  "tsc",
+  "tsrs",
   "vue_ls",
   "yamlls",
   -- "nil_ls",
@@ -83,13 +78,6 @@ end
 -- Conditionally add eslint
 if should_enable_eslint() then
   table.insert(servers, "eslint")
-end
-
--- Mutually exclusive: deno or tsc
-if should_enable_deno() then
-  table.insert(servers, "denols")
-else
-  table.insert(servers, "tsc")
 end
 
 -- Enable LSP servers

@@ -1,4 +1,4 @@
--- TODO: add linting for github action, deno
+-- TODO: add linting for github action
 
 return {
   "mfussenegger/nvim-lint",
@@ -36,7 +36,6 @@ return {
       "oxc.json",
     }
     local biome_root_files = { "biome.json", "biome.jsonc" }
-    local deno_root_files = { "deno.json", "deno.jsonc" }
     local eslint_root_files = {
       ".eslintrc",
       ".eslintrc.json",
@@ -80,8 +79,6 @@ return {
         return { "oxlint" }
       elseif has_any_file(biome_root_files) then
         return { "biomejs" }
-      elseif has_any_file(deno_root_files) then
-        return { "deno" }
       elseif has_any_file(eslint_root_files) then
         return { "eslint_d" }
       else

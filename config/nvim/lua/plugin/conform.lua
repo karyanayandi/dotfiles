@@ -1,4 +1,3 @@
-
 return {
   "stevearc/conform.nvim",
   lazy = true,
@@ -8,7 +7,6 @@ return {
     local util = require "conform.util"
 
     local biome_root_files = { "biome.json", "biome.jsonc" }
-    local deno_root_files = { "deno.json", "deno.jsonc" }
     local oxfmt_root_files = { ".oxfmtrc.json", ".oxfmtrc.jsonc", "oxc.json" }
     local prettier_root_files = {
       ".prettierrc",
@@ -165,8 +163,6 @@ return {
         formatters = { "oxfmt" }
       elseif has_root_file(dir, biome_root_files) then
         formatters = { "biome" }
-      elseif has_root_file(dir, deno_root_files) then
-        formatters = { "deno_fmt" }
       elseif prettier_root(nil, { dirname = dir }) then
         formatters = { "prettierd" }
       else
@@ -178,7 +174,6 @@ return {
     end
 
     local biome_root = util.root_file(biome_root_files)
-    local deno_root = util.root_file(deno_root_files)
     local oxfmt_root = util.root_file(oxfmt_root_files)
     local vite_root = function(self, ctx)
       return find_root_dir(ctx.dirname, vite_root_files)
@@ -241,28 +236,6 @@ return {
           args = { "--stdin-filepath", "$FILENAME" },
           stdin = true,
           cwd = oxfmt_root,
-        },
-        deno_fmt = {
-          args = function(self, ctx)
-            local extension = vim.bo[ctx.buf].filetype == "typescript" and "ts"
-              or vim.bo[ctx.buf].filetype == "typescriptreact" and "tsx"
-              or vim.bo[ctx.buf].filetype == "javascript" and "js"
-              or vim.bo[ctx.buf].filetype == "javascriptreact" and "jsx"
-              or "ts"
-            local config_file = vim.fs.find({ "deno.json", "deno.jsonc" }, {
-              upward = true,
-              path = ctx.dirname,
-              limit = 1,
-            })[1]
-            local args = { "fmt", "-", "--ext", extension }
-            if config_file then
-              table.insert(args, "--config")
-              table.insert(args, config_file)
-            end
-            return args
-          end,
-          cwd = deno_root,
-          require_cwd = true,
         },
         biome = {
           command = "node_modules/.bin/biome",
