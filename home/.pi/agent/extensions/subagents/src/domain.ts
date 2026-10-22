@@ -55,6 +55,7 @@ export interface SubagentMeta {
   readonly backend: BackendName
   /** Display label, e.g. "openai-codex/gpt-6.1-sol" or "gpt-6-luna". */
   readonly modelLabel?: string
+  readonly thinkingLevel?: ReasoningEffort
   /** Context window capacity for utilization display, when known. */
   readonly contextWindow?: number
   /** Pi session file path. */

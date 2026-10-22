@@ -303,6 +303,7 @@ export class SubagentDashboard implements Component {
       const rightParts = [
         theme.fg("muted", snap.backend),
         theme.fg("muted", sanitizeTerminalText(snap.meta.modelLabel ?? "?")),
+        theme.fg("muted", `thinking: ${snap.meta.thinkingLevel ?? "?"}`),
         theme.fg("muted", formatElapsed(snap)),
         statusWord(snap, theme),
       ]
@@ -314,10 +315,12 @@ export class SubagentDashboard implements Component {
       const leftMax = Math.max(0, width - rightWidth - 2)
       const leftTruncated = truncateToWidth(left, leftMax)
       const gap = Math.max(2, width - visibleWidth(leftTruncated) - rightWidth)
+
       const row = truncateToWidth(
         leftTruncated + " ".repeat(gap) + right,
         width,
       )
+
       out.push(row)
     }
 
@@ -530,6 +533,7 @@ export class TakeoverView implements Component, Focusable {
 
     const metadata =
       `${snap.backend} · ${sanitizeTerminalText(snap.meta.modelLabel ?? "?")}` +
+      ` · thinking: ${snap.meta.thinkingLevel ?? "?"}` +
       (this.options?.badge
         ? ` · ${sanitizeTerminalText(this.options.badge)}`
         : "")
@@ -585,13 +589,16 @@ export class TakeoverView implements Component, Focusable {
     while (body.length < viewport) body.push("")
     lines.push(...body.slice(0, viewport))
     lines.push("")
+
     const inputIndicator = inputActivityIndicator(
       theme,
       snap.status === "running",
     )
+
     const input = this.input
       .render(Math.max(1, width - 4))
       .map((line) => `  ${inputIndicator} ${line}`)
+
     const height = Math.max(0, (this.tui.terminal.rows || 30) - 1)
 
     return [

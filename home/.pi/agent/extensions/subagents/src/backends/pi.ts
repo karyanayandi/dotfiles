@@ -389,6 +389,7 @@ async function makePiSession(task: SpawnTask): Promise<SubagentSession> {
     return {
       backend: "pi",
       modelLabel: m ? `${m.provider}/${m.id}` : undefined,
+      thinkingLevel: session.thinkingLevel,
       contextWindow: m?.contextWindow,
       sessionFilePath: session.sessionFile,
     }
