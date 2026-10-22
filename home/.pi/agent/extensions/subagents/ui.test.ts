@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { stripVTControlCharacters } from "node:util"
 import { ProcessTerminal, visibleWidth } from "@earendil-works/pi-tui"
-import type { SubagentSnapshot } from "./src/domain.ts"
+import { REASONING_EFFORTS, type SubagentSnapshot } from "./src/domain.ts"
 import type { SubagentReadModel } from "./src/manager.ts"
 import { SubagentDashboard, TakeoverView } from "./src/ui/takeover.ts"
 import { buildTranscriptLines } from "./src/ui/transcript.ts"
@@ -92,7 +92,9 @@ void test("dashboard and detail hide context metrics but keep metadata and usage
     ...snapshot(),
     usage: { tokens: 12_000, contextWindow: 100_000 },
   }
+
   const { tui, keys, view } = setup(snap)
+
   const dashboard = new SubagentDashboard(
     tui,
     theme,
@@ -101,6 +103,7 @@ void test("dashboard and detail hide context metrics but keep metadata and usage
     { index: 0 },
     () => undefined,
   )
+
   const takeover = new TakeoverView(
     tui,
     theme,
@@ -109,17 +112,20 @@ void test("dashboard and detail hide context metrics but keep metadata and usage
     view,
     () => undefined,
   )
+
   try {
     for (const component of [dashboard, takeover]) {
       const text = component
         .render(200)
         .map(stripVTControlCharacters)
         .join("\n")
+
       assert.doesNotMatch(text, /12%|100k|12[,.]?000|context|tokens/i)
       assert.match(text, /pi/)
       assert.match(text, /model/)
       assert.match(text, /running/)
     }
+
     assert.deepEqual(view.get(snap.id)?.usage, {
       tokens: 12_000,
       contextWindow: 100_000,
@@ -129,6 +135,55 @@ void test("dashboard and detail hide context metrics but keep metadata and usage
     takeover.dispose()
   }
 })
+
+for (const thinkingLevel of [...REASONING_EFFORTS, undefined]) {
+  void test(`dashboard and detail show thinking level ${thinkingLevel ?? "unknown"}`, () => {
+    const snap = snapshot()
+
+    const { tui, keys, view } = setup({
+      ...snap,
+      meta: { ...snap.meta, thinkingLevel },
+    })
+
+    const dashboard = new SubagentDashboard(
+      tui,
+      theme,
+      keys,
+      view,
+      { index: 0 },
+      () => undefined,
+    )
+
+    const takeover = new TakeoverView(
+      tui,
+      theme,
+      keys,
+      snap.id,
+      view,
+      () => undefined,
+    )
+
+    try {
+      for (const component of [dashboard, takeover]) {
+        const text = stripVTControlCharacters(component.render(200).join("\n"))
+        assert.ok(
+          text
+            .split("\n")
+            .some(
+              (line) =>
+                line.trimEnd().endsWith(`model · ${thinkingLevel ?? "off"}`) ||
+                line.includes(`model · ${thinkingLevel ?? "off"} ·`),
+            ),
+          text,
+        )
+        assert.doesNotMatch(text, /thinking:/)
+      }
+    } finally {
+      dashboard.dispose()
+      takeover.dispose()
+    }
+  })
+}
 
 for (const width of [0, 1, 2, 8, 24, 80, 160]) {
   void test(`dashboard and takeover fit width ${width}`, () => {
@@ -245,7 +300,9 @@ void test("borderless views keep fixed height across resize, scroll, and updates
     liveTools: [],
     queued: [],
   }
+
   const { tui, keys, view, setSnapshot } = setup(snap)
+
   const dashboard = new SubagentDashboard(
     tui,
     theme,
@@ -254,6 +311,7 @@ void test("borderless views keep fixed height across resize, scroll, and updates
     { index: 0 },
     () => undefined,
   )
+
   const takeover = new TakeoverView(
     tui,
     theme,
@@ -269,19 +327,23 @@ void test("borderless views keep fixed height across resize, scroll, and updates
         value: rows,
         configurable: true,
       })
+
       for (const component of [dashboard, takeover]) {
         const lines = component.render(100)
         assert.equal(lines.length, rows - 1)
         assert.ok(lines.every((line) => visibleWidth(line) <= 100))
       }
+
       if (rows < 24) continue
       const tail = takeover.render(100).map(stripVTControlCharacters).join("\n")
       assert.match(tail, /message 99/)
       takeover.handleInput("\u001b[A")
+
       const scrolled = takeover
         .render(100)
         .map(stripVTControlCharacters)
         .join("\n")
+
       assert.match(scrolled, /lines below/)
       takeover.handleInput("\u001b[B")
       assert.match(
@@ -303,6 +365,7 @@ void test("borderless views keep fixed height across resize, scroll, and updates
 
 void test("takeover keeps metadata and an unboxed input", () => {
   const { tui, keys, view } = setup()
+
   const takeover = new TakeoverView(
     tui,
     theme,
@@ -312,13 +375,14 @@ void test("takeover keeps metadata and an unboxed input", () => {
     () => undefined,
     { badge: "side task" },
   )
+
   try {
     const lines = takeover.render(160).map(stripVTControlCharacters)
     assert.match(lines[0], /Subagent.*sa-1.*Wide 界 agent/)
     assert.match(lines[0], /running/)
     assert.match(lines[1], /pi.*model.*side task/)
     assert.doesNotMatch(lines.join("\n"), /Message/)
-    assert.match(lines.at(-2) ?? "", /^  [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] /)
+    assert.match(lines.at(-2) ?? "", /^ {2}[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] /)
     assert.doesNotMatch(lines.join("\n"), /›|❯|> /)
     assert.match(lines.at(-1) ?? "", /send.*back.*abort run.*scroll/)
   } finally {
@@ -338,13 +402,16 @@ void test("subagent state keeps status icons and marks selection with an arrow",
     "bg",
     (color: Parameters<typeof theme.bg>[0], text: string) => {
       assert.notEqual(color, "selectedBg")
+
       return text
     },
   )
+
   const { tui, keys, view, setSnapshot } = setup({
     ...snapshot(),
     createdAt: 0,
   })
+
   const dashboard = new SubagentDashboard(
     tui,
     theme,
@@ -353,6 +420,7 @@ void test("subagent state keeps status icons and marks selection with an arrow",
     { index: 0 },
     () => undefined,
   )
+
   const takeover = new TakeoverView(
     tui,
     theme,
@@ -361,8 +429,10 @@ void test("subagent state keeps status icons and marks selection with an arrow",
     view,
     () => undefined,
   )
+
   const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
   const taskFrames = ["◜", "◝", "◞", "◟"]
+
   try {
     setSnapshot({
       ...snapshot(),
@@ -372,9 +442,10 @@ void test("subagent state keeps status icons and marks selection with an arrow",
     })
     assert.match(
       takeover.render(160).map(stripVTControlCharacters).at(-2) ?? "",
-      /^  ┃ /,
+      /^ {2}┃ /,
     )
     setSnapshot({ ...snapshot(), createdAt: 0 })
+
     for (let index = 0; index < frames.length; index++) {
       const lines = takeover.render(160).map(stripVTControlCharacters)
       assert.match(lines[0], new RegExp(taskFrames[index % taskFrames.length]))
@@ -385,16 +456,19 @@ void test("subagent state keeps status icons and marks selection with an arrow",
       assert.match(lines.at(-2) ?? "", new RegExp(`^  ${frames[index]} `))
       context.mock.timers.tick(120)
     }
+
     const selectedRow = dashboard
       .render(160)
       .find((line) => line.includes("sa-1"))
+
     assert.ok(selectedRow)
     assert.match(
       stripVTControlCharacters(selectedRow),
       /^› [◜◝◞◟] Wide 界 agent/,
     )
-    assert.doesNotMatch(selectedRow, /\u001b\[1m/)
+    assert.equal(selectedRow.includes("\u001b[1m"), false)
     assert.ok(dashboard.render(160).some((line) => line.includes("\u001b[1m")))
+
     for (const [status, glyph] of [
       ["done", "✓"],
       ["error", "✕"],
@@ -402,7 +476,7 @@ void test("subagent state keeps status icons and marks selection with an arrow",
       setSnapshot({ ...snapshot(), status })
       const lines = takeover.render(160).map(stripVTControlCharacters)
       assert.match(lines[0], new RegExp(glyph))
-      assert.match(lines.at(-2) ?? "", /^  ┃ /)
+      assert.match(lines.at(-2) ?? "", /^ {2}┃ /)
       assert.doesNotMatch(lines.at(-2) ?? "", /✓|✕/)
       assert.doesNotMatch(lines.join("\n"), /›|❯|> /)
     }
@@ -415,6 +489,7 @@ void test("subagent state keeps status icons and marks selection with an arrow",
 void test("missing subagents render a bounded borderless notice", () => {
   const { tui, keys, view } = setup()
   const missing = { ...view, get: () => undefined }
+
   const takeover = new TakeoverView(
     tui,
     theme,
@@ -423,11 +498,13 @@ void test("missing subagents render a bounded borderless notice", () => {
     missing,
     () => undefined,
   )
+
   try {
     for (const width of [0, 1, 8, 80]) {
       const lines = takeover.render(width)
       assert.ok(lines.every((line) => visibleWidth(line) <= width))
       assert.doesNotMatch(lines.join("\n"), /[┌┐└┘│─╭╮╰╯]/)
+
       if (width === 80)
         assert.match(lines.join("\n"), /sa-missing is no longer tracked/)
     }
@@ -452,9 +529,11 @@ void test("transcript renders assistant Markdown without raw emphasis", () => {
     queued: [],
     liveAssistant: { thinking: "**Next step**", text: "**Working**" },
   }
+
   const lines = buildTranscriptLines(snap, 80, theme).map(
     stripVTControlCharacters,
   )
+
   const text = lines.join("\n")
   assert.match(text, /Checking bindings/)
   assert.match(text, /Result uses model/)
@@ -505,6 +584,7 @@ void test("dashboard running icons request redraws and stop after settle or disp
   context.mock.timers.enable({ apis: ["Date", "setInterval"], now: 0 })
   const { tui, keys, view, setSnapshot } = setup()
   const redraw = context.mock.method(tui, "requestRender", () => undefined)
+
   const dashboard = new SubagentDashboard(
     tui,
     theme,
@@ -513,6 +593,7 @@ void test("dashboard running icons request redraws and stop after settle or disp
     { index: 0 },
     () => undefined,
   )
+
   try {
     assert.match(dashboard.render(160).join("\n"), /◜/)
     context.mock.timers.tick(120)
