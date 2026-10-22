@@ -420,6 +420,7 @@ void test(
       )
       assert.equal(meta.backend, "pi")
       assert.equal(meta.modelLabel, `${PROVIDER}/${MODEL_ID}`)
+      assert.equal(meta.thinkingLevel, "off")
       assert.equal(meta.contextWindow, 8192)
       assert.ok(meta.sessionFilePath)
       assert.ok(

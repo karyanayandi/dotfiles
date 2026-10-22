@@ -303,7 +303,7 @@ export class SubagentDashboard implements Component {
       const rightParts = [
         theme.fg("muted", snap.backend),
         theme.fg("muted", sanitizeTerminalText(snap.meta.modelLabel ?? "?")),
-        theme.fg("muted", `thinking: ${snap.meta.thinkingLevel ?? "?"}`),
+        theme.fg("muted", snap.meta.thinkingLevel ?? "?"),
         theme.fg("muted", formatElapsed(snap)),
         statusWord(snap, theme),
       ]
@@ -533,7 +533,7 @@ export class TakeoverView implements Component, Focusable {
 
     const metadata =
       `${snap.backend} · ${sanitizeTerminalText(snap.meta.modelLabel ?? "?")}` +
-      ` · thinking: ${snap.meta.thinkingLevel ?? "?"}` +
+      ` · ${snap.meta.thinkingLevel ?? "?"}` +
       (this.options?.badge
         ? ` · ${sanitizeTerminalText(this.options.badge)}`
         : "")
