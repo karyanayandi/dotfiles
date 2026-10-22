@@ -83,3 +83,14 @@ test("activity summary keeps counts and links without square status marks", () =
   assert.match(text, /\/workflows.*to view/)
   assert.doesNotMatch(text, /■/)
 })
+
+test("terminal summary uses its own label, counts, and ps hint", () => {
+  const text = stripVTControlCharacters(
+    formatActivityStatus(theme, "background terminal", {
+      running: 0,
+      done: 2,
+      failed: 1,
+    }),
+  )
+  assert.equal(text, "background terminal: ✓ 2 done · ✕ 1 failed · /ps to view")
+})

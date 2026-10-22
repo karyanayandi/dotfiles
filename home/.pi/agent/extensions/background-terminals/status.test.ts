@@ -13,7 +13,7 @@ import terminals from "./index.ts"
 import { theme } from "../subagents/test-theme.ts"
 
 test(
-  "running terminals animate in footer and clear on kill and shutdown",
+  "terminal footer follows subagent design and clears on shutdown",
   { timeout: 10_000 },
   async () => {
     const directory = await mkdtemp(join(tmpdir(), "pi-terminal-status-"))
@@ -80,7 +80,7 @@ test(
       )
       assert.match(
         statuses.at(-1) ?? "",
-        /[◜◝◞◟] 1 background terminal running.*\/ps to view/,
+        /^background terminal: [◜◝◞◟] 1 running · \/ps to view$/,
       )
       assert.deepEqual(widgets, [])
       await Reflect.apply(kill.execute, kill, [
@@ -92,11 +92,14 @@ test(
       ])
       for (
         let attempt = 0;
-        attempt < 100 && statuses.at(-1) !== undefined;
+        attempt < 100 && !statuses.at(-1)?.includes("✕ 1 failed");
         attempt++
       )
         await delay(20)
-      assert.equal(statuses.at(-1), undefined)
+      assert.equal(
+        statuses.at(-1),
+        "background terminal: ✕ 1 failed · /ps to view",
+      )
       const settled = statuses.length
       await delay(300)
       assert.equal(statuses.length, settled)
@@ -107,9 +110,40 @@ test(
         undefined,
         ctx,
       ])
-      for (let attempt = 0; attempt < 100 && !statuses.at(-1); attempt++)
+      for (
+        let attempt = 0;
+        attempt < 100 && !/[◜◝◞◟]/.test(statuses.at(-1) ?? "");
+        attempt++
+      )
         await delay(20)
-      assert.match(statuses.at(-1) ?? "", /1 background terminal running/)
+      assert.match(
+        statuses.at(-1) ?? "",
+        /^background terminal: [◜◝◞◟] 1 running · ✕ 1 failed · \/ps to view$/,
+      )
+      for (const exitCode of [0, 1]) {
+        await Reflect.apply(spawn.execute, spawn, [
+          `exit-${exitCode}`,
+          {
+            command: `"${process.execPath}" -e "process.exit(${exitCode})"`,
+            title: `exit ${exitCode}`,
+          },
+          undefined,
+          undefined,
+          ctx,
+        ])
+        const outcome = exitCode === 0 ? "✓ 1 done" : "✕ 2 failed"
+        for (
+          let attempt = 0;
+          attempt < 100 && !statuses.at(-1)?.includes(outcome);
+          attempt++
+        )
+          await delay(20)
+        assert.ok(statuses.at(-1)?.includes(outcome))
+      }
+      assert.match(
+        statuses.at(-1) ?? "",
+        /^background terminal: [◜◝◞◟] 1 running · ✓ 1 done · ✕ 2 failed · \/ps to view$/,
+      )
       await emit("session_shutdown")
       assert.equal(statuses.at(-1), undefined)
       const closed = statuses.length

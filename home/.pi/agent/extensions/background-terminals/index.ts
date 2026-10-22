@@ -10,7 +10,7 @@
  * - bg_kill: SIGTERM→SIGKILL the whole process tree; returns final state.
  *
  * While ≥1 process runs, the footer status shows
- * "N background terminal(s) running • /ps to view". `/ps` opens a two-stage
+ * terminal counts and a /ps hint. `/ps` opens a two-stage
  * full-screen overlay (list → read-only detail with stdout/stderr toggle).
  *
  * Architecture: one Promise-based manager per session. Tool cancellation
@@ -28,7 +28,7 @@ import { getMarkdownTheme } from "@earendil-works/pi-coding-agent"
 import { Markdown, Text } from "@earendil-works/pi-tui"
 import {
   ACTIVITY_FRAME_MS,
-  activityIndicator,
+  formatActivityStatus,
 } from "@pi/shared/activity-status"
 import { cacheRenderer } from "@pi/shared/render-cache"
 import { toolSchema } from "@pi/shared/schema"
@@ -100,9 +100,12 @@ export default function (pi: ExtensionAPI) {
     if (!ui) return
 
     try {
-      const running = manager.view
-        .list()
-        .filter((snap) => snap.status === "running").length
+      const terminals = manager.view.list()
+      const running = terminals.filter(
+        (snap) => snap.status === "running",
+      ).length
+      const done = terminals.filter((snap) => snap.status === "done").length
+      const failed = terminals.length - running - done
 
       if (running > 0 && statusTimer === undefined) {
         statusTimer = setInterval(
@@ -114,23 +117,19 @@ export default function (pi: ExtensionAPI) {
         statusTimer = undefined
       }
 
-      if (running === 0) {
+      if (terminals.length === 0) {
         ui.setStatus(STATUS_KEY, undefined)
 
         return
       }
 
-      const theme = ui.theme
       ui.setStatus(
         STATUS_KEY,
-        activityIndicator(theme, "running") +
-          theme.fg(
-            "text",
-            ` ${running} background terminal${running === 1 ? "" : "s"} running`,
-          ) +
-          theme.fg("dim", " • ") +
-          theme.fg("accent", "/ps") +
-          theme.fg("dim", " to view"),
+        formatActivityStatus(ui.theme, "background terminal", {
+          running,
+          done,
+          failed,
+        }),
       )
     } catch {
       // UI may be unavailable (print/RPC modes or teardown).

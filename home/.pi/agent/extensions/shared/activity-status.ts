@@ -42,7 +42,7 @@ export function inputActivityIndicator(
 
 export function formatActivityStatus(
   theme: Theme,
-  label: "subagents" | "workflows",
+  label: "subagents" | "workflows" | "background terminal",
   counts: ActivityCounts,
 ) {
   const parts: string[] = []
@@ -61,7 +61,8 @@ export function formatActivityStatus(
     parts.push(theme.fg("error", `✕ ${counts.failed} failed`))
   }
 
-  parts.push(theme.fg("accent", `/${label}`) + theme.fg("dim", " to view"))
+  const command = label === "background terminal" ? "ps" : label
+  parts.push(theme.fg("accent", `/${command}`) + theme.fg("dim", " to view"))
 
   return `${theme.fg("muted", `${label}:`)} ${parts.join(theme.fg("dim", " · "))}`
 }
