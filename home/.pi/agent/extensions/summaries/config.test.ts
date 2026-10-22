@@ -2,16 +2,16 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { DEFAULT_SUMMARY_CONFIG, parseSummaryConfig } from "./src/config.ts"
 
-test("summary config defaults to Codex gpt-6-luna", () => {
+await test("summary config defaults to OpenAI gpt-6-luna", () => {
   assert.deepEqual(parseSummaryConfig(undefined), DEFAULT_SUMMARY_CONFIG)
   assert.deepEqual(DEFAULT_SUMMARY_CONFIG, {
-    provider: "openai-codex",
+    provider: "openai",
     model: "gpt-6-luna",
     reasoning: "off",
   })
 })
 
-test("summary config validates persisted input and trims names", () => {
+await test("summary config validates persisted input and trims names", () => {
   for (const value of [
     null,
     [],

@@ -136,7 +136,7 @@ export interface KillResult {
 }
 
 export interface TerminalReadModel {
-  list(): readonly TerminalSnapshot[]
+  list(this: void): readonly TerminalSnapshot[]
   get(id: string): TerminalSnapshot | undefined
   size(): number
   subscribe(listener: () => void): () => void
@@ -259,18 +259,16 @@ export function createTerminalManager(): TerminalManager {
   }
 
   const notify = (id?: string) => {
-    if (!globalNotifyTimer) {
-      globalNotifyTimer = setTimeout(
-        () => {
-          globalNotifyTimer = undefined
-          notifyGlobalListeners()
-        },
-        Math.max(
-          0,
-          GLOBAL_NOTIFY_INTERVAL_MS - (Date.now() - lastGlobalNotifyAt),
-        ),
-      )
-    }
+    globalNotifyTimer ??= setTimeout(
+      () => {
+        globalNotifyTimer = undefined
+        notifyGlobalListeners()
+      },
+      Math.max(
+        0,
+        GLOBAL_NOTIFY_INTERVAL_MS - (Date.now() - lastGlobalNotifyAt),
+      ),
+    )
 
     if (id) {
       for (const listener of idListeners.get(id) ?? []) {

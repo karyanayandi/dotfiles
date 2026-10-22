@@ -50,5 +50,5 @@ export function formatContextUtilization(usage: ContextUtilization) {
   if (capacity === undefined) return ""
   const percent = contextPercent(usage)
 
-  return `${percent === undefined ? "?" : percent}%/${formatCompactTokens(capacity)}`
+  return `${percent ?? "?"}%/${formatCompactTokens(capacity)}`
 }

@@ -67,6 +67,31 @@ function truncateUtf8(text: string, maxBytes: number) {
   return text.slice(0, end)
 }
 
+function truncateUtf8Suffix(text: string, maxBytes: number) {
+  const segments = Array.from(
+    new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text),
+    ({ segment }) => segment,
+  )
+
+  let start = segments.length
+  let retainedBytes = 0
+
+  while (start > 0) {
+    const segment = segments[start - 1]
+
+    if (segment === undefined) break
+
+    const segmentBytes = Buffer.byteLength(segment, "utf8")
+
+    if (retainedBytes + segmentBytes > maxBytes) break
+
+    retainedBytes += segmentBytes
+    start -= 1
+  }
+
+  return segments.slice(start).join("")
+}
+
 function capped(text: string, maxBytes: number, notice: string) {
   if (Buffer.byteLength(text, "utf8") <= maxBytes) return text
   const suffix = `\n[${notice}]`
@@ -150,12 +175,10 @@ function serializeToolArguments<Value>(value: Value) {
   }
 }
 
-type TextualContent =
-  | Extract<
-      Extract<SessionEntry, { type: "message" }>["message"],
-      { role: "user" | "toolResult" | "custom" }
-    >["content"]
-  | Extract<SessionEntry, { type: "custom_message" }>["content"]
+type TextualContent = Extract<
+  Extract<SessionEntry, { type: "message" }>["message"],
+  { role: "user" | "toolResult" | "custom" }
+>["content"]
 
 function textContent(content: TextualContent) {
   if (!Array.isArray(content)) return redactSecrets(content)
@@ -270,12 +293,7 @@ export function serializeRunTranscript(
   const tailBytes = maxBytes - markerBytes - headBytes
   const head = truncateUtf8(transcript, headBytes)
 
-  const reversedTail = truncateUtf8(
-    [...transcript].reverse().join(""),
-    tailBytes,
-  )
-
-  const tail = [...reversedTail].reverse().join("")
+  const tail = truncateUtf8Suffix(transcript, tailBytes)
 
   return `${head}${marker}${tail}`
 }

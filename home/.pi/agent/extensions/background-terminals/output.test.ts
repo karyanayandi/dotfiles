@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { OutputBuffer } from "./src/output.ts"
 
-test("push/view roundtrip preserves text and counts bytes", () => {
+await test("push/view roundtrip preserves text and counts bytes", () => {
   const buf = new OutputBuffer(1024)
   buf.push("hello ")
   buf.push("world\n")
@@ -12,7 +12,7 @@ test("push/view roundtrip preserves text and counts bytes", () => {
   assert.equal(view.truncatedBytes, 0)
 })
 
-test("head chunks are evicted past the cap and accounted as truncated", () => {
+await test("head chunks are evicted past the cap and accounted as truncated", () => {
   const buf = new OutputBuffer(10)
   buf.push("aaaa") // 4 bytes
   buf.push("bbbb") // 8 bytes
@@ -23,7 +23,7 @@ test("head chunks are evicted past the cap and accounted as truncated", () => {
   assert.equal(view.truncatedBytes, 4)
 })
 
-test("a single chunk larger than the cap is trimmed to its tail. retention stays bounded", () => {
+await test("a single chunk larger than the cap is trimmed to its tail. retention stays bounded", () => {
   const buf = new OutputBuffer(4)
   buf.push("0123456789")
   // Only the newest cap-worth of bytes is retained; the head is truncated.
@@ -37,7 +37,7 @@ test("a single chunk larger than the cap is trimmed to its tail. retention stays
   assert.equal(buf.view().truncatedBytes, 10)
 })
 
-test("an oversized chunk evicts everything retained before it", () => {
+await test("an oversized chunk evicts everything retained before it", () => {
   const buf = new OutputBuffer(8)
   buf.push("abcd")
   buf.push("0123456789") // 10 bytes > cap: "abcd" evicted, chunk tail-trimmed
@@ -47,7 +47,7 @@ test("an oversized chunk evicts everything retained before it", () => {
   assert.equal(view.truncatedBytes, 6)
 })
 
-test("an oversized chunk cut lands on a UTF-8 code point boundary", () => {
+await test("an oversized chunk cut lands on a UTF-8 code point boundary", () => {
   const buf = new OutputBuffer(5)
   buf.push("ééééé") // 10 bytes; naive cut at byte 5 would split an é
   const view = buf.view()
@@ -57,7 +57,7 @@ test("an oversized chunk cut lands on a UTF-8 code point boundary", () => {
   assert.ok(!view.text.includes("�"))
 })
 
-test("spill receives the complete oversized chunk before trimming", () => {
+await test("spill receives the complete oversized chunk before trimming", () => {
   const spilled: string[] = []
   const buf = new OutputBuffer(4, (chunk) => spilled.push(chunk))
   buf.push("0123456789")
@@ -65,19 +65,19 @@ test("spill receives the complete oversized chunk before trimming", () => {
   assert.equal(buf.view().text, "6789")
 })
 
-test("push reports spill backpressure while retaining the chunk", () => {
+await test("push reports spill backpressure while retaining the chunk", () => {
   const buf = new OutputBuffer(1024, () => false)
   assert.equal(buf.push("queued"), false)
   assert.equal(buf.view().text, "queued")
 })
 
-test("byte accounting uses UTF-8 byte length, not string length", () => {
+await test("byte accounting uses UTF-8 byte length, not string length", () => {
   const buf = new OutputBuffer(1024)
   buf.push("héllo") // é is 2 bytes
   assert.equal(buf.view().totalBytes, 6)
 })
 
-test("multibyte chunks are never split by eviction", () => {
+await test("multibyte chunks are never split by eviction", () => {
   const buf = new OutputBuffer(8)
   buf.push("ééé") // 6 bytes
   buf.push("üüü") // 6 bytes -> evicts the first chunk whole
@@ -86,7 +86,7 @@ test("multibyte chunks are never split by eviction", () => {
   assert.equal(view.truncatedBytes, 6)
 })
 
-test("spill callback receives every chunk in order, even after eviction", () => {
+await test("spill callback receives every chunk in order, even after eviction", () => {
   const spilled: string[] = []
   const buf = new OutputBuffer(4, (chunk) => spilled.push(chunk))
   buf.push("aaaa")
@@ -96,7 +96,7 @@ test("spill callback receives every chunk in order, even after eviction", () => 
   assert.equal(buf.view().text, "cccc")
 })
 
-test("view text is cached between pushes and version increments per push", () => {
+await test("view text is cached between pushes and version increments per push", () => {
   const buf = new OutputBuffer(1024)
   buf.push("a")
   const first = buf.view()

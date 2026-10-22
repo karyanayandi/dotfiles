@@ -34,7 +34,7 @@ async function withTempDir(run: (directory: string) => Promise<void>) {
   }
 }
 
-test("child denylist keeps extension and workflow structured tools available", async () => {
+await test("child denylist keeps extension and workflow structured tools available", async () => {
   await withTempDir(async (directory) => {
     let starts = 0
     let shutdowns = 0
@@ -149,7 +149,7 @@ test("child denylist keeps extension and workflow structured tools available", a
   })
 })
 
-test("resource loading gates project extensions but retains global extensions", async () => {
+await test("resource loading gates project extensions but retains global extensions", async () => {
   await withTempDir(async (directory) => {
     const cwd = path.join(directory, "project")
     const agentDir = path.join(directory, "agent")
@@ -203,7 +203,7 @@ test("resource loading gates project extensions but retains global extensions", 
   })
 })
 
-test("alternate standalone cwd only uses explicit saved trust", async () => {
+await test("alternate standalone cwd only uses explicit saved trust", async () => {
   await withTempDir(async (directory) => {
     const parentCwd = path.join(directory, "parent")
     const childCwd = path.join(directory, "alternate")
@@ -243,7 +243,7 @@ test("alternate standalone cwd only uses explicit saved trust", async () => {
   })
 })
 
-test("shutdown helper balances hooks and disposal despite errors", async () => {
+await test("shutdown helper balances hooks and disposal despite errors", async () => {
   let emits = 0
   let disposals = 0
 
@@ -271,7 +271,7 @@ test("shutdown helper balances hooks and disposal despite errors", async () => {
   assert.equal(disposals, 1)
 })
 
-test("shutdown helper bounds a stuck hook before disposal", async () => {
+await test("shutdown helper bounds a stuck hook before disposal", async () => {
   let disposals = 0
 
   const session: DisposableChildSession = {

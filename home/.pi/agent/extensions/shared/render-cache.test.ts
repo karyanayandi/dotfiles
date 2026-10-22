@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import { test } from "node:test"
 import { cacheRenderer } from "./render-cache.ts"
 
-test("caches render output by width until invalidated", () => {
+await test("caches render output by width until invalidated", () => {
   let renders = 0
   let invalidations = 0
 

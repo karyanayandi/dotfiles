@@ -32,6 +32,7 @@ describe("renderExtensionStatuses", () => {
         "workflows: ◜ 12 running · ✓ 34 done · ✕ 56 failed · /workflows to view",
       ],
     ])
+
     const fullWidth = visibleWidth(
       [
         "◜ 12 background terminals running · /ps ↗",
@@ -39,10 +40,12 @@ describe("renderExtensionStatuses", () => {
         "workflows: ◜ 12 running · ✓ 34 done · ✕ 56 failed · /workflows ↗",
       ].join("  "),
     )
+
     for (const width of [240, 80, fullWidth, fullWidth - 1, 60, fullWidth]) {
       const lines = renderExtensionStatuses(statuses, width)
       const plain = lines.map(stripVTControlCharacters).join("\n")
       expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+
       if (width >= fullWidth) {
         expect(plain).toContain("background terminals running")
         expect(plain).toContain("subagents:")
@@ -54,14 +57,18 @@ describe("renderExtensionStatuses", () => {
         expect(plain).toContain("⑂  ◜ 12")
         expect(plain).not.toMatch(/background terminals|subagents:|workflows:/)
       }
+
       for (const command of ["/ps ↗", "/subagents ↗", "/workflows ↗"])
         expect(plain).toContain(command)
     }
+
     expect(renderExtensionStatuses(statuses, fullWidth)).toHaveLength(1)
     expect(renderExtensionStatuses(statuses, 240)).toHaveLength(1)
+
     const single = new Map([
       ["subagents", "subagents: ◜ 1 running · /subagents to view"],
     ])
+
     expect(renderExtensionStatuses(single, 30)).toEqual([
       "⌘  ◜ 1 · /subagents ↗",
     ])
@@ -99,13 +106,16 @@ describe("renderExtensionStatuses", () => {
       ],
       ["workflows", "workflows: ◞ 6 running · /workflows to view"],
     ])
+
     expect(renderExtensionStatuses(statuses, 250)).toHaveLength(1)
     expect(renderExtensionStatuses(statuses, 250).join("")).toContain(
       "background terminals running",
     )
+
     const full = stripVTControlCharacters(
       renderExtensionStatuses(statuses, 250).join(""),
     )
+
     expect(full).not.toContain("to view")
     expect(full).toContain("/ps ↗  subagents:")
     expect(full).toContain("/subagents ↗  workflows:")
@@ -121,10 +131,12 @@ describe("renderExtensionStatuses", () => {
     expect(compactText).toContain("/subagents ↗  ⑂  ◞ 6")
     expect(compactText).toContain("/workflows ↗")
     expect(compactText).not.toMatch(/\/\w+ {2,}↗/)
+
     for (const width of [1, 2, 4, 8, 12, 20, 40, 60, 80, 100, 160]) {
       const lines = renderExtensionStatuses(statuses, width)
       expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
       const text = stripVTControlCharacters(lines.join("")).replace(/\s/g, "")
+
       for (const value of [
         "◜2",
         "◝3",
@@ -138,6 +150,7 @@ describe("renderExtensionStatuses", () => {
         expect(text).toContain(value)
       expect(text).not.toContain("…")
     }
+
     expect(renderExtensionStatuses(statuses, 0)).toEqual([])
   })
 
@@ -153,11 +166,13 @@ describe("renderExtensionStatuses", () => {
       ]),
       30,
     ).map(stripVTControlCharacters)
+
     expect(lines).toEqual([
       ">_  ◜ 1 · /ps ↗",
       "⌘  ◜ 1 · /subagents ↗",
       "⑂  ◜ 1 · /workflows ↗",
     ])
+
     for (const line of lines) expect(line).toMatch(/^(?:>_|⌘|⑂) {2}◜/)
   })
 
@@ -169,13 +184,16 @@ describe("renderExtensionStatuses", () => {
       ],
       ["workflows", "workflows: ◞ 6 running · /workflows to view"],
     ])
+
     for (const width of [30, 80, 250]) {
       const plain = renderExtensionStatuses(statuses, width)
+
       const styled = renderExtensionStatuses(
         statuses,
         width,
         (text) => `\u001b[2m${text}\u001b[22m`,
       )
+
       expect(styled.map(stripVTControlCharacters)).toEqual(
         plain.map(stripVTControlCharacters),
       )
@@ -191,6 +209,7 @@ describe("renderExtensionStatuses", () => {
       new Map([["other", "custom 界 status"]]),
       8,
     )
+
     expect(lines.every((line) => visibleWidth(line) <= 8)).toBe(true)
     expect(lines.join("").replace(/\s/g, "")).toBe("custom界status")
   })

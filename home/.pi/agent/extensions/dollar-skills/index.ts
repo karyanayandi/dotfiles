@@ -56,10 +56,12 @@ export function expandDollarSkill(
       const command = commands.find(
         (command) => command.name === `skill:${name}`,
       )
+
       if (!command) return match
 
       const path = command.sourceInfo.path
       const body = stripFrontmatter(readFileSync(path, "utf8")).trim()
+
       return `${prefix}<skill name="${name}" location="${path}">\nReferences are relative to ${dirname(path)}.\n\n${body}\n</skill>`
     },
   )
@@ -109,8 +111,9 @@ export default function dollarSkills(pi: ExtensionAPI) {
 
         return items.length > 0 ? { prefix, items } : null
       },
-      applyCompletion: current.applyCompletion,
-      shouldTriggerFileCompletion: current.shouldTriggerFileCompletion,
+      applyCompletion: current.applyCompletion.bind(current),
+      shouldTriggerFileCompletion:
+        current.shouldTriggerFileCompletion?.bind(current),
     }))
   })
 }

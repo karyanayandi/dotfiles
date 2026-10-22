@@ -10,7 +10,7 @@ import {
   ToolCallTimeoutError,
 } from "./tool-call-timeout.ts"
 
-test("the production timeout error names the tool and three-minute limit", () => {
+await test("the production timeout error names the tool and three-minute limit", () => {
   assert.equal(
     new ToolCallTimeoutError("fixture_tool", CHILD_TOOL_CALL_TIMEOUT_MS)
       .message,
@@ -18,7 +18,7 @@ test("the production timeout error names the tool and three-minute limit", () =>
   )
 })
 
-test("a hung tool call fails clearly and receives an abort signal", async () => {
+await test("a hung tool call fails clearly and receives an abort signal", async () => {
   let executionSignal: AbortSignal | undefined
 
   await assert.rejects(
@@ -42,7 +42,7 @@ test("a hung tool call fails clearly and receives an abort signal", async () => 
   assert.equal(executionSignal?.reason instanceof ToolCallTimeoutError, true)
 })
 
-test("parent cancellation still stops the timeout wrapper immediately", async () => {
+await test("parent cancellation still stops the timeout wrapper immediately", async () => {
   const controller = new AbortController()
   const reason = new Error("cancelled fixture")
 
@@ -58,21 +58,21 @@ test("parent cancellation still stops the timeout wrapper immediately", async ()
   await assert.rejects(pending, (error) => error === reason)
 })
 
-test("the guard wraps each definition once and can discover later tools", () => {
+await test("the guard wraps each definition once and can discover later tools", () => {
   const definitions = new Map<string, ToolDefinition>()
 
-  const createDefinition = (name: string): ToolDefinition => ({
-    name,
-    label: name,
-    description: name,
-    parameters: toolSchema(v.object({})),
-    execute() {
-      return Promise.resolve({
-        content: [{ type: "text", text: "done" }],
-        details: {},
-      })
-    },
-  })
+  const createDefinition = (name: string) =>
+    ({
+      name,
+      label: name,
+      description: name,
+      parameters: toolSchema(v.object({})),
+      execute: () =>
+        Promise.resolve({
+          content: [{ type: "text", text: "done" }],
+          details: {},
+        }),
+    }) satisfies ToolDefinition
 
   const first = createDefinition("first")
   definitions.set(first.name, first)
@@ -98,7 +98,7 @@ test("the guard wraps each definition once and can discover later tools", () => 
   assert.notEqual(second.execute, secondExecute)
 })
 
-test("successful and terminating tool results pass through unchanged", async () => {
+await test("successful and terminating tool results pass through unchanged", async () => {
   const result = {
     content: [{ type: "text" as const, text: "recorded" }],
     details: { value: "fixture" },
@@ -113,7 +113,7 @@ test("successful and terminating tool results pass through unchanged", async () 
   )
 })
 
-test("the timeout is fresh for each tool call, not shared across calls", async () => {
+await test("the timeout is fresh for each tool call, not shared across calls", async () => {
   const execute = () =>
     runWithToolCallTimeout("slow_fixture", 100, undefined, async () => {
       await new Promise((resolve) => setTimeout(resolve, 60))

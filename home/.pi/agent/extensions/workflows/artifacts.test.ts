@@ -23,7 +23,7 @@ function workflowDetails(): WorkflowDetails {
   }
 }
 
-test("artifact transcript keeps the initial prompt, marker, and newest entries", () => {
+await test("artifact transcript keeps the initial prompt, marker, and newest entries", () => {
   const prompt = `initial:${"p".repeat(70)}`
 
   const transcript = [
@@ -55,7 +55,7 @@ test("artifact transcript keeps the initial prompt, marker, and newest entries",
   )
 })
 
-test("live artifact persistence includes current agents and transcripts", () => {
+await test("live artifact persistence includes current agents and transcripts", () => {
   const directory = mkdtempSync(join(tmpdir(), "pi-workflow-artifacts-"))
 
   try {
@@ -128,7 +128,7 @@ test("live artifact persistence includes current agents and transcripts", () => 
   }
 })
 
-test("workflow checkpoints throttle updates and support immediate/final flushes", async () => {
+await test("workflow checkpoints throttle updates and support immediate/final flushes", async () => {
   const details = workflowDetails()
   const snapshots: WorkflowDetails[] = []
 

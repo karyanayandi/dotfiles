@@ -67,7 +67,7 @@ async function pollUntil(check: () => boolean, timeoutMs = 5_000) {
   return true
 }
 
-test("captures streams, settles once, and flushes full spill before notifying", async () => {
+await test("captures streams, settles once, and flushes full spill before notifying", async () => {
   await withManager(async (manager) => {
     const settled: TerminalSnapshot[] = []
     manager.view.setOnSettled((snap) => settled.push(snap))
@@ -96,7 +96,7 @@ test("captures streams, settles once, and flushes full spill before notifying", 
   })
 })
 
-test("non-zero exit and spawn error settle failed with truthful details", async () => {
+await test("non-zero exit and spawn error settle failed with truthful details", async () => {
   await withManager(async (manager) => {
     const failed = await manager.start({
       command: nodeCmd("process.exit(3)"),
@@ -120,7 +120,7 @@ test("non-zero exit and spawn error settle failed with truthful details", async 
   })
 })
 
-test("kill waits for settlement, reports repeat kills, and does not duplicate result", async () => {
+await test("kill waits for settlement, reports repeat kills, and does not duplicate result", async () => {
   await withManager(async (manager) => {
     const consumed: boolean[] = []
     manager.view.setOnSettled((_snap, wasConsumed) =>
@@ -156,7 +156,7 @@ test("kill waits for settlement, reports repeat kills, and does not duplicate re
   })
 })
 
-test("kill abort stops waiting but detached termination continues", async () => {
+await test("kill abort stops waiting but detached termination continues", async () => {
   await withManager(async (manager) => {
     const snap = await manager.start({
       command:
@@ -184,7 +184,7 @@ test("kill abort stops waiting but detached termination continues", async () => 
   })
 })
 
-test(
+await test(
   "SIGTERM-resistant process is escalated within bounded teardown",
   { skip: process.platform === "win32" },
   async () => {
@@ -210,7 +210,7 @@ test(
   },
 )
 
-test(
+await test(
   "kills POSIX process group and reaps inherited-pipe descendant",
   { skip: process.platform === "win32" },
   async () => {
@@ -249,7 +249,7 @@ test(
   },
 )
 
-test("concurrency cap is atomic and settled entries do not consume slots", async () => {
+await test("concurrency cap is atomic and settled entries do not consume slots", async () => {
   await withManager(async (manager) => {
     const terminals = await Promise.all(
       Array.from({ length: MAX_RUNNING }, (_, index) =>
@@ -277,7 +277,7 @@ test("concurrency cap is atomic and settled entries do not consume slots", async
   })
 })
 
-test("pruning keeps running entries and preserves tombstone kill reports", async () => {
+await test("pruning keeps running entries and preserves tombstone kill reports", async () => {
   await withManager(async (manager) => {
     const keeper = await manager.start({
       command: nodeCmd("setInterval(() => {}, 1000)"),
@@ -309,7 +309,7 @@ test("pruning keeps running entries and preserves tombstone kill reports", async
   })
 })
 
-test("dispose kills processes and removes private spill directory", async () => {
+await test("dispose kills processes and removes private spill directory", async () => {
   const runtime = createTerminalRuntime()
 
   const snap = await runtime.manager.start({

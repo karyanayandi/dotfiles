@@ -13,7 +13,7 @@ Each extension uses TypeScript directly:
 ```json
 {
   "scripts": {
-    "check": "tsc --noEmit -p ."
+    "check": "tsrs --noEmit -p ."
   }
 }
 ```

@@ -2,15 +2,16 @@ import { deepStrictEqual, throws } from "node:assert"
 import { test } from "node:test"
 import { isModelShortcut } from "./index.ts"
 import { nextThinkingLevel, parseShortcuts } from "./src/config.ts"
+import { removeLastGrapheme } from "./src/picker.ts"
 
-test("accepts Ctrl+number shortcuts", () => {
+await test("accepts Ctrl+number shortcuts", () => {
   deepStrictEqual(isModelShortcut("ctrl+1"), true)
   deepStrictEqual(isModelShortcut("ctrl+0"), true)
   deepStrictEqual(isModelShortcut("ctrl+shift+1"), false)
   deepStrictEqual(isModelShortcut("f1"), false)
 })
 
-test("cycles through model-supported thinking levels", () => {
+await test("cycles through model-supported thinking levels", () => {
   const extended = ["minimal", "low", "medium", "high", "xhigh", "max"] as const
   const limited = ["low", "high"] as const
 
@@ -20,7 +21,7 @@ test("cycles through model-supported thinking levels", () => {
   deepStrictEqual(nextThinkingLevel(limited, "high", 1), "low")
 })
 
-test("parses shortcut thinking levels and legacy model strings", () => {
+await test("parses shortcut thinking levels and legacy model strings", () => {
   deepStrictEqual(
     parseShortcuts({
       "ctrl+1": "anthropic/claude-sonnet",
@@ -43,4 +44,10 @@ test("parses shortcut thinking levels and legacy model strings", () => {
       "ctrl+1": { model: "openai/gpt-5", thinkingLevel: "invalid" },
     }),
   )
+})
+
+await test("removes whole grapheme clusters from the picker query", () => {
+  deepStrictEqual(removeLastGrapheme("search 👨‍👩‍👧‍👦"), "search ")
+  deepStrictEqual(removeLastGrapheme("e\u0301"), "")
+  deepStrictEqual(removeLastGrapheme("🇨🇦"), "")
 })

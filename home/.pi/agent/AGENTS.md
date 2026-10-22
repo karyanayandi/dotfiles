@@ -9,7 +9,8 @@
   `set_project_path`. Check `get_settings_info`.
 - Keep the file watcher off. Call `configure_file_watcher` with `enabled=false`,
   then call `set_project_path` again for the same project. Check that
-  `get_file_watcher_status` reports `active=false` before you build a deep index.
+  `get_file_watcher_status` reports `active=false` before you build a deep
+  index.
 - Use `search_code_advanced` and `find_files` for code context. Follow search
   pagination with `start_index` when `has_more=true`. Use `refresh_index` when
   the file list is stale.
@@ -63,10 +64,10 @@
 
 ## Testing
 
-- Never run the test suite for the whole project. Run only test files needed
-  for the requested changes, including new or generated test files and existing
-  test files for affected behavior. Use explicit file paths or test filters to
-  avoid unrelated tests and reduce test time. Report which files you tested.
+- Never run the test suite for the whole project. Run only test files needed for
+  the requested changes, including new or generated test files and existing test
+  files for affected behavior. Use explicit file paths or test filters to avoid
+  unrelated tests and reduce test time. Report which files you tested.
 - Do not exclude relevant test files to hide failures. If the test command
   cannot select specific files, report this limit instead of running all tests.
 - Complete all requested code and features before you run tests. Test runs take
@@ -123,10 +124,10 @@
 - Do not add comments or JSDoc unless they are necessary to explain non-obvious
   behavior, a required workaround, or a public API contract.
 - Prefer clear names and straightforward code over explanatory comments.
-- When you add or update documentation, comments, JSDoc, or instructions
-  inside code, use ASD-STE100 Simplified Technical English: approved words,
-  short sentences, and active voice. Keep required technical names, code
-  identifiers, and syntax unchanged.
+- When you add or update documentation, comments, JSDoc, or instructions inside
+  code, use ASD-STE100 Simplified Technical English: approved words, short
+  sentences, and active voice. Keep required technical names, code identifiers,
+  and syntax unchanged.
 
 ## Development servers
 
@@ -144,9 +145,9 @@
 - Use Conventional Commits: `<type>(scope): <description>`. Scope is optional;
   if used, enclose it in parentheses, not square brackets. Add `!` before `:`
   for a breaking change.
-- Write exactly one commit message for all changes in the commit. Use one
-  title that summarizes the complete change and one body that gives details.
-  Do not write separate commit messages for each file or change.
+- Write exactly one commit message for all changes in the commit. Use one title
+  that summarizes the complete change and one body that gives details. Do not
+  write separate commit messages for each file or change.
 - Keep the full title under 50 characters, including the type and scope.
 - Separate the title and body with a blank line. Use prose or a list for the
   body, and wrap each line at 72 characters, including list markers and indent.

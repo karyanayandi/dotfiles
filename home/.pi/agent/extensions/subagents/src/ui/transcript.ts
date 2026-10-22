@@ -89,12 +89,14 @@ function renderUserText(
   for (let i = 0; i < wrapped.length; i++) {
     const prefix =
       i === 0 ? theme.fg("dim", "  User: ") : " ".repeat(prefixWidth)
+
     out.push(truncateToWidth(prefix + theme.fg("dim", wrapped[i]), width))
   }
 }
 
 function visibleAssistantText(part: TranscriptPart): string | undefined {
   if (part.type === "text") return sanitizeText(part.text).trim() || undefined
+
   if (part.type === "thinking")
     return (
       sanitizeText(part.redacted ? "[redacted reasoning]" : part.text).trim() ||
@@ -113,6 +115,7 @@ function renderThinking(
   const reasoning = sanitizeText(text).trim()
 
   if (!reasoning) return
+
   for (const line of new Markdown(reasoning, 1, 0, getMarkdownTheme()).render(
     width,
   )) {
@@ -154,6 +157,7 @@ function renderAssistantItem(
       }
 
       index--
+
       if (thinking.length === 0) continue
 
       renderThinking(theme, thinking.join("\n\n"), width, out)
@@ -272,6 +276,7 @@ export function buildTranscriptLines(
     if (thinking || text) out.push("")
 
     if (thinking) renderThinking(theme, thinking, width, out)
+
     if (thinking && text) out.push("")
 
     if (text)
@@ -296,6 +301,7 @@ export function buildTranscriptLines(
   // visibly acknowledges the user's input instead of appearing to do nothing.
   for (const message of snap.queued) {
     if (out.length > 0) out.push("")
+
     const prefix = theme.fg(
       "warning",
       `  ${activityIndicator(theme, "queued")} [queued ${message.kind}] `,

@@ -4,7 +4,7 @@ import { test } from "node:test"
 import * as v from "valibot"
 import { toolSchema, unsafeSchema } from "./schema.ts"
 
-test("toolSchema emits pi-compatible JSON Schema", () => {
+await test("toolSchema emits pi-compatible JSON Schema", () => {
   const schema = toolSchema(
     v.object({
       count: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(3)),
@@ -42,7 +42,7 @@ test("toolSchema emits pi-compatible JSON Schema", () => {
   assert.ok(!("~unsafe" in schema))
 })
 
-test("unsafeSchema preserves caller JSON Schema", () => {
+await test("unsafeSchema preserves caller JSON Schema", () => {
   assert.deepEqual(unsafeSchema({ type: "string", minLength: 1 }), {
     type: "string",
     minLength: 1,

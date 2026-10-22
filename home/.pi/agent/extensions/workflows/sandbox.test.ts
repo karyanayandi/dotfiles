@@ -22,7 +22,7 @@ function run(
   })
 }
 
-test("sandbox exposes only workflow capabilities and validates results", async () => {
+await test("sandbox exposes only workflow capabilities and validates results", async () => {
   const phases: string[] = []
 
   const result = await run(
@@ -51,7 +51,7 @@ test("sandbox exposes only workflow capabilities and validates results", async (
   assert.deepEqual(phases, ["Gather"])
 })
 
-test("sandbox result serialization handles cycles and bigint", async () => {
+await test("sandbox result serialization handles cycles and bigint", async () => {
   const result = await run(`
     const value = { count: 7n };
     value.self = value;
@@ -61,7 +61,7 @@ test("sandbox result serialization handles cycles and bigint", async () => {
   assert.deepEqual(result, { count: "7n", self: "[circular]" })
 })
 
-test("sandbox rejects unawaited agent calls", async () => {
+await test("sandbox rejects unawaited agent calls", async () => {
   let calls = 0
   await assert.rejects(
     run(`agent("orphan"); return "done";`, {
@@ -76,7 +76,7 @@ test("sandbox rejects unawaited agent calls", async () => {
   assert.equal(calls, 0)
 })
 
-test("sandbox source cannot escape the host accounting wrapper", async () => {
+await test("sandbox source cannot escape the host accounting wrapper", async () => {
   let calls = 0
   await assert.rejects(
     run(
@@ -94,7 +94,7 @@ test("sandbox source cannot escape the host accounting wrapper", async () => {
   assert.equal(calls, 0)
 })
 
-test("sandbox rejects array agent options before invoking the host agent", async () => {
+await test("sandbox rejects array agent options before invoking the host agent", async () => {
   let calls = 0
   await assert.rejects(
     run(`return await agent("invalid", []);`, {
@@ -109,11 +109,11 @@ test("sandbox rejects array agent options before invoking the host agent", async
   assert.equal(calls, 0)
 })
 
-test("sandbox VM still rejects non-yielding synchronous code", async () => {
+await test("sandbox VM still rejects non-yielding synchronous code", async () => {
   await assert.rejects(run(`while (true) {}`), /timed out/)
 })
 
-test("workflow agent invocations have no per-request wall timer", async () => {
+await test("workflow agent invocations have no per-request wall timer", async () => {
   let signalAborted = false
 
   const result = await run(`return (await agent("delayed")).output;`, {
@@ -129,7 +129,7 @@ test("workflow agent invocations have no per-request wall timer", async () => {
   assert.equal(signalAborted, false)
 })
 
-test("workflow cancellation aborts a pending agent request", async () => {
+await test("workflow cancellation aborts a pending agent request", async () => {
   const controller = new AbortController()
   let startedResolve: (() => void) | undefined
 

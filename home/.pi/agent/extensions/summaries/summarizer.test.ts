@@ -2,12 +2,12 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { parseRecapResponse, reasoningOptions } from "./src/summarizer.ts"
 
-test("omits reasoning when configured off", () => {
+await test("omits reasoning when configured off", () => {
   assert.deepEqual(reasoningOptions("off"), {})
   assert.deepEqual(reasoningOptions("high"), { reasoning: "high" })
 })
 
-test("parses strict recap JSON", () => {
+await test("parses strict recap JSON", () => {
   assert.deepEqual(
     parseRecapResponse(
       '{"recap":"Updated config and ran focused tests.","next":"Review the diff."}',
@@ -19,7 +19,7 @@ test("parses strict recap JSON", () => {
   )
 })
 
-test("defensively extracts fenced or surrounded JSON and normalizes Next", () => {
+await test("defensively extracts fenced or surrounded JSON and normalizes Next", () => {
   assert.deepEqual(
     parseRecapResponse(
       'Result follows:\n```json\n{"recap":"- Added the extension\\n- Tests pass","next":"Next: Reload Pi."}\n```',
@@ -31,7 +31,7 @@ test("defensively extracts fenced or surrounded JSON and normalizes Next", () =>
   )
 })
 
-test("rejects malformed or incomplete output", () => {
+await test("rejects malformed or incomplete output", () => {
   assert.throws(() => parseRecapResponse("not json"), /valid recap JSON/)
   assert.throws(
     () => parseRecapResponse('{"recap":"missing next"}'),
@@ -46,7 +46,7 @@ test("rejects malformed or incomplete output", () => {
   )
 })
 
-test("strips terminal control sequences from recap fields", () => {
+await test("strips terminal control sequences from recap fields", () => {
   assert.deepEqual(
     parseRecapResponse(
       '{"recap":"Updated \\u001b[31mconfig\\u001b[0m.","next":"Review it.\\u0007"}',

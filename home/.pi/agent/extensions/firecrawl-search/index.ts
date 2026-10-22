@@ -149,28 +149,37 @@ function throwIfAborted(signal: AbortSignal | undefined): void {
 function withAbort<T>(promise: Promise<T>, signal: AbortSignal | undefined) {
   if (!signal) return promise
 
-  if (signal.aborted) return Promise.reject(signal.reason)
-
-  return new Promise<T>((resolve, reject) => {
-    const abort = () => reject(signal.reason)
-    signal.addEventListener("abort", abort, { once: true })
-    void promise.then(resolve, reject).finally(() => {
-      signal.removeEventListener("abort", abort)
+  if (signal.aborted) {
+    return Promise.resolve().then(() => {
+      throw signal.reason
     })
+  }
+
+  let onAbort: (() => void) | undefined
+
+  const aborted = new Promise<void>((resolve) => {
+    onAbort = () => resolve()
+    signal.addEventListener("abort", onAbort, { once: true })
+  }).then(() => {
+    throw signal.reason
+  })
+
+  if (signal.aborted) onAbort?.()
+
+  return Promise.race([promise, aborted]).finally(() => {
+    if (onAbort) signal.removeEventListener("abort", onAbort)
   })
 }
 
 function wait(ms: number, signal: AbortSignal | undefined): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(resolve, ms)
-    signal?.addEventListener(
-      "abort",
-      () => {
-        clearTimeout(timer)
-        reject(signal.reason)
-      },
-      { once: true },
-    )
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  const timeout = new Promise<void>((resolve) => {
+    timer = setTimeout(resolve, ms)
+  })
+
+  return withAbort(timeout, signal).finally(() => {
+    if (timer !== undefined) clearTimeout(timer)
   })
 }
 
@@ -478,10 +487,17 @@ export default function firecrawlTools(pi: ExtensionAPI) {
                 ? `\n\nMetadata:\n${stringify(document.metadata)}`
                 : ""
 
-            const markdown =
-              document.markdown?.trim() || "No markdown content returned."
+            const markdown = document.markdown?.trim()
 
-            return { details: document, output: `${markdown}${metadata}` }
+            const outputMarkdown =
+              markdown === undefined || markdown === ""
+                ? "No markdown content returned."
+                : markdown
+
+            return {
+              details: document,
+              output: `${outputMarkdown}${metadata}`,
+            }
           } catch (cause) {
             throw new OutputError(errorMessage(cause), { cause })
           }

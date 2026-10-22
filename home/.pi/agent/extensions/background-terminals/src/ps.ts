@@ -24,11 +24,12 @@ import type { TerminalReadModel } from "./manager.ts"
 import { createOutputLineCache, sanitizeText } from "./ui/output-view.ts"
 
 const GUTTER = "  "
+
 const OUTPUT_SCROLL_STEP = 6
 
 type PickerKeybindings = Pick<KeybindingsManager, "getKeys" | "matches">
 
-type PickerContext = {
+interface PickerContext {
   ui: {
     custom<T>(
       factory: (
@@ -251,12 +252,15 @@ class TerminalDashboard implements Component {
     reconcileDashboardSelection(this.selection, terminals)
 
     const height = Math.max(0, (this.tui.terminal.rows || 30) - 1)
+
     if (height === 0) return []
 
     const running = terminals.filter((snap) => snap.status === "running").length
+
     const heading =
       this.theme.fg("accent", this.theme.bold("Background terminals")) +
       this.theme.fg("muted", ` · ${running}/${terminals.length} running`)
+
     const rowHeight = Math.max(0, height - 3)
     const lines = [truncateToWidth(`${GUTTER}${heading}`, width)]
 
@@ -295,13 +299,17 @@ class TerminalDashboard implements Component {
     }
 
     const visible = terminals.slice(start, start + height)
+
     const lines = visible.map((snap, offset) => {
       const index = start + offset
       const selected = index === this.selection.index
+
       const title = selected
         ? this.theme.fg("accent", oneLine(snap.title))
         : this.theme.fg("text", oneLine(snap.title))
+
       const exit = snap.status === "running" ? "" : ` · ${formatExit(snap)}`
+
       const metadata = [
         `pid ${snap.pid ?? "?"}`,
         formatElapsed(snap),
@@ -497,6 +505,7 @@ class TerminalDetailView implements Component {
     if (width <= 0) return []
 
     const height = this.screenHeight()
+
     if (height === 0) return []
 
     const snap = this.snap()
@@ -542,6 +551,7 @@ class TerminalDetailView implements Component {
 
     const active = this.stream
     const buffer = active === "stdout" ? snap.stdout : snap.stderr
+
     const tab = (name: "stdout" | "stderr", size: number) =>
       name === active
         ? this.theme.fg(
@@ -562,6 +572,7 @@ class TerminalDetailView implements Component {
       buffer.totalBytes,
       width - GUTTER.length,
     )
+
     const viewport = this.viewportHeight()
     const noteRows: string[] = []
 

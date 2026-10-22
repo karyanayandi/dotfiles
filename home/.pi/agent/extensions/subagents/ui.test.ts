@@ -75,10 +75,12 @@ function setup(initial = snapshot()) {
   const tui = new TuiMainScreen(new ProcessTerminal())
   tui.requestRender = () => undefined
 
+  const setSnapshot = (next: SubagentSnapshot) => {
+    snap = next
+  }
+
   return {
-    setSnapshot(next: SubagentSnapshot) {
-      snap = next
-    },
+    setSnapshot,
     sent,
     aborted,
     view,

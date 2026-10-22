@@ -6,7 +6,7 @@ import {
   ACTIVITY_FRAME_MS,
   activityIndicator,
 } from "@pi/shared/activity-status"
-import { theme } from "../subagents/test-theme.ts"
+import { theme } from "@pi/shared/test-theme"
 import {
   stateGlyph,
   statusGlyph,
@@ -14,7 +14,7 @@ import {
   type WorkflowStatus,
 } from "./model.ts"
 
-test("workflow indicators use shared states and animate running frames", () => {
+await test("workflow indicators use shared states and animate running frames", () => {
   const originalNow = Date.now
   let now = 0
   Date.now = () => now
@@ -25,6 +25,7 @@ test("workflow indicators use shared states and animate running frames", () => {
       done: "✓",
       error: "✕",
     }
+
     const runs: Record<WorkflowStatus, string> = {
       running: "◜",
       completed: "✓",
@@ -46,6 +47,7 @@ test("workflow indicators use shared states and animate running frames", () => {
       "aborted",
     ] as const) {
       const rendered = statusGlyph(status, theme)
+
       const sharedState =
         status === "completed"
           ? "done"
@@ -54,6 +56,7 @@ test("workflow indicators use shared states and animate running frames", () => {
             : status === "aborted"
               ? "stopped"
               : "running"
+
       assert.equal(rendered, activityIndicator(theme, sharedState))
       assert.equal(stripVTControlCharacters(rendered), runs[status])
       assert.equal(visibleWidth(rendered), 1)

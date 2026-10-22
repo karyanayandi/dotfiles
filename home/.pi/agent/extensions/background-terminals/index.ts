@@ -101,9 +101,11 @@ export default function (pi: ExtensionAPI) {
 
     try {
       const terminals = manager.view.list()
+
       const running = terminals.filter(
         (snap) => snap.status === "running",
       ).length
+
       const done = terminals.filter((snap) => snap.status === "done").length
       const failed = terminals.length - running - done
 

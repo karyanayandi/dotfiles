@@ -59,7 +59,9 @@ export function loadShortcuts() {
   try {
     return parseShortcuts(JSON.parse(readFileSync(configPath, "utf8")))
   } catch (error) {
-    console.error(`Model shortcuts: could not load ${configPath}: ${error}`)
+    console.error(
+      `Model shortcuts: could not load ${configPath}: ${String(error)}`,
+    )
 
     return {}
   }

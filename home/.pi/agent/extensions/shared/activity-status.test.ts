@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import { test } from "node:test"
 import { stripVTControlCharacters } from "node:util"
 import { visibleWidth } from "@earendil-works/pi-tui"
-import { theme } from "../subagents/test-theme.ts"
+import { theme } from "./test-theme.ts"
 import {
   ACTIVITY_FRAME_MS,
   activityIndicator,
@@ -10,9 +10,10 @@ import {
   formatActivityStatus,
 } from "./activity-status.ts"
 
-test("task activity uses a single-column arc spinner at 120 ms", () => {
+await test("task activity uses a single-column arc spinner at 120 ms", () => {
   const frames = ["◜", "◝", "◞", "◟"]
   assert.equal(ACTIVITY_FRAME_MS, 120)
+
   for (let index = 0; index < frames.length * 2; index++) {
     const now = index * ACTIVITY_FRAME_MS
     const indicator = activityIndicator(theme, "running", now)
@@ -28,8 +29,9 @@ test("task activity uses a single-column arc spinner at 120 ms", () => {
   }
 })
 
-test("input alone uses the main Pi spinner and idle pipe", () => {
+await test("input alone uses the main Pi spinner and idle pipe", () => {
   const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
   for (let index = 0; index < frames.length * 2; index++) {
     const now = index * ACTIVITY_FRAME_MS
     const indicator = inputActivityIndicator(theme, true, now)
@@ -50,7 +52,7 @@ test("input alone uses the main Pi spinner and idle pipe", () => {
   }
 })
 
-test("settled and queued indicators do not animate", () => {
+await test("settled and queued indicators do not animate", () => {
   for (const [state, glyph] of [
     ["done", "✓"],
     ["error", "✕"],
@@ -69,7 +71,7 @@ test("settled and queued indicators do not animate", () => {
   }
 })
 
-test("activity summary keeps counts and links without square status marks", () => {
+await test("activity summary keeps counts and links without square status marks", () => {
   const text = stripVTControlCharacters(
     formatActivityStatus(theme, "workflows", {
       running: 2,
@@ -77,6 +79,7 @@ test("activity summary keeps counts and links without square status marks", () =
       failed: 3,
     }),
   )
+
   assert.match(text, /[◜◝◞◟] 2 running/)
   assert.match(text, /✓ 1 done/)
   assert.match(text, /✕ 3 failed/)
@@ -84,7 +87,7 @@ test("activity summary keeps counts and links without square status marks", () =
   assert.doesNotMatch(text, /■/)
 })
 
-test("terminal summary uses its own label, counts, and ps hint", () => {
+await test("terminal summary uses its own label, counts, and ps hint", () => {
   const text = stripVTControlCharacters(
     formatActivityStatus(theme, "background terminal", {
       running: 0,
@@ -92,5 +95,6 @@ test("terminal summary uses its own label, counts, and ps hint", () => {
       failed: 1,
     }),
   )
+
   assert.equal(text, "background terminal: ✓ 2 done · ✕ 1 failed · /ps to view")
 })

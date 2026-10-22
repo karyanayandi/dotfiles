@@ -9,7 +9,7 @@ import {
   buildTerminalResultMessage,
 } from "./src/prompt.ts"
 
-test("start descriptions identify the platform-specific shell contract", () => {
+await test("start descriptions identify the platform-specific shell contract", () => {
   assert.match(BG_START_TOOL_DESCRIPTION, /sh -c on POSIX/)
   assert.match(BG_START_TOOL_DESCRIPTION, /cmd\.exe \/d \/s \/c on Windows/)
   assert.match(BG_START_PARAMETER_DESCRIPTIONS.command, /sh -c on POSIX/)
@@ -40,7 +40,7 @@ function snap(overrides: Partial<TerminalSnapshot> = {}): TerminalSnapshot {
   }
 }
 
-test("kill report distinguishes killed / raced natural exit / already settled", () => {
+await test("kill report distinguishes killed / raced natural exit / already settled", () => {
   const report = buildKillReport([
     {
       id: "bt-1",
@@ -74,7 +74,7 @@ test("kill report distinguishes killed / raced natural exit / already settled", 
   assert.match(lines[2], /was already failed \(exit 1\)/)
 })
 
-test("status result marks head-truncated output with a pointer at the full log", () => {
+await test("status result marks head-truncated output with a pointer at the full log", () => {
   const text = buildStatusResult(
     snap({
       stdout: view({
@@ -90,7 +90,7 @@ test("status result marks head-truncated output with a pointer at the full log",
   assert.match(text, /Full log: \/tmp\/bt-1\.stdout\.log/)
 })
 
-test("completion message reports kill vs exit and omits empty stderr", () => {
+await test("completion message reports kill vs exit and omits empty stderr", () => {
   const killed = buildTerminalResultMessage(
     snap({ status: "killed", exitCode: undefined, signal: "SIGTERM" }),
   )
@@ -110,7 +110,7 @@ test("completion message reports kill vs exit and omits empty stderr", () => {
   assert.match(failed, /stderr:\nboom/)
 })
 
-test("completion output is a shorter tail than the detailed status view", () => {
+await test("completion output is a shorter tail than the detailed status view", () => {
   const output = Array.from(
     { length: 100 },
     (_, index) => `line-${index + 1}`,

@@ -224,7 +224,7 @@ export async function showChangedFiles(
       function moveDiff(amount: number) {
         const maxOffset = Math.max(
           0,
-          files[selectedIndex]!.diff.length - bodyHeight(),
+          files[selectedIndex].diff.length - bodyHeight(),
         )
 
         diffOffset = Math.max(0, Math.min(maxOffset, diffOffset + amount))
@@ -368,7 +368,7 @@ export async function showChangedFiles(
         if (matchesKey(data, Key.end) || data === "G") {
           diffOffset = Math.max(
             0,
-            files[selectedIndex]!.diff.length - bodyHeight(),
+            files[selectedIndex].diff.length - bodyHeight(),
           )
           tui.requestRender()
         }
@@ -383,7 +383,7 @@ export async function showChangedFiles(
         )
 
         const diffWidth = Math.max(1, width - sidebarWidth - 3)
-        const selectedFile = files[selectedIndex]!
+        const selectedFile = files[selectedIndex]
         const title = `local changes · ${files.length} ${files.length === 1 ? "file" : "files"} · ${focus === "files" ? "FILES" : "DIFF"}`
         const lines = [border(width, title, true)]
 

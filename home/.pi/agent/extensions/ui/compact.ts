@@ -73,6 +73,13 @@ type ToolUpdateResult = ToolExecutionComponent["updateResult"]
 
 type ToolSetExpanded = ToolExecutionComponent["setExpanded"]
 
+function readPrototypeMethod<T extends object, K extends keyof T>(
+  prototype: T,
+  method: K,
+): T[K] {
+  return prototype[method]
+}
+
 interface PatchableToolExecutionPrototype {
   render: ToolRender
   invalidate: ToolInvalidate
@@ -418,9 +425,7 @@ export function installToolSpacing(
     return () => undefined
   }
 
-  if (!prototype.__piUiToolSpacingOriginalRender) {
-    prototype.__piUiToolSpacingOriginalRender = prototype.render
-  }
+  prototype.__piUiToolSpacingOriginalRender ??= prototype.render
 
   const originalRender = prototype.__piUiToolSpacingOriginalRender
 
@@ -440,7 +445,7 @@ export function installToolSpacing(
     { settled: boolean; expanded: boolean; hasImages: boolean }
   >()
 
-  const compactRender = function (
+  const compactRender = function compactRender(
     this: ToolExecutionComponent,
     width: number,
   ): string[] {
@@ -481,12 +486,14 @@ export function installToolSpacing(
     return lines
   }
 
-  const compactInvalidate = function (this: ToolExecutionComponent) {
+  const compactInvalidate = function compactInvalidate(
+    this: ToolExecutionComponent,
+  ) {
     renderCache.delete(this)
     originalInvalidate.call(this)
   }
 
-  const compactUpdateResult: ToolUpdateResult = function (
+  const compactUpdateResult: ToolUpdateResult = function compactUpdateResult(
     this: ToolExecutionComponent,
     result,
     isPartial = false,
@@ -501,7 +508,7 @@ export function installToolSpacing(
     originalUpdateResult.call(this, result, isPartial)
   }
 
-  const compactSetExpanded: ToolSetExpanded = function (
+  const compactSetExpanded: ToolSetExpanded = function compactSetExpanded(
     this: ToolExecutionComponent,
     expanded,
   ) {
@@ -515,7 +522,7 @@ export function installToolSpacing(
     originalSetExpanded.call(this, expanded)
   }
 
-  const compactRenderInner = function (
+  const compactRenderInner = function compactRenderInner(
     this: ToolExecutionComponent,
     width: number,
     rendered: string[],
@@ -862,9 +869,10 @@ export function installCompactMessages(
   theme: Theme,
   getCompact: () => boolean,
 ): () => void {
-  const originalMarkdownRender = Markdown.prototype.render
+  const originalMarkdownRender: (this: Markdown, width: number) => string[] =
+    readPrototypeMethod(Markdown.prototype, "render")
 
-  const compactMarkdownRender = function (
+  const compactMarkdownRender = function compactMarkdownRender(
     this: Markdown,
     width: number,
   ): string[] {
@@ -908,9 +916,13 @@ export function installCompactMessages(
 
   Markdown.prototype.render = compactMarkdownRender
 
-  const originalTextRender = Text.prototype.render
+  const originalTextRender: (this: Text, width: number) => string[] =
+    readPrototypeMethod(Text.prototype, "render")
 
-  const compactTextRender = function (this: Text, width: number): string[] {
+  const compactTextRender = function compactTextRender(
+    this: Text,
+    width: number,
+  ): string[] {
     if (!getCompact()) return originalTextRender.call(this, width)
     const { text } = v.parse(textStateSchema, this)
 
@@ -922,11 +934,17 @@ export function installCompactMessages(
 
   Text.prototype.render = compactTextRender
 
-  const originalUserRender = UserMessageComponent.prototype.render
-  const originalUserInvalidate = UserMessageComponent.prototype.invalidate
+  const originalUserRender: (
+    this: UserMessageComponent,
+    width: number,
+  ) => string[] = readPrototypeMethod(UserMessageComponent.prototype, "render")
+
+  const originalUserInvalidate: (this: UserMessageComponent) => void =
+    readPrototypeMethod(UserMessageComponent.prototype, "invalidate")
+
   const compactUserMessages = new WeakMap<UserMessageComponent, Text>()
 
-  const compactUserRender = function (
+  const compactUserRender = function compactUserRender(
     this: UserMessageComponent,
     width: number,
   ): string[] {
@@ -947,7 +965,9 @@ export function installCompactMessages(
     return message.render(width)
   }
 
-  const compactUserInvalidate = function (this: UserMessageComponent) {
+  const compactUserInvalidate = function compactUserInvalidate(
+    this: UserMessageComponent,
+  ) {
     compactUserMessages.delete(this)
     originalUserInvalidate.call(this)
   }
@@ -955,13 +975,22 @@ export function installCompactMessages(
   UserMessageComponent.prototype.render = compactUserRender
   UserMessageComponent.prototype.invalidate = compactUserInvalidate
 
-  const originalAssistantRender = AssistantMessageComponent.prototype.render
+  const originalAssistantRender: (
+    this: AssistantMessageComponent,
+    width: number,
+  ) => string[] = readPrototypeMethod(
+    AssistantMessageComponent.prototype,
+    "render",
+  )
 
-  const originalAssistantInvalidate =
-    AssistantMessageComponent.prototype.invalidate
+  const originalAssistantInvalidate: (this: AssistantMessageComponent) => void =
+    readPrototypeMethod(AssistantMessageComponent.prototype, "invalidate")
 
-  const originalAssistantUpdateContent =
-    AssistantMessageComponent.prototype.updateContent
+  const originalAssistantUpdateContent: (
+    this: AssistantMessageComponent,
+    ...args: Parameters<AssistantMessageComponent["updateContent"]>
+  ) => ReturnType<AssistantMessageComponent["updateContent"]> =
+    readPrototypeMethod(AssistantMessageComponent.prototype, "updateContent")
 
   const compactAssistantLines = new WeakMap<
     AssistantMessageComponent,
@@ -973,7 +1002,7 @@ export function installCompactMessages(
     { streaming: boolean }
   >()
 
-  const compactAssistantRender = function (
+  const compactAssistantRender = function compactAssistantRender(
     this: AssistantMessageComponent,
     width: number,
   ): string[] {
@@ -1040,7 +1069,7 @@ export function installCompactMessages(
     return lines
   }
 
-  const compactAssistantInvalidate = function (
+  const compactAssistantInvalidate = function compactAssistantInvalidate(
     this: AssistantMessageComponent,
   ) {
     compactAssistantLines.delete(this)
@@ -1048,7 +1077,11 @@ export function installCompactMessages(
   }
 
   const compactAssistantUpdateContent: AssistantMessageComponent["updateContent"] =
-    function (this: AssistantMessageComponent, message, isStreaming) {
+    function compactAssistantUpdateContent(
+      this: AssistantMessageComponent,
+      message,
+      isStreaming,
+    ) {
       const previous = compactAssistantState.get(this)
       compactAssistantState.set(this, {
         streaming: isStreaming ?? previous?.streaming ?? false,

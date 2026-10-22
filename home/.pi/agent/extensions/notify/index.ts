@@ -61,11 +61,11 @@ function commandExists(command: string): boolean {
 }
 
 function hasDesktopSession(): boolean {
-  return Boolean(
-    process.env.DISPLAY ||
-    process.env.WAYLAND_DISPLAY ||
+  return [
+    process.env.DISPLAY,
+    process.env.WAYLAND_DISPLAY,
     process.env.DBUS_SESSION_BUS_ADDRESS,
-  )
+  ].some(Boolean)
 }
 
 function canUseWindowsToast(): boolean {

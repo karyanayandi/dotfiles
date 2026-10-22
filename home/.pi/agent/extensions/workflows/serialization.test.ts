@@ -6,7 +6,7 @@ import { test } from "node:test"
 import * as v from "valibot"
 import { safeStringify, writeFileAtomic } from "./serialization.ts"
 
-test("safeStringify handles cycles, bigint, depth, and size", () => {
+await test("safeStringify handles cycles, bigint, depth, and size", () => {
   interface CyclicFixture {
     bigint: bigint
     nested: { deeper: { deepest: boolean } }
@@ -36,7 +36,7 @@ test("safeStringify handles cycles, bigint, depth, and size", () => {
   assert.match(text, /truncated/)
 })
 
-test("serialization preserves arbitrary primitive and unreadable property markers", () => {
+await test("serialization preserves arbitrary primitive and unreadable property markers", () => {
   const value = {
     missing: undefined,
     nan: Number.NaN,
@@ -66,7 +66,7 @@ test("serialization preserves arbitrary primitive and unreadable property marker
   assert.equal(safeStringify(null), "null")
 })
 
-test("atomic writes leave complete readable content", () => {
+await test("atomic writes leave complete readable content", () => {
   const directory = mkdtempSync(join(tmpdir(), "pi-workflow-test-"))
 
   try {

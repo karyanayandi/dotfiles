@@ -30,7 +30,7 @@ function entry(
   }
 }
 
-test("run boundaries replace stale starts and settle exactly once", () => {
+await test("run boundaries replace stale starts and settle exactly once", () => {
   const boundary = createRunBoundary()
   boundary.begin("before-run")
   boundary.begin("new-top-level-run")
@@ -41,7 +41,7 @@ test("run boundaries replace stale starts and settle exactly once", () => {
   assert.equal(boundary.settle(), undefined)
 })
 
-test("run slicing starts after the before_agent_start leaf", () => {
+await test("run slicing starts after the before_agent_start leaf", () => {
   const entries = [
     entry("old", { role: "user", content: "old", timestamp: 0 }),
     entry("new", { role: "user", content: "new", timestamp: 1 }),
@@ -54,7 +54,7 @@ test("run slicing starts after the before_agent_start leaf", () => {
   assert.deepEqual(getRunEntries(entries, "missing"), [])
 })
 
-test("transcript omits thinking, images, and recap entries while redacting tool data", () => {
+await test("transcript omits thinking, images, and recap entries while redacting tool data", () => {
   const entries: SessionEntry[] = [
     entry("user", {
       role: "user",
@@ -119,7 +119,7 @@ test("transcript omits thinking, images, and recap entries while redacting tool 
   assert.match(transcript, /tool arguments capped/)
 })
 
-test("transcript enforces per-result and total byte caps", () => {
+await test("transcript enforces per-result and total byte caps", () => {
   const entries = Array.from({ length: 20 }, (_, index) =>
     entry(`result-${index}`, {
       role: "toolResult",
@@ -135,4 +135,29 @@ test("transcript enforces per-result and total byte caps", () => {
   assert.ok(Buffer.byteLength(transcript, "utf8") <= TRANSCRIPT_MAX_BYTES)
   assert.match(transcript, /transcript capped/)
   assert.match(transcript, /tool result capped/)
+})
+
+await test("transcript cap keeps a complete grapheme at the tail", () => {
+  const transcript = serializeRunTranscript(
+    [
+      entry("assistant", {
+        role: "assistant",
+        content: [{ type: "text", text: "👩‍💻".repeat(20) }],
+        api: "openai-codex-responses",
+        provider: "openai-codex",
+        model: "gpt-6-luna",
+        usage,
+        stopReason: "stop",
+        timestamp: 0,
+      }),
+    ],
+    81,
+  )
+
+  const marker = "\n\n[... transcript capped; middle omitted ...]\n\n"
+  const tail = transcript.split(marker).at(-1)
+
+  assert.ok(Buffer.byteLength(transcript, "utf8") <= 81)
+
+  assert.ok(tail?.startsWith("👩‍💻"))
 })

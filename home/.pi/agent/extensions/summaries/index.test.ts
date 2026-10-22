@@ -11,15 +11,16 @@ import {
 import summariesExtension from "./index.ts"
 
 function createDeferredRejection() {
-  let rejectPromise: (reason?: unknown) => void = () => undefined
+  let rejectPromise: (reason: Error) => void = () => undefined
+
   const promise = new Promise<never>((_resolve, reject) => {
-    rejectPromise = reject
+    rejectPromise = (reason) => reject(reason)
   })
 
   return { promise, reject: rejectPromise }
 }
 
-test("registers only the recap renderer, command, and bounded lifecycle hooks", () => {
+await test("registers only the recap renderer, command, and bounded lifecycle hooks", () => {
   const events = new Set<string>()
   const renderers = new Set<string>()
   const commands = new Set<string>()
@@ -52,25 +53,29 @@ test("registers only the recap renderer, command, and bounded lifecycle hooks", 
   assert.deepEqual(commands, new Set(["summary-model"]))
 })
 
-test(
+await test(
   "shows and clears the run indicator above the editor through its lifecycle",
   { timeout: 10_000 },
   async () => {
     const directory = await mkdtemp(join(tmpdir(), "pi-summaries-widget-"))
+
     const widgets: {
       key: string
       content: string[] | undefined
       placement: string | undefined
     }[] = []
+
     const notifications: { message: string; type: string | undefined }[] = []
     const entries: { type: string; data: unknown }[] = []
     const completionAuth = createDeferredRejection()
     const shutdownAuth = createDeferredRejection()
     const authRequests = [completionAuth.promise, shutdownAuth.promise]
     let resolveAppend: () => void = () => undefined
+
     const appended = new Promise<void>((resolve) => {
       resolveAppend = resolve
     })
+
     let emit: ((event: string) => Promise<void>) | undefined
 
     const loader = new DefaultResourceLoader({
@@ -92,6 +97,7 @@ test(
         entries.push({ type, data })
         resolveAppend()
       }
+
       emit = async (event) => {
         for (const handler of extension.handlers.get(event) ?? [])
           await handler({ type: event }, ctx)
@@ -134,7 +140,9 @@ test(
           find: () => ({}),
           getApiKeyAndHeaders: () => {
             const request = authRequests.shift()
+
             if (!request) throw new Error("Unexpected summary model request")
+
             return request
           },
         },

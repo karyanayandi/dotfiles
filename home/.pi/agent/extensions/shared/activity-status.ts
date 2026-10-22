@@ -11,6 +11,7 @@ interface ActivityCounts {
 export const ACTIVITY_FRAME_MS = 120
 
 const spinnerFrames = ["◜", "◝", "◞", "◟"]
+
 const inputSpinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
 type ActivityState = "running" | "done" | "error" | "stopped" | "queued"
@@ -22,11 +23,16 @@ export function activityIndicator(
 ) {
   if (state === "running") {
     const frame = Math.floor(now / ACTIVITY_FRAME_MS) % spinnerFrames.length
+
     return theme.fg("text", spinnerFrames[frame] ?? spinnerFrames[0])
   }
+
   if (state === "done") return theme.fg("success", "✓")
+
   if (state === "error") return theme.fg("error", "✕")
+
   if (state === "stopped") return theme.fg("muted", "▪")
+
   return theme.fg("warning", "○")
 }
 
@@ -37,6 +43,7 @@ export function inputActivityIndicator(
 ) {
   if (!working) return theme.fg("text", "┃")
   const frame = Math.floor(now / ACTIVITY_FRAME_MS) % inputSpinnerFrames.length
+
   return theme.fg("text", inputSpinnerFrames[frame] ?? inputSpinnerFrames[0])
 }
 

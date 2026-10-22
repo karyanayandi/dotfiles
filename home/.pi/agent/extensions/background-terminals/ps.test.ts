@@ -23,9 +23,10 @@ import {
   sanitizeText,
 } from "./src/ui/output-view.ts"
 import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
-import { theme } from "../subagents/test-theme.ts"
+import { theme } from "@pi/shared/test-theme"
 
-interface CapturedComponent extends Component {
+type CapturedComponent = Omit<Component, "handleInput"> & {
+  handleInput?: (this: void, data: string) => void
   dispose?(): void
 }
 
@@ -47,14 +48,17 @@ function terminal(
   overrides: Partial<TerminalSnapshot> = {},
 ): TerminalSnapshot {
   const createdAt = Date.now() - 35_000
+
   const stdoutText = Array.from(
     { length: 40 },
     (_, index) => `stdout line ${index}`,
   ).join("\n")
+
   const stderrText = Array.from(
     { length: 40 },
     (_, index) => `stderr line ${index}`,
   ).join("\n")
+
   const base: TerminalSnapshot = {
     id,
     command: "printf 'hello world'",
@@ -134,6 +138,7 @@ function createHarness(
   }
 
   const keybindings = new KeybindingsManager(TUI_KEYBINDINGS)
+
   const ui: PickerTestUI = {
     custom<T>(
       factory: (
@@ -146,6 +151,7 @@ function createHarness(
       return new Promise<T>((resolve, reject) => {
         let component: CapturedComponent | undefined
         let doneCalled = false
+
         const done = (value: T) => {
           doneCalled = true
           component?.dispose?.()
@@ -156,6 +162,7 @@ function createHarness(
           (created) => {
             component = created
             components.push(created)
+
             if (doneCalled) created.dispose?.()
           },
           reject,
@@ -184,12 +191,16 @@ function createHarness(
     },
     setSnapshot(snap: TerminalSnapshot) {
       snapshots.set(snap.id, snap)
+
       for (const listener of globalListeners) listener()
+
       for (const listener of detailListeners.get(snap.id) ?? []) listener()
     },
     removeSnapshot(id: string) {
       snapshots.delete(id)
+
       for (const listener of globalListeners) listener()
+
       for (const listener of detailListeners.get(id) ?? []) listener()
     },
     run: () => openTerminalPicker({ ui }, view),
@@ -210,7 +221,7 @@ async function componentAt(
   return component
 }
 
-function send(component: Component, data: string) {
+function send(component: CapturedComponent, data: string) {
   assert.ok(component.handleInput, "component accepts keyboard input")
   component.handleInput(data)
 }
@@ -223,14 +234,23 @@ function plainText(component: Component, width = 80) {
   return plainLines(component, width).join("\n")
 }
 
+function isThemeProperty(
+  target: Theme,
+  property: string | symbol,
+): property is keyof Theme {
+  return property in target
+}
+
 function withBoldAnsi(): Theme {
   return new Proxy(theme, {
-    get(target, property, receiver) {
+    get(target, property) {
       if (property === "bold") {
         return (text: string) => `\u001b[1m${text}\u001b[22m`
       }
 
-      return Reflect.get(target, property, receiver)
+      if (isThemeProperty(target, property)) return target[property]
+
+      return undefined
     },
   })
 }
@@ -244,7 +264,7 @@ function assertBounded(lines: readonly string[], width: number) {
   }
 }
 
-test("dashboard selection follows its terminal id and falls back by row", () => {
+await test("dashboard selection follows its terminal id and falls back by row", () => {
   const selection = { id: "bt-7", index: 6 }
 
   reconcileDashboardSelection(selection, [
@@ -267,13 +287,14 @@ test("dashboard selection follows its terminal id and falls back by row", () => 
   assert.deepEqual(selection, { id: undefined, index: 0 })
 })
 
-test("dashboard and detail are borderless, bounded, and fixed-height", async () => {
+await test("dashboard and detail are borderless, bounded, and fixed-height", async () => {
   const harness = createHarness([
     terminal("bt-running", "running", { title: "Running 界" }),
     terminal("bt-done", "done", { title: "Finished" }),
     terminal("bt-failed", "failed", { title: "Broken" }),
     terminal("bt-killed", "killed", { title: "Stopped" }),
   ])
+
   const run = harness.run()
 
   try {
@@ -285,6 +306,7 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
       for (const component of [dashboard, detail]) {
         const lines = component.render(width)
         assertBounded(lines, width)
+
         if (width === 0) assert.deepEqual(lines, [])
 
         const text = lines.map(stripVTControlCharacters).join("\n")
@@ -293,7 +315,7 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
     }
 
     const dashboardText = plainText(dashboard)
-    assert.match(dashboardText, /^  /)
+    assert.match(dashboardText, /^ {2}/)
     assert.match(dashboardText, /1\/4 running/)
     assert.match(dashboardText, /[◜◝◞◟] Running 界/)
     assert.match(dashboardText, /✓ Finished/)
@@ -305,11 +327,11 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
     assert.equal(detailLines.length, 23)
     assert.match(
       detailLines[0],
-      /^  [◜◝◞◟] Background process · bt-running · Running 界/,
+      /^ {2}[◜◝◞◟] Background process · bt-running · Running 界/,
     )
     assert.match(detailLines[1], /running.*pid 1234.*worker 界/)
-    assert.match(detailLines[2], /^  \$ printf 'hello world'/)
-    assert.ok(detailLines.some((line) => /stdout \(/.test(line)))
+    assert.match(detailLines[2], /^ {2}\$ printf 'hello world'/)
+    assert.ok(detailLines.some((line) => line.includes("stdout (")))
     assert.ok(detailLines.at(-1)?.startsWith("  "))
 
     for (const rows of [1, 2, 3, 4, 8, 24, 40]) {
@@ -317,10 +339,12 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
         value: rows,
         configurable: true,
       })
+
       for (const component of [dashboard, detail]) {
         const lines = component.render(80)
         assert.ok(lines.length <= Math.max(0, rows - 1))
         assertBounded(lines, 80)
+
         if (rows >= 24) assert.equal(lines.length, rows - 1)
       }
     }
@@ -334,7 +358,7 @@ test("dashboard and detail are borderless, bounded, and fixed-height", async () 
   }
 })
 
-test("dashboard navigation opens and returns from selected detail, and kills running terminal", async () => {
+await test("dashboard navigation opens and returns from selected detail, and kills running terminal", async () => {
   const harness = createHarness(
     [
       terminal("bt-running"),
@@ -343,6 +367,7 @@ test("dashboard navigation opens and returns from selected detail, and kills run
     ],
     withBoldAnsi(),
   )
+
   const run = harness.run()
 
   try {
@@ -350,16 +375,24 @@ test("dashboard navigation opens and returns from selected detail, and kills run
     send(dashboard, "x")
     send(dashboard, "j")
     const dashboardText = plainText(dashboard)
+
     const selectedLine =
       dashboard
         .render(80)
         .find((line) => stripVTControlCharacters(line).includes("Finished")) ??
       ""
+
     assert.match(dashboardText, /✓ Finished/)
     assert.equal((dashboardText.match(/›/g) ?? []).length, 1)
     assert.match(stripVTControlCharacters(selectedLine), /^› ✓ Finished/)
-    assert.doesNotMatch(selectedLine, /\u001b\[(?:1|4\d)m/)
-    assert.match(selectedLine, /\u001b\[39m/)
+    assert.equal(
+      [
+        "\u001b[1m",
+        ...Array.from({ length: 10 }, (_, digit) => `\u001b[4${digit}m`),
+      ].some((code) => selectedLine.includes(code)),
+      false,
+    )
+    assert.equal(selectedLine.includes("\u001b[39m"), true)
     send(dashboard, "\r")
 
     const detail = await componentAt(harness, 1)
@@ -378,15 +411,17 @@ test("dashboard navigation opens and returns from selected detail, and kills run
   }
 })
 
-test("status indicators animate while running and stop their tickers on cleanup", async (context) => {
+await test("status indicators animate while running and stop their tickers on cleanup", async (context) => {
   context.mock.timers.enable({ apis: ["Date", "setInterval"], now: 0 })
   const running = terminal("bt-running", "running", { title: "Running" })
+
   const harness = createHarness([
     running,
     terminal("bt-done", "done", { title: "Finished" }),
     terminal("bt-failed", "failed", { title: "Broken" }),
     terminal("bt-killed", "killed", { title: "Stopped" }),
   ])
+
   const run = harness.run()
 
   try {
@@ -407,7 +442,7 @@ test("status indicators animate while running and stop their tickers on cleanup"
     const detail = await componentAt(harness, 1)
     assert.match(
       plainLines(detail, 80)[0],
-      /^  ◝ Background process · bt-running · Running$/,
+      /^ {2}◝ Background process · bt-running · Running$/,
     )
 
     const beforeDetailTick = harness.renderRequests
@@ -415,7 +450,7 @@ test("status indicators animate while running and stop their tickers on cleanup"
     assert.equal(harness.renderRequests, beforeDetailTick + 1)
     assert.match(
       plainLines(detail, 80)[0],
-      /^  ◞ Background process · bt-running · Running$/,
+      /^ {2}◞ Background process · bt-running · Running$/,
     )
 
     harness.setSnapshot({
@@ -427,7 +462,7 @@ test("status indicators animate while running and stop their tickers on cleanup"
     await new Promise<void>((resolve) => setTimeout(resolve, 60))
     assert.match(
       plainLines(detail, 80)[0],
-      /^  ✓ Background process · bt-running · Running$/,
+      /^ {2}✓ Background process · bt-running · Running$/,
     )
     const settledRequests = harness.renderRequests
     context.mock.timers.tick(ACTIVITY_FRAME_MS)
@@ -449,7 +484,7 @@ test("status indicators animate while running and stop their tickers on cleanup"
   }
 })
 
-test("detail switches streams, scrolls, follows live output, shows notices, and cleans up missing snapshots", async () => {
+await test("detail switches streams, scrolls, follows live output, shows notices, and cleans up missing snapshots", async () => {
   const initial = terminal("bt-detail")
   const harness = createHarness([initial])
   const run = harness.run()
@@ -475,6 +510,7 @@ test("detail switches streams, scrolls, follows live output, shows notices, and 
 
     send(detail, "t")
     const liveText = `${initial.stdout.text}\nstdout live output`
+
     const liveSnapshot = {
       ...initial,
       stdout: {
@@ -483,6 +519,7 @@ test("detail switches streams, scrolls, follows live output, shows notices, and 
         totalBytes: Buffer.byteLength(liveText),
       },
     }
+
     const requestsBeforeUpdate = harness.renderRequests
     harness.setSnapshot(liveSnapshot)
     await new Promise<void>((resolve) => setTimeout(resolve, 75))
@@ -498,6 +535,7 @@ test("detail switches streams, scrolls, follows live output, shows notices, and 
         spillPath: "/tmp/full.log",
       },
     }
+
     harness.setSnapshot(withNotices)
     const noticeText = plainText(detail)
     assert.match(noticeText, /error: process failed/)
@@ -520,7 +558,7 @@ test("detail switches streams, scrolls, follows live output, shows notices, and 
   }
 })
 
-test("sanitizeText strips ANSI, tabs, and control characters", () => {
+await test("sanitizeText strips ANSI, tabs, and control characters", () => {
   assert.equal(sanitizeText("\u001b[31mred\u001b[0m"), "red")
   assert.equal(sanitizeText("\u001b[12345Cshifted"), "shifted")
   assert.equal(sanitizeText("\u001b]0;window title\u0007output"), "output")
@@ -535,7 +573,7 @@ test("sanitizeText strips ANSI, tabs, and control characters", () => {
   assert.equal(sanitizeText("a\u0007b\u0000c"), "abc")
 })
 
-test("output line cache reuses a version/width key and invalidates either dimension", () => {
+await test("output line cache reuses a version/width key and invalidates either dimension", () => {
   const cache = createOutputLineCache()
   const first = cache.get("first", 1, 80)
   const sameKey = cache.get("different text is intentionally ignored", 1, 80)
@@ -551,7 +589,7 @@ test("output line cache reuses a version/width key and invalidates either dimens
   assert.ok(newWidth.length > 1)
 })
 
-test("buildOutputLines wraps long lines and keeps only the final CR segment", () => {
+await test("buildOutputLines wraps long lines and keeps only the final CR segment", () => {
   const lines = buildOutputLines("progress 1\rprogress 2\rdone\nnext", 80)
   assert.deepEqual(lines, ["done", "next"])
   assert.deepEqual(buildOutputLines("progress 1\rprogress 2\r", 80), [
@@ -563,7 +601,7 @@ test("buildOutputLines wraps long lines and keeps only the final CR segment", ()
   assert.equal(wrapped.join(""), "x".repeat(25))
 })
 
-test("buildOutputLines drops one trailing empty line from a trailing newline", () => {
+await test("buildOutputLines drops one trailing empty line from a trailing newline", () => {
   assert.deepEqual(buildOutputLines("a\nb\n", 80), ["a", "b"])
   assert.deepEqual(buildOutputLines("a\n\n", 80), ["a", ""])
 })

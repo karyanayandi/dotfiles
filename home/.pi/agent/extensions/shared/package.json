@@ -6,7 +6,7 @@
     "./*": "./*.ts"
   },
   "scripts": {
-    "check": "tsc --noEmit -p .",
+    "check": "tsrs --noEmit -p .",
     "test": "node --test --experimental-strip-types *.test.ts"
   },
   "dependencies": {

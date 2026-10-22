@@ -10,6 +10,7 @@ import * as v from "valibot"
 import {
   createFirstResponseWatchdog,
   guardWorkflowChildTools,
+  parseThinkingLevel,
   recordToolExecutionTiming,
   transcriptFromMessages,
   type ToolExecutionTiming,
@@ -75,7 +76,17 @@ function parallelToolMessages(): AgentSession["messages"] {
   ]
 }
 
-test("completed parallel tool calls pair lifecycle timings with calls and results", () => {
+await test("thinking level parser accepts supported levels only", () => {
+  assert.deepEqual(parseThinkingLevel("high"), {
+    typed: true,
+    success: true,
+    output: "high",
+    issues: undefined,
+  })
+  assert.equal(parseThinkingLevel("unsupported").success, false)
+})
+
+await test("completed parallel tool calls pair lifecycle timings with calls and results", () => {
   const timings = new Map<string, ToolExecutionTiming>()
   recordToolExecutionTiming(
     timings,
@@ -154,7 +165,7 @@ test("completed parallel tool calls pair lifecycle timings with calls and result
   }
 })
 
-test("in-flight aborted tool calls retain start timing without completion", () => {
+await test("in-flight aborted tool calls retain start timing without completion", () => {
   const timings = new Map<string, ToolExecutionTiming>()
   recordToolExecutionTiming(
     timings,
@@ -183,7 +194,8 @@ test("in-flight aborted tool calls retain start timing without completion", () =
   )
 })
 
-test("first-response watchdog aborts a silent provider request", async () => {
+await test("first-response watchdog aborts a silent provider request", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] })
   let aborted = false
 
   const watchdog = createFirstResponseWatchdog(
@@ -195,7 +207,7 @@ test("first-response watchdog aborts a silent provider request", async () => {
     { timeoutMs: 10, model: "fixture-model" },
   )
 
-  await assert.rejects(
+  const rejection = assert.rejects(
     watchdog.waitFor(
       new Promise<never>(() => {
         // Silent provider fixture stays pending until the watchdog fires.
@@ -203,10 +215,13 @@ test("first-response watchdog aborts a silent provider request", async () => {
     ),
     /no assistant response event for fixture-model within 10 ms.*stalled/i,
   )
+
+  context.mock.timers.tick(10)
+  await rejection
   assert.equal(aborted, true)
 })
 
-test("first assistant response disarms the watchdog without limiting the run", async () => {
+await test("first assistant response disarms the watchdog without limiting the run", async () => {
   const watchdog = createFirstResponseWatchdog(
     () => Promise.reject(new Error("watchdog should have been disarmed")),
     { timeoutMs: 10 },
@@ -221,7 +236,7 @@ test("first assistant response disarms the watchdog without limiting the run", a
   assert.equal(result, "done")
 })
 
-test("workflow children guard structured, normal, and dynamically registered tools", async () => {
+await test("workflow children guard structured, normal, and dynamically registered tools", async () => {
   const structuredResult = {
     content: [{ type: "text" as const, text: "recorded" }],
     details: { value: "fixture" },
@@ -267,6 +282,7 @@ test("workflow children guard structured, normal, and dynamically registered too
     description: "fixture",
     parameters: toolSchema(v.object({})),
     execute(
+      this: void,
       _toolCallId: string,
       _params: Record<string, never>,
       signal?: AbortSignal,

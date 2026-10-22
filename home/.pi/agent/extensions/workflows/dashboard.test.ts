@@ -18,13 +18,13 @@ import {
 } from "@earendil-works/pi-tui"
 import { TuiMainScreen } from "@earendil-works/pi-tui/dist/tui-main-screen.js"
 import { ACTIVITY_FRAME_MS } from "@pi/shared/activity-status"
-import { theme } from "../subagents/test-theme.ts"
+import { theme } from "@pi/shared/test-theme"
 import {
   WorkflowDashboard,
   loadRunEntries,
   normalizeDetails,
 } from "./dashboard.ts"
-import type { WorkflowDetails } from "./model.ts"
+import type { Theme, WorkflowDetails } from "./model.ts"
 
 function workflowArtifact(status: "completed" | "running" = "completed") {
   const transcript = [
@@ -145,6 +145,7 @@ function createDashboardHarness(
   tui.requestRender = () => {
     renderRequests.count++
   }
+
   const dashboard = new WorkflowDashboard(
     tui,
     displayTheme,
@@ -162,6 +163,7 @@ function createDashboardHarness(
     renderRequests,
     dispose() {
       dashboard.dispose()
+
       if (previous === undefined) delete process.env.PI_CODING_AGENT_DIR
       else process.env.PI_CODING_AGENT_DIR = previous
       rmSync(directory, { recursive: true, force: true })
@@ -180,9 +182,16 @@ function plainText(dashboard: WorkflowDashboard, width = 80) {
   return dashboard.render(width).map(stripVTControlCharacters).join("\n")
 }
 
+function isThemeProperty(
+  target: Theme,
+  property: string | symbol,
+): property is keyof Theme {
+  return property in target
+}
+
 function selectedStyleTheme() {
   return new Proxy(theme, {
-    get(target, property, receiver) {
+    get(target, property) {
       if (property === "bg")
         return (color: Parameters<typeof target.bg>[0], text: string) =>
           color === "selectedBg"
@@ -198,7 +207,9 @@ function selectedStyleTheme() {
       if (property === "bold")
         return (text: string) => `\u001b[1m${text}\u001b[22m`
 
-      return Reflect.get(target, property, receiver)
+      if (isThemeProperty(target, property)) return target[property]
+
+      return undefined
     },
   })
 }
@@ -213,8 +224,9 @@ function assertSelectedRow(dashboard: WorkflowDashboard, text: string) {
     )
 
   assert.ok(row, `missing selected row containing ${text}`)
-  assert.doesNotMatch(row, /\u001b\[(?:1|4\d)m/)
-  assert.match(row, /\u001b\[35m/)
+  assert.ok(!row.includes("\u001b[1m"))
+  assert.ok(!row.includes("\u001b[44m"))
+  assert.ok(row.includes("\u001b[35m"))
 }
 
 function assertScreen(
@@ -231,6 +243,7 @@ function assertScreen(
   }
 
   assert.equal(lines.length, rows - 1)
+
   for (const line of lines)
     assert.ok(
       visibleWidth(line) <= width,
@@ -242,7 +255,7 @@ function assertScreen(
   assert.doesNotMatch(text, /■/)
 }
 
-test("dashboard loads legacy artifacts, filters sessions, and recovers stale runs", () => {
+await test("dashboard loads legacy artifacts, filters sessions, and recovers stale runs", () => {
   const directory = mkdtempSync(join(tmpdir(), "pi-workflow-dashboard-"))
   const previous = process.env.PI_CODING_AGENT_DIR
   process.env.PI_CODING_AGENT_DIR = directory
@@ -321,19 +334,20 @@ test("dashboard loads legacy artifacts, filters sessions, and recovers stale run
   }
 })
 
-test("workflow screens stay borderless, bounded, and fixed-height", () => {
+await test("workflow screens stay borderless, bounded, and fixed-height", () => {
   const harness = createDashboardHarness(true, new Map(), selectedStyleTheme())
   const { dashboard, tui } = harness
 
   try {
     for (const rows of [4, 8, 24, 40]) {
       setRows(tui, rows)
+
       for (const width of [0, 1, 2, 8, 24, 80, 160])
         assertScreen(dashboard, width, rows)
     }
 
     const list = plainText(dashboard)
-    assert.match(list, /^  Workflows/m)
+    assert.match(list, /^ {2}Workflows/m)
     assert.match(list, /✓ Build plan 界/)
     assert.equal((list.match(/›/g) ?? []).length, 1)
     assert.doesNotMatch(list, /■/)
@@ -345,8 +359,10 @@ test("workflow screens stay borderless, bounded, and fixed-height", () => {
     assert.match(shortList.at(-1) ?? "", /select/)
 
     dashboard.handleInput("\r")
+
     for (const rows of [4, 8, 24, 40]) {
       setRows(tui, rows)
+
       for (const width of [0, 1, 2, 8, 24, 80, 160])
         assertScreen(dashboard, width, rows)
     }
@@ -370,20 +386,23 @@ test("workflow screens stay borderless, bounded, and fixed-height", () => {
   }
 })
 
-test("running workflow indicators animate and request live renders", async () => {
+await test("running workflow indicators animate and request live renders", async () => {
   const activeWorkflow = normalizeDetails(
     "wf_fixture",
     workflowArtifact("running"),
   )
+
   assert.ok(activeWorkflow)
 
   const originalNow = Date.now
   let now = 0
   Date.now = () => now
+
   const harness = createDashboardHarness(
     true,
     new Map([["wf_fixture", activeWorkflow]]),
   )
+
   setRows(harness.tui, 24)
 
   try {
@@ -401,7 +420,7 @@ test("running workflow indicators animate and request live renders", async () =>
   }
 })
 
-test("phase and agent focus navigate to a compact Markdown transcript", () => {
+await test("phase and agent focus navigate to a compact Markdown transcript", () => {
   const harness = createDashboardHarness(true, new Map(), selectedStyleTheme())
   const { dashboard, tui } = harness
   setRows(tui, 24)
@@ -439,9 +458,11 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
 
     for (const rows of [4, 8, 24, 40]) {
       setRows(tui, rows)
+
       for (const width of [0, 1, 2, 8, 24, 80, 160])
         assertScreen(dashboard, width, rows)
     }
+
     setRows(tui, 24)
 
     const top = plainText(dashboard)
@@ -453,7 +474,8 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
     assert.match(top, /read.*src\/main\.ts/)
     assert.match(top, /Read finished/)
     assert.doesNotMatch(top, /USER|ASSISTANT|THINKING|\*\*|`/)
-    assert.doesNotMatch(top, /hidden title|\u001b/)
+    assert.ok(!top.includes("hidden title"))
+    assert.ok(!top.includes("\u001b"))
 
     dashboard.handleInput("j")
     assert.notEqual(plainText(dashboard), top)
@@ -475,7 +497,7 @@ test("phase and agent focus navigate to a compact Markdown transcript", () => {
   }
 })
 
-test("empty and failed runs render notices and save an inspectable report", () => {
+await test("empty and failed runs render notices and save an inspectable report", () => {
   const emptyHarness = createDashboardHarness(false)
 
   try {
@@ -505,6 +527,7 @@ test("empty and failed runs render notices and save an inspectable report", () =
       join(directory, "workflows", "wf_fixture", "report.md"),
       "utf8",
     )
+
     assert.match(report, /^# Workflow Build plan 界/m)
     assert.match(report, /Status: done/)
     assert.match(report, /## Gather/)

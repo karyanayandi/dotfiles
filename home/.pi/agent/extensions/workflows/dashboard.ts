@@ -5,6 +5,7 @@
 
 import * as fs from "node:fs"
 import * as path from "node:path"
+import { stripVTControlCharacters } from "node:util"
 import * as v from "valibot"
 import {
   getAgentDir,
@@ -41,8 +42,6 @@ import {
   type TranscriptEntry,
   type WorkflowDetails,
 } from "./model.ts"
-import { sanitizeText } from "../background-terminals/src/ui/output-view.ts"
-import { sanitizeTerminalText } from "../ui/layout.ts"
 
 const GUTTER = "  "
 
@@ -53,7 +52,25 @@ const ARTIFACT_REFRESH_MS = 500
 const TRANSCRIPT_SCROLL_STEP = 20
 
 function terminalText(text: string): string {
-  return sanitizeTerminalText(sanitizeText(text))
+  const safeText = stripVTControlCharacters(text).replaceAll("\t", "  ")
+  let sanitized = ""
+
+  for (const character of safeText) {
+    const codePoint = character.codePointAt(0)
+
+    if (
+      codePoint === undefined ||
+      codePoint <= 0x1f ||
+      (codePoint >= 0x7f && codePoint <= 0x9f) ||
+      (codePoint >= 0x202a && codePoint <= 0x202e) ||
+      (codePoint >= 0x2066 && codePoint <= 0x2069)
+    )
+      continue
+
+    sanitized += character
+  }
+
+  return sanitized
 }
 
 function oneLine(text: string): string {
@@ -517,6 +534,7 @@ export class WorkflowDashboard {
   dispose() {
     if (this.disposed) return
     this.disposed = true
+
     if (this.timer) clearInterval(this.timer)
     this.timer = undefined
   }
@@ -547,6 +565,7 @@ export class WorkflowDashboard {
 
     this.timer = setInterval(() => {
       if (this.disposed) return
+
       if (Date.now() - this.lastRefreshAt >= ARTIFACT_REFRESH_MS) this.refresh()
       this.tui.requestRender()
       this.syncTimer()
@@ -757,6 +776,7 @@ export class WorkflowDashboard {
     if (width <= 0) return []
 
     const height = Math.max(0, this.tui.terminal.rows - 1)
+
     if (height === 0) return []
 
     const agent = this.selectedAgent()
@@ -781,11 +801,13 @@ export class WorkflowDashboard {
     if (width < 64) return truncateToWidth(`${left} ${right}`, width, "…")
 
     const rightText = truncateToWidth(right, width, "…")
+
     const leftText = truncateToWidth(
       left,
       Math.max(0, width - visibleWidth(rightText) - 1),
       "…",
     )
+
     const pad = Math.max(
       1,
       width - visibleWidth(leftText) - visibleWidth(rightText),
@@ -819,10 +841,12 @@ export class WorkflowDashboard {
 
   private renderList(width: number, height: number): string[] {
     const theme = this.theme
+
     const footer = this.hintLine(
       `${this.keys("tui.select.up")}/${this.keys("tui.select.down")} select · ${this.keys("tui.select.confirm")} open · ${this.keys("tui.select.cancel")} close`,
       width,
     )
+
     const header = this.split(
       `${GUTTER}${theme.bold(theme.fg("accent", "Workflows"))}`,
       theme.fg(
@@ -850,12 +874,15 @@ export class WorkflowDashboard {
         const selected = index === this.listIndex
         const details = entry.details
         const label = oneLine(details.name ?? details.runId)
+
         const title = selected
           ? theme.fg("accent", label)
           : theme.fg("text", label)
+
         const { done, failed } = countStates(details)
         const settled = done + failed
         const left = `${selected ? theme.fg("accent", "› ") : GUTTER}${statusGlyph(details.status, theme)} ${title} ${theme.fg("dim", oneLine(details.runId))}`
+
         const right = theme.fg(
           "muted",
           `${settled}/${details.agents.length} · ${formatElapsed(details.startedAt, details.finishedAt)} · ${statusWord(details.status)}`,
@@ -865,6 +892,7 @@ export class WorkflowDashboard {
           width >= 64
             ? this.split(left, right, width)
             : truncateToWidth(`${left} ${right}`, width, "…")
+
         body.push(line)
       }
     }
@@ -877,13 +905,17 @@ export class WorkflowDashboard {
   private phaseRow(group: PhaseGroup, index: number): string {
     const selected = index === this.phaseIndex
     const focused = selected && this.detailFocus === "phases"
+
     const done = group.agents.filter(
       (agent) => agent.state !== "running",
     ).length
+
     const title = oneLine(group.title)
+
     const styledTitle = focused
       ? this.theme.fg("accent", title)
       : this.theme.fg("text", title)
+
     const count = group.agents.length
       ? `${done}/${group.agents.length}`
       : "empty"
@@ -896,9 +928,11 @@ export class WorkflowDashboard {
   private agentRow(agent: AgentRecord, index: number): string {
     const selected = index === this.agentIndex
     const focused = selected && this.detailFocus === "agents"
+
     const label = focused
       ? this.theme.fg("accent", oneLine(agent.label))
       : this.theme.fg("text", oneLine(agent.label))
+
     const metadata = [
       oneLine(agent.model ?? ""),
       agentContext(agent),
@@ -944,6 +978,7 @@ export class WorkflowDashboard {
       rows.push(
         `${GUTTER}${this.agentRow(agent, visible.offset + visibleIndex)}`,
       )
+
       if (agent.error)
         rows.push(
           theme.fg("error", `${GUTTER}  error: ${oneLine(agent.error)}`),
@@ -966,11 +1001,13 @@ export class WorkflowDashboard {
     const phaseWindow = this.windowed(groups, this.phaseIndex, dataHeight)
     const agentList = selectedGroup?.agents ?? []
     const agentWindow = this.windowed(agentList, this.agentIndex, dataHeight)
+
     const phaseRows = groups.length
       ? phaseWindow.items.map((group, index) =>
           this.phaseRow(group, phaseWindow.offset + index),
         )
       : [this.theme.fg("dim", "no agents or phases yet")]
+
     const agentRows = agentList.length
       ? agentWindow.items.flatMap((agent, index) => [
           this.agentRow(agent, agentWindow.offset + index),
@@ -984,14 +1021,17 @@ export class WorkflowDashboard {
             groups.length ? "no agents in this phase yet" : "",
           ),
         ]
+
     const lines: string[] = []
 
     for (let index = 0; index < bodyHeight; index++) {
       const isHeading = hasHeadings && index === 0
       const rowIndex = index - Number(hasHeadings)
+
       const left = isHeading
         ? this.theme.fg("muted", this.theme.bold("Phases"))
         : (phaseRows[rowIndex] ?? "")
+
       const right = isHeading
         ? this.theme.fg(
             "muted",
@@ -1002,6 +1042,7 @@ export class WorkflowDashboard {
             ),
           )
         : (agentRows[rowIndex] ?? "")
+
       const leftText = truncateToWidth(left, leftWidth, "…")
       const rightText = truncateToWidth(right, rightWidth, "…")
 
@@ -1021,17 +1062,21 @@ export class WorkflowDashboard {
     const theme = this.theme
     const { done, failed } = countStates(details)
     const settled = done + failed
+
     const summary =
       theme.fg(
         "muted",
         `${settled}/${details.agents.length} agents · ${formatElapsed(details.startedAt, details.finishedAt)} · `,
       ) + theme.fg(statusColor(details.status), statusWord(details.status))
+
     const header = this.split(
       `${GUTTER}${statusGlyph(details.status, theme)} ${theme.bold(theme.fg("accent", `Workflow · ${oneLine(details.name ?? details.runId)}`))}`,
       summary,
       width,
     )
+
     const totals = formatUsage(aggregateUsage(details.agents))
+
     const metadata = [
       oneLine(details.description ?? details.runId),
       totals,
@@ -1039,6 +1084,7 @@ export class WorkflowDashboard {
     ]
       .filter(Boolean)
       .join(" · ")
+
     const headerHeight = height >= 4 ? 2 : 1
     const headers = [header]
 
@@ -1052,6 +1098,7 @@ export class WorkflowDashboard {
     const selectedGroup = groups[this.phaseIndex]
     this.clampAgentIndex()
     const bodyHeight = Math.max(0, height - headerHeight - 1)
+
     const body =
       width >= 80
         ? this.renderDetailColumns(groups, selectedGroup, width, bodyHeight)
@@ -1104,17 +1151,21 @@ export class WorkflowDashboard {
         }
       } else {
         const text = terminalText(entry.text).trim()
+
         const prefix =
           entry.role === "user"
             ? `${theme.fg("accent", theme.bold("User"))} `
             : entry.role === "tool"
               ? `${theme.fg("warning", "·")} `
               : `${theme.fg(entry.isError ? "error" : "success", entry.isError ? "✕" : "✓")} `
+
         const label = entry.role === "tool" ? oneLine(entry.name ?? "tool") : ""
+
         const body =
           entry.role === "tool"
             ? `${theme.fg("toolTitle", theme.bold(label))}${text ? ` ${theme.fg("toolOutput", text)}` : ""}`
             : theme.fg(entry.isError ? "error" : "dim", text)
+
         const wrapped = wrapTextWithAnsi(
           body,
           Math.max(1, width - GUTTER.length - visibleWidth(prefix)),
@@ -1148,13 +1199,16 @@ export class WorkflowDashboard {
     this.transcriptViewportSize = bodyHeight
     const maxScroll = Math.max(0, rows.length - bodyHeight)
     this.transcriptScroll = Math.min(this.transcriptScroll, maxScroll)
+
     const visible = rows.slice(
       this.transcriptScroll,
       this.transcriptScroll + bodyHeight,
     )
+
     const last = Math.min(rows.length, this.transcriptScroll + bodyHeight)
     const position = `${rows.length ? this.transcriptScroll + 1 : 0}-${last}/${rows.length}`
     const header = `${GUTTER}${stateGlyph(agent.state, theme)} ${theme.bold(theme.fg("accent", `Workflow agent · ${oneLine(agent.label)}`))}`
+
     const metadata = [
       oneLine(details.name ?? details.runId),
       oneLine(agent.phase ?? "unphased"),
@@ -1167,6 +1221,7 @@ export class WorkflowDashboard {
     ]
       .filter(Boolean)
       .join(" · ")
+
     const headers = [header]
 
     if (headerHeight === 2)

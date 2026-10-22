@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { crawlEffect, type CrawlClient } from "./index.ts"
 
-test("cancels the remote crawl when polling is interrupted", async () => {
+await test("cancels the remote crawl when polling is interrupted", async () => {
   let pollingStarted!: () => void
 
   const startedPolling = new Promise<void>((resolve) => {
@@ -41,4 +41,20 @@ test("cancels the remote crawl when polling is interrupted", async () => {
   await interrupted
 
   assert.deepEqual(cancelledJobs, ["crawl-123"])
+})
+
+await test("preserves crawl request rejection causes", async () => {
+  const cause = new Error("network down")
+
+  const client: CrawlClient = {
+    startCrawl: () =>
+      Promise.resolve({ id: "crawl-123", url: "https://example.com" }),
+    getCrawlStatus: () => Promise.reject(cause),
+    cancelCrawl: () => Promise.resolve(true),
+  }
+
+  await assert.rejects(
+    crawlEffect(client, "https://example.com", { limit: 1 }),
+    { cause },
+  )
 })

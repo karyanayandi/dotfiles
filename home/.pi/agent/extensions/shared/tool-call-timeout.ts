@@ -98,10 +98,10 @@ export function createToolCallTimeoutGuard(
     if (wrapped.has(definition)) return
     wrapped.add(definition)
 
-    const execute = definition.execute
+    const execute = definition.execute.bind(definition)
     definition.execute = (toolCallId, params, signal, onUpdate, ctx) =>
       runWithToolCallTimeout(definition.name, timeoutMs, signal, (signal) =>
-        execute.call(definition, toolCallId, params, signal, onUpdate, ctx),
+        execute(toolCallId, params, signal, onUpdate, ctx),
       )
   }
 

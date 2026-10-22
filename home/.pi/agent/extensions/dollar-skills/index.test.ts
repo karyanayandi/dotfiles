@@ -6,17 +6,20 @@ import { join } from "node:path"
 
 import { expandDollarSkill, searchSkills } from "./index.ts"
 
-test("expands dollar skills throughout prompts using native skill blocks", (t) => {
+await test("expands dollar skills throughout prompts using native skill blocks", (t) => {
   const directory = mkdtempSync(join(tmpdir(), "dollar-skills-"))
   t.after(() => rmSync(directory, { recursive: true, force: true }))
+
   const commands = ["react-doctor", "accessibility"].map((name) => {
     const path = join(directory, `${name}.md`)
     writeFileSync(
       path,
       `---\nname: ${name}\ndescription: Test skill\n---\n\nUse ${name}.\n`,
     )
+
     return { name: `skill:${name}`, sourceInfo: { path } }
   })
+
   const blocks = commands.map(
     ({ name, sourceInfo }) =>
       `<skill name="${name.slice(6)}" location="${sourceInfo.path}">\nReferences are relative to ${directory}.\n\nUse ${name.slice(6)}.\n</skill>`,
@@ -45,11 +48,12 @@ test("expands dollar skills throughout prompts using native skill blocks", (t) =
   ]) {
     assert.equal(expandDollarSkill(input, commands), undefined)
   }
+
   rmSync(commands[0].sourceInfo.path)
   assert.throws(() => expandDollarSkill("$react-doctor", commands), /ENOENT/)
 })
 
-test("searches skill names and descriptions with literal case-insensitive terms", () => {
+await test("searches skill names and descriptions with literal case-insensitive terms", () => {
   const commands = [
     { name: "skill:react-doctor", description: "Diagnose React issues" },
     {

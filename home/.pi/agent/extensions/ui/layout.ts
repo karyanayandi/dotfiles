@@ -88,9 +88,11 @@ export function renderExtensionStatuses(
         ] as const,
     )
     .filter(([, text]) => Boolean(text))
+
   const full = entries.map(([, text]) => text).join("  ")
 
   if (!full) return []
+
   if (visibleWidth(full) <= width) return [full]
 
   const sections = entries.map(([key, text]) => {

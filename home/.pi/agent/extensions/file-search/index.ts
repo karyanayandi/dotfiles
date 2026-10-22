@@ -106,26 +106,25 @@ function isAbortError<ErrorValue>(error: ErrorValue) {
 }
 
 function awaitWithAbort<T>(promise: Promise<T>, signal: AbortSignal) {
-  if (signal.aborted)
+  if (signal.aborted) {
     return Promise.reject(
       new DOMException("The operation was aborted", "AbortError"),
     )
+  }
 
-  return new Promise<T>((resolve, reject) => {
-    const abort = () =>
-      reject(new DOMException("The operation was aborted", "AbortError"))
+  let onAbort: (() => void) | undefined
 
-    signal.addEventListener("abort", abort, { once: true })
-    void promise.then(
-      (value) => {
-        signal.removeEventListener("abort", abort)
-        resolve(value)
-      },
-      (error) => {
-        signal.removeEventListener("abort", abort)
-        reject(error)
-      },
-    )
+  const aborted = new Promise<void>((resolve) => {
+    onAbort = () => resolve()
+    signal.addEventListener("abort", onAbort, { once: true })
+  }).then(() => {
+    throw new DOMException("The operation was aborted", "AbortError")
+  })
+
+  if (signal.aborted) onAbort?.()
+
+  return Promise.race([promise, aborted]).finally(() => {
+    if (onAbort) signal.removeEventListener("abort", onAbort)
   })
 }
 

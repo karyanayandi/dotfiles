@@ -50,7 +50,9 @@ export function buildOutputLines(text: string, width: number) {
     const finalSegment = segments.at(-1) ?? ""
 
     const lastSegment =
-      finalSegment || [...segments].reverse().find((segment) => segment) || ""
+      finalSegment !== ""
+        ? finalSegment
+        : ([...segments].reverse().find((segment) => segment) ?? "")
 
     const clean = sanitizeText(lastSegment)
 

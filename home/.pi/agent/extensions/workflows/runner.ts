@@ -58,6 +58,20 @@ export type WorkflowModel = NonNullable<ExtensionContext["model"]>
 
 export type ThinkingLevel = ReturnType<ExtensionAPI["getThinkingLevel"]>
 
+export const THINKING_LEVELS = [
+  "off",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+] as const satisfies readonly ThinkingLevel[]
+
+export function parseThinkingLevel(effort: string) {
+  return v.safeParse(v.picklist(THINKING_LEVELS), effort)
+}
+
 type AgentMessage = AgentSession["messages"][number]
 
 type ToolTimingEvent = Extract<

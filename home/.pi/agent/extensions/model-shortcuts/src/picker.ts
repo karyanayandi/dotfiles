@@ -12,6 +12,20 @@ import {
   Text,
 } from "@earendil-works/pi-tui"
 
+const graphemeSegmenter = new Intl.Segmenter(undefined, {
+  granularity: "grapheme",
+})
+
+export function removeLastGrapheme(value: string) {
+  let lastIndex = 0
+
+  for (const { index } of graphemeSegmenter.segment(value)) {
+    lastIndex = index
+  }
+
+  return value.slice(0, lastIndex)
+}
+
 export function pick(
   ctx: ExtensionContext,
   title: string,
@@ -64,7 +78,7 @@ export function pick(
       render: (width: number) => list.render(width),
       invalidate: () => list.invalidate(),
       handleInput(data: string) {
-        const isPrintable = [...data].every((character) => {
+        const isPrintable = Array.from(data).every((character) => {
           const codePoint = character.codePointAt(0) ?? 0
 
           return codePoint >= 32 && codePoint !== 127
@@ -77,7 +91,7 @@ export function pick(
           query += printable
           updateList()
         } else if (matchesKey(data, Key.backspace)) {
-          query = query.slice(0, -1)
+          query = removeLastGrapheme(query)
           updateList()
         } else {
           list.handleInput(data)

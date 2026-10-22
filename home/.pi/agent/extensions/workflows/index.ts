@@ -78,7 +78,9 @@ import {
 } from "./prompt.ts"
 import {
   createWorkflowResources,
+  parseThinkingLevel,
   runAgent,
+  THINKING_LEVELS,
   type ThinkingLevel,
   type WorkflowModel,
 } from "./runner.ts"
@@ -88,16 +90,6 @@ import { safeStringify, writeFileAtomic } from "./serialization.ts"
 const PREVIEW_LENGTH = 200
 
 const EMIT_INTERVAL_MS = 120
-
-const THINKING_LEVELS = [
-  "off",
-  "minimal",
-  "low",
-  "medium",
-  "high",
-  "xhigh",
-  "max",
-] as const
 
 /** What `agent()` resolves to inside the script. */
 interface ScriptAgentResult {
@@ -336,6 +328,7 @@ export default function workflows(pi: ExtensionAPI) {
 
   pi.on("session_shutdown", async () => {
     const ui = lastUi
+
     if (activityTimer) clearInterval(activityTimer)
     activityTimer = undefined
     lastUi = undefined
@@ -640,16 +633,19 @@ export default function workflows(pi: ExtensionAPI) {
             let thinkingLevel: ThinkingLevel = pi.getThinkingLevel()
 
             if (opts.effort !== undefined) {
-              const effort = String(opts.effort)
+              const effort = v.safeParse(v.string(), opts.effort)
 
-              const parsedEffort = v.safeParse(
-                v.picklist(THINKING_LEVELS),
-                effort,
-              )
+              if (!effort.success) {
+                return fail(
+                  `agent "${label}": invalid effort (use ${THINKING_LEVELS.join("|")})`,
+                )
+              }
+
+              const parsedEffort = parseThinkingLevel(effort.output)
 
               if (!parsedEffort.success) {
                 return fail(
-                  `agent "${label}": invalid effort "${effort}" (use ${THINKING_LEVELS.join("|")})`,
+                  `agent "${label}": invalid effort "${effort.output}" (use ${THINKING_LEVELS.join("|")})`,
                 )
               }
 
