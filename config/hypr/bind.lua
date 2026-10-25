@@ -1,6 +1,6 @@
 -- ~/.config/hypr/bind.lua
 
-local terminal = "ghostty"
+local terminal = "foot"
 local fileManager = "nemo"
 local browser = "google-chrome-stable"
 local mainMod = "SUPER"
