@@ -1,4 +1,4 @@
 {
   "model": "openai/gpt-6-luna",
-  "reasoningEffort": "xhigh"
+  "reasoningEffort": "max"
 }

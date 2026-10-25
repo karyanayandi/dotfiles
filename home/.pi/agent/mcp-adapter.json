@@ -35,6 +35,14 @@
       "command": "/home/karyana/.local/bin/code-index-mcp",
       "args": [],
       "directTools": true
+    },
+    "rea": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["rea-agents@6.7.0", "mcp"],
+      "env": {
+        "HOPPER_LAUNCHER_PATH": "/opt/hopper/bin/Hopper"
+      }
     }
   }
 }
