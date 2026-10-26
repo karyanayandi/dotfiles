@@ -137,8 +137,13 @@
 
 ## Browser automation
 
-- When using Playwriter, prefer the current active tab. Open a new tab only when
-  the task genuinely requires it.
+- Always use a custom tab group with a project-specific name and an explicit
+  color when using Playwriter. Never use the default Playwriter tab group.
+- Keep all tabs used by Playwriter in that project's group. Do not use, move,
+  or close tabs from other projects. This prevents conflicts when Playwriter
+  runs in more than one project.
+- Prefer the current active tab only if it belongs to that project's group.
+  Open a new tab in that group only when the task requires it.
 
 ## Git
 
