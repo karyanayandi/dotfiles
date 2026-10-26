@@ -80,6 +80,30 @@ describe("renderExtensionStatuses", () => {
     ])
   })
 
+  test("compacts current background terminal labels on resize", () => {
+    const status =
+      "\u001b[90mbackground terminal:\u001b[39m ◜ 1 running · \u001b[32m✓ 3 done\u001b[39m · \u001b[31m✕ 2 failed\u001b[39m · /ps to view"
+
+    const statuses = new Map([["background-terminals", status]])
+    const full = status.replace(" to view", " ↗")
+    const fullWidth = visibleWidth(full)
+
+    for (const width of [fullWidth, fullWidth - 1, 50, 20, 1, fullWidth]) {
+      const lines = renderExtensionStatuses(statuses, width)
+      const plain = lines.map(stripVTControlCharacters).join("\n")
+
+      expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true)
+
+      if (width >= fullWidth) {
+        expect(lines).toEqual([full])
+      } else {
+        expect(plain.replace(/\s/g, "")).toBe(">_◜1·✓3·✕2·/ps↗")
+        expect(lines.join("")).toContain("\u001b[32m")
+        expect(lines.join("")).toContain("\u001b[31m")
+      }
+    }
+  })
+
   test("omits empty statuses and respects terminal width", () => {
     const lines = renderExtensionStatuses(
       new Map([

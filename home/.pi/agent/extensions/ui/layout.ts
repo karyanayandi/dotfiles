@@ -97,7 +97,9 @@ export function renderExtensionStatuses(
 
   const sections = entries.map(([key, text]) => {
     if (key === "background-terminals") {
-      text = `>_  ${text.replace(/ background terminals? running/g, "")}`
+      text = text.includes("background terminal:")
+        ? text.replace("background terminal:", ">_ ")
+        : `>_  ${text.replace(/ background terminals? running/g, "")}`
     } else if (key === "subagents") {
       text = text.replace("subagents:", "⌘ ")
     } else if (key === "workflows") {
