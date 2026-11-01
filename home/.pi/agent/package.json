@@ -27,11 +27,11 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@yopem/oxlint-config": "^0.5.0",
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0",
-    "oxlint-tsgolint": "^7.0.2004",
-    "tsrs": "^0.18.0-ts7.1.0-dev.20260929",
+    "@yopem/oxlint-config": "^0.7.1",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
+    "oxlint-tsgolint": "^7.0.2005",
+    "tsrs": "^0.20.1-ts7.1.0-beta",
     "turbo": "^2.11.10",
     "typescript": "catalog:"
   },
@@ -46,7 +46,7 @@
   "catalog": {
     "@earendil-works/pi-coding-agent": "1.4.0",
     "@earendil-works/pi-tui": "^1.4.0",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@valibot/to-json-schema": "^1.8.0",
     "firecrawl": "^4.51.0",
     "typescript": "^7.0.2",
