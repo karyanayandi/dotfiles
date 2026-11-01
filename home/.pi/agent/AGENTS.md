@@ -28,6 +28,13 @@
 
 ## Work quality and continuity
 
+- At the start of a task, read the relevant progress notes in `docs/`.
+  During the task, keep Markdown notes in `docs/` up to date with completed
+  work, work in progress, remaining work, blockers, and validation results.
+  Include the context and next steps a new agent needs to continue. Update the
+  notes before stopping and when the task is complete. Never commit these
+  notes. If the user asks to change `AGENTS.md` only, do not create or update
+  progress notes.
 - Do not speculate about token budgets, remaining context, or time left. Do not
   narrate internal resource accounting or invent deadlines.
 - Never use perceived token, context, or time pressure to rush work, reduce the
