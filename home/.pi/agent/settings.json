@@ -1,12 +1,12 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "gpt-6.1-sol",
+  "defaultModel": "gpt-6.1-terra",
   "defaultProjectTrust": "always",
   "defaultProvider": "openai",
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "xhigh",
   "subagents": {
-    "defaultModel": "gpt-6-luna",
-    "defaultThinking": "max",
+    "defaultModel": "gpt-6.1-terra",
+    "defaultThinking": "xhigh",
     "defaultProvider": "openai"
   },
   "editorPaddingX": 3,
@@ -26,7 +26,6 @@
     "npm:pi-nvim",
     "npm:pi-observational-memory",
     "npm:pi-tool-display",
-    "npm:pi-autoresearch",
     "npm:pi-tmux-images"
   ],
   "quietStartup": true,
@@ -43,9 +42,12 @@
   "modelThinkingLevels": {
     "openai/gpt-6-astra": "low",
     "openai/gpt-6.1-sol": "medium",
+    "openai/gpt-6.1-terra": "xhigh",
     "openai/gpt-6-luna": "max"
   },
-  "extensions": ["-builtin:mcp"],
+  "extensions": [
+    "-builtin:mcp"
+  ],
   "deviceId": "3dcc8fa1-0ae2-46c9-99f9-a0a6e55df560",
   "piBolt": {
     "packages": [],
