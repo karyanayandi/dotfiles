@@ -33,6 +33,13 @@ hl.config {
   },
 }
 
+hl.config {
+  render = {
+    cm_auto_hdr = 0,
+    send_content_type = false,
+  },
+}
+
 -- Decoration
 hl.config {
   decoration = {
