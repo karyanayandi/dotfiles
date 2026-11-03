@@ -250,7 +250,10 @@ function toolPreview(value: JsonValue): string | undefined {
   return undefined
 }
 
-function assistantParts(msg: AssistantMessage): TranscriptPart[] {
+function assistantParts(
+  msg: AssistantMessage,
+  session: AgentSession,
+): TranscriptPart[] {
   const parts: TranscriptPart[] = []
 
   for (const part of msg.content) {
@@ -269,9 +272,19 @@ function assistantParts(msg: AssistantMessage): TranscriptPart[] {
         name: part.name,
         argsPreview: safeJson(part.arguments),
         displayArgs:
-          part.name === "edit" || part.name === "ctx_execute"
+          part.name === "edit" ||
+          part.name === "write" ||
+          part.name === "ctx_execute"
             ? part.arguments
             : undefined,
+        displayRenderers:
+          part.name === "edit" || part.name === "write"
+            ? session.extensionRunner.resolveToolRenderers(part.name, () =>
+                session.getToolDefinition(part.name),
+              )
+            : undefined,
+        displayState:
+          part.name === "edit" || part.name === "write" ? {} : undefined,
       })
     }
   }
@@ -484,7 +497,7 @@ async function makePiSession(task: SpawnTask): Promise<SubagentSession> {
         } else if (msg.role === "assistant") {
           emit({
             _tag: "AssistantMessage",
-            parts: assistantParts(msg),
+            parts: assistantParts(msg, session),
           })
           emitUsage()
           emit({ _tag: "MetaChanged", meta: currentMeta() })
@@ -516,7 +529,10 @@ async function makePiSession(task: SpawnTask): Promise<SubagentSession> {
           name: event.toolName,
           isError: event.isError,
           outputPreview: toolPreview(event.result),
-          displayResult: event.toolName === "edit" ? event.result : undefined,
+          displayResult:
+            event.toolName === "edit" || event.toolName === "write"
+              ? event.result
+              : undefined,
         })
         break
       case "queue_update":

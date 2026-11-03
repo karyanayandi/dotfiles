@@ -5,7 +5,10 @@
  * events become the normalized `SubagentEvent` union.
  */
 
-import type { ModelRegistry } from "@earendil-works/pi-coding-agent"
+import type {
+  ModelRegistry,
+  ToolRenderers,
+} from "@earendil-works/pi-coding-agent"
 
 export type BackendName = "pi"
 
@@ -78,6 +81,8 @@ export type TranscriptPart =
       readonly argsPreview?: string
       /** Backend-native arguments retained for optional takeover renderers. */
       readonly displayArgs?: unknown
+      readonly displayRenderers?: ToolRenderers
+      readonly displayState?: object
     }
 
 export type TranscriptItem =

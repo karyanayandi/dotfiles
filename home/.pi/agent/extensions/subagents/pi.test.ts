@@ -8,12 +8,17 @@ import {
   type ServerResponse,
 } from "node:http"
 import { syncBuiltinESMExports } from "node:module"
+import { fileURLToPath } from "node:url"
+import { stripVTControlCharacters } from "node:util"
+import { visibleWidth } from "@earendil-works/pi-tui"
+import { buildTranscriptLines } from "./src/ui/transcript.ts"
+import { theme } from "./test-theme.ts"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import test, { type TestContext } from "node:test"
 import { ModelRegistry, ModelRuntime } from "@earendil-works/pi-coding-agent"
 import { piBackend } from "./src/backends/pi.ts"
-import type { SpawnTask, SubagentEvent } from "./src/domain.ts"
+import type { SpawnTask, SubagentEvent, TranscriptItem } from "./src/domain.ts"
 import * as v from "valibot"
 
 const PROVIDER = "subagents-local-test"
@@ -28,6 +33,8 @@ const CANCEL_PROMPT = "Hold the response until cancelled"
 
 const CANCEL_TEXT = "partial local result"
 
+const DISPLAY_PROMPT = "Write and edit the local test file"
+
 type RunSettledEvent = Extract<SubagentEvent, { _tag: "RunSettled" }>
 
 const requestSchema = v.looseObject({
@@ -37,6 +44,7 @@ const requestSchema = v.looseObject({
       role: v.string(),
       content: v.union([
         v.string(),
+        v.null(),
         v.array(
           v.looseObject({ type: v.string(), text: v.optional(v.string()) }),
         ),
@@ -124,7 +132,7 @@ function readLastUserText(body: ModelRequest) {
 
   if (!message) return undefined
 
-  if (!Array.isArray(message.content)) return message.content
+  if (!Array.isArray(message.content)) return message.content ?? undefined
 
   return message.content
     .filter((part) => part.type === "text")
@@ -138,7 +146,16 @@ function readToolNames(body: ModelRequest) {
 
 function sendChunk(
   response: ServerResponse,
-  delta: Record<string, string>,
+  delta: {
+    role?: string
+    content?: string
+    tool_calls?: {
+      index: number
+      id: string
+      type: string
+      function: { name: string; arguments: string }
+    }[]
+  },
   finishReason: string | null,
 ) {
   response.write(
@@ -198,6 +215,60 @@ async function createFixture(): Promise<PiFixture> {
       connection: "keep-alive",
     })
     sendChunk(response, { role: "assistant" }, null)
+
+    if (readLastUserText(body) === DISPLAY_PROMPT) {
+      const completed = body.messages.filter(
+        (message) => message.role === "tool",
+      ).length
+
+      const calls = [
+        {
+          name: "write",
+          arguments: { path: "demo.txt", content: "first line\n" },
+        },
+        {
+          name: "edit",
+          arguments: {
+            path: "demo.txt",
+            edits: [{ oldText: "first line", newText: "second line" }],
+          },
+        },
+        {
+          name: "write",
+          arguments: { path: "demo.txt", content: "third line\n" },
+        },
+      ]
+
+      const call = calls[completed]
+
+      if (call) {
+        sendChunk(
+          response,
+          {
+            tool_calls: [
+              {
+                index: 0,
+                id: `call-${completed}`,
+                type: "function",
+                function: {
+                  name: call.name,
+                  arguments: JSON.stringify(call.arguments),
+                },
+              },
+            ],
+          },
+          null,
+        )
+        sendChunk(response, {}, "tool_calls")
+      } else {
+        sendChunk(response, { content: "Finished changes" }, null)
+        sendChunk(response, {}, "stop")
+      }
+
+      response.end("data: [DONE]\n\n")
+
+      return
+    }
 
     if (readLastUserText(body) === CANCEL_PROMPT) {
       blockedResponseClosed = new Promise((resolve) =>
@@ -458,6 +529,94 @@ void test(
           await fixture.close()
         }
       }
+    }
+  },
+)
+
+void test(
+  "takeover shows pi-tool-display for child writes and edits",
+  { timeout: 20_000 },
+  async () => {
+    const fixture = await createFixture()
+    let session: Awaited<ReturnType<typeof piBackend.spawn>> | undefined
+
+    try {
+      const displayPath = fileURLToPath(
+        new URL(
+          "../../npm/node_modules/pi-tool-display/index.ts",
+          import.meta.url,
+        ),
+      )
+
+      await writeFile(
+        join(fixture.agentDir, "settings.json"),
+        JSON.stringify({ extensions: [displayPath] }),
+      )
+      session = await piBackend.spawn(
+        makeTask(fixture.cwd, fixture.modelRegistry, DISPLAY_PROMPT),
+      )
+
+      const events = await collectUntilSettled(session.events)
+
+      const transcript = events.flatMap<TranscriptItem>((event) => {
+        if (event._tag === "AssistantMessage")
+          return [{ kind: "assistant" as const, parts: event.parts }]
+
+        if (event._tag === "ToolEnd")
+          return [
+            {
+              kind: "toolResult" as const,
+              toolId: event.toolId,
+              name: event.name,
+              isError: event.isError,
+              outputPreview: event.outputPreview,
+              displayResult: event.displayResult,
+            },
+          ]
+
+        return []
+      })
+
+      const snapshot = {
+        id: "sa-1",
+        origin: "model" as const,
+        backend: "pi" as const,
+        title: "display",
+        prompt: DISPLAY_PROMPT,
+        cwd: fixture.cwd,
+        status: "done" as const,
+        createdAt: 0,
+        meta: { backend: "pi" as const },
+        usage: {},
+        transcript,
+        liveTools: [],
+        queued: [],
+        finalText: "Finished changes",
+        turns: 4,
+      }
+
+      const lines = buildTranscriptLines(snapshot, 100, theme).map(
+        stripVTControlCharacters,
+      )
+
+      const rendered = lines.join("\n")
+
+      assert.equal(
+        await readFile(join(fixture.cwd, "demo.txt"), "utf8"),
+        "third line\n",
+      )
+      assert.match(rendered, /first line/)
+      assert.match(rendered, /second line/)
+      assert.match(rendered, /third line/)
+      assert.doesNotMatch(rendered, /Successfully replaced 1 block/)
+      assert.ok(
+        buildTranscriptLines(snapshot, 20, theme).every(
+          (line) => visibleWidth(line) <= 20,
+        ),
+      )
+    } finally {
+      if (session) await session.dispose()
+      await fixture.close()
     }
   },
 )

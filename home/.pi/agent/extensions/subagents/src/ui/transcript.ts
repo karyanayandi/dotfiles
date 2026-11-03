@@ -12,6 +12,7 @@ import {
   wrapTextWithAnsi,
 } from "@earendil-works/pi-tui"
 import { activityIndicator } from "@pi/shared/activity-status"
+import * as v from "valibot"
 import type {
   SubagentSnapshot,
   TranscriptItem,
@@ -42,16 +43,71 @@ type GlobalWithTranscriptToolRenderer = typeof globalThis & {
   [transcriptToolRendererKey]?: SubagentTranscriptToolRenderer
 }
 
+const toolResultSchema = v.looseObject({
+  content: v.array(
+    v.union([
+      v.looseObject({ type: v.literal("text"), text: v.string() }),
+      v.looseObject({
+        type: v.literal("image"),
+        data: v.string(),
+        mimeType: v.string(),
+      }),
+    ]),
+  ),
+  details: v.optional(v.unknown()),
+})
+
+function renderNativeTool(request: SubagentTranscriptToolRenderRequest) {
+  const { call, result, snapshot, theme, width } = request
+  const renderers = call.displayRenderers
+
+  if (
+    !result ||
+    !renderers?.renderResult ||
+    !v.is(toolResultSchema, result.displayResult)
+  )
+    return undefined
+
+  const context = {
+    args: call.displayArgs,
+    toolCallId: call.toolId,
+    invalidate: () => undefined,
+    lastComponent: undefined,
+    state: call.displayState ?? {},
+    cwd: snapshot.cwd,
+    executionStarted: true,
+    argsComplete: true,
+    isPartial: false,
+    expanded: false,
+    showImages: false,
+    isError: result.isError,
+    durationMs: undefined,
+    outputPad: 0,
+  }
+
+  const callLines =
+    renderers.renderCall?.(call.displayArgs, theme, context).render(width) ?? []
+
+  const resultLines = renderers
+    .renderResult(
+      { ...result.displayResult, details: result.displayResult.details },
+      { expanded: false, isPartial: false },
+      theme,
+      context,
+    )
+    .render(width)
+
+  return [...callLines, ...resultLines]
+}
+
 function renderTranscriptTool(request: SubagentTranscriptToolRenderRequest) {
   // SAFETY: The optional symbol property belongs to the transcript renderer hook.
   const renderer = (globalThis as GlobalWithTranscriptToolRenderer)[
     transcriptToolRendererKey
   ]
 
-  if (!renderer) return undefined
-
   try {
-    const lines = renderer(request)
+    const lines = renderer?.(request) ?? renderNativeTool(request)
 
     return lines?.map((line) => truncateToWidth(line, request.width))
   } catch {

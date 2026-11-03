@@ -75,6 +75,61 @@ void test("dashboard selection follows its subagent id and falls back by row", (
   assert.deepEqual(selection, { id: undefined, index: 0 })
 })
 
+void test("takeover keeps error output when a tool renderer fails", () => {
+  const snapshot: SubagentSnapshot = {
+    id: "sa-1",
+    origin: "model",
+    backend: "pi",
+    title: "failed edit",
+    prompt: "edit",
+    cwd: "/tmp",
+    status: "done",
+    createdAt: 0,
+    meta: { backend: "pi" },
+    usage: {},
+    liveTools: [],
+    queued: [],
+    finalText: "",
+    turns: 1,
+    transcript: [
+      {
+        kind: "assistant",
+        parts: [
+          {
+            type: "toolCall",
+            toolId: "failed",
+            name: "edit",
+            displayArgs: { path: "demo.txt" },
+            displayRenderers: {
+              renderResult() {
+                throw new Error("render failure")
+              },
+            },
+            displayState: {},
+          },
+        ],
+      },
+      {
+        kind: "toolResult",
+        toolId: "failed",
+        name: "edit",
+        isError: true,
+        outputPreview: "No match found",
+        displayResult: {
+          content: [{ type: "text", text: "No match found" }],
+          details: undefined,
+        },
+      },
+    ],
+  }
+
+  const rendered = buildTranscriptLines(snapshot, 80, theme)
+    .map(stripVTControlCharacters)
+    .join("\n")
+
+  assert.match(rendered, /No match found/)
+})
+
 void test("takeover delegates rich tool rows to an installed transcript renderer", () => {
   const key = Symbol.for("pi-subagents.transcriptToolRenderer.v1")
 
