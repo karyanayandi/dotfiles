@@ -6,11 +6,15 @@
     "model": "openai/gpt-6.1-sol"
   },
   "ctrl+3": {
-    "model": "openai/gpt-6-luna",
-    "thinkingLevel": "max"
+    "model": "openai/gpt-6.1-terra",
+    "thinkingLevel": "xhigh"
   },
   "ctrl+4": {
     "model": "openai/gpt-6-luna",
-    "thinkingLevel": "low"
+    "thinkingLevel": "max"
+  },
+  "ctrl+5": {
+    "model": "openai/gpt-6-luna",
+    "thinkingLevel": "off"
   }
 }
