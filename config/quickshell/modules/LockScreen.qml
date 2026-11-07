@@ -249,13 +249,13 @@ Scope {
             Rectangle {
                 anchors.fill: parent
                 color: Theme.colBg
-                opacity: 0.86
+                opacity: 0.78
             }
 
             Column {
                 anchors.centerIn: parent
-                width: Math.min(360, parent.width - 48)
-                spacing: 20
+                width: Math.min(340, parent.width - 48)
+                spacing: 16
 
                 SystemClock {
                     id: clock
@@ -268,7 +268,7 @@ Scope {
                     text: Qt.formatDateTime(clock.date, "HH:mm")
                     color: Theme.colFg
                     font.family: Theme.fontUi
-                    font.pixelSize: 80
+                    font.pixelSize: 72
                     font.weight: Font.Light
                     font.letterSpacing: -2
                 }
@@ -278,7 +278,8 @@ Scope {
                     text: Qt.formatDateTime(clock.date, "dddd, MMMM d")
                     color: Theme.colFg
                     font.family: Theme.fontUi
-                    font.pixelSize: 18
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
                 }
 
                 Text {
@@ -287,8 +288,9 @@ Scope {
                     text: pam.user
                     color: Theme.colFg
                     font.family: Theme.fontUi
-                    font.pixelSize: 20
-                    font.weight: Font.Medium
+                    topPadding: 24
+                    font.pixelSize: 16
+                    font.weight: Font.DemiBold
                 }
 
                 TextField {
@@ -327,7 +329,7 @@ Scope {
                     }
 
                     background: Rectangle {
-                        radius: 14
+                        radius: Theme.radiusControl
                         color: Theme.colBgAlt
                         border.width: password.activeFocus ? 2 : 1
                         border.color: password.activeFocus ? Theme.colSelected : Theme.colBorderStrong
@@ -356,7 +358,7 @@ Scope {
                     }
 
                     background: Rectangle {
-                        radius: 14
+                        radius: Theme.radiusControl
                         color: Theme.colSelected
                         opacity: submit.down ? 0.7 : submit.enabled ? 1 : 0.5
                         border.width: submit.visualFocus ? 2 : 0

@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 import "../.."
 import "../panels" as Panels
+import "../../components" as Components
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -63,7 +64,7 @@ ColumnLayout {
         id: button
 
         background: Rectangle {
-            radius: height / 2
+            radius: Theme.radiusControl
             color: button.checked ? Theme.colChipActive : button.down ? Theme.colActionBg : button.hovered ? Theme.colHoverAlpha : "transparent"
             border.width: button.visualFocus ? 2 : 0
             border.color: Theme.colFg
@@ -72,8 +73,8 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 56
-        radius: 28
+        implicitHeight: 52
+        radius: Theme.radiusCard
         color: Theme.colInputBg
 
         RowLayout {
@@ -219,7 +220,7 @@ ColumnLayout {
         Layout.fillHeight: true
         Layout.minimumHeight: 120
         color: Theme.colInputBg
-        radius: 16
+        radius: Theme.radiusCard
         border.width: 1
         border.color: Theme.colBorder
         clip: true
@@ -234,8 +235,8 @@ ColumnLayout {
             clip: true
             interactive: root.tool === "pan"
             boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.horizontal: ScrollBar {}
-            ScrollBar.vertical: ScrollBar {}
+            ScrollBar.horizontal: Components.ThemedScrollBar {}
+            ScrollBar.vertical: Components.ThemedScrollBar {}
 
             Image {
                 id: preview

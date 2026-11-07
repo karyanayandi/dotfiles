@@ -19,8 +19,8 @@ Item {
     readonly property bool recordingBusy: service.busy && service.action === "record"
     readonly property bool canCapture: Boolean(service.ready && !service.busy && (selectedMode === "window" ? service.windowSupported : service.tools.slurp && (video ? service.tools["wf-recorder"] : service.tools.grim)))
 
-    implicitWidth: editing ? 960 : 360
-    implicitHeight: layout.implicitHeight + 36
+    implicitWidth: editing ? 960 : 700
+    implicitHeight: layout.implicitHeight + 2 * Theme.panelPadding
     visible: opened
 
     signal captureRequested(string action, var options)
@@ -76,7 +76,7 @@ Item {
         ToolTip.delay: 400
 
         background: Rectangle {
-            radius: height / 2
+            radius: Theme.radiusControl
             color: button.checked ? Theme.colChipActive : button.down ? Theme.colActionBg : button.hovered ? Theme.colHoverAlpha : "transparent"
             border.width: button.visualFocus ? 2 : 0
             border.color: Theme.colFg
@@ -94,7 +94,7 @@ Item {
         id: layout
 
         anchors.fill: parent
-        anchors.margins: 18
+        anchors.margins: Theme.panelPadding
         spacing: 12
         Keys.onEscapePressed: root.opened = false
 
@@ -103,16 +103,11 @@ Item {
 
             Label {
                 Layout.fillWidth: true
-                visible: root.editing
-                text: "Screenshot"
+                text: root.editing ? "Screenshot" : root.video ? "Screen Recording" : "Screenshot"
                 color: Theme.colFg
                 font.family: Theme.fontUi
-                font.pixelSize: 22
-                font.bold: true
-            }
-            Item {
-                Layout.fillWidth: true
-                visible: !root.editing
+                font.pixelSize: 16
+                font.weight: Font.DemiBold
             }
             CaptureButton {
                 id: closeButton
@@ -128,162 +123,169 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 8
-            visible: !root.editing && !root.service.recording
-
-            Repeater {
-                model: ["area", "screen", "window"]
-
-                CaptureButton {
-                    id: modeButton
-
-                    required property string modelData
-                    readonly property string label: modelData === "area" ? "Selection" : modelData === "screen" ? "Screen" : "Window"
-
-                    objectName: "captureMode_" + modelData
-                    Layout.fillWidth: true
-                    implicitHeight: 88
-                    autoExclusive: true
-                    checkable: true
-                    checked: root.selectedMode === modelData
-                    enabled: !root.service.busy && (modelData !== "window" || (!root.video && root.service.windowSupported))
-                    Accessible.name: label + " capture"
-                    onClicked: root.selectedMode = modelData
-
-                    background: Rectangle {
-                        radius: 12
-                        color: modeButton.checked ? Theme.colChipActive : modeButton.down ? Theme.colActionBg : modeButton.hovered ? Theme.colHoverAlpha : "transparent"
-                        border.width: modeButton.visualFocus ? 2 : 0
-                        border.color: Theme.colFg
-                    }
-                    contentItem: ColumnLayout {
-                        spacing: 8
-                        Text {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: modeButton.modelData === "area" ? "\uf125" : modeButton.modelData === "screen" ? "\uf108" : "\uf2d0"
-                            font.family: Theme.fontFamily
-                            font.pixelSize: 30
-                            color: modeButton.checked ? Theme.colBg : Theme.colFg
-                        }
-                        Label {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: modeButton.label
-                            font.family: Theme.fontUi
-                            font.pixelSize: 13
-                            color: modeButton.checked ? Theme.colBg : Theme.colFg
-                        }
-                    }
-                }
-            }
-        }
-
-        Label {
-            Layout.fillWidth: true
-            visible: !root.editing && root.service.recording
-            text: "●  " + Math.floor(root.service.elapsed / 60) + ":" + String(root.service.elapsed % 60).padStart(2, "0")
-            Accessible.name: "Recording, " + root.service.elapsed + " seconds"
-            color: Theme.colUrgent
-            font.family: Theme.fontUi
-            font.pixelSize: 28
-            horizontalAlignment: Text.AlignHCenter
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: 1
-            color: Theme.colBorder
-            visible: !root.editing
-        }
-
-        Item {
-            Layout.fillWidth: true
-            implicitHeight: 64
+            spacing: 12
             visible: !root.editing
 
             Rectangle {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                width: switchRow.implicitWidth + 6
-                height: 38
-                radius: 19
+                Layout.fillWidth: true
+                implicitHeight: 48
+                radius: Theme.radiusCard
                 color: Theme.colInputBg
+                visible: !root.service.recording
 
                 RowLayout {
-                    id: switchRow
-                    anchors.centerIn: parent
-                    spacing: 3
+                    anchors.fill: parent
+                    anchors.margins: 3
+                    spacing: 2
+                    Repeater {
+                        model: ["area", "screen", "window"]
 
-                    CaptureButton {
-                        objectName: "capturePhoto"
-                        Accessible.name: "Screenshot"
-                        text: "\uf030"
-                        autoExclusive: true
-                        checkable: true
-                        checked: !root.video
-                        enabled: !root.service.busy
-                        implicitHeight: 32
-                        onClicked: root.video = false
-                    }
-                    CaptureButton {
-                        objectName: "captureVideo"
-                        Accessible.name: "Screen recording"
-                        text: "\uf03d"
-                        autoExclusive: true
-                        checkable: true
-                        checked: root.video
-                        enabled: !root.service.busy
-                        implicitHeight: 32
-                        onClicked: root.video = true
+                        CaptureButton {
+                            id: modeButton
+
+                            required property string modelData
+                            readonly property string label: modelData === "area" ? "Selection" : modelData === "screen" ? "Screen" : "Window"
+
+                            objectName: "captureMode_" + modelData
+                            Layout.fillWidth: true
+                            implicitHeight: 42
+                            autoExclusive: true
+                            checkable: true
+                            checked: root.selectedMode === modelData
+                            enabled: !root.service.busy && (modelData !== "window" || (!root.video && root.service.windowSupported))
+                            Accessible.name: label + " capture"
+                            onClicked: root.selectedMode = modelData
+
+                            background: Rectangle {
+                                radius: Theme.radiusControl
+                                color: modeButton.checked ? Theme.colChipActive : modeButton.down ? Theme.colActionBg : modeButton.hovered ? Theme.colHoverAlpha : "transparent"
+                                border.width: modeButton.visualFocus ? 2 : 0
+                                border.color: Theme.colFg
+                            }
+                            contentItem: RowLayout {
+                                spacing: 6
+                                Text {
+                                    text: modeButton.modelData === "area" ? "\uf125" : modeButton.modelData === "screen" ? "\uf108" : "\uf2d0"
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: 16
+                                    color: modeButton.checked ? Theme.colBg : Theme.colFg
+                                }
+                                Label {
+                                    visible: root.width >= 560
+                                    text: modeButton.label
+                                    font.family: Theme.fontUi
+                                    font.pixelSize: 13
+                                    color: modeButton.checked ? Theme.colBg : Theme.colFg
+                                }
+                            }
+                        }
                     }
                 }
             }
+            Label {
+                Layout.fillWidth: true
+                visible: !root.editing && root.service.recording
+                text: "●  " + Math.floor(root.service.elapsed / 60) + ":" + String(root.service.elapsed % 60).padStart(2, "0")
+                Accessible.name: "Recording, " + root.service.elapsed + " seconds"
+                color: Theme.colUrgent
+                font.family: Theme.fontUi
+                font.pixelSize: 18
+                horizontalAlignment: Text.AlignHCenter
+            }
 
-            CaptureButton {
-                id: shutter
+            Item {
+                Layout.preferredWidth: 185
+                implicitHeight: 44
+                visible: !root.editing
 
-                anchors.centerIn: parent
-                implicitWidth: 64
-                implicitHeight: 64
-                objectName: root.editing ? "" : "captureStart"
-                Accessible.name: root.video ? "Start recording" : "Take screenshot"
-                enabled: root.canCapture
-                visible: !root.recordingBusy
-                onClicked: root.captureRequested(root.video ? "record" : "screenshot", {
-                    "mode": root.selectedMode,
-                    "audio": audio.currentValue || ""
-                })
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: switchRow.implicitWidth + 6
+                    height: 40
+                    radius: Theme.radiusControl
+                    color: Theme.colInputBg
 
-                background: Rectangle {
-                    radius: width / 2
-                    color: "transparent"
-                    border.width: 4
-                    border.color: shutter.visualFocus ? Theme.colChipActive : Theme.colFg
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: 8
+                    RowLayout {
+                        id: switchRow
+                        anchors.centerIn: parent
+                        spacing: 3
+
+                        CaptureButton {
+                            objectName: "capturePhoto"
+                            Accessible.name: "Screenshot"
+                            text: "\uf030"
+                            autoExclusive: true
+                            checkable: true
+                            checked: !root.video
+                            enabled: !root.service.busy
+                            implicitHeight: 32
+                            onClicked: root.video = false
+                        }
+                        CaptureButton {
+                            objectName: "captureVideo"
+                            Accessible.name: "Screen recording"
+                            text: "\uf03d"
+                            autoExclusive: true
+                            checkable: true
+                            checked: root.video
+                            enabled: !root.service.busy
+                            implicitHeight: 32
+                            onClicked: root.video = true
+                        }
+                    }
+                }
+
+                CaptureButton {
+                    id: shutter
+
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    implicitWidth: 44
+                    implicitHeight: 44
+                    objectName: root.editing ? "" : "captureStart"
+                    Accessible.name: root.video ? "Start recording" : "Take screenshot"
+                    enabled: root.canCapture
+                    visible: !root.recordingBusy
+                    onClicked: root.captureRequested(root.video ? "record" : "screenshot", {
+                        "mode": root.selectedMode,
+                        "audio": audio.currentValue || ""
+                    })
+
+                    background: Rectangle {
                         radius: width / 2
-                        color: shutter.down ? Qt.darker(root.video ? Theme.colUrgent : Theme.colFg, 1.3) : shutter.hovered ? Qt.darker(root.video ? Theme.colUrgent : Theme.colFg, 1.1) : root.video ? Theme.colUrgent : Theme.colFg
+                        color: "transparent"
+                        border.width: 2
+                        border.color: shutter.visualFocus ? Theme.colChipActive : Theme.colFg
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            radius: width / 2
+                            color: shutter.down ? Qt.darker(root.video ? Theme.colUrgent : Theme.colFg, 1.3) : shutter.hovered ? Qt.darker(root.video ? Theme.colUrgent : Theme.colFg, 1.1) : root.video ? Theme.colUrgent : Theme.colFg
+                        }
                     }
                 }
-            }
-            CaptureButton {
-                id: stopButton
+                CaptureButton {
+                    id: stopButton
 
-                anchors.centerIn: parent
-                objectName: "captureStop"
-                implicitWidth: 64
-                implicitHeight: 64
-                Accessible.name: root.service.recording ? "Stop recording" : "Cancel recording"
-                visible: root.recordingBusy
-                text: root.service.recording ? "\uf04d" : "\uf00d"
-                background: Rectangle {
-                    radius: width / 2
-                    color: Theme.colUrgent
-                    border.width: 4
-                    border.color: stopButton.visualFocus ? Theme.colChipActive : Theme.colFg
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    objectName: "captureStop"
+                    implicitWidth: 44
+                    implicitHeight: 44
+                    Accessible.name: root.service.recording ? "Stop recording" : "Cancel recording"
+                    visible: root.recordingBusy
+                    text: root.service.recording ? "\uf04d" : "\uf00d"
+                    background: Rectangle {
+                        radius: width / 2
+                        color: Theme.colUrgent
+                        border.width: 2
+                        border.color: stopButton.visualFocus ? Theme.colChipActive : Theme.colFg
+                    }
+                    onClicked: root.service.stop()
                 }
-                onClicked: root.service.stop()
             }
+
         }
 
         Panels.PanelComboBox {

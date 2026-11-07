@@ -19,7 +19,7 @@ Rectangle {
         expiry.restart();
     }
 
-    radius: 18
+    radius: Theme.radiusCard
     color: Theme.colBg
     border.color: failed ? Theme.colUrgent : Theme.colBorderStrong
     border.width: 1
@@ -62,7 +62,7 @@ Rectangle {
         Label {
             text: root.failed ? "\uf06a" : "\uf00c"
             font.family: Theme.fontFamily
-            font.pixelSize: 24
+            font.pixelSize: 18
             color: root.failed ? Theme.colUrgent : Theme.colFg
             Accessible.ignored: true
         }
@@ -84,6 +84,8 @@ Rectangle {
     }
 
     Behavior on opacity {
+        enabled: !Config.reducedMotion
+
         NumberAnimation {
             duration: Config.animFast
             easing.type: Easing.OutCubic
