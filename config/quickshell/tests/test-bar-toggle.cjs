@@ -23,14 +23,14 @@ for (const panel of ['audio', 'calendar', 'capture']) {
 win.view = 'audio';
 click(win, 'calendar');
 assert.equal(win.view, 'calendar', 'Different icon switches panel');
-const width = source.match(/        width: (Math\.min\(win\.width - 24,.*)\n/);
-assert.ok(width, 'Island width binding exists');
-const islandWidth = new Function('win', 'bar', 'Config', `return ${width[1]};`);
-for (const view of ['', 'controls', 'notifications', 'launcher', 'audio']) {
-    const state = { width: 1920, view, activePanel: { implicitWidth: 380 } };
-    assert.equal(islandWidth(state, { implicitWidth: 720 }, { launcherWidth: 680 }),
-        view === 'controls' || view === 'notifications' ? 400 : 720);
+const width = source.match(/        width: (Math\.min\(win\.width - 32,.*)\n/);
+assert.ok(width, 'Detached panel width binding exists');
+const panelWidth = new Function('win', 'Config', `return ${width[1]};`);
+const config = { launcherWidth: 680, centerWidth: 420, osdWidth: 200 };
+for (const [view, expected] of [['controls', 420], ['notifications', 420], ['launcher', 680], ['audio', 440], ['volume', 200]]) {
+    const state = { width: 1920, view, centeredSearch: view === 'launcher', activePanel: { implicitWidth: 380 } };
+    assert.equal(panelWidth(state, config), expected);
     state.width = 360;
-    assert.equal(islandWidth(state, { implicitWidth: 720 }, { launcherWidth: 680 }), 336);
+    assert.equal(panelWidth(state, config), Math.min(328, expected));
 }
-console.log('PASS bar panel toggle and width');
+console.log('PASS bar panel toggle and detached panel width');

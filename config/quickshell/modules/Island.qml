@@ -11,6 +11,8 @@ PanelWindow {
 
     readonly property var activePanel: view === "polkit" ? auth : panels[view] || (view === "launcher" ? launcher : view === "controls" ? controls : view === "notifications" ? center : view === "volume" ? osd : null)
     required property var audio
+    readonly property bool bluetoothPanel: view === "launcher" && launcher.mode === "bluetooth"
+    readonly property bool centeredSearch: view === "launcher" && !bluetoothPanel
     property string captureAction: ""
     property bool captureHidden: false
     property var captureOptions: ({})
@@ -22,8 +24,10 @@ PanelWindow {
     readonly property real panelHeight: {
         if (!activePanel)
             return 0;
+        if (bluetoothPanel)
+            return Math.max(0, Math.min(height - Config.barExclusiveZone - 40, center.implicitHeight));
         if (view === "launcher" || view === "notifications")
-            return Math.max(0, Math.min(height - Config.barExclusiveZone - 16, activePanel.implicitHeight));
+            return Math.max(0, Math.min(height - Config.barExclusiveZone - 40, activePanel.implicitHeight));
         return Math.max(0, activePanel.implicitHeight);
     }
     readonly property var panels: ({
@@ -102,8 +106,11 @@ PanelWindow {
     visible: !captureHidden
 
     mask: Region {
-        item: auth.active ? backdrop : win.captureSelecting ? null : win.interactive && !capture.opened ? backdrop : island
+        item: auth.active ? backdrop : win.captureSelecting ? null : win.interactive && !capture.opened ? backdrop : menuBar
 
+        Region {
+            item: panelSurface.visible && !win.captureSelecting ? panelSurface : null
+        }
         Region {
             item: feedback.visible && !win.captureSelecting ? feedback : null
         }
@@ -220,7 +227,7 @@ PanelWindow {
         target: "displays"
     }
     anchors {
-        bottom: true
+        top: true
         left: true
         right: true
     }
@@ -251,44 +258,30 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         visible: opacity > 0 && !auth.active
         width: Math.min(420, win.width - 24)
-        y: Math.max(12, island.y - height - 12)
+        y: Config.barHeight + 20
         z: 2
     }
     Rectangle {
-        id: island
+        id: panelSurface
 
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Config.barBottomMargin
-        anchors.horizontalCenter: parent.horizontalCenter
+        readonly property bool centered: win.centeredSearch || win.view === "polkit"
+        readonly property bool feedbackOnly: win.view === "volume"
+        x: feedbackOnly || centered ? (win.width - width) / 2 : win.width - width - 16
+        y: feedbackOnly ? win.height - height - 64 : centered ? Math.max(Config.barHeight + 16, (win.height - height) / 2) : Config.barHeight + 12
+        width: Math.min(win.width - 32, win.centeredSearch ? Config.launcherWidth : win.view === "volume" ? Config.osdWidth : win.bluetoothPanel || win.view === "controls" || win.view === "notifications" ? Config.centerWidth : Math.max(440, win.activePanel ? win.activePanel.implicitWidth : 440))
+        height: win.panelHeight
+        radius: Theme.radiusPanel
+        color: Theme.colLauncherBg
         border.color: Theme.colBorderStrong
         border.width: 1
         clip: true
-        color: Theme.colBgAlpha095
-        height: Config.barHeight + (win.view !== "" ? win.panelHeight + 8 : 0)
-        radius: win.view === "" ? Config.barRadius : 26
-        width: Math.min(win.width - 24, win.view === "controls" || win.view === "notifications" ? 400 : Math.max(bar.implicitWidth, win.view === "launcher" ? Config.launcherWidth : win.activePanel ? Math.max(440, win.activePanel.implicitWidth) : 0))
+        visible: win.view !== "" && !win.captureSelecting
+        opacity: visible ? 1 : 0
 
-        Behavior on height {
+        Behavior on opacity {
             enabled: !Config.reducedMotion
-
             NumberAnimation {
-                duration: Config.animNormal
-                easing.type: Easing.OutCubic
-            }
-        }
-        Behavior on radius {
-            enabled: !Config.reducedMotion
-
-            NumberAnimation {
-                duration: Config.animNormal
-                easing.type: Easing.OutCubic
-            }
-        }
-        Behavior on width {
-            enabled: !Config.reducedMotion
-
-            NumberAnimation {
-                duration: Config.animNormal
+                duration: Config.animFast
                 easing.type: Easing.OutCubic
             }
         }
@@ -299,10 +292,7 @@ PanelWindow {
         Item {
             id: content
 
-            anchors.bottom: bar.top
-            anchors.bottomMargin: 8
-            anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.fill: parent
             clip: true
             height: win.panelHeight
             visible: win.view !== ""
@@ -419,12 +409,26 @@ PanelWindow {
                 }
             }
         }
+    }
+    Rectangle {
+        id: menuBar
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: Config.barHeight
+        color: Theme.colBgAlpha095
+
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: 1
+            color: Theme.colBorder
+        }
         Bar {
             id: bar
 
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.fill: parent
             audio: win.audio
             capture: captureService
             controls: controls

@@ -9,8 +9,8 @@ RowLayout {
     property string submap: ""
 
     spacing: 0
-    Layout.leftMargin: 15
-    Layout.rightMargin: 15
+    Layout.leftMargin: 0
+    Layout.rightMargin: 0
     Layout.alignment: Qt.AlignVCenter
 
     WheelHandler {
@@ -33,17 +33,17 @@ RowLayout {
             property bool isSpecial: modelData.name.startsWith("special:")
 
             visible: !isSpecial
-            Layout.preferredHeight: isSpecial ? 0 : 30
+            Layout.preferredHeight: isSpecial ? 0 : 24
             Layout.preferredWidth: isSpecial ? 0 : wsText.implicitWidth + 20
-            radius: 6
-            color: wsMouse.containsMouse ? Theme.colAccent : (isUrgent ? Qt.alpha(Theme.colUrgent, 0.16) : "transparent")
+            radius: 5
+            color: wsMouse.pressed || isFocused || isActive ? Theme.colBarPressed : wsMouse.containsMouse ? Theme.colBarHover : (isUrgent ? Qt.alpha(Theme.colUrgent, 0.16) : "transparent")
             scale: wsMouse.pressed ? 0.96 : 1
 
             Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: isFocused || isActive ? 3 : 0
+                height: 0
                 color: Theme.colFg
                 visible: isFocused || isActive
             }
@@ -66,7 +66,7 @@ RowLayout {
                 text: modelData.name
                 color: Theme.colFg
                 font.family: Theme.fontUi
-                font.pixelSize: Theme.fontSize
+                font.pixelSize: 12
             }
 
             MouseArea {
@@ -79,6 +79,7 @@ RowLayout {
             }
 
             Behavior on scale {
+                enabled: !Config.reducedMotion
                 NumberAnimation {
                     duration: 120
                     easing.type: Easing.OutCubic
@@ -87,6 +88,7 @@ RowLayout {
             }
 
             Behavior on color {
+                enabled: !Config.reducedMotion
                 ColorAnimation {
                     duration: 180
                     easing.type: Easing.OutCubic
@@ -103,7 +105,7 @@ RowLayout {
         text: root.submap
         color: Theme.colFg
         font.family: Theme.fontUi
-        font.pixelSize: Theme.fontSize
+        font.pixelSize: 12
         font.italic: true
         leftPadding: 10
         rightPadding: 10

@@ -9,25 +9,26 @@ AbstractButton {
     property date now: new Date()
 
     Layout.alignment: Qt.AlignVCenter
-    Layout.rightMargin: 10
+    Layout.rightMargin: 0
     leftPadding: 10
     rightPadding: 10
-    implicitHeight: 34
+    implicitHeight: 28
     hoverEnabled: true
     Accessible.name: "Open calendar, " + Qt.formatDateTime(now, "dddd, dd MMMM, HH:mm")
 
     contentItem: Text {
-        text: Qt.formatDateTime(root.now, "HH:mm")
+        text: Qt.formatDateTime(root.now, "ddd d MMM  HH:mm")
         color: Theme.colFg
         font.family: Theme.fontUi
-        font.pixelSize: Theme.fontSize
+        font.pixelSize: 13
+        font.weight: Font.Medium
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
     }
 
     background: Rectangle {
         radius: 8
-        color: root.down ? Theme.colActionBg : root.hovered ? Theme.colBgAlt : "transparent"
+        color: root.down ? Theme.colBarPressed : root.hovered ? Theme.colBarHover : "transparent"
         border.width: root.visualFocus ? 2 : 0
         border.color: Theme.colFg
     }
