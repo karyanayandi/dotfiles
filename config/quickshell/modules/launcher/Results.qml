@@ -1,4 +1,5 @@
 import "../.."
+import "../../components" as Components
 import QtQuick
 import QtQuick.Controls
 
@@ -10,7 +11,7 @@ Item {
     property string emptyText: "No results"
     readonly property bool wallpaperGrid: root.model.length > 0 && root.model[0].kind === "wallpaper"
     readonly property bool valueGrid: root.model.length > 0 && (root.model[0].kind === "emoji" || root.model[0].kind === "nerd" || root.wallpaperGrid)
-    readonly property int gridColumns: Math.max(1, Math.floor(grid.width / grid.cellWidth))
+    readonly property int gridColumns: Math.max(1, Math.floor((root.wallpaperGrid ? root.width - 16 : root.width) / (root.wallpaperGrid ? 160 : 64)))
 
     signal selectionRequested(int index)
     signal activated(int index, bool ctrl)
@@ -21,7 +22,10 @@ Item {
         id: list
 
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
         spacing: 4
         visible: root.model.length > 0 && !root.valueGrid
         clip: true
@@ -34,10 +38,8 @@ Item {
 
         highlight: Rectangle {
             width: list.width
-            radius: 10
-            color: Theme.g1
-            border.color: Theme.colBorder
-            border.width: 1
+            radius: Theme.radiusControl
+            color: Theme.colHoverAlpha
         }
 
         delegate: ResultItem {
@@ -54,18 +56,21 @@ Item {
 
     GridView {
         id: grid
+        objectName: "launcherGrid"
 
-        width: Math.floor(parent.width / cellWidth) * cellWidth
+        width: root.wallpaperGrid ? Math.max(1, parent.width - 16) : root.gridColumns * cellWidth
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.topMargin: root.wallpaperGrid ? 8 : 0
+        anchors.bottomMargin: root.wallpaperGrid ? 8 : 0
         visible: root.valueGrid
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         model: root.valueGrid ? root.model.length : 0
         currentIndex: root.selected
-        cellWidth: root.wallpaperGrid ? 160 : 64
-        cellHeight: root.wallpaperGrid ? 108 : 56
+        cellWidth: root.wallpaperGrid ? width / root.gridColumns : 64
+        cellHeight: root.wallpaperGrid ? Math.round(cellWidth * 0.675) : 56
         onCurrentIndexChanged: {
             if (currentIndex >= 0 && root.valueGrid) {
                 positionViewAtIndex(currentIndex, GridView.Contain);
@@ -82,7 +87,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 4
-                radius: 10
+                radius: Theme.radiusCard
                 color: index === root.selected ? Theme.colHoverAlpha : "transparent"
                 border.color: index === root.selected ? Theme.g6 : Theme.colBorder
                 border.width: index === root.selected ? 2 : 1
@@ -148,17 +153,7 @@ Item {
             }
         }
 
-        ScrollBar.vertical: ScrollBar {
-            id: scrollBar
-            policy: ScrollBar.AsNeeded
-            contentItem: Rectangle {
-                implicitWidth: 6
-                implicitHeight: 24
-                radius: 3
-                color: scrollBar.pressed ? Theme.g7 : Theme.colMuted
-                opacity: scrollBar.active ? 0.8 : 0.4
-            }
-        }
+        ScrollBar.vertical: Components.ThemedScrollBar {}
     }
 
     Text {

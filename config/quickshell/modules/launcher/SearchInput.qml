@@ -24,15 +24,15 @@ RowLayout {
 
     Layout.fillWidth: true
     Layout.preferredHeight: Config.launcherInputHeight
-    Layout.leftMargin: 20
-    Layout.rightMargin: 20
+    Layout.leftMargin: Theme.panelPadding
+    Layout.rightMargin: Theme.panelPadding
     spacing: 12
 
     Text {
         text: "\u{f0349}"
         color: Theme.colMuted
         font.family: Theme.fontFamily
-        font.pixelSize: 18
+        font.pixelSize: 22
         Layout.alignment: Qt.AlignVCenter
     }
 
@@ -45,7 +45,7 @@ RowLayout {
         selectionColor: Theme.colSelected
         selectedTextColor: Theme.colBg
         font.family: Theme.fontUi
-        font.pixelSize: 20
+        font.pixelSize: 22
         font.weight: Font.Normal
         clip: true
         focus: true
@@ -99,14 +99,16 @@ RowLayout {
             }
             color: Theme.g19
             font.family: Theme.fontUi
-            font.pixelSize: 17
+            font.pixelSize: 20
+            elide: Text.ElideRight
+            width: parent.width
         }
     }
 
     Rectangle {
         implicitWidth: 32
         implicitHeight: 32
-        radius: 8
+        radius: Theme.radiusControl
         color: clearMouse.pressed ? Theme.g2 : clearMouse.containsMouse ? Theme.g1 : "transparent"
         visible: input.text.length > 0
         Layout.alignment: Qt.AlignVCenter
@@ -143,7 +145,7 @@ RowLayout {
             anchors.centerIn: parent
             width: parent.width + 10
             height: parent.height + 6
-            radius: 6
+            radius: Theme.radiusControl
             color: Theme.colChipBg
             z: -1
             border.color: Theme.colBorder

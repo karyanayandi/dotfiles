@@ -10,8 +10,8 @@ RowLayout {
     required property var wallpaper
 
     Layout.fillWidth: true
-    Layout.leftMargin: 14
-    Layout.rightMargin: 14
+    Layout.leftMargin: Theme.panelPadding
+    Layout.rightMargin: Theme.panelPadding
     Layout.topMargin: 8
     Layout.bottomMargin: 10
     spacing: 12
@@ -34,8 +34,8 @@ RowLayout {
 
     Rectangle {
         visible: root.mode === "wallpaper"
-        height: 24
-        radius: 8
+        implicitHeight: 24
+        radius: Theme.radiusControl
         color: root.wallpaper.rotationInterval > 0 ? Theme.g7 : Theme.colChipBg
         border.color: Theme.colBorder
         border.width: 1
@@ -58,7 +58,7 @@ RowLayout {
     Rectangle {
         visible: root.mode === "wallpaper"
         implicitHeight: 24
-        radius: 8
+        radius: Theme.radiusControl
         color: root.wallpaper.monochrome ? Theme.g7 : Theme.colChipBg
         Accessible.role: Accessible.Button
         Accessible.name: "Mono colors"
@@ -85,8 +85,8 @@ RowLayout {
 
     Rectangle {
         visible: root.mode === "bluetooth"
-        height: 24
-        radius: 8
+        implicitHeight: 24
+        radius: Theme.radiusControl
         color: root.bluetooth.scanning ? Theme.colHoverAlpha : Theme.colChipBg
         border.color: Theme.colBorder
         border.width: 1
@@ -108,8 +108,8 @@ RowLayout {
 
     Rectangle {
         visible: root.mode === "bluetooth"
-        height: 24
-        radius: 8
+        implicitHeight: 24
+        radius: Theme.radiusControl
         color: root.bluetooth.powered ? Theme.g7 : Theme.colChipBg
         border.color: Theme.colBorder
         border.width: 1
@@ -131,8 +131,8 @@ RowLayout {
 
     Rectangle {
         visible: root.mode === "clipboard"
-        height: 24
-        radius: 8
+        implicitHeight: 24
+        radius: Theme.radiusControl
         color: Theme.colChipBg
         border.color: Theme.colBorder
         border.width: 1

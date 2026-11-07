@@ -29,7 +29,8 @@ for name in (
 ):
     assert "implicitHeight: Math.min" not in (modules / name).read_text(), name
 
-assert "ScrollBar.AsNeeded" in (modules / "launcher/Results.qml").read_text()
+assert "Components.ThemedScrollBar {" in (modules / "launcher/Results.qml").read_text()
+assert "policy: ScrollBar.AsNeeded" in (modules.parent / "components/ThemedScrollBar.qml").read_text()
 assert "Flickable {" in (modules / "notifications/Center.qml").read_text()
 print(
     "PASS menus use content height; scrolling stays in launcher, notifications, and capture"

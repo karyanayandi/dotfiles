@@ -11,7 +11,7 @@ Item {
     readonly property string mode: model.mode
     required property var wallpaper
     implicitWidth: Config.launcherWidth
-    implicitHeight: 480
+    implicitHeight: Config.launcherMaxHeight
 
     function open(mode) {
         if (!enabled)

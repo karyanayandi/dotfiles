@@ -16,11 +16,11 @@ Item {
     signal activated(int index, bool ctrl)
 
     width: ListView.view ? ListView.view.width : 0
-    height: 60
+    height: 58
 
     Rectangle {
         anchors.fill: parent
-        radius: 10
+        radius: Theme.radiusControl
         color: Theme.g2
         visible: pointer.pressed
     }
@@ -29,12 +29,12 @@ Item {
         anchors.fill: parent
         anchors.leftMargin: 12
         anchors.rightMargin: 12
-        spacing: 32
+        spacing: 14
 
         Rectangle {
             Layout.preferredWidth: 36
             Layout.preferredHeight: 36
-            radius: 10
+            radius: Theme.radiusControl
             color: Theme.g16
             border.color: Theme.colBorder
             border.width: 1
