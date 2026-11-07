@@ -26,7 +26,7 @@ Button {
     ToolTip.delay: 400
 
     background: Rectangle {
-        radius: 12
+        radius: Theme.radiusControl
         color: root.tone === "danger" ? Theme.colUrgent : root.emphasized ? Theme.colChipActive : root.down ? Theme.colActionBg : root.hovered ? Theme.colHoverAlpha : Theme.colBgAlt
         border.width: root.visualFocus ? 2 : 1
         border.color: root.visualFocus ? Theme.colFg : Theme.colBorder

@@ -12,31 +12,31 @@ QtObject {
     // Set false before starting a fallback agent such as hyprpolkitagent.
     property bool polkitAgentEnabled: true
     // layout
-    property int barHeight: 42
+    property int barHeight: 36
     property int barMinWidth: 900
     property int barMaxWidth: 1200
-    property int barRadius: 14
-    property int barBottomMargin: 10
-    property int barSideMargin: 12
-    property int barExclusiveZone: 52
+    property int barRadius: 0
+    property int barBottomMargin: 0
+    property int barSideMargin: 16
+    property int barExclusiveZone: 36
     // osd
-    property int osdWidth: 200
-    property int osdHeight: 176
+    property int osdWidth: 344
+    property int osdHeight: 84
     property int osdHideMs: 1800
     property int osdRadius: 18
     // notifications
-    property int popupWidth: 400
+    property int popupWidth: 380
     property int popupTtlLow: 2000
     property int popupTtlNormal: 4000
     property int popupTtlCritical: 6000
     property int centerWidth: 420
     property int centerMaxHeight: 720
     // launcher
-    property int launcherWidth: 680
-    property int launcherMaxHeight: 560
+    property int launcherWidth: 920
+    property int launcherMaxHeight: 600
     property int launcherRadius: 20
-    property int launcherInputHeight: 68
-    // Disable island geometry transitions for reduced-motion setups.
+    property int launcherInputHeight: 64
+    // Disable interface motion for reduced-motion setups.
     property bool reducedMotion: false
     // animations (ms)
     property int animFast: 120

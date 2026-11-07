@@ -49,7 +49,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.margins: Theme.panelPadding
         spacing: 16
         Keys.onEscapePressed: root.opened = false
 
@@ -60,7 +60,7 @@ Item {
             Text {
                 color: Theme.colFg
                 font.family: Theme.fontFamily
-                font.pixelSize: 22
+                font.pixelSize: 18
                 text: root.icon
                 visible: root.icon !== ""
             }
@@ -68,9 +68,9 @@ Item {
             Text {
                 Layout.fillWidth: true
                 color: Theme.colFg
-                font.bold: true
+                font.weight: Font.DemiBold
                 font.family: Theme.fontUi
-                font.pixelSize: 22
+                font.pixelSize: 18
                 text: root.title
             }
 

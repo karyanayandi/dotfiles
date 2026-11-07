@@ -40,7 +40,7 @@ SpinBox {
         y: 6
         width: 34
         height: root.height - 12
-        radius: 8
+        radius: Theme.radiusControl
         color: root.down.pressed ? Theme.colActionBg : root.down.hovered ? Theme.colHoverAlpha : "transparent"
         opacity: root.enabled && root.value > root.from ? 1 : 0.35
         Accessible.role: Accessible.Button
@@ -60,7 +60,7 @@ SpinBox {
         y: 6
         width: 34
         height: root.height - 12
-        radius: 8
+        radius: Theme.radiusControl
         color: root.up.pressed ? Theme.colActionBg : root.up.hovered ? Theme.colHoverAlpha : "transparent"
         opacity: root.enabled && root.value < root.to ? 1 : 0.35
         Accessible.role: Accessible.Button
@@ -76,7 +76,7 @@ SpinBox {
         }
     }
     background: Rectangle {
-        radius: 12
+        radius: Theme.radiusControl
         color: root.hovered ? Theme.colBgAlt : Theme.colInputBg
         border.width: root.activeFocus || editor.activeFocus ? 2 : 1
         border.color: root.activeFocus || editor.activeFocus ? Theme.colChipActive : Theme.colBorder

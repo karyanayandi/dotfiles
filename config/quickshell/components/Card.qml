@@ -7,7 +7,7 @@ Rectangle {
     property bool showShadow: true
     property bool showTopHighlight: false
 
-    radius: Config.barRadius
+    radius: Theme.radiusPanel
     color: Theme.colBgAlpha095
     border.color: Theme.colBorder
     border.width: 1

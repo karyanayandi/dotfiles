@@ -32,6 +32,8 @@ QtObject {
     property color g20: palette.g20
     property color colFg: g5
     property color colFgDim: g4
+    property color colBarHover: Qt.alpha(colFg, 0.08)
+    property color colBarPressed: Qt.alpha(colFg, 0.16)
     property color colBg: g0
     property color colBgAlt: g1
     property color colBgSec: g1
@@ -60,7 +62,11 @@ QtObject {
     property color colChipBg: Qt.rgba(g2.r, g2.g, g2.b, 0.9)
     property color colChipActive: g6
     property string fontFallback: "Nerd Font"
-    property int fontSize: 15
+    property int fontSize: 14
+    property int radiusPanel: 18
+    property int radiusCard: 12
+    property int radiusControl: 8
+    property int panelPadding: 20
 
     // Animate base colors once; semantic and alpha colors follow each frame.
     component PaletteBehavior: Behavior {

@@ -30,7 +30,7 @@ TextField {
         color: root.activeFocus ? Theme.colFg : Theme.colFgDim
     }
     background: Rectangle {
-        radius: 12
+        radius: Theme.radiusControl
         color: root.hovered ? Theme.colBgAlt : Theme.colInputBg
         border.width: root.activeFocus ? 2 : 1
         border.color: root.activeFocus ? Theme.colChipActive : Theme.colBorder

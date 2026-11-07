@@ -29,7 +29,7 @@ ComboBox {
         border.color: root.visualFocus ? Theme.colChipActive : Theme.colBorder
         border.width: root.visualFocus ? 2 : 1
         color: root.down ? Theme.colActionBg : root.hovered ? Theme.colBgAlt : Theme.colInputBg
-        radius: 12
+        radius: Theme.radiusControl
     }
     contentItem: Text {
         color: root.enabled ? Theme.colFg : Theme.colFgDim
@@ -51,7 +51,7 @@ ComboBox {
 
         background: Rectangle {
             color: option.highlighted ? Theme.colChipActive : option.hovered ? Theme.colHoverAlpha : "transparent"
-            radius: 8
+            radius: Theme.radiusControl
         }
         contentItem: RowLayout {
             spacing: 10
@@ -90,7 +90,7 @@ ComboBox {
             border.color: Theme.colBorderStrong
             border.width: 1
             color: Theme.colBg
-            radius: 14
+            radius: Theme.radiusCard
         }
         contentItem: ListView {
             id: options
