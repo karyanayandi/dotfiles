@@ -10,7 +10,7 @@ Rectangle {
 
     required property var notification
     property int imgSize: 40
-    property int cardRadius: 16
+    property int cardRadius: Theme.radiusCard
     property color cardBg: Theme.g16
     property bool showClose: true
     property var filteredActions: notification ? notification.actions.filter((a) => {
@@ -23,7 +23,7 @@ Rectangle {
     color: cardBg
     border.color: notification && notification.urgency === NotificationUrgency.Critical ? Theme.colCritical : Theme.colBorder
     border.width: 1
-    implicitHeight: inner.implicitHeight + 32
+    implicitHeight: inner.implicitHeight + 2 * Theme.panelPadding
 
     ColumnLayout {
         id: inner
@@ -31,8 +31,8 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 16
-        spacing: 10
+        anchors.margins: Theme.panelPadding
+        spacing: 8
 
         RowLayout {
             Layout.fillWidth: true
@@ -70,7 +70,7 @@ Rectangle {
                 onClicked: root.closeRequested()
 
                 background: Rectangle {
-                    radius: 10
+                    radius: Theme.radiusControl
                     color: closeButton.down ? Theme.g2 : closeButton.hovered ? Theme.g1 : "transparent"
                     border.width: closeButton.visualFocus ? 1 : 0
                     border.color: Theme.g7
@@ -94,7 +94,7 @@ Rectangle {
             textFormat: Text.PlainText
             color: Theme.colFg
             font.family: Theme.fontUi
-            font.pixelSize: 16
+            font.pixelSize: 15
             font.weight: Font.DemiBold
             wrapMode: Text.Wrap
             maximumLineCount: 3
@@ -108,7 +108,7 @@ Rectangle {
             color: Theme.colFgDim
             linkColor: Theme.g9
             font.family: Theme.fontUi
-            font.pixelSize: 14
+            font.pixelSize: 13
             wrapMode: Text.Wrap
             Layout.fillWidth: true
             maximumLineCount: 6
@@ -136,7 +136,7 @@ Rectangle {
                     onClicked: modelData.invoke()
 
                     background: Rectangle {
-                        radius: 10
+                        radius: Theme.radiusControl
                         color: actionButton.down ? Theme.g3 : actionButton.hovered ? Theme.g2 : Theme.g1
                         border.width: actionButton.visualFocus ? 1 : 0
                         border.color: Theme.g7

@@ -42,7 +42,7 @@ Item {
         id: col
 
         anchors.fill: parent
-        anchors.margins: 18
+        anchors.margins: Theme.panelPadding
         spacing: 0
 
         RowLayout {
@@ -56,7 +56,7 @@ Item {
                 text: "Notifications"
                 color: Theme.colFg
                 font.family: Theme.fontUi
-                font.pixelSize: 22
+                font.pixelSize: 20
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
             }
@@ -70,7 +70,7 @@ Item {
                 onClicked: win.notifs.controlCenterVisible = false
 
                 background: Rectangle {
-                    radius: 10
+                    radius: Theme.radiusControl
                     color: closeCenter.down ? Theme.g2 : closeCenter.hovered ? Theme.g1 : "transparent"
                     border.width: closeCenter.visualFocus ? 1 : 0
                     border.color: Theme.g7
@@ -85,35 +85,33 @@ Item {
                 }
             }
 
-            Rectangle {
+            Button {
+                id: clearAll
+                objectName: "notificationClearAll"
                 visible: win.notifs.notifCount > 0
-                Layout.preferredWidth: clearText.implicitWidth + 32
+                Layout.preferredWidth: contentItem.implicitWidth + 32
                 Layout.preferredHeight: 32
-                radius: 6
-                color: clearMa.pressed ? Theme.g2 : clearMa.containsMouse ? Theme.g1 : Theme.g16
+                hoverEnabled: true
+                Accessible.name: "Clear all notifications"
+                onClicked: win.notifs.dismissAll()
 
-                Text {
-                    id: clearText
-
-                    anchors.centerIn: parent
+                contentItem: Text {
                     text: "Clear all"
                     color: Theme.colFg
                     font.family: Theme.fontUi
                     font.pixelSize: 13
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                 }
+                background: Rectangle {
+                    radius: Theme.radiusControl
+                    color: clearAll.down ? Theme.g2 : clearAll.hovered ? Theme.g1 : Theme.g16
+                    border.width: clearAll.visualFocus ? 2 : 0
+                    border.color: Theme.colFg
 
-                MouseArea {
-                    id: clearMa
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: win.notifs.dismissAll()
-                }
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: 200
+                    Behavior on color {
+                        enabled: !Config.reducedMotion
+                        ColorAnimation { duration: Config.animFast }
                     }
                 }
             }
@@ -136,6 +134,7 @@ Item {
 
             Switch {
                 id: dndSwitch
+                objectName: "notificationDndSwitch"
 
                 Layout.preferredWidth: 48
                 Layout.preferredHeight: 32
@@ -148,7 +147,7 @@ Item {
                     height: 28
                     y: (dndSwitch.height - height) / 2
                     radius: 14
-                    color: dndSwitch.checked ? Theme.g7 : Theme.g2
+                    color: dndSwitch.checked ? Theme.colDndChecked : Theme.g2
                     border.width: dndSwitch.visualFocus ? 2 : 0
                     border.color: Theme.colFg
 
@@ -161,6 +160,8 @@ Item {
                         color: dndSwitch.checked ? Theme.colBg : Theme.colFg
 
                         Behavior on x {
+                            enabled: !Config.reducedMotion
+
                             NumberAnimation {
                                 duration: Config.animFast
                                 easing.type: Easing.OutCubic
@@ -277,7 +278,7 @@ Item {
                                 onClicked: group.collapsed = !group.collapsed
 
                                 background: Rectangle {
-                                    radius: 10
+                                    radius: Theme.radiusControl
                                     color: collapseButton.down ? Theme.g2 : collapseButton.hovered ? Theme.g1 : "transparent"
                                     border.width: collapseButton.visualFocus ? 1 : 0
                                     border.color: Theme.g7
@@ -293,27 +294,28 @@ Item {
                                 }
                             }
 
-                            Rectangle {
+                            Button {
+                                id: dismissGroup
+                                objectName: "notificationDismissGroup_" + group.grp.appName
                                 Layout.preferredWidth: 28
                                 Layout.preferredHeight: 28
-                                radius: 7
-                                color: caMa.pressed ? Theme.g2 : caMa.containsMouse ? Theme.g1 : "transparent"
+                                hoverEnabled: true
+                                Accessible.name: "Dismiss " + group.grp.appName + " notifications"
+                                onClicked: win.notifs.dismissGroup(group.grp)
 
-                                Text {
-                                    anchors.centerIn: parent
+                                contentItem: Text {
                                     text: "\uf00d"
                                     font.family: Theme.fontFamily
                                     color: Theme.colFg
                                     font.pixelSize: 13
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
-
-                                MouseArea {
-                                    id: caMa
-
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: win.notifs.dismissGroup(grp)
+                                background: Rectangle {
+                                    radius: Theme.radiusControl
+                                    color: dismissGroup.down ? Theme.g2 : dismissGroup.hovered ? Theme.g1 : "transparent"
+                                    border.width: dismissGroup.visualFocus ? 2 : 0
+                                    border.color: Theme.colFg
                                 }
                             }
                         }
@@ -369,7 +371,7 @@ Item {
                             Text {
                                 visible: collapsed && grp.notifications.length > 1
                                 text: "+" + (grp.notifications.length - 1) + " more"
-                                color: Theme.g4
+                                color: Theme.colFgDim
                                 font.family: Theme.fontUi
                                 font.pixelSize: 13
                                 Layout.leftMargin: 4

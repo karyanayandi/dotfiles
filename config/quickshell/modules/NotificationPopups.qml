@@ -10,9 +10,9 @@ PanelWindow {
 
     anchors.top: true
     anchors.right: true
-    margins.top: 18
-    margins.right: 18
-    implicitWidth: Math.min(Config.popupWidth, screen ? screen.width - 36 : Config.popupWidth)
+    margins.top: Config.barHeight + 12
+    margins.right: 20
+    implicitWidth: Math.max(0, Math.min(Config.popupWidth, screen ? screen.width - 40 : Config.popupWidth))
     implicitHeight: popups.implicitHeight
     exclusiveZone: 0
     color: "transparent"
@@ -26,6 +26,7 @@ PanelWindow {
         id: popups
         anchors.fill: parent
         notifs: win.notifs
+        maxHeight: Math.max(0, win.screen ? win.screen.height - win.margins.top - 20 : 500)
         visible: win.visible
     }
 }
