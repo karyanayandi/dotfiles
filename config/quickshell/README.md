@@ -1,6 +1,8 @@
-# Quickshell island
+# Quickshell desktop
 
-Desktop panels live in `modules/Island.qml`, except capture controls in `modules/CaptureWindow.qml`. Capture hides only its own window, so screenshots and recordings can include the launcher. Shared controls use `Theme.qml`, Nerd Font glyphs, keyboard focus rings, and the existing Matugen palette. `Config.reducedMotion` disables island geometry animation.
+A continuous top menu bar holds workspaces on the left, the clock in the center, and status controls on the right. The bar has no launcher buttons or Desktop label. Use the launcher shortcut to open search in a separate window at the center of the screen. The general launcher is 920 px wide and up to 600 px high. It fits smaller screens. Bluetooth opens at the top right and uses the notification center dimensions. Control Center has no bar button; use its existing shortcut. Hover feedback uses a light tint from the Matugen foreground color. Control Center, calendar, audio, media, display settings, and notifications open below the top-right edge. Notification banners stack down the top-right edge within the screen height. An overflow stack shows layered card edges and a +N more notifications label. Select it to open notification history. Each banner lasts at most four seconds, including critical banners and app requests for longer display. Hover pauses only that banner. Tall banners scroll to keep actions reachable. Popup expiry does not delete history. Volume-key feedback uses a compact horizontal indicator near the bottom center. Wallpaper thumbnails use responsive columns without large side gaps. Capture, launcher, and notification scrollbars use the Matugen palette.
+
+`modules/Island.qml` hosts the desktop panels. Its file name and `island` IPC target stay unchanged for compatibility. Panels no longer expand from the bar. Capture controls use `modules/CaptureWindow.qml`. Capture hides only its own window, so screenshots and recordings can include the launcher. Shared controls use `Theme.qml`, Nerd Font glyphs, keyboard focus rings, and the existing Matugen palette. `Config.reducedMotion` disables interface motion.
 
 ## Shortcuts
 
@@ -46,7 +48,7 @@ Menus and dropdowns use full content height without scrolling. Launcher results,
 
 ## Polkit
 
-`Config.polkitAgentEnabled` enables Quickshell's native Polkit agent. Real requests appear in the island and block other panel/focus paths. Passwords are masked, submitted directly to the native flow, cleared afterward, and never exposed through IPC or logs.
+`Config.polkitAgentEnabled` enables Quickshell's native Polkit agent. Real requests appear in a centered authentication panel and block other panel/focus paths. Passwords are masked, submitted directly to the native flow, cleared afterward, and never exposed through IPC or logs.
 
 Existing `hyprpolkitagent.service` was stopped and disabled after native registration and cancellation checks. Both compositor configs no longer launch another agent. Keep the fallback package installed.
 
@@ -63,9 +65,16 @@ Quickshell 0.3.1 with PipeWire, MPRIS, and Polkit modules; Python 3; UDisks2 and
 
 ## Checks
 
-Run from repository root:
+Run from repository root. Select only the checks for the changed features:
 
 ```sh
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-desktop-layout.py
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-notification-popups.py
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-wallpaper-layout.py
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-volume-ui.py
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-scrollbars.py
+PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-notification-controls.py
+node config/quickshell/tests/test-bar-toggle.cjs
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-capture.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-capture-editor.py
 PYTHONDONTWRITEBYTECODE=1 python3 config/quickshell/tests/test-capture-launcher.py
