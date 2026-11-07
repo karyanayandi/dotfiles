@@ -50,7 +50,7 @@ Item {
     }
 
     enabled: !blocked
-    implicitHeight: form.implicitHeight + 48
+    implicitHeight: form.implicitHeight + 2 * Shell.Theme.panelPadding
     implicitWidth: 520
     visible: opened
 
@@ -148,7 +148,7 @@ Item {
     Pane {
         anchors.fill: parent
         font.family: Shell.Theme.fontUi
-        padding: 24
+        padding: Shell.Theme.panelPadding
         palette.text: Shell.Theme.colFg
         palette.windowText: Shell.Theme.colFg
 
@@ -176,13 +176,13 @@ Item {
 
                     Label {
                         font.family: Shell.Theme.fontFamily
-                        font.pixelSize: 22
+                        font.pixelSize: 18
                         text: "\uf108"
                     }
                     Label {
                         Layout.fillWidth: true
-                        font.bold: true
-                        font.pixelSize: 22
+                        font.weight: Font.DemiBold
+                        font.pixelSize: 18
                         text: "Displays"
                     }
                     Panels.PanelButton {

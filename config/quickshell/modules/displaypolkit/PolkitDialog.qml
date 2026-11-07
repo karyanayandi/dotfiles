@@ -23,7 +23,7 @@ Item {
             flow.cancelAuthenticationRequest();
     }
 
-    implicitHeight: form.implicitHeight + 48
+    implicitHeight: form.implicitHeight + 2 * Shell.Theme.panelPadding
     implicitWidth: 480
     visible: opened
 
@@ -83,7 +83,7 @@ Item {
     Pane {
         anchors.fill: parent
         font.family: Shell.Theme.fontUi
-        padding: 24
+        padding: Shell.Theme.panelPadding
         palette.base: Shell.Theme.colBgAlt
         palette.button: Shell.Theme.colBgAlt
         palette.buttonText: Shell.Theme.colFg
@@ -118,13 +118,13 @@ Item {
 
                     Label {
                         font.family: Shell.Theme.fontFamily
-                        font.pixelSize: 22
+                        font.pixelSize: 18
                         text: "\uf023"
                     }
                     Label {
                         Layout.fillWidth: true
-                        font.bold: true
-                        font.pixelSize: 22
+                        font.weight: Font.DemiBold
+                        font.pixelSize: 18
                         text: "Authenticate"
                         wrapMode: Text.Wrap
                     }
@@ -137,6 +137,7 @@ Item {
                 }
                 Label {
                     Layout.fillWidth: true
+                    color: Shell.Theme.colFgDim
                     font.pixelSize: 12
                     text: root.flow ? root.flow.actionId : ""
                     textFormat: Text.PlainText

@@ -41,7 +41,7 @@ Panel {
             text: Qt.formatDate(calendar.month, "MMMM yyyy")
             color: Theme.colFg
             font.family: Theme.fontUi
-            font.pixelSize: 18
+            font.pixelSize: 16
             font.weight: Font.DemiBold
             horizontalAlignment: Text.AlignHCenter
         }
@@ -58,8 +58,8 @@ Panel {
     GridLayout {
         Layout.fillWidth: true
         columns: 7
-        columnSpacing: 4
-        rowSpacing: 4
+        columnSpacing: 2
+        rowSpacing: 2
 
         Repeater {
             model: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]

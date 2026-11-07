@@ -61,7 +61,7 @@ Panel {
                 text: row.player.trackTitle || "Untitled track"
                 color: Theme.colFg
                 font.family: Theme.fontUi
-                font.pixelSize: 20
+                font.pixelSize: 18
                 font.weight: Font.DemiBold
                 wrapMode: Text.WordWrap
             }
@@ -77,7 +77,7 @@ Panel {
 
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 12
+                spacing: 8
                 PanelButton {
                     Accessible.name: "Previous"
                     ToolTip.visible: hovered || visualFocus

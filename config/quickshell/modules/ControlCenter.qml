@@ -26,7 +26,7 @@ Item {
     signal launcherRequested(string mode)
     signal panelRequested(string panel)
 
-    implicitHeight: content.implicitHeight + 28
+    implicitHeight: content.implicitHeight + 2 * Theme.panelPadding
     implicitWidth: 380
     visible: opened
 
@@ -107,7 +107,7 @@ Item {
             id: bodyPane
 
             anchors.fill: parent
-            anchors.margins: 14
+            anchors.margins: Theme.panelPadding
             padding: 0
 
             background: Item {
@@ -116,7 +116,7 @@ Item {
             ColumnLayout {
                 id: content
 
-                spacing: 10
+                spacing: 12
                 width: bodyPane.availableWidth
 
                 RowLayout {
@@ -132,7 +132,7 @@ Item {
                         Layout.fillWidth: true
                         color: Theme.colFg
                         font.family: Theme.fontUi
-                        font.letterSpacing: -0.4
+                        font.letterSpacing: -0.2
                         font.pixelSize: 18
                         font.weight: Font.DemiBold
                         text: "Control center"
@@ -202,7 +202,7 @@ Item {
                     Layout.fillWidth: true
                     color: Theme.colBgAlt
                     implicitHeight: sound.implicitHeight + 20
-                    radius: 22
+                    radius: Theme.radiusCard
 
                     ColumnLayout {
                         id: sound
@@ -350,7 +350,7 @@ Item {
                     Layout.fillWidth: true
                     implicitHeight: codexLimits.implicitHeight + 28
                     color: Theme.colBgAlt
-                    radius: 22
+                    radius: Theme.radiusCard
 
                     Extras.CodexLimits {
                         id: codexLimits
@@ -385,7 +385,7 @@ Item {
             border.color: button.visualFocus ? Theme.colFg : Theme.colBorder
             border.width: button.visualFocus ? 2 : 1
             color: button.down ? Theme.g2 : button.checked ? Theme.colActionBg : button.hovered ? Theme.g2 : Theme.colBgAlt
-            radius: 18
+            radius: Theme.radiusControl
         }
         contentItem: RowLayout {
             spacing: button.glyph && button.text ? 10 : 0

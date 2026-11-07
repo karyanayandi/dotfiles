@@ -26,7 +26,7 @@ CaptureSurface {
         border.color: Theme.colBorderStrong
         // Sample data is intentionally not themed; every UI color comes from Theme.
         color: root.service.hex || Theme.colBgAlt
-        radius: 12
+        radius: Theme.radiusCard
     }
 
     RowLayout {

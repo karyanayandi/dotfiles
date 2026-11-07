@@ -35,7 +35,8 @@ ColumnLayout {
             text: "Removable drives"
             color: Theme.colFg
             font.family: Theme.fontUi
-            font.pixelSize: 16
+            font.pixelSize: 14
+            font.weight: Font.DemiBold
         }
 
         ControlAction {

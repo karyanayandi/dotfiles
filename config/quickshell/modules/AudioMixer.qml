@@ -36,7 +36,7 @@ Panel {
             visible: !!node.audio
             Layout.fillWidth: true
 
-            spacing: 6
+            spacing: 8
 
             RowLayout {
                 Layout.fillWidth: true
@@ -55,7 +55,8 @@ Panel {
                     text: row.node.description || row.node.name
                     color: Theme.colFg
                     font.family: Theme.fontUi
-                    font.weight: Font.Medium
+                    font.pixelSize: 14
+                    font.weight: Font.DemiBold
                     wrapMode: Text.WordWrap
                 }
 
@@ -97,6 +98,7 @@ Panel {
                     text: Math.round((row.node.audio ? row.node.audio.volume : 0) * 100) + "%"
                     color: Theme.colFgDim
                     font.family: Theme.fontUi
+                    font.pixelSize: 12
                     Layout.minimumWidth: 40
                     horizontalAlignment: Text.AlignRight
                 }
