@@ -166,7 +166,7 @@ return {
       elseif prettier_root(nil, { dirname = dir }) then
         formatters = { "prettierd" }
       else
-        formatters = { "oxfmt" }
+        formatters = { "bun_fmt" }
       end
 
       vim.b[bufnr].js_formatter = formatters
@@ -224,6 +224,14 @@ return {
     conform.setup {
       formatters_by_ft = formatters_by_ft,
       formatters = {
+        bun_fmt = {
+          command = "bun",
+          args = { "fmt", "--no-script", "--stdin-filepath", "$FILENAME" },
+          stdin = true,
+          cwd = function(_, ctx)
+            return ctx.dirname
+          end,
+        },
         vp_fmt = {
           command = "vp",
           args = { "fmt", "--stdin-filepath", "$FILENAME" },

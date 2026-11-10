@@ -8,6 +8,31 @@ return {
     local lint = require "lint"
     local uv = vim.uv or vim.loop
 
+    lint.linters.bun_lint = {
+      cmd = "bun",
+      args = {
+        "lint",
+        "--no-script",
+        "--format",
+        "github",
+        "--stdin",
+        "--stdin-filename",
+        function()
+          return vim.api.nvim_buf_get_name(0)
+        end,
+      },
+      stdin = true,
+      stream = "stdout",
+      ignore_exitcode = true,
+      parser = (require "lint.parser").from_pattern(
+        "::([^ ]+) file=(.*),line=(%d+),col=(%d+),endLine=(%d+),endColumn=(%d+),title=(.*)::(.*)",
+        { "severity", "file", "lnum", "col", "end_lnum", "end_col", "code", "message" },
+        { error = vim.diagnostic.severity.ERROR, warning = vim.diagnostic.severity.WARN },
+        { source = "bun-lint" },
+        {}
+      ),
+    }
+
     require("lint").linters.vp_lint = {
       cmd = function()
         local local_binary = vim.fn.fnamemodify("./node_modules/.bin/vp", ":p")
@@ -29,6 +54,7 @@ return {
     local oxlint_root_files = {
       "oxlint.json",
       ".oxlintrc.json",
+      ".oxlintrc.jsonc",
       "oxlint.config.js",
       "oxlint.config.ts",
       ".oxlint.json",
@@ -49,44 +75,42 @@ return {
       return uv.fs_stat(file) ~= nil
     end
 
-    local function has_any_file(files)
-      for _, file in ipairs(files) do
-        if exists(file) then
-          return true
-        end
-      end
-      return false
+    local function has_any_file(dir, files)
+      return vim.fs.find(files, { upward = true, path = dir, limit = 1 })[1] ~= nil
     end
 
-    local function has_vite_plus()
-      if not exists "vite.config.ts" then
+    local function has_vite_plus(dir)
+      local config = vim.fs.find("vite.config.ts", { upward = true, path = dir, limit = 1 })[1]
+      if not config then
         return false
       end
-      if not exists "package.json" then
+      local package = vim.fs.dirname(config) .. "/package.json"
+      if not exists(package) then
         return false
       end
-      local pkg = vim.fn.readfile "package.json"
+      local pkg = vim.fn.readfile(package)
       if not pkg or #pkg == 0 then
         return false
       end
       return table.concat(pkg, "\n"):find "vite%-plus" ~= nil
     end
 
-    local function javascript_linter()
-      if has_vite_plus() then
+    local function javascript_linter(bufnr)
+      local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+      if has_vite_plus(dir) then
         return { "vp_lint" }
-      elseif has_any_file(oxlint_root_files) then
+      elseif has_any_file(dir, oxlint_root_files) then
         return { "oxlint" }
-      elseif has_any_file(biome_root_files) then
+      elseif has_any_file(dir, biome_root_files) then
         return { "biomejs" }
-      elseif has_any_file(eslint_root_files) then
+      elseif has_any_file(dir, eslint_root_files) then
         return { "eslint_d" }
       else
-        return { "oxlint" }
+        return { "bun_lint" }
       end
     end
 
-    local js_linter = javascript_linter()
+    local js_linter = { "bun_lint" }
 
     lint.linters_by_ft = {
       astro = js_linter,
@@ -143,6 +167,9 @@ return {
       if names then
         return names
       end
+      if lint.linters_by_ft[ft] == js_linter then
+        return javascript_linter(bufnr)
+      end
       return lint.linters_by_ft[ft] or {}
     end
 
@@ -166,7 +193,13 @@ return {
       end
       last_lint_tick[bufnr] = tick
       local ft = vim.bo[bufnr].filetype
-      lint.try_lint(buf_linters(bufnr, ft), { ignore_errors = true })
+      vim.api.nvim_buf_call(bufnr, function()
+        local opts = { ignore_errors = true }
+        if lint.linters_by_ft[ft] == js_linter then
+          opts.cwd = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+        end
+        lint.try_lint(active_linters(bufnr, ft), opts)
+      end)
     end
 
     local lint_timer = nil
