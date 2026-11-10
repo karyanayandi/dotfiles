@@ -45,6 +45,33 @@ except where a shared shortcut replaces them. Alt+1–9 now selects tabs,
 not workspaces. Alt+h/l now selects tabs, not panes. Alt+Shift+h/l now
 selects workspaces, not pane swaps.
 
+## Vim navigation
+
+Ctrl+h/j/k/l moves between Neovim splits. At an edge, it moves to the next
+Herdr pane. Outside Herdr, the same keys still use `vim-tmux-navigator`.
+Ctrl+backslash keeps the tmux previous-pane action. Editor maps use normal mode.
+
+Install the CLI plugin once:
+
+```sh
+herdr plugin install paulbkim-dev/vim-herdr-navigation --yes
+```
+
+Neovim installs the same repository through lazy.nvim and loads its editor
+maps. Keep `jq` installed so the CLI plugin can detect Vim.
+
+Desktop uses the local `vim-navigation` mod. Stow
+`herdr-app/mods/vim-navigation/` and select `matugen` or `matugen-herdr`.
+These layouts load the mod without a visible panel. Other layouts need the
+same `floating` entry. The mod checks the focused terminal's foreground
+program with `hc get`, forwards Vim keys with `hc keys`, and uses `pane.go`
+for other programs. Keep the `hc` CLI installed.
+
+These bindings replace shell Ctrl+L (clear screen), Ctrl+K (kill line),
+Ctrl+H (backspace on some terminals), and Ctrl+J (line feed). Use the existing
+Alt/prefix keys to leave programs that capture these keys. Tmux files do not
+change. If tmux runs inside Herdr, Herdr is the outer navigation target.
+
 ## Limits
 
 - Herdr tab shortcuts use indexes 1–9. There is no tmux-style tab 0 binding.
@@ -55,8 +82,6 @@ selects workspaces, not pane swaps.
 - TPM install/update keys, tmux-resurrect save/restore keys, and tmux-yank copy
   keys do not apply to Herdr. Herdr manages its own persistent sessions and
   clipboard support.
-- Vim-aware Ctrl+h/j/k/l routing requires tmux and its navigator plugin. These
-  keys are not captured globally in Herdr. Use prefix+h/j/k/l instead.
 - Prefix+Ctrl+Space is not configured as tmux `send-prefix`.
 - Wallpaper colors now apply to Herdr through Matugen. Edit `base.toml` for
   keys and settings. Do not edit the generated `config.toml`.
