@@ -77,15 +77,28 @@ settings and writes `~/.config/theme/generated/herdr.toml`. `config.toml`
 links to this file. The wallpaper command reloads a running default Herdr
 server. Named sessions need `herdr --session NAME server reload-config`.
 
-Desktop uses `~/.config/herdr-app/themes/matugen.json`. Stow the
-`herdr-app/layouts/matugen.json` file, then select it once:
+Desktop has two Matugen layouts. Stow the files in `herdr-app/layouts/`.
+Both use `~/.config/herdr-app/themes/matugen.json`.
+
+| Layout | Structure |
+| --- | --- |
+| `matugen-herdr` | Default Herdr: spaces and agents sidebar, tabs, Files and Changes panels, status bar |
+| `matugen` | Terminals: tabs in the title bar and terminal panes |
+
+Select the default Herdr version:
+
+```sh
+herdr-app do layout.switch --name matugen-herdr
+```
+
+Select the Terminals version:
 
 ```sh
 herdr-app do layout.switch --name matugen
 ```
 
 Desktop watches the generated theme file. Later wallpaper changes need no
-restart. The Matugen layout keeps the Terminals layout structure but uses
-color names, not fixed hex colors. The original layouts stay unchanged.
+restart. Both layouts use color names, not fixed hex colors. The original
+layouts stay unchanged.
 Other layouts can use the theme through `herdr-app do app.theme --name matugen`;
 fixed layout colors can still override theme colors.

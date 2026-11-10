@@ -17,6 +17,16 @@ def check():
     assert layout["theme"] == "matugen"
     assert "colors" not in layout
     assert not layout.get("background", "").startswith("#")
+    default_path = ROOT / "config/herdr-app/layouts/matugen-herdr.json"
+    default_layout = json.loads(default_path.read_text())
+    assert default_layout["theme"] == layout["theme"]
+    assert default_layout["type"] == "row"
+    assert layout["type"] == "column"
+    assert "colors" not in default_layout
+    assert "#" not in default_path.read_text()
+    assert [node["id"] for node in default_layout["children"]] == ["sidebar", "work"]
+    for mod in ("workspace-chrome", "spaces", "agents", "tabs", "pane", "files", "changes", "workspace-status"):
+        assert f'"mod": "{mod}"' in default_path.read_text()
     with tempfile.TemporaryDirectory(prefix="herdr-theme-") as directory:
         home = Path(directory)
         entries = ["[config]"]
@@ -52,9 +62,9 @@ def check():
                 assert all(before != after for before, after in zip(previous, rendered))
             previous = rendered
         artifact = Path("/tmp/herdr-theme-check.json")
-        artifact.write_text(json.dumps({"cli": cli["theme"], "desktop": desktop}, indent=2) + "\n")
+        artifact.write_text(json.dumps({"cli": cli["theme"], "desktop": desktop, "layouts": {"matugen": layout, "matugen-herdr": default_layout}}, indent=2) + "\n")
         assert json.loads(artifact.read_text())["desktop"] == desktop
-    print("PASS: two Herdr palettes, valid config, preserved keys, Desktop ANSI colors; /tmp/herdr-theme-check.json")
+    print("PASS: two Herdr palettes, valid config, preserved keys, Desktop ANSI colors and both layouts; /tmp/herdr-theme-check.json")
 
 
 if __name__ == "__main__":

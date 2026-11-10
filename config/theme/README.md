@@ -78,8 +78,9 @@ still work.
 - Herdr uses a generated config with Matugen color tokens. Its base settings
   and keys stay in `herdr/base.toml`. The wallpaper command reloads the running
   default server. Named sessions need a separate config reload. Desktop watches
-  `herdr-app/themes/matugen.json`; select the `matugen` layout once to remove
-  fixed layout colors. See `herdr/README.md` for setup.
+  `herdr-app/themes/matugen.json`; select `matugen-herdr` for the default
+  Herdr layout or `matugen` for the Terminals layout. Both use the same live
+  palette without fixed layout colors. See `herdr/README.md` for setup.
 - Pi watches `~/.pi/agent/themes/matugen.json`. It does not watch external cache
   theme paths. Run `/reload` once after this migration; choose `matugen` in
   `/settings` if needed. Later palette changes reload natively.
