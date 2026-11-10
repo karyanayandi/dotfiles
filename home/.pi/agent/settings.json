@@ -16,7 +16,7 @@
   "images": {
     "blockImages": false
   },
-  "lastChangelogVersion": "1.4.0",
+  "lastChangelogVersion": "1.5.2",
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
@@ -52,5 +52,10 @@
   "piBolt": {
     "packages": [],
     "packagesOverlay": true
+  },
+  "extensionChangelogVersions": {
+    "{\"source\":\"npm:pi-mcp-adapter\",\"scope\":\"user\"}": "7.0.1",
+    "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0",
+    "{\"source\":\"npm:pi-tmux-images\",\"scope\":\"user\"}": "0.2.0"
   }
 }
