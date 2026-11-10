@@ -38,5 +38,6 @@
     "session.tab.next": "alt+=",
     "session.tab.previous": "alt+-",
     "model.cycle_recent": "f11"
-  }
+  },
+  "plugins": ["./herdr-opencode"]
 }

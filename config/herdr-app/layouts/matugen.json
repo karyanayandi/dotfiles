@@ -1,0 +1,36 @@
+{
+  "id": "root",
+  "type": "column",
+  "titlebar": "none",
+  "traffic_lights": [16, 18],
+  "theme": "matugen",
+  "font_size": 15,
+  "background": "background",
+  "padding": [6, 6],
+  "gap": 8,
+  "children": [
+    {
+      "id": "tabs",
+      "type": "block",
+      "size": { "px": 38 },
+      "window_drag": true,
+      "content": { "mod": "terminals-bar" }
+    },
+    {
+      "id": "main",
+      "type": "block",
+      "content": {
+        "tab": "active",
+        "pane": {
+          "header": { "content": { "mod": "terminals-pane" }, "height": 38 },
+          "background": "surface",
+          "border": { "width": 1, "color": "border" },
+          "focus": { "width": 1, "color": "accent" },
+          "radius": 12,
+          "gap": 8,
+          "lone": true
+        }
+      }
+    }
+  ]
+}

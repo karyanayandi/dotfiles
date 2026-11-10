@@ -75,6 +75,11 @@ still work.
   these settings into `~/.config/theme/generated/workmux/config.yaml`.
   `~/.config/workmux/config.yaml` links to this output. Generated config edits
   do not survive the next render.
+- Herdr uses a generated config with Matugen color tokens. Its base settings
+  and keys stay in `herdr/base.toml`. The wallpaper command reloads the running
+  default server. Named sessions need a separate config reload. Desktop watches
+  `herdr-app/themes/matugen.json`; select the `matugen` layout once to remove
+  fixed layout colors. See `herdr/README.md` for setup.
 - Pi watches `~/.pi/agent/themes/matugen.json`. It does not watch external cache
   theme paths. Run `/reload` once after this migration; choose `matugen` in
   `/settings` if needed. Later palette changes reload natively.
@@ -97,6 +102,7 @@ Checks:
 ```sh
 python3 config/theme/check.py
 python3 config/theme/test-ghostty.py
+python3 config/theme/test-herdr.py
 sh config/quickshell/tests/test-theme.sh
 python3 config/quickshell/tests/test-monochrome.py
 ```

@@ -119,6 +119,11 @@ else
   matugen "${matugen_args[@]}" image "$image"
 fi
 
+# Herdr broadcasts config changes to attached clients. Desktop watches its theme file.
+if [[ -S $config_home/herdr/herdr.sock ]] && command -v herdr >/dev/null; then
+  herdr server reload-config >/dev/null || echo 'wallpaper-theme: Herdr reload failed.' >&2
+fi
+
 # Workmux watches the config directory, not the generated symlink target.
 if [[ -f $config_home/workmux/config.yaml ]]; then
   touch -h -- "$config_home/workmux/config.yaml"

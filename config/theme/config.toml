@@ -49,6 +49,17 @@ output_path = "~/.config/qt6ct/colors-generated.conf"
 input_path = "./templates/foot.ini"
 output_path = "~/.config/theme/generated/foot.ini"
 
+[templates.herdr-base]
+input_path = "../herdr/base.toml"
+
+[templates.herdr]
+input_path = "./templates/herdr.toml"
+output_path = "~/.config/theme/generated/herdr.toml"
+
+[templates.herdr-app]
+input_path = "./templates/herdr-app.json"
+output_path = "~/.config/herdr-app/themes/matugen.json"
+
 [templates.ghostty]
 input_path = "./templates/ghostty.conf"
 output_path = "~/.config/theme/generated/ghostty"

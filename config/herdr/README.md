@@ -58,8 +58,8 @@ selects workspaces, not pane swaps.
 - Vim-aware Ctrl+h/j/k/l routing requires tmux and its navigator plugin. These
   keys are not captured globally in Herdr. Use prefix+h/j/k/l instead.
 - Prefix+Ctrl+Space is not configured as tmux `send-prefix`.
-- The wallpaper theme template only sets tmux colors. This config does not
-  change Herdr colors.
+- Wallpaper colors now apply to Herdr through Matugen. Edit `base.toml` for
+  keys and settings. Do not edit the generated `config.toml`.
 
 The outer terminal and window manager must pass Alt keys to Herdr. If Herdr
 runs inside tmux with the old config, tmux can capture those keys first.
@@ -69,3 +69,23 @@ runs inside tmux with the old config, tmux can capture those keys first.
 The dotfiles setup uses `stow` from `config/` with `~/.config` as its target.
 Check the config with `herdr config check`. Apply changes to a running server
 with `herdr server reload-config`.
+
+## Wallpaper colors
+
+Run `wallpaper-theme` after you change `base.toml`. Matugen adds the color
+settings and writes `~/.config/theme/generated/herdr.toml`. `config.toml`
+links to this file. The wallpaper command reloads a running default Herdr
+server. Named sessions need `herdr --session NAME server reload-config`.
+
+Desktop uses `~/.config/herdr-app/themes/matugen.json`. Stow the
+`herdr-app/layouts/matugen.json` file, then select it once:
+
+```sh
+herdr-app do layout.switch --name matugen
+```
+
+Desktop watches the generated theme file. Later wallpaper changes need no
+restart. The Matugen layout keeps the Terminals layout structure but uses
+color names, not fixed hex colors. The original layouts stay unchanged.
+Other layouts can use the theme through `herdr-app do app.theme --name matugen`;
+fixed layout colors can still override theme colors.
