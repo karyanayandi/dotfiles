@@ -180,5 +180,11 @@
         }
       ]
     }
+  ],
+  "floating": [
+    {
+      "id": "vim-navigation",
+      "content": { "mod": "vim-navigation" }
+    }
   ]
 }
