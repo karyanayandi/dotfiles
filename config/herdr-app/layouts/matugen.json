@@ -14,7 +14,7 @@
       "type": "block",
       "size": { "px": 38 },
       "window_drag": true,
-      "content": { "mod": "terminals-bar" }
+      "content": { "mod": "matugen-terminals-bar" }
     },
     {
       "id": "main",

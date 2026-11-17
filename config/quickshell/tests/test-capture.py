@@ -8,6 +8,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -27,6 +28,66 @@ class CaptureTests(unittest.TestCase):
 
     def tearDown(self):
         self.capture.close()
+
+    @unittest.skipUnless(shutil.which("magick"), "ImageMagick missing")
+    def test_tmp_cleanup_preserves_capture_and_editing(self):
+        for cache_override in ("", "custom cache"):
+            with self.subTest(cache=cache_override), tempfile.TemporaryDirectory() as root:
+                home = Path(root)
+                system_tmp = home / "tmp"
+                system_tmp.mkdir()
+                cache = home / (cache_override or ".cache")
+                events = []
+                with (
+                    patch.dict(
+                        os.environ,
+                        {
+                            "HOME": str(home),
+                            "XDG_CACHE_HOME": str(cache) if cache_override else "",
+                        },
+                    ),
+                    patch.object(tempfile, "tempdir", str(system_tmp)),
+                ):
+                    capture = module.Capture(events.append)
+                    try:
+                        self.assertEqual(
+                            Path(capture.temp.name).parent, cache / "quickshell"
+                        )
+                        self.assertEqual(
+                            Path(capture.temp.name).stat().st_mode & 0o777, 0o700
+                        )
+                        for path in system_tmp.iterdir():
+                            if path.is_dir():
+                                shutil.rmtree(path)
+                            else:
+                                path.unlink()
+
+                        def capture_image(args, **kwargs):
+                            subprocess.run(
+                                ["magick", "-size", "20x10", "xc:white", args[-1]],
+                                check=True,
+                            )
+                            return b""
+
+                        with (
+                            patch.object(capture, "slurp", return_value="0,0 20x10"),
+                            patch.object(capture, "run", side_effect=capture_image),
+                        ):
+                            capture.screenshot({"mode": "area"})
+                        self.assertEqual(events[-1]["event"], "preview")
+                        capture.edit(
+                            {"operation": "crop", "x": 0, "y": 0, "width": 10, "height": 5}
+                        )
+                        self.assertTrue(capture.png_ready(capture.preview))
+                        with patch.object(capture, "run", return_value=b"") as run:
+                            capture.busy.acquire()
+                            capture.execute({"action": "copy-image"})
+                            self.assertEqual(
+                                run.call_args.kwargs["data"], capture.preview.read_bytes()
+                            )
+                    finally:
+                        capture.close()
+                    self.assertFalse(Path(capture.temp.name).exists())
 
     def test_capture_window_and_stop_button(self):
         modules = Path(__file__).resolve().parents[1] / "modules"

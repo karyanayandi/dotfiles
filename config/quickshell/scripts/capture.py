@@ -28,7 +28,9 @@ class Capture:
         self.thread = None
         self.preview = None
         self.history = []
-        self.temp = tempfile.TemporaryDirectory(prefix="quickshell-capture-")
+        cache = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "quickshell"
+        cache.mkdir(parents=True, exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(prefix="quickshell-capture-", dir=cache)
 
     def run(
         self,

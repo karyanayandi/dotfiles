@@ -102,8 +102,10 @@ settings and writes `~/.config/theme/generated/herdr.toml`. `config.toml`
 links to this file. The wallpaper command reloads a running default Herdr
 server. Named sessions need `herdr --session NAME server reload-config`.
 
-Desktop has two Matugen layouts. Stow the files in `herdr-app/layouts/`.
-Both use `~/.config/herdr-app/themes/matugen.json`.
+Desktop has two Matugen layouts. Stow the files in `herdr-app/layouts/`
+and `herdr-app/mods/matugen-terminals-bar/`. Both layouts use
+`~/.config/herdr-app/themes/matugen.json`. The Terminals layout uses the
+local tab bar mod. It uses icons from the installed `terminals-bar` mod.
 
 | Layout | Structure |
 | --- | --- |
