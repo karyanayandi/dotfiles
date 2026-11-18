@@ -1,17 +1,17 @@
 {
   "collapseChangelog": true,
-  "defaultModel": "gpt-6.1-terra",
+  "defaultModel": "gpt-6.2-sol",
   "defaultProjectTrust": "always",
   "defaultProvider": "openai",
-  "defaultThinkingLevel": "xhigh",
+  "defaultThinkingLevel": "medium",
   "subagents": {
     "defaultModel": "gpt-6.1-terra",
     "defaultThinking": "xhigh",
     "defaultProvider": "openai"
   },
   "editorPaddingX": 3,
-  "enableInstallTelemetry": true,
-  "enableSkillCommands": false,
+  "enableInstallTelemetry": false,
+  "enableSkillCommands": true,
   "hideThinkingBlock": false,
   "images": {
     "blockImages": false
@@ -40,14 +40,15 @@
   },
   "tuiMode": "fullscreen",
   "modelThinkingLevels": {
+    "openai/gpt-6.2-astra": "low",
     "openai/gpt-6-astra": "low",
+    "openai/gpt-6.2-sol": "medium",
     "openai/gpt-6.1-sol": "medium",
+    "openai/gpt-6-sol": "medium",
     "openai/gpt-6.1-terra": "xhigh",
     "openai/gpt-6-luna": "max"
   },
-  "extensions": [
-    "-builtin:mcp"
-  ],
+  "extensions": ["-builtin:mcp"],
   "deviceId": "3dcc8fa1-0ae2-46c9-99f9-a0a6e55df560",
   "piBolt": {
     "packages": [],
