@@ -20,13 +20,14 @@
   "outputPad": 1,
   "packages": [
     "git:github.com/DietrichGebert/ponytail",
+    "npm:@calesennett/pi-codex-fast",
     "npm:context-mode",
     "npm:pi-caveman",
     "npm:pi-mcp-adapter",
     "npm:pi-nvim",
     "npm:pi-observational-memory",
-    "npm:pi-tool-display",
-    "npm:pi-tmux-images"
+    "npm:pi-tmux-images",
+    "npm:pi-tool-display"
   ],
   "quietStartup": true,
   "showHardwareCursor": true,
@@ -57,6 +58,11 @@
   "extensionChangelogVersions": {
     "{\"source\":\"npm:pi-mcp-adapter\",\"scope\":\"user\"}": "7.0.1",
     "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0",
-    "{\"source\":\"npm:pi-tmux-images\",\"scope\":\"user\"}": "0.2.0"
+    "{\"source\":\"npm:pi-tmux-images\",\"scope\":\"user\"}": "0.2.0",
+    "{\"source\":\"npm:@diegopetrucci/pi-fast\",\"scope\":\"user\"}": "0.1.13"
+  },
+  "pi-codex-fast": {
+    "enabled": false,
+    "mode": "off"
   }
 }

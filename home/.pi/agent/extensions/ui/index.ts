@@ -39,6 +39,10 @@ class EmptyFooter implements Component {
   }
 }
 
+const MINIMAL_EDITOR_PADDING = 1
+
+const MINIMAL_PROMPT_INDENT = " ".repeat(MINIMAL_EDITOR_PADDING)
+
 class MinimalFooter implements Component {
   constructor(
     private readonly getStatuses: () => ReadonlyMap<string, string>,
@@ -46,7 +50,11 @@ class MinimalFooter implements Component {
   ) {}
 
   render(width: number) {
-    return renderExtensionStatuses(this.getStatuses(), width, this.dim)
+    return renderExtensionStatuses(
+      this.getStatuses(),
+      width - MINIMAL_PROMPT_INDENT.length,
+      this.dim,
+    ).map((line) => MINIMAL_PROMPT_INDENT + line)
   }
 
   invalidate(): void {
@@ -441,7 +449,7 @@ export default function ui(pi: ExtensionAPI) {
 
         const isMinimal = layout === "minimal"
         this.borderColor = isMinimal ? () => "" : this.defaultBorderColor
-        this.setPaddingX(isMinimal ? 1 : 2)
+        this.setPaddingX(isMinimal ? MINIMAL_EDITOR_PADDING : 2)
         const lines = super.render(width).map(neutralizeFakeCursor)
 
         if (isMinimal) {
@@ -451,7 +459,6 @@ export default function ui(pi: ExtensionAPI) {
 
           const firstEmpty = lines.findIndex((line) => line === "")
           const firstContent = firstEmpty >= 0 ? firstEmpty + 1 : 0
-          const pad = " ".repeat(this.getPaddingX())
 
           if (firstContent < lines.length) {
             let line = lines[firstContent]
@@ -464,20 +471,27 @@ export default function ui(pi: ExtensionAPI) {
               i++
             }
 
-            line = pad + indicator + " " + line.slice(i)
+            line = MINIMAL_PROMPT_INDENT + indicator + " " + line.slice(i)
             lines[firstContent] = truncateToWidth(line, width, "", true)
           }
 
           // Add blank top margin. Drop bottom border.
           const body = lines.filter((line) => line !== "")
+          const infoWidth = width - MINIMAL_PROMPT_INDENT.length
+
+          if (infoWidth <= 0) return ["", ...body]
 
           const info = truncateToWidth(
             `${sanitizeTerminalText(ctx.model?.id ?? "no model")} · ${pi.getThinkingLevel()}`,
-            width,
+            infoWidth,
             "…",
           )
 
-          return ["", ...body, pad + ctx.ui.theme.fg("muted", info)]
+          return [
+            "",
+            ...body,
+            MINIMAL_PROMPT_INDENT + ctx.ui.theme.fg("muted", info),
+          ]
         }
 
         const borderIndices: number[] = []
